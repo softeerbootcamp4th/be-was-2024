@@ -6,11 +6,11 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import readType.ByteReader;
-import readType.ByteReaderFactory;
+import readType.SimpleByteReaderFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final ByteReaderFactory ByteReaderFactory = new ByteReaderFactory();
+    private static final SimpleByteReaderFactory SimpleByteReaderFactory = new SimpleByteReaderFactory();
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -40,9 +40,11 @@ public class RequestHandler implements Runnable {
                 }
             }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            HttpRequest httpRequest = new HttpRequest(method,url,mimeTypeForClient);
 
 
-            ByteReader byteReader = ByteReaderFactory.returnByteReader(mimeTypeForClient);
+
+            ByteReader byteReader = SimpleByteReaderFactory.returnByteReader(httpRequest);
             if(byteReader==null) throw new IOException();
 
             byte[] body = byteReader.readBytes(url);

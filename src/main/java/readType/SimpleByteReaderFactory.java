@@ -1,8 +1,10 @@
 package readType;
 
-public class ByteReaderFactory {
-    public ByteReader returnByteReader(String mimeType){
-        System.out.println(mimeType+":mimeType");
+import webserver.HttpRequest;
+
+public class SimpleByteReaderFactory {
+    public ByteReader returnByteReader(HttpRequest httpRequest){
+        String mimeType = httpRequest.getMimeTypeForClient();
         ByteReader byteReader = null;
         if(mimeType.startsWith("text")) {
             mimeType =mimeType.substring("text".length()+1);
