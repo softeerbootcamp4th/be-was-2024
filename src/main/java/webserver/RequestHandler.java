@@ -1,17 +1,16 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import readType.ByteReader;
+import readType.ByteReaderFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
+    private static final ByteReaderFactory ByteReaderFactory = new ByteReaderFactory();
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -21,11 +20,33 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String methodLine = br.readLine();
+
+            String[] tokens = methodLine.split(" ");
+            String method = tokens[0];
+            String url = tokens[1];
+            String mimeTypeForClient ="";
+
+            System.out.println(methodLine);
+            while(true){
+                String line = br.readLine();
+                if(line.isEmpty()) break;
+                System.out.println(line);
+                if(line.startsWith("Accept: ")){
+                    tokens = line.split(" ");
+                    mimeTypeForClient = tokens[1];
+                }
+            }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+
+
+            ByteReader byteReader = ByteReaderFactory.returnByteReader(mimeTypeForClient);
+            if(byteReader==null) throw new IOException();
+
+            byte[] body = byteReader.readBytes(url);
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
