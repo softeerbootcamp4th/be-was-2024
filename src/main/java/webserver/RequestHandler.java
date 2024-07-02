@@ -32,13 +32,13 @@ public class RequestHandler implements Runnable {
             // keep-alive 모드에서는 별도로 처리하지 않으면 null 반환하지 않고, 그냥 blocking 된다.
             // http header / body는 CR LF로 구분되므로, 공백 기준으로 읽지 않을 수도 없음.
             // readline은 /r or /n이 나오면 새로운 라인으로 판정.
-            List<String> header_lines = new ArrayList<>();
+            List<String> headerLines = new ArrayList<>();
             String buffer;
             while (!(buffer = br.readLine()).isEmpty()) {
-                header_lines.add(buffer);
+                headerLines.add(buffer);
             }
             // body 부분은 나중에 추가적으로 확장
-            HttpRequest request = new HttpRequest(requestLine, header_lines);
+            HttpRequest request = new HttpRequest(requestLine, headerLines);
 
             logger.debug("http method: {}", request.getMethod());
             logger.debug("url: {}", request.getUrl());

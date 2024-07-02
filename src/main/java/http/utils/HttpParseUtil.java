@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HttpParseUtil {
-    public static String[] ParseRequestLine(String requestLine) {
+    public static String[] parseRequestLine(String requestLine) {
         // method url version 정보가 포함되어야 한다. 각각은 공백을 기준으로 나눔.
         List<String> result = new ArrayList<>();
         String[] line_info = requestLine.split(" ");

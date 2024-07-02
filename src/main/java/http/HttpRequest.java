@@ -14,13 +14,13 @@ public class HttpRequest {
     MyHttpHeaders headers;
 
     public HttpRequest(String requestLine, List<String> headerLines) {
-        String[] reqLineTokens = HttpParseUtil.ParseRequestLine(requestLine);
+        String[] reqLineTokens = HttpParseUtil.parseRequestLine(requestLine);
         this.method = HttpMethodTypeUtil.getHttpMethodType(reqLineTokens[0]);
         this.url = reqLineTokens[1];
         this.version = reqLineTokens[2];
 
         headers = new MyHttpHeaders();
-        headers.PutHeaders(headerLines);
+        headers.putHeaders(headerLines);
     }
 
     public String getUrl() {
@@ -36,6 +36,6 @@ public class HttpRequest {
     }
 
     public Map<String, String> getHeaderMap() {
-        return headers.GetHeaders();
+        return headers.getHeaders();
     }
 }

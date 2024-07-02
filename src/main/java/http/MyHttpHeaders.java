@@ -12,13 +12,13 @@ public class MyHttpHeaders {
         headers = new HashMap<>();
     }
 
-    public void PutHeaders(List<String> headerLines) {
+    public void putHeaders(List<String> headerLines) {
         for (String headerLine : headerLines) {
-            PutHeader(headerLine);
+            putHeader(headerLine);
         }
     }
 
-    public void PutHeader(String headerLine) {
+    public void putHeader(String headerLine) {
         // 속성 값 부분에도 : 기호 존재 가능 => 2개만 나누기
         String[] parts = headerLine.split(":", 2);
         // 속성 이름: 값 구조가 아닌 경우 예외 처리
@@ -26,12 +26,12 @@ public class MyHttpHeaders {
         headers.put(parts[0].trim(), parts[1].trim());
     }
 
-    public String GetHeader(String name) {
+    public String getHeader(String name) {
         return headers.get(name);
     }
 
     // 외부에서 변경 불가능한 상태로 맵 공개
-    public Map<String, String> GetHeaders() {
+    public Map<String, String> getHeaders() {
         return Collections.unmodifiableMap(headers);
     }
 }
