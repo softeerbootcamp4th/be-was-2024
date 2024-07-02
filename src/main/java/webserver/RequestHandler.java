@@ -3,9 +3,12 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.HttpRequestParser;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,25 +27,19 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            HttpRequestParser httpRequestParser = new HttpRequestParser(br);
+
+            // 읽은 헤더 로깅
             StringBuilder sb = new StringBuilder();
-
-            // 모든 요청 내용 읽기
-            String startLine = br.readLine();
-
-            String readLine = null;
-            while (!(readLine = br.readLine()).isEmpty()) {
-                sb.append(readLine);
+            Map<String, String> headers = httpRequestParser.getHeaders();
+            for (String key : headers.keySet()) {
+                sb.append(key).append(": ").append(headers.get(key));
             }
 
-            // 읽은 내용 로깅
-            String request = sb.toString();
-            logger.debug(request);
-
+            logger.debug(sb.toString());
 
             // 요청 URL 파싱
-            String[] tokens = startLine.split(" ");
-            String url = tokens[1];
-
+            String url = httpRequestParser.getUrl();
             logger.info("요청 URL: " + url);
 
             // index.html 읽기
@@ -52,10 +49,8 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-//            byte[] body = "<h1>Hello World</h1>".getBytes();
             response200Header(dos, body.length);
             responseBody(dos, body);
-
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
