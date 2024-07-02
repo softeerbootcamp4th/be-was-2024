@@ -5,13 +5,14 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import readType.ByteReader;
-import readType.SimpleByteReaderFactory;
+import returnType.ContentTypeFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final SimpleByteReaderFactory SimpleByteReaderFactory = new SimpleByteReaderFactory();
+    private final ContentTypeFactory contentTypeFactory = new ContentTypeFactory();
+
     private Socket connection;
+    private ResponseMaker responseMaker;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -41,14 +42,9 @@ public class RequestHandler implements Runnable {
             }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = new HttpRequest(method,url,mimeTypeForClient);
+            responseMaker = new ResponseMaker(contentTypeFactory.getContentTypeFactory(httpRequest));
+            responseMaker.makeResponse(httpRequest,out);
 
-            ByteReader byteReader = SimpleByteReaderFactory.returnByteReader(httpRequest);
-            if(byteReader==null) throw new IOException();
-
-            byte[] body = byteReader.readBytes(url);
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
