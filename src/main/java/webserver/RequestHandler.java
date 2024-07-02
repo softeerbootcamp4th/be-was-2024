@@ -23,20 +23,38 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder request = new StringBuilder();
 
-            String line;
-            while((line = reader.readLine()) !=null && !line.isEmpty()){
+            String line = reader.readLine();
+            if (line != null && !line.isEmpty()) {
                 request.append(line).append("\n");
+                String[] tokens = line.split(" ");
+                String url = tokens[1];
+                logger.debug("Requested URL: " + url);
+
+                while ((line = reader.readLine()) != null && !line.isEmpty()) {
+                    request.append(line).append("\n");
+                }
+                logger.debug("HTTP Request Content:\n" + request.toString());
+
+                DataOutputStream dos = new DataOutputStream(out);
+                if("/".equals(url)) {
+                    response200Header(dos, "Hello World!".length());
+                    responseBody(dos, "Hello World!".getBytes());
+                }
+                else {
+                    Path filePath = Paths.get("src/main/resources/static/" + url);
+
+                    if (Files.exists(filePath)) {
+                        byte[] body = Files.readAllBytes(filePath);
+                        response200Header(dos, body.length);
+                        responseBody(dos, body);
+                    } else {
+                        response404Header(dos);
+                    }
+                }
             }
-            logger.debug("HTTP Request Content:\n" + request.toString());
-            DataOutputStream dos = new DataOutputStream(out);
-            Path filePath = Paths.get("src/main/resources/static/index.html");
-            byte[] body = Files.readAllBytes(filePath);
-            response200Header(dos, body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -48,6 +66,21 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Header(DataOutputStream dos) {
+        try {
+            String body = "<html><body><h1>404 Not Found</h1></body></html>";
+            byte[] bodyBytes = body.getBytes();
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.write(bodyBytes, 0, bodyBytes.length);
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
