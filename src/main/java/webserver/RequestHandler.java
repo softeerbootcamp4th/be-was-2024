@@ -2,13 +2,9 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
-import com.sun.security.jgss.GSSUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.ThreadPoolExecutor;
 
 
 public class RequestHandler implements Runnable {
@@ -36,7 +32,12 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("src/main/resources/static" + path).toPath());
+            File file = new File("src/main/resources/static" + path);
+
+            //io를 사용하여 파일 읽어오기
+            InputStream fileInputStream = new FileInputStream(file);
+            byte[] body = fileInputStream.readAllBytes();
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
