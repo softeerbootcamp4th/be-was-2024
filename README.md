@@ -41,8 +41,10 @@ java io의 FileInputStream을 이용하여 byte array로 읽는게 가능하다.
 File html = new File("src/main/resources/static" + url);
 byte[] body = new byte[(int) html.length()];
 
-try (FileInputStream fileInputStream = new FileInputStream(html)) {
-	fileInputStream.read(body);
+// 버퍼를 사용하면 빠르게 가져올 수 있음
+try (FileInputStream fileInputStream = new FileInputStream(html);
+BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);) {
+        bufferedInputStream.read(body);
 }
 ```
 
