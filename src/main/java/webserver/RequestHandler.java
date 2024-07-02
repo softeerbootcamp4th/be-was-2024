@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.RequestParser;
 
 
 public class RequestHandler implements Runnable {
@@ -24,7 +25,7 @@ public class RequestHandler implements Runnable {
             //inputStream을 문자열로 변환
             BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = buffer.readLine();
-            String path = line.split(" ")[1];
+            String path = RequestParser.parseUriFromRequestHeader(line);
 
             while (!line.isEmpty()) {
                 logger.debug(line);
