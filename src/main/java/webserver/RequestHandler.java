@@ -25,16 +25,7 @@ public class RequestHandler implements Runnable {
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
 
-            String line = br.readLine();
-            String url = line.split(" ")[1];
-
-            String request = "";
-            while (!line.equals("")) {
-                request += line + "\n";
-                line = br.readLine();
-            }
-            logger.debug("\n\n***** REQUEST *****\n" + request);
-
+            String url = RequestLogging.printRequest(br);
 
             if (url.equals("/")) {
                 byte[] body = "<h1>Hello World</h1>".getBytes();
