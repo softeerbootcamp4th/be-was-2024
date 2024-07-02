@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,22 +18,25 @@ public class Request{
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public Request(BufferedReader br) throws IOException {
-        requestLineParse(br);
+        requestLineParse(br.readLine());
         httpHeaders = new ConcurrentHashMap<>();
-        requestHeaderParse(br);
+        List<String> headerLines = new ArrayList<>();
+        String tmp;
+        while((tmp = br.readLine()) != null && !tmp.isEmpty()) {
+            headerLines.add(tmp);
+        }
+        requestHeaderParse(headerLines);
     }
 
-    private void requestHeaderParse(BufferedReader br) throws IOException {
-        String tmp;
-        while((tmp = br.readLine())!=null && !tmp.isEmpty()) {
-            logger.debug("header " + tmp);
-            String[] headerLine = tmp.split(": ");
-            httpHeaders.put(headerLine[0], headerLine[1]);
+    public void requestHeaderParse(List<String> headerLines) throws IOException {
+        for(String headerLine: headerLines) {
+            logger.debug("header " + headerLine);
+            String[] headerkv = headerLine.split(": ");
+            httpHeaders.put(headerkv[0], headerkv[1]);
         }
     }
 
-    private void requestLineParse(BufferedReader br) throws IOException {
-        String requestLine = br.readLine();
+    public void requestLineParse(String requestLine) throws IOException {
         logger.debug("requestLine " + requestLine);
         String[] s = requestLine.split(" ");
         this.method = s[0];
