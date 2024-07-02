@@ -47,23 +47,16 @@ public class RequestHandler implements Runnable {
                 String email = params[3].split("=")[1];
 
                 Database.addUser(new User(userId, password, name, email));
-                path += "/index.html";
+
+                String redirectResponse = "HTTP/1.1 302 Found\r\n" +
+                        "Location: /\r\n" +
+                        "Content-Length: 0\r\n" +
+                        "\r\n";
+
+                out.write(redirectResponse.getBytes());
             } else {
                 path += url;
             }
-
-//            if (splitURL[0].equals("/")) {
-//                url += "index.html";
-//            } else if (splitURL[0].equals("/registration")) {
-//                url += "index.html";
-//                String[] params = splitURL[1].split("&");
-//
-//                for (String param : params) {
-//                    System.out.println("param = " + param);
-//                }
-//
-
-//            }
 
             byte[] body = FileHandler.getFileContent(path);
             String[] tokens = url.split("\\.");
