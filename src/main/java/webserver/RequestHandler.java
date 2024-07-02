@@ -24,6 +24,7 @@ public class RequestHandler implements Runnable {
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             StringBuilder reqHeader = new StringBuilder();
 
+            // Request Header 출력
             String reqLine = reader.readLine(), line;
             reqHeader.append("  ").append(reqLine).append("\n");
             while ((line = reader.readLine()) != null && !line.equals("")) {
@@ -31,20 +32,21 @@ public class RequestHandler implements Runnable {
             }
             logger.debug("\n:: Request ::\n{}", reqHeader.toString());
 
-            String path = reqLine.split(" ")[1];
+            // Request 처리
+            RequestInformation reqInfo = new RequestInformation(reqLine);
 
-            if (path.equals("/")) { path = "/index.html"; }
+            String path = reqInfo.getPath();
 
             byte[] body = readFileToBytes("./src/main/resources/static" + path);
-//            byte[] body = Files.readAllBytes(new File("./src/main/resources/static" + path).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, body.length);
+            response200Header(dos, reqInfo.getContentType(), body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
+
 
     private static byte[] readFileToBytes(String filePath) throws IOException {
         File file = new File(filePath);
@@ -57,10 +59,10 @@ public class RequestHandler implements Runnable {
         return bytes;
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
