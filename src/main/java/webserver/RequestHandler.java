@@ -6,6 +6,8 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static util.Utils.*;
+
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -21,18 +23,13 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            StringBuilder sb = new StringBuilder();
-
-            while(br.ready()){
-                sb.append(br.readLine())
-                        .append("\n");
-            }
-
-            logger.debug(sb.toString());
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+
+            String request = getAllStrings(in);
+            logger.debug(request);
+
+            byte[] body = getFile(getUrl(request));
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
