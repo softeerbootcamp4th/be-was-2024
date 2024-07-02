@@ -33,9 +33,9 @@ public class RequestHandler implements Runnable {
                 String line; // 읽어들일 라인
                 String url = ""; // 요청 파일
                 while (!(line = br.readLine()).isEmpty()) {
+                    logger.debug(line); // 읽어들인 라인 출력
                     // 요청이 GET일 경우
                     if (urlParser.getHttpMethod(line).equals("GET")) {
-                        logger.debug(line);
                         // 요청 파일 받아오기
                         url = urlParser.getGetURL(line);
                     }
