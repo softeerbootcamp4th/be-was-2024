@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.HttpRequestParser;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,7 +24,7 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine(); // Request Line (ex: "GET /index.html HTTP/1.1")
-            String[] requestLine = getRequestLineElements(line);
+            String[] requestLine = HttpRequestParser.parseRequestLine(line);
             while(!line.isEmpty()) {
                 logger.debug("header: {}", line);
                 line = br.readLine();
@@ -40,13 +41,6 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
-
-    private String[] getRequestLineElements(String requestLine){
-        // 0: RequestType (ex: GET)
-        // 1: RequestURI (ex: /index.html)
-        // 2: HTTP version (ex: HTTP/1.1
-        return requestLine.split(" ");
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
