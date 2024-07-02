@@ -1,6 +1,5 @@
 package webserver;
 
-import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 
