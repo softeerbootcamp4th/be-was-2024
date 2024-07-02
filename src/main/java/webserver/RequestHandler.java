@@ -28,7 +28,7 @@ public class RequestHandler implements Runnable {
 
             String line;
             StringBuilder sb = new StringBuilder("\n");
-            while (!(line = bufferedReader.readLine()).isEmpty()){ //null check는 broken pipe 에러를 발생시킨다.
+            while (!(line = bufferedReader.readLine()).isEmpty()){ //null check only는 broken pipe 에러를 발생시킨다.
                 if(isFirstLine){
                     String[] tokens = line.split(" ");
                     requestURL = tokens[1];
@@ -49,6 +49,7 @@ public class RequestHandler implements Runnable {
         File file = new File("src/main/resources/static" + requestURL);
 
         if(!file.exists()){
+            //이 부분에서 보기 좋은 에러페이지 html 파일을 읽어들여서 내보내면 더 좋을듯
             byte[] body = "<h1>Page Not Found!</h1>".getBytes();
             responseHeader(dos, body.length, HttpStatus.SC_NOT_FOUND);
             responseBody(dos, body);
@@ -80,6 +81,7 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         } catch (IllegalStateException ie){
+            logger.error(ie.getMessage());
             byte[] body = "<h1>Server Error</h1>".getBytes();
             responseHeader(dos, body.length, HttpStatus.SC_INTERNAL_SERVER_ERROR);
             responseBody(dos, body);
