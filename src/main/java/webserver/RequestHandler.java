@@ -8,6 +8,8 @@ import com.sun.security.jgss.GSSUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadPoolExecutor;
+
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -29,8 +31,8 @@ public class RequestHandler implements Runnable {
             String path = line.split(" ")[1];
 
             while (!line.isEmpty()) {
-                line=buffer.readLine();
                 logger.debug(line);
+                line=buffer.readLine();
             }
 
             DataOutputStream dos = new DataOutputStream(out);
