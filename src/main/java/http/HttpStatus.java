@@ -48,7 +48,7 @@ public class HttpStatus {
     public static final int SC_NETWORK_AUTHENTICATION_REQUIRED = 511;
 
 
-    public String getStautusString(int statusCode) throws IllegalStateException {
+    public static String getStautusString(int statusCode) throws IllegalStateException {
         return switch (statusCode) {
             case SC_OK -> "OK";
             case SC_CREATED -> "Created";
