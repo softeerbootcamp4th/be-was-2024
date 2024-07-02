@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +35,8 @@ public class RequestHandler implements Runnable {
 
             if (path.equals("/")) { path = "/index.html"; }
 
-            byte[] body = Files.readAllBytes(new File("./src/main/resources/static" + path).toPath());
+            byte[] body = readFileToBytes("./src/main/resources/static" + path);
+//            byte[] body = Files.readAllBytes(new File("./src/main/resources/static" + path).toPath());
 
             DataOutputStream dos = new DataOutputStream(out);
             response200Header(dos, body.length);
@@ -44,6 +44,17 @@ public class RequestHandler implements Runnable {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private static byte[] readFileToBytes(String filePath) throws IOException {
+        File file = new File(filePath);
+        byte[] bytes = new byte[(int) file.length()];
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.read(bytes);
+        }
+
+        return bytes;
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
