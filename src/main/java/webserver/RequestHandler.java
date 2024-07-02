@@ -2,7 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
+import data.HttpRequestMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,20 +25,56 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String str= bufferedReader.readLine();
-            logger.debug(str);
-            String uri = str.split(" ")[1];
-            while (!(str = bufferedReader.readLine()).equals("")) {
-                logger.debug(str);
-            }
-            File file = new File("src/main/resources/static" + uri);
+            String requestString = getRequestString(in);
+            logger.debug(requestString);
+            HttpRequestMessage httpRequestMessage = getHttpRequestMessage(requestString);
+
+            File file = new File("src/main/resources/static" + httpRequestMessage.getUri());
             byte[] body = readAllBytesFromFile(file);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private String getRequestString(InputStream in) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        String tempStr;
+        StringBuilder stringBuilder = new StringBuilder();
+        while (!(tempStr = bufferedReader.readLine()).equals("")) {
+            stringBuilder.append(tempStr);
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
+    private HttpRequestMessage getHttpRequestMessage(String requestMessage){
+        String[] messageSplit = requestMessage.split("\n\n",2);
+        String headerPart = messageSplit[0];
+        String bodyPart = "";
+        try {
+             bodyPart = messageSplit[1];
+        }
+        catch (Exception e){
+            logger.debug("no body");
+        }
+        String[] headerSplit = headerPart.split("\n",2);
+        String startLine = headerSplit[0];
+
+        String[] startLineSplit = startLine.split(" ");
+        String method = startLineSplit[0];
+        String uri = startLineSplit[1];
+        String version = startLineSplit[2];
+
+        String[] headerArray =  headerSplit[1].split("\n");
+        Map<String, String> headers = new HashMap<>();
+        for (String header : headerArray) {
+            String[] headerParts = header.split(": ", 2);
+            headers.put(headerParts[0], headerParts[1]);
+        }
+
+        return new HttpRequestMessage(method,uri,version,headers,bodyPart);
     }
 
     private byte[] readAllBytesFromFile(File file) throws IOException {
