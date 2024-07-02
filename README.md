@@ -209,6 +209,22 @@ ThreadPool 은 매번 스레드를 시작 및 종료하는 것이 아니라 미�
 
 > newCachedThreadPool() 을 사용해 필요한 만큼의 스레드풀을 생성할 수도 있다.
 
+#### Executors.newFixedThreadPool();
+
+> ExecutorService executor = Executors.newFixedThreadPool(30);
+
+<img width="1050" alt="image" src="https://github.com/min9805/min9805.github.io/assets/56664567/bfdb0bda-4392-4130-8bef-32ee738567ab">
+
+newFixedThreadPool() 은 실제 미리 스레드를 모두 만들어놓는다. 때문에 계속해서 요청을 보내게되면 1~30 번까지의 스레드를 모두 이용하고 다시 1번 스레드부터 순서대로 사용하게 된다.
+
+#### Executors.newCachedThreadPool();
+
+> ExecutorService executor = Executors.newCachedThreadPool();
+
+<img width="1058" alt="image" src="https://github.com/min9805/min9805.github.io/assets/56664567/7727b9d4-e052-4599-96fe-4e77ee49e075">
+
+반면에 newCachedThreadPool() 같은 경우에는 미리 스레드를 만들어놓지 않고 실제 사용되는 만큼의 스레드만 생성한다. 때문에 실제 결과에서도 1~10 번까지의 스레드들이 재사용되는 것을 볼 수 있다.
+
 ### Callable, Future
 
 기존 Runnable 인터페이스는 결과를 반환할 수 없다는 문제가 있다.
@@ -249,8 +265,6 @@ public interface Future<V> {
 기본적으로 Future 을 기반으로 외부에서 완료시킬 수 있기에 CompletableFuture 이다.
 즉, 몇 초 이내로 응답이 안오면 기본값을 반환시키는 등의 작업이 가능해졌다.
 뿐만 아니라 콜백 등록 및 Future 조합도 가능하기에 다방면으로 활용할 수 있다.
-
-public class HttpHeaders implements MultiValueMap<String, String>, Serializable {
 
 ## 웹 서버 With Spring
 
