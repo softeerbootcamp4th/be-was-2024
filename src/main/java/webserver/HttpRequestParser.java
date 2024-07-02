@@ -14,13 +14,19 @@ public class HttpRequestParser {
         }
     }
 
-    public static String parseRequestAccept(String requestLine) {
-        String[] tokens = requestLine.split(",");
+    public static String parseRequestContentType(String requestLine) {
+        String[] pathParts = requestLine.split("/");
+        if (pathParts.length < 1) {
+            return null;
+        }
+        String lastPathPart = pathParts[pathParts.length - 1];
 
-        if (tokens.length >= 1) {
-            return tokens[0];
+        // 파일 이름에서 확장자 추출
+        int lastDotIndex = lastPathPart.lastIndexOf('.');
+        if (lastDotIndex != -1) {
+            return lastPathPart.substring(lastDotIndex + 1);
         } else {
-            throw new IllegalArgumentException("Invalid HTTP request line: " + requestLine);
+            return null;
         }
     }
 }

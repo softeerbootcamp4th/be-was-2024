@@ -31,6 +31,14 @@ public class RequestHandler implements Runnable {
 
             line = br.readLine();
             String uri = HttpRequestParser.parseRequestURI(line);
+            String extension = HttpRequestParser.parseRequestContentType(uri);
+
+
+            String contentType = ContentType.html.getContentType();
+            if (extension != null) {
+                contentType = ContentType.valueOf(extension).getContentType();
+            }
+
             requestBuilder.append(line).append("\n");
 
             // 요청 메시지를 한 줄씩 읽어 StringBuilder 에 추가
@@ -44,9 +52,7 @@ public class RequestHandler implements Runnable {
                 }
             }
 
-            String contentType = HttpRequestParser.parseRequestAccept(headers.get("Accept"));
-
-            logger.debug("HTTP Request : {}", requestBuilder);
+//            logger.debug("HTTP Request : {}", requestBuilder);
 
             // Response
 
