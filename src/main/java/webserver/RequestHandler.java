@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -40,7 +40,6 @@ public class RequestHandler implements Runnable {
             path += url;
 
             byte[] body = FileHandler.getFileContent(path);
-
             String[] tokens = url.split("\\.");
             String type = tokens[tokens.length - 1];
 
@@ -71,16 +70,17 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private String getContentType(String type){
-        String contentType = "*/*";
-
-        if (type.equals("html")) contentType =  "text./css";
-        else if (type.equals("css")) contentType =  "text/css";
-        else if (type.equals("js")) contentType =  "text/javascript";
-        else if (type.equals("ico")) contentType =  "image/vnd.microsoft.icon";
-        else if (type.equals("png")) contentType =  "image/png";
-        else if (type.equals("jpg")) contentType =  "image/jpg";
-        else if (type.equals("svg")) contentType =  "image/svg+xml";
+    private String getContentType(String type) {
+        String contentType = switch (type) {
+            case "html" -> "text./css";
+            case "css" -> "text/css";
+            case "js" -> "text/javascript";
+            case "ico" -> "image/vnd.microsoft.icon";
+            case "png" -> "image/png";
+            case "jpg" -> "image/jpg";
+            case "svg" -> "image/svg+xml";
+            default -> "*/*";
+        };
 
         return contentType;
     }
