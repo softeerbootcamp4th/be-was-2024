@@ -2,8 +2,8 @@ package common;
 
 public class WebUtils {
 
-    public static boolean isMethodHeader(String keyword) {
-        return keyword.equals("GET") || keyword.equals("POST") || keyword.equals("PUT") || keyword.equals("PATCH") || keyword.equals("DELETE");
+    public static boolean isMethodHeader(String method) {
+        return method.equals("GET") || method.equals("POST") || method.equals("PUT") || method.equals("PATCH") || method.equals("DELETE");
     }
 
     public static String getProperContentType(String extension) {
@@ -17,5 +17,9 @@ public class WebUtils {
             case "svg" -> "image/svg+xml";
             default -> null;
         };
+    }
+
+    public static boolean isRESTRequest(String path) {
+        return path.split("\\.").length==1;
     }
 }

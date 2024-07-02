@@ -31,7 +31,7 @@ public class WebServer {
             // 클라이언트가 연결될 때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                threadPool.execute(new RequestHandler(connection));
+                threadPool.execute(new RequestHandler(connection, new WebAdapter()));
             }
         } catch (IOException e) {
             logger.error("Server Start Error: " + e.getMessage());
