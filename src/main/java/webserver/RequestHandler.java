@@ -71,8 +71,8 @@ public class RequestHandler implements Runnable {
     }
 
     private String getContentType(String type) {
-        String contentType = switch (type) {
-            case "html" -> "text./css";
+        return switch (type) {
+            case "html" -> "text/html";
             case "css" -> "text/css";
             case "js" -> "text/javascript";
             case "ico" -> "image/vnd.microsoft.icon";
@@ -81,7 +81,5 @@ public class RequestHandler implements Runnable {
             case "svg" -> "image/svg+xml";
             default -> "*/*";
         };
-
-        return contentType;
     }
 }
