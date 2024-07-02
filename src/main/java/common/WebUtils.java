@@ -6,6 +6,14 @@ public class WebUtils {
         return method.equals("GET") || method.equals("POST") || method.equals("PUT") || method.equals("PATCH") || method.equals("DELETE");
     }
 
+    public static boolean isGetRequest(String method) {
+        return method.equals("GET");
+    }
+
+    public static boolean isPostRequest(String method) {
+        return method.equals("POST");
+    }
+
     public static String getProperContentType(String extension) {
         return switch (extension) {
             case "html" -> "text/html";
