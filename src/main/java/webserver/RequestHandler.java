@@ -77,7 +77,7 @@ public class RequestHandler implements Runnable {
 
     private String mapUri(String uri){
         return switch (uri){
-            case "/registration" -> "/registration/index.html";
+            case "/registration.html" -> "/registration/index.html";
             default -> uri;
         };
     }
