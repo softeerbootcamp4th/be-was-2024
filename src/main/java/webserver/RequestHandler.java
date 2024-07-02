@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,19 +23,24 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-            String str;
-            str = bufferedReader.readLine();
+            String str= bufferedReader.readLine();
             logger.debug(str);
             String uri = str.split(" ")[1];
-            while (!(str = bufferedReader.readLine()).equals("")){
+            while (!(str = bufferedReader.readLine()).equals("")) {
                 logger.debug(str);
             }
-            byte[] body = Files.readAllBytes(new File("src/main/webapp" + uri).toPath());
+            File file = new File("src/main/resources/static" + uri);
+            byte[] body = readAllBytesFromFile(file);
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private byte[] readAllBytesFromFile(File file) throws IOException {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        return fileInputStream.readAllBytes();
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
