@@ -36,7 +36,7 @@ public class WebServer {
             {
                 try
                 {
-                    threadPool.execute(new RequestHandler(connection));
+                    threadPool.submit(new RequestHandler(connection));
                 }
                 catch(Exception a) {
                     logger.error(a.getMessage());
