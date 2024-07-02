@@ -2,9 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +36,14 @@ public class RequestHandler implements Runnable {
                 logger.debug("HTTP Request Content:\n" + request.toString());
 
                 DataOutputStream dos = new DataOutputStream(out);
-                if("/".equals(url)) {
+                if ("/".equals(url)) {
                     response200Header(dos, "Hello World!".length());
                     responseBody(dos, "Hello World!".getBytes());
-                }
-                else {
-                    Path filePath = Paths.get("src/main/resources/static/" + url);
+                } else {
+                    File file = new File("src/main/resources/static" + url);
 
-                    if (Files.exists(filePath)) {
-                        byte[] body = Files.readAllBytes(filePath);
+                    if (file.exists() && !file.isDirectory()) {
+                        byte[] body = readFileToByteArray(file);
                         response200Header(dos, body.length);
                         responseBody(dos, body);
                     } else {
@@ -57,6 +53,17 @@ public class RequestHandler implements Runnable {
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private byte[] readFileToByteArray(File file) {
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] data = new byte[(int) file.length()];
+            fis.read(data);
+            return data;
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return null;
         }
     }
 
