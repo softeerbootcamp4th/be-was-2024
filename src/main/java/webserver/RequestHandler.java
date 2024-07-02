@@ -25,6 +25,7 @@ public class RequestHandler implements Runnable {
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
 
+            // 로그 출력 후 요청 주소 반환
             String url = RequestLogging.printRequest(br);
 
             if (url.equals("/")) {
@@ -35,22 +36,7 @@ public class RequestHandler implements Runnable {
             }
 
             String path = "./src/main/resources/static" + url;
-            String str = "";
-            byte[] body = new byte[0];
-
-            try {
-                br = new BufferedReader(new FileReader(path));
-                String fileLine = br.readLine();
-
-                while (fileLine != null) {
-                    str += fileLine;
-                    fileLine = br.readLine();
-                }
-                body = str.getBytes();
-
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
+            byte[] body = FileHandler.getFileContent(path);
 
             String[] tokens = url.split("\\.");
             String type = tokens[tokens.length - 1];
