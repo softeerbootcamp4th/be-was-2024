@@ -1,5 +1,6 @@
 package webserver;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 
@@ -22,24 +23,31 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
 
-            InputStreamReader isr = new InputStreamReader(in, "UTF-8");
+            InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
 
             String line = br.readLine();
-            logger.debug("request = " + line);
-            String[] tokens = line.split(" ");
-            String url = tokens[1];
+            String url = line.split(" ")[1];
+
+            String request = "";
+            while (!line.equals("")) {
+                request += line + "\n";
+                line = br.readLine();
+            }
+            logger.debug("\n\n***** REQUEST *****\n" + request);
+
 
             if (url.equals("/")) {
                 byte[] body = "<h1>Hello World</h1>".getBytes();
-                response200Header(dos, body.length);
+                response200Header(dos, body.length, "text/html");
                 responseBody(dos, body);
-
+                return;
             }
 
             String path = "./src/main/resources/static" + url;
             String str = "";
             byte[] body = new byte[0];
+
             try {
                 br = new BufferedReader(new FileReader(path));
                 String fileLine = br.readLine();
@@ -49,27 +57,32 @@ public class RequestHandler implements Runnable {
                     fileLine = br.readLine();
                 }
                 body = str.getBytes();
+
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error(e.getMessage());
             }
 
-            while (line.isEmpty()) {
-                logger.debug("request = " + line);
-                line = br.readLine();
-            }
+            String[] tokens = url.split("\\.");
+            String type = tokens[tokens.length - 1];
 
-            response200Header(dos, body.length);
+            if(type.equals("html")) response200Header(dos, body.length, "text/html");
+            else if(type.equals("css")) response200Header(dos, body.length, "text/css");
+            else if(type.equals("js")) response200Header(dos, body.length, "text/javascript");
+            else if(type.equals("ico")) response200Header(dos, body.length, "image/vnd.microsoft.icon");
+            else if(type.equals("png")) response200Header(dos, body.length, "image/png");
+            else if(type.equals("jpg")) response200Header(dos, body.length, "image/jpg");
+            else if(type.equals("svg")) response200Header(dos, body.length, "image/svg+xml");
+
             responseBody(dos, body);
-
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String type) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + type + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
