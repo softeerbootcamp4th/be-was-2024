@@ -26,7 +26,7 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             String line = br.readLine();
             logger.debug("request line : {} ",line);
-            String url = parseUrl(line);
+            String url = line.split(" ")[1];
             System.out.println(url);
             while(!line.equals(""))
             {
@@ -36,7 +36,7 @@ public class RequestHandler implements Runnable {
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = Files.readAllBytes(new File("src/main/resources/static/"+url).toPath());
+            byte[] body = Files.readAllBytes(new File("src/main/resources/static"+url).toPath());
 
             response200Header(dos,body.length);
             responseBody(dos, body);
@@ -66,11 +66,4 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private String parseUrl(String header)
-    {
-        String[] tokens = header.split("/");
-        String[] ntokens= tokens[1].split(" ");
-
-        return ntokens[0];
-    }
 }
