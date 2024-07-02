@@ -1,9 +1,12 @@
-package readType;
+package byteReader;
 
 import java.io.FileInputStream;
 
-public class StaticHtmlByteReader implements ByteReader {
-    private final String FILE_BASE_URL ="./src/main/resources/static";
+public interface StaticByteReader extends ByteReader{
+    final String FILE_BASE_URL ="./src/main/resources/static";
+}
+
+class StaticFileByteReader implements StaticByteReader{
     @Override
     public byte[] readBytes(String url)  {
         try{
