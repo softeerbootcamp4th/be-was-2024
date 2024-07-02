@@ -29,11 +29,11 @@ public class RequestHandler implements Runnable {
             String url = tokens[1];
             String mimeTypeForClient ="";
 
-            System.out.println(methodLine);
+            logger.debug(methodLine);
             while(true){
                 String line = br.readLine();
                 if(line.isEmpty()) break;
-                System.out.println(line);
+                logger.debug(line);
                 if(line.startsWith("Accept: ")){
                     tokens = line.split(" ");
                     mimeTypeForClient = tokens[1];
