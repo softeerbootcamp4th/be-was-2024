@@ -13,4 +13,14 @@ public class HttpRequestParser {
             throw new IllegalArgumentException("Invalid HTTP request line: " + requestLine);
         }
     }
+
+    public static String parseRequestAccept(String requestLine) {
+        String[] tokens = requestLine.split(",");
+
+        if (tokens.length >= 1) {
+            return tokens[0];
+        } else {
+            throw new IllegalArgumentException("Invalid HTTP request line: " + requestLine);
+        }
+    }
 }

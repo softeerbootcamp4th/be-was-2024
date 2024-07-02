@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -25,16 +27,24 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             StringBuilder requestBuilder = new StringBuilder();
             String line;
+            Map<String, String> headers = new HashMap<>();
 
             line = br.readLine();
             String uri = HttpRequestParser.parseRequestURI(line);
             requestBuilder.append(line).append("\n");
-            logger.debug("uri : {}", uri);
 
             // 요청 메시지를 한 줄씩 읽어 StringBuilder 에 추가
             while ((line = br.readLine()) != null && !line.isEmpty()) {
                 requestBuilder.append(line).append("\n");
+                int index = line.indexOf(':');
+                if (index > 0) {
+                    String headerName = line.substring(0, index).trim();
+                    String headerValue = line.substring(index + 1).trim();
+                    headers.put(headerName, headerValue);
+                }
             }
+
+            String contentType = HttpRequestParser.parseRequestAccept(headers.get("Accept"));
 
             logger.debug("HTTP Request : {}", requestBuilder);
 
@@ -42,19 +52,19 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            byte[] body = fileContentReader.readStaticResource(uri);
+            byte[] body = FileContentReader.readStaticResource(uri);
 
-            response200Header(dos, body.length);
+            response200Header(dos, contentType, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
