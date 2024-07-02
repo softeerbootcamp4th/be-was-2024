@@ -28,7 +28,6 @@ public class RequestHandler implements Runnable {
             String requestString = getRequestString(in);
             logger.debug(requestString);
             HttpRequestMessage httpRequestMessage = getHttpRequestMessage(requestString);
-
             File file = new File("src/main/resources/static" + httpRequestMessage.getUri());
             byte[] body = readAllBytesFromFile(file);
             response200Header(dos, body.length);
@@ -53,12 +52,10 @@ public class RequestHandler implements Runnable {
         String[] messageSplit = requestMessage.split("\n\n",2);
         String headerPart = messageSplit[0];
         String bodyPart = "";
-        try {
-             bodyPart = messageSplit[1];
+        if (messageSplit.length > 1) {
+            bodyPart = messageSplit[1];
         }
-        catch (Exception e){
-            logger.debug("no body");
-        }
+
         String[] headerSplit = headerPart.split("\n",2);
         String startLine = headerSplit[0];
 
