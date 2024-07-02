@@ -15,7 +15,7 @@ public class WebServer {
 
     public static void main(String args[]) throws Exception {
         int port = 0;
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = Executors.newFixedThreadPool(10); // thread 갯수 제한을 위한 thread pool
 
         if (args == null || args.length == 0) {
             port = DEFAULT_PORT;
@@ -30,7 +30,7 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                executor.submit(new RequestHandler(connection));
+                executor.submit(new RequestHandler(connection)); // 요청이 올 시에 executor queue에 작업 추가
             }
         }
     }
