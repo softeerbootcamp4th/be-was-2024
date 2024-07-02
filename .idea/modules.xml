@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/be-was-neon.iml" filepath="$PROJECT_DIR$/.idea/modules/be-was-neon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/be-was-neon.main.iml" filepath="$PROJECT_DIR$/.idea/modules/be-was-neon.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/be-was-neon.test.iml" filepath="$PROJECT_DIR$/.idea/modules/be-was-neon.test.iml" />
+    </modules>
+  </component>
+</project>
