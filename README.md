@@ -19,7 +19,7 @@
     서버로 들어오는 HTTP Request의 내용을 읽고 적절하게 파싱해서 로거(log.debug)를 이용해 출력한다.
 
 #### 코드 수정사항
-WebServer.java
+- WebServer.java
 ```java
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -49,7 +49,7 @@ public class WebServer {
 }
 ```
 
-RequestHandler.java
+- RequestHandler.java
 ```java
 public void run() { //RequestHandler의 run 부분
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
@@ -84,6 +84,56 @@ public void run() { //RequestHandler의 run 부분
 ```
 ### Task 2
 
+    학습 목표
+    
+    HTTP Response 에 대해 학습한다.
+    MIME 타입에 대해 이해하고 이를 적용할 수 있다.
 
+    기능요구사항
+    
+    지금까지 구현한 소스 코드는 css 와 파비콘 등을 지원하지 못하고 있다. 다양한 컨텐츠 타입을 지원하도록 개선해 본다.
+    지원할 컨텐츠 타입의 확장자 목록
+    
+    html, css, js, ico, png, jpg
+
+- RequestHandler.java 
+
+switch문을 이용하여 지원하는 content type에 따른 header 추가
+지원하지 않는 type의 경우 405 error를 띄우도록 만듬
+```java
+switch (tokens[1].split("\\.")[1]) { //content type에 따른 response
+    case "html":
+        response200Header(dos, body.length,"text/html;charset=utf-8");
+        responseBody(dos, body);
+        break;
+    case "css":
+        response200Header(dos, body.length,"text/css;charset=utf-8");
+        responseBody(dos, body);
+        break;
+    case "js":
+        response200Header(dos, body.length,"text/javascript;charset=utf-8");
+        responseBody(dos, body);
+        break;
+    case "ico":
+        response200Header(dos, body.length,"image/x-icon");
+        responseBody(dos, body);
+        break;
+    case "png":
+        response200Header(dos, body.length,"image/png");
+        responseBody(dos, body);
+        break;
+    case "jpg":
+        response200Header(dos, body.length,"image/jpeg");
+        responseBody(dos, body);
+        break;
+    case "svg":
+        response200Header(dos, body.length,"image/svg+xml");
+        responseBody(dos,body);
+        break;
+    default:
+        response405Header(dos);
+        break;
+    }
+```
 
 ### Task 3
