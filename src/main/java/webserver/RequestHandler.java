@@ -2,10 +2,13 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import data.HttpRequestMessage;
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +79,12 @@ public class RequestHandler implements Runnable {
     }
 
     private String mapUri(String uri){
+        //동적 기능
+        if (uri.startsWith("/create")){
+            return DynamicRequestProcess.registration(uri);
+        }
+
+        //정적 페이지 리턴
         return switch (uri){
             case "/registration.html" -> "/registration/index.html";
             default -> uri;
