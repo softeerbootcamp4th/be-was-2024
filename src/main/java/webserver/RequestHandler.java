@@ -11,6 +11,7 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
+    private PathPar pathPar = new PathPar();
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
@@ -24,8 +25,7 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
             logger.debug("request line : {} ",line);
-            String url = line.split(" ")[1];
-            System.out.println(url);
+            String url = pathPar.getUrl(line);
             while(!line.equals(""))
             {
                 line = br.readLine();
