@@ -11,6 +11,7 @@ public class RequestLogging {
 
     public static String printRequest(BufferedReader br) throws IOException {
         String line = br.readLine();
+        if (line == null) return "/";
         String url = line.split(" ")[1];
         String request = "";
         while (!line.equals("")) {

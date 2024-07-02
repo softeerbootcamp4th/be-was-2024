@@ -3,6 +3,8 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,15 +31,39 @@ public class RequestHandler implements Runnable {
             String url = RequestLogging.printRequest(br);
             String path = "./src/main/resources/static";
 
-            if (url.equals("/")) {
-                byte[] body = "<h1>Hello World</h1>".getBytes();
-                response200Header(dos, body.length, "text/html");
-                responseBody(dos, body);
-                return;
-            } else if (url.equals("/registration")) {
-                url += "/index.html";
+            String[] splitURL = url.split("\\?");
+            String requestUrl = splitURL[0];
+
+            if (requestUrl.equals("/")) {
+                path += "/index.html";
+            } else if (requestUrl.equals("/registration")) {
+                path += "/registration/index.html";
+            } else if (requestUrl.equals("/user/create")) {
+                String[] params = splitURL[1].split("&");
+
+                String userId = params[0].split("=")[1];
+                String password = params[1].split("=")[1];
+                String name = params[2].split("=")[1];
+                String email = params[3].split("=")[1];
+
+                Database.addUser(new User(userId, password, name, email));
+                path += "/index.html";
+            } else {
+                path += url;
             }
-            path += url;
+
+//            if (splitURL[0].equals("/")) {
+//                url += "index.html";
+//            } else if (splitURL[0].equals("/registration")) {
+//                url += "index.html";
+//                String[] params = splitURL[1].split("&");
+//
+//                for (String param : params) {
+//                    System.out.println("param = " + param);
+//                }
+//
+
+//            }
 
             byte[] body = FileHandler.getFileContent(path);
             String[] tokens = url.split("\\.");
