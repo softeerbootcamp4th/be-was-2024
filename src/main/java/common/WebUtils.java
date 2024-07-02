@@ -7,22 +7,15 @@ public class WebUtils {
     }
 
     public static String getProperContentType(String extension) {
-        switch(extension) {
-            case "html":
-                return "text/html";
-            case "css":
-                return "text/css";
-            case "js":
-                return "application/javascript";
-            case "ico":
-                return "image/x-icon";
-            case "png":
-                return "image/png";
-            case "jpg":
-                return "image/jpeg";
-            case "svg":
-                return "image/svg+xml";
-        }
-        return null;
+        return switch (extension) {
+            case "html" -> "text/html";
+            case "css" -> "text/css";
+            case "js" -> "application/javascript";
+            case "ico" -> "image/x-icon";
+            case "png" -> "image/png";
+            case "jpg" -> "image/jpeg";
+            case "svg" -> "image/svg+xml";
+            default -> null;
+        };
     }
 }
