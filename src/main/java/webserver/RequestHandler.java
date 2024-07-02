@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +22,18 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = br.readLine();
+            String url = line.split(" ")[1];
             while(!line.isEmpty()) {
                 logger.debug("header: {}", line);
                 line = br.readLine();
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+            File file = new File("src/main/resources/static" + url);
+            byte[] body = new byte[(int) file.length()];
+            try(FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis)) {
+                bis.read(body);
+            }
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
