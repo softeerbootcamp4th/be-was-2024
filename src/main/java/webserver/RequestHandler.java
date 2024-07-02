@@ -2,8 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.Scanner;
 
 import common.WebUtils;
 import org.slf4j.Logger;
@@ -25,12 +23,14 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String str, path = "";
+            String str, path = "", extension = "", contentType = "";
 
             while(!(str = br.readLine()).isEmpty()) {
                 String[] headerLine = str.split(" ");
-                if(WebUtils.isWebRequest(headerLine[0])) { // request uri path 추출하기
+                if(WebUtils.isMethodHeader(headerLine[0])) { // request uri path 추출하기
                     path = headerLine[1];
+                    extension = path.substring(path.lastIndexOf(".")+1);
+                    contentType = WebUtils.getProperContentType(extension);
                 }
                 logger.debug("{}", str);
             }
@@ -44,17 +44,17 @@ public class RequestHandler implements Runnable {
                 fis.read(body);
             }
 
-            response200Header(dos, body.length);
+            response200Header(dos, body.length, contentType);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
