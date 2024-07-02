@@ -2,6 +2,8 @@ package returnType;
 
 import webserver.HttpRequest;
 
+import java.util.logging.Logger;
+
 public class ContentTypeFactory {
     public ContentTypeFactory getContentTypeFactory(HttpRequest httpRequest){
         String url = httpRequest.getUrl();
@@ -11,20 +13,18 @@ public class ContentTypeFactory {
         else if(url.endsWith("css")){
             return new CSSFactory();
         }
+        else if (url.startsWith("/img")){
+            IMGFactory imgFactory = new IMGFactory();
+            return imgFactory.getContentTypeFactory(httpRequest);
+        }
         return new UNKNOWNContentFactory();
     }
 
     public String getContentType() {
-        return null;
+        throw new IllegalArgumentException("contentType 정해지지 않음");
     }
 }
 
-class UNKNOWNContentFactory extends ContentTypeFactory{
-    @Override
-    public String getContentType() {
-        return"unknown content type";
-    }
-}
 class HTMLFactory extends ContentTypeFactory {
     @Override
     public String getContentType() {
@@ -37,9 +37,9 @@ class CSSFactory extends ContentTypeFactory {
         return "text/css";
     }
 }
-class IMGFactory extends ContentTypeFactory {
+class UNKNOWNContentFactory extends ContentTypeFactory{
     @Override
     public String getContentType() {
-        return "text/html";
+        return"unknown content type";
     }
 }

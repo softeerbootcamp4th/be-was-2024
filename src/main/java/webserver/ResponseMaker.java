@@ -3,7 +3,7 @@ package webserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import byteReader.ByteReader;
-import byteReader.SimpleByteReaderFactory;
+import byteReader.ByteReaderMapper;
 import returnType.ContentTypeFactory;
 
 import java.io.DataOutputStream;
@@ -13,25 +13,25 @@ import java.io.OutputStream;
 public class ResponseMaker {
 
     private final Logger logger = LoggerFactory.getLogger(ResponseMaker.class);
-    private final SimpleByteReaderFactory simpleByteReaderFactory = new SimpleByteReaderFactory();
+    private final ByteReaderMapper byteReaderMapper = new ByteReaderMapper();
     private final ByteReader byteReader;
     private ContentTypeFactory contentTypeFactory;
     private String contentType;
 
     public ResponseMaker( ContentTypeFactory contentTypeFactory){
         this.contentTypeFactory = contentTypeFactory;
-        this.byteReader = simpleByteReaderFactory.returnByteReader(contentTypeFactory.getContentType());
+        this.byteReader = byteReaderMapper.returnByteReader(contentTypeFactory.getContentType());
     }
     public void makeResponse(HttpRequest httpRequest, OutputStream out) throws IOException {
         contentType = contentTypeFactory.getContentType();
-        ByteReader byteReader = simpleByteReaderFactory.returnByteReader(contentType);
+        ByteReader byteReader = byteReaderMapper.returnByteReader(contentType);
 
         if(byteReader==null) throw new IOException();
+        System.out.println(httpRequest.getUrl());
         byte[] body = byteReader.readBytes(httpRequest.getUrl());
         DataOutputStream dos = new DataOutputStream(out);
         response200Header(dos, contentType,body.length);
         responseBody(dos, body);
-
     }
 
 
