@@ -1,7 +1,7 @@
 package webserver;
 
 public class URLParser {
-    public String getGetURL(String line) {
+    public String getURL(String line) {
         return line.split(" ")[1];
     }
 

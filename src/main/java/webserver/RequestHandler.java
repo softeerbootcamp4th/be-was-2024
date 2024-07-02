@@ -37,7 +37,7 @@ public class RequestHandler implements Runnable {
                     // 요청이 GET일 경우
                     if (urlParser.getHttpMethod(line).equals("GET")) {
                         // 요청 파일 받아오기
-                        url = urlParser.getGetURL(line);
+                        url = urlParser.getURL(line);
                     }
                 }
 

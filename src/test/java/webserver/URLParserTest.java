@@ -13,7 +13,7 @@ class URLParserTest {
     @Test
     @DisplayName("get url 테스트")
     void testGetURL() {
-        String url = urlParser.getGetURL(line);
+        String url = urlParser.getURL(line);
         Assertions.assertThat(url).isEqualTo("/index.html");
     }
 
