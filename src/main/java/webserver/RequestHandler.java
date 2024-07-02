@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
             logger.debug("request line : {} ",line);
             String url = line.split(" ")[1];

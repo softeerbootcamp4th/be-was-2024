@@ -42,6 +42,7 @@ public class WebServer {
                     logger.error(a.getMessage());
                 }
             }
+            threadPool.shutdown();
 
         }
         catch(IOException e)
