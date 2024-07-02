@@ -28,9 +28,10 @@ public class RequestHandler implements Runnable {
             String requestString = getRequestString(in);
             logger.debug(requestString);
             HttpRequestMessage httpRequestMessage = getHttpRequestMessage(requestString);
-            File file = new File("src/main/resources/static" + httpRequestMessage.getUri());
+            String path = "src/main/resources/static" + mapUri(httpRequestMessage.getUri());
+            File file = new File(path);
             byte[] body = readAllBytesFromFile(file);
-            response200Header(dos, httpRequestMessage.getUri().split("\\.")[1] ,body.length);
+            response200Header(dos, path.split("\\.")[1] ,body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -72,6 +73,13 @@ public class RequestHandler implements Runnable {
         }
 
         return new HttpRequestMessage(method,uri,version,headers,bodyPart);
+    }
+
+    private String mapUri(String uri){
+        return switch (uri){
+            case "/registration" -> "/registration/index.html";
+            default -> uri;
+        };
     }
 
     private byte[] readAllBytesFromFile(File file) throws IOException {
