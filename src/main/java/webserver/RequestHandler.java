@@ -30,7 +30,7 @@ public class RequestHandler implements Runnable {
             HttpRequestMessage httpRequestMessage = getHttpRequestMessage(requestString);
             File file = new File("src/main/resources/static" + httpRequestMessage.getUri());
             byte[] body = readAllBytesFromFile(file);
-            response200Header(dos, body.length);
+            response200Header(dos, httpRequestMessage.getUri().split("\\.")[1] ,body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -75,14 +75,27 @@ public class RequestHandler implements Runnable {
     }
 
     private byte[] readAllBytesFromFile(File file) throws IOException {
-        FileInputStream fileInputStream = new FileInputStream(file);
-        return fileInputStream.readAllBytes();
+        byte[] bytes;
+        try (FileInputStream fileInputStream = new FileInputStream(file)){
+            bytes = fileInputStream.readAllBytes();
+        }
+        return bytes;
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String type, int lengthOfBodyContent) {
+        String contentType = switch (type) {
+            case "css" -> "text/css";
+            case "js" -> "application/javascript";
+            case "html" -> "text/html";
+            case "jpg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "ico" -> "image/x-icon";
+            case "svg" -> "image/svg+xml";
+            default -> "text/plain";
+        };
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType +";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
