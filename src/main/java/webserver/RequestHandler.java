@@ -33,7 +33,7 @@ public class RequestHandler implements Runnable {
             logger.debug("\n:: Request ::\n{}", reqHeader.toString());
 
             // Request 처리
-            RequestInformation reqInfo = new RequestInformation(reqLine);
+            RequestInfo reqInfo = new RequestInfo(reqLine);
 
             String path = reqInfo.getPath();
 

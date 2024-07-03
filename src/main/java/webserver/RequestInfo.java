@@ -43,20 +43,18 @@ enum MIMEType {
     public String getContentType() { return contentType; }
 }
 
-public class RequestInformation {
+public class RequestInfo {
     private MethodType method;
     private MIMEType mime;
     private String path;
 
-    public RequestInformation(String requestLine) {
+    public RequestInfo(String requestLine) {
         method = findMethod(requestLine);
         path = findPath(requestLine);
         if (path.equals("/")) {
             path = "/index.html";
         }
-        try {
-            mime = findMIME(path);
-        } catch(Exception e) { e.printStackTrace(); }
+        mime = findMIME(path);
     }
 
     private static MethodType findMethod(String requestLine) {
