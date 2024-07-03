@@ -29,6 +29,7 @@ public class RequestHandler implements Runnable {
             HttpResponse response = new HttpResponse(dos);
 
             String url = request.getUrl();
+            String content = request.getContentType();
             logger.debug("HTTP Request Content:\n" + request.toString());
 
             if ("/".equals(url)) {
@@ -39,7 +40,7 @@ public class RequestHandler implements Runnable {
 
                 if (file.exists() && !file.isDirectory()) {
                     byte[] body = readFileToByteArray(file);
-                    response.sendResponse(200, "OK", "text/html;charset=utf-8", body);
+                    response.sendResponse(200, "OK", content, body);
                 } else {
                     String body = "<html><body><h1>404 Not Found</h1></body></html>";
                     response.sendResponse(404, "Not Found", "text/html;charset=utf-8", body.getBytes());

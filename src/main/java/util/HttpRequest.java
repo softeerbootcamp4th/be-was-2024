@@ -57,4 +57,24 @@ public class HttpRequest {
     public String getHeader(String headerName) {
         return headers.get(headerName);
     }
+
+    public String getContentType() {
+        if (url.endsWith(".html")) {
+            return "text/html";
+        } else if (url.endsWith(".css")) {
+            return "text/css";
+        } else if (url.endsWith(".js")) {
+            return "application/javascript";
+        } else if (url.endsWith(".ico")) {
+            return "image/x-icon";
+        } else if (url.endsWith(".png")) {
+            return "image/png";
+        } else if (url.endsWith(".jpg") || url.endsWith(".jpeg")) {
+            return "image/jpeg";
+        } else if (url.endsWith(".svg")) {
+            return "image/svg+xml";
+        } else {
+            return "application/octet-stream";
+        }
+    }
 }
