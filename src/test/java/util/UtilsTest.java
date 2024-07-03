@@ -52,14 +52,9 @@ class UtilsTest {
     }
 
     @Test
-    void contentType() throws IOException {
+    void contentType() {
 
         //given
-        HttpRequest httpRequest = HttpRequest.createHttpRequest("GET /index.html HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n");
-
         String contentType = "text/html";
 
         //when

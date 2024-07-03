@@ -49,8 +49,7 @@ public class Utils {
             case "html" -> "text/html";
             case "css" -> "text/css";
             case "js" -> "text/javascript";
-            case "ico" -> "image/png";
-            case "png" -> "image/png";
+            case "ico", "png" -> "image/png";
             case "jpg" -> "image/jpg";
             case "svg" -> "image/svg+xml";
             default -> throw new IllegalStateException("Unexpected value: " + extension);
