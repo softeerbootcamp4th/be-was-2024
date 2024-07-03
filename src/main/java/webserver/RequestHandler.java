@@ -50,7 +50,7 @@ public class RequestHandler implements Runnable {
         if ("/".equals(url)) {
             handleRootRequest(response);
         } else {
-            handleFileRequest(url, contentType, response);
+            handleFileRequest(url, content, response);
         }
     }
 
