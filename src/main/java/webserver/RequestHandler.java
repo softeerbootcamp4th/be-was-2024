@@ -1,18 +1,18 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import returnType.ContentTypeFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private final ContentTypeFactory contentTypeFactory = new ContentTypeFactory();
 
     private Socket connection;
+    private ResponseMaker responseMaker;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -21,13 +21,30 @@ public class RequestHandler implements Runnable {
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            String methodLine = br.readLine();
+
+            String[] tokens = methodLine.split(" ");
+            String method = tokens[0];
+            String url = tokens[1];
+            String mimeTypeForClient ="";
+
+            logger.debug(methodLine);
+            while(true){
+                String line = br.readLine();
+                if(line.isEmpty()) break;
+                logger.debug(line);
+                if(line.startsWith("Accept: ")){
+                    tokens = line.split(" ");
+                    mimeTypeForClient = tokens[1];
+                }
+            }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            HttpRequest httpRequest = new HttpRequest(method,url,mimeTypeForClient);
+            responseMaker = new ResponseMaker(contentTypeFactory.getContentTypeFactory(httpRequest));
+            responseMaker.makeResponse(httpRequest,out);
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
