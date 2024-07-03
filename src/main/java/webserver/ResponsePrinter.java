@@ -29,7 +29,7 @@ public class ResponsePrinter {
     public void makeResponse(HttpRequest httpRequest, OutputStream out) throws IOException {
         contentType = contentTypeFactory.getContentType();
         ByteReader byteReader = byteReaderMapper.returnByteReader(contentType);
-        String finalUrl = responseManager.getMappedUrl(httpRequest.getUrl());
+        String finalUrl = responseManager.getByte(httpRequest.getUrl());
         try{
             byte[] body = byteReader.readBytes(finalUrl);
             DataOutputStream dos = new DataOutputStream(out);

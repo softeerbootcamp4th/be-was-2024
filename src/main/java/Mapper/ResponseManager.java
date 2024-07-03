@@ -1,37 +1,80 @@
 package Mapper;
 
-import db.Database;
-import model.User;
+import byteReader.ByteReader;
 import requestForm.SignInForm;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 public class ResponseManager {
     private final UserMapper userMapper;
+    private final URIParser uriParser;
     public ResponseManager(UserMapper userMapper){
         this.userMapper = userMapper;
+        uriParser = new URIParser();
     }
+    public ByteReader getByte(String originalUrl) {
+        try{
+            RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
+            if (requestInformation.getPath()[1].equals("registration")) {
+                return new StaticFileFounder().findFile(originalUrl);
+            }
+            if (requestInformation.getPath()[1].equals("create")) {
+                SignInForm signInForm = new SignInForm(requestInformation.getInformation());
+                return userMapper.addUser(signInForm);
+            }
+            throw new IllegalArgumentException("404");
+        }
+        catch (FileNotFoundException e){
 
-    public String getMappedUrl(String originalUrl) {
+        }
+        catch (IllegalArgumentException e){
+
+        }
+        throw new IllegalArgumentException("알수 없는 에러");
+    }
+}
+class URIParser{
+    public RequestInformation getParsedUrl(String originalUrl){
         String[] uriSeperated = originalUrl.split("\\?");
         String pathUrl = uriSeperated[0];
         String[] pathSeperated = pathUrl.split("/");
-
-        if (pathSeperated[1].equals("registration")) return "registration/index.html";
-        if (pathSeperated[1].equals("create")) {
-            String[] paramSeperated = uriSeperated[1].split("&");
-            HashMap<String, String> map = new HashMap<>();
-            for (String param : paramSeperated) {
-                String[] keyValue = param.split("=");
-                map.put(keyValue[0], keyValue[1]);
-            }
-            SignInForm signInForm = new SignInForm(map);
-            userMapper.saveUser(signInForm);
-            for(User user : Database.findAll()){
-                System.out.println(user.getUserId());
-            }
-            return originalUrl;
+        if(uriSeperated.length>1){
+            HashMap<String,String> map = parseParam(uriSeperated);
+            return new RequestInformation(pathSeperated,true,map);
         }
-        return pathUrl;
+        return new RequestInformation(pathSeperated,false,null);
+    }
+    private static HashMap<String, String> parseParam(String[] uriSeperated) {
+        String[] paramSeperated = uriSeperated[1].split("&");
+        HashMap<String, String> map = new HashMap<>();
+        for (String param : paramSeperated) {
+            String[] keyValue = param.split("=");
+            map.put(keyValue[0], keyValue[1]);
+        }
+        return map;
+    }
+}
+class RequestInformation{
+    private String[] path;
+    private boolean ifAdditionalInformationExist;
+    private HashMap<String,String> information;
+
+    public String[] getPath() {
+        return path;
+    }
+
+    public HashMap<String, String> getInformation() {
+        return information;
+    }
+
+    public boolean IfAdditionalInformationExist() {
+        return ifAdditionalInformationExist;
+    }
+
+    public RequestInformation(String[] path, boolean ifAdditionalInformationExist, HashMap<String,String> information) {
+        this.path = path;
+        this.ifAdditionalInformationExist = ifAdditionalInformationExist;
+        this.information = information;
     }
 }
