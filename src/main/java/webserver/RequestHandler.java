@@ -76,7 +76,6 @@ public class RequestHandler implements Runnable {
 
         try (FileInputStream fis = new FileInputStream(file)) {
             byte[] body = fis.readAllBytes();
-            logger.info(httpRequest.getContentType());
             responseHeader(dos, body.length, HttpStatus.SC_OK, httpRequest.getContentType());
             responseBody(dos, body);
         } catch (IOException e) {
