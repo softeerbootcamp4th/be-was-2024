@@ -18,7 +18,7 @@ class HttpRequestObjectTest {
 
         // then
         assertEquals("GET", httpRequestObject.getRequestMethod());
-        assertEquals("/index.html", httpRequestObject.getRequestURI());
+        assertEquals("/index.html", httpRequestObject.getRequestPath());
         assertEquals("HTTP/1.1", httpRequestObject.getHttpVersion());
     }
 }
