@@ -25,7 +25,8 @@ public class RequestHandler implements Runnable {
             //inputStream을 문자열로 변환
             BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
             String line = buffer.readLine();
-            String path = RequestParser.parseUriFromRequestHeader(line);
+            String path = RequestParser.parseUriFromRequestHeaderStartLine(line);
+            String contentType = RequestParser.parseContentTypeFromRequestHeaderStartLine(line);
 
             while (!line.isEmpty()) {
                 logger.debug(line);
@@ -39,7 +40,7 @@ public class RequestHandler implements Runnable {
             InputStream fileInputStream = new FileInputStream(file);
             byte[] body = fileInputStream.readAllBytes();
 
-            response200Header(dos, body.length);
+            response200Header(dos, contentType,body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -47,10 +48,10 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
             ;
