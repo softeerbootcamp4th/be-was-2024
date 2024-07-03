@@ -1,13 +1,11 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-
 import common.WebUtils;
-import db.Database;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -28,39 +26,23 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String str, path = "", extension = "", contentType = "";
-            System.out.println();
-            System.out.println("====REQUEST====");
+            System.out.println("\n====REQUEST====");
 
             while(!(str = br.readLine()).isEmpty()) {
+                logger.debug("{}", str);
                 String[] headerLine = str.split(" ");
-                if(WebUtils.isMethodHeader(headerLine[0])) { // request uri path 추출하기
-                    path = headerLine[1];
-                    System.out.println("@@path = " + path);
+                if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에서
+                    path = headerLine[1]; // request uri path 추출하기
                     if(WebUtils.isRESTRequest(path)) {
-                        // 실습을 위한 GET방식 회원가입
-                        if(path.split("\\?")[0].equals("/user/create")) {
-                            String userId = path.split("\\?")[1].split("&")[0].split("=")[1];
-                            String nickname = path.split("\\?")[1].split("&")[1].split("=")[1];
-                            String password = path.split("\\?")[1].split("&")[2].split("=")[1];
-                            Database.addUser(new User(userId, password, nickname, null));
-
-                            String redirectResponse = "HTTP/1.1 302 Found\r\n" +
-                                    "Location: /\r\n" +
-                                    "Content-Length: 0\r\n" +
-                                    "\r\n";
-                            out.write(redirectResponse.getBytes());
-                        }
-                        // 일반적인 GET Request
-                        else if(WebUtils.isGetRequest(headerLine[0])) {
-                            System.out.println("path = " + path);
-                            path = webAdapter.resolveRequestUri(path);
+                        // GET Request
+                        if(WebUtils.isGetRequest(headerLine[0])) {
+                            path = webAdapter.resolveRequestUri(path, out);
                         }
                     }
                     extension = path.substring(path.lastIndexOf(".")+1);
                     contentType = WebUtils.getProperContentType(extension);
                     readAndResponseFromPath(out, dirPath+path, contentType);
                 }
-                logger.debug("{}", str);
             }
 
         } catch (IOException e) {
@@ -70,7 +52,6 @@ public class RequestHandler implements Runnable {
 
     private void readAndResponseFromPath(OutputStream out, String path, String contentType) throws IOException{
         DataOutputStream dos = new DataOutputStream(out);
-        System.out.println("path = " + path);
         File file = new File(path);
         byte[] body = new byte[(int)file.length()];
 
