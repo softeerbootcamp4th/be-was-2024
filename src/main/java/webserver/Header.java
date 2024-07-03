@@ -6,9 +6,19 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpHeaderParser {
+public class Header {
 
-    public static Map<String, String> parseHeaders(String request) throws IOException {
+    private Map<String, String> headers;
+
+    public Header(String request) throws IOException {
+        this.headers = parseHeaders(request);
+    }
+
+    public String get(String headerKey){
+        return headers.get(headerKey);
+    }
+
+    private Map<String, String> parseHeaders(String request) throws IOException {
         BufferedReader br = new BufferedReader(new StringReader(request));
         Map<String, String> headers = new HashMap<>();
         br.readLine();
@@ -28,13 +38,13 @@ public class HttpHeaderParser {
         return headers;
     }
 
-    public static String parseHeaderName(String header){
+    private static String parseHeaderName(String header){
         StringBuilder sb = new StringBuilder(header.split(" ")[0]);
         sb.setLength(sb.length()-1);
         return sb.toString();
     }
 
-    public static String parseHeaderValue(String header){
+    private static String parseHeaderValue(String header){
         return header.split(" ")[1];
     }
 
