@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.PathPar;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,12 +25,12 @@ public class RequestHandler implements Runnable {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
-            logger.debug("request line : {} ",line);
+            logger.debug("request line : {} ",line);// 가장 첫번째 줄, 즉 request line
             String url = pathPar.getUrl(line);
             while(!line.equals(""))
             {
                 line = br.readLine();
-                logger.debug("request line : {}",line);
+                logger.debug("request Headers : {}",line);
             }
             //week1 task2 를 위한 주석
 
@@ -38,9 +39,8 @@ public class RequestHandler implements Runnable {
 
 
             byte[] body;
-
-            File fi = new File("src/main/resources/static"+url);
-
+            url = pathPar.getDir("src/main/resources/static"+url);
+            File fi = new File(url);
             try(FileInputStream fin = new FileInputStream(fi);
                 BufferedInputStream bi = new BufferedInputStream(fin);)
             {
