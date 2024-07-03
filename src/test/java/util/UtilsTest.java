@@ -1,6 +1,7 @@
 package util;
 
 import org.junit.jupiter.api.Test;
+import webserver.HttpRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -48,6 +49,20 @@ class UtilsTest {
         //HELP resources 폴더 안의 테스트 파일에 의존함.
         byte[] bytes = new byte[]{'t', 'e', 's', 't'};
         assertArrayEquals(bytes, Utils.getFile("/test/test.html"));
+    }
+
+    @Test
+    void contentType() {
+
+        //given
+        String contentType = "text/html";
+
+        //when
+        String result = Utils.getContentType("html");
+
+        //then
+        assertEquals(contentType, result);
+
     }
 
 }
