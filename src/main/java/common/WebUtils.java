@@ -23,7 +23,7 @@ public class WebUtils {
             case "png" -> "image/png";
             case "jpg" -> "image/jpeg";
             case "svg" -> "image/svg+xml";
-            default -> null;
+            default -> "*/*";
         };
     }
 
