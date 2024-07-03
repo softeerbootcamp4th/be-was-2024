@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static util.Utils.*;
-import static webserver.HttpRequest.getExtension;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,8 +29,10 @@ public class RequestHandler implements Runnable {
             String request = getAllStrings(in);
             logger.debug(request);
 
+            HttpRequest httpRequest = new HttpRequest(request);
+
             byte[] body = getFile(getUrl(request));
-            response200Header(dos, body.length, getContentType(getExtension(getUrl(request))));
+            response200Header(dos, body.length, getContentType(httpRequest.getPath().getExtension()));
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
