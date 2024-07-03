@@ -1,10 +1,12 @@
 package webserver;
 
+import java.util.Arrays;
+
 enum MethodType {
     GET("GET"),
     POST("POST");
 
-    private String value;
+    private final String value;
 
     MethodType(String value) { this.value = value; }
 
@@ -18,14 +20,22 @@ enum MIMEType {
     ICO("ico", "image/x-icon"),
     PNG("png", "image/png"),
     JPG("jpg", "image/jpeg"),
-    SVG("svg", "image/svg+xml");
+    SVG("svg", "image/svg+xml"),
+    DEFAULT("", "text/plain");
 
-    private String value;
-    private String contentType;
+    private final String value;
+    private final String contentType;
 
     MIMEType(String value, String contentType) {
         this.value = value;
         this.contentType = contentType;
+    }
+
+    public static MIMEType findByContentType(String contentType) {
+        return Arrays.stream(MIMEType.values())
+                .filter(type -> type.getValue().equals(contentType.toLowerCase()))
+                .findAny()
+                .orElse(DEFAULT);
     }
 
     public String getValue() { return value; }
@@ -44,7 +54,9 @@ public class RequestInformation {
         if (path.equals("/")) {
             path = "/index.html";
         }
-        mime = findMime(path);
+        try {
+            mime = findMIME(path);
+        } catch(Exception e) { e.printStackTrace(); }
     }
 
     private static MethodType findMethod(String requestLine) {
@@ -55,9 +67,9 @@ public class RequestInformation {
         return requestLine.split(" ")[1];
     }
 
-    private static MIMEType findMime(String path) {
+    private static MIMEType findMIME(String path) {
         String[] list = path.split("\\.");
-        return MIMEType.valueOf(list[list.length - 1].toUpperCase());
+        return MIMEType.findByContentType(list[list.length - 1]);
     }
 
     public String getMethod() { return method.getValue(); }
