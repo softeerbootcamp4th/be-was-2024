@@ -46,9 +46,7 @@ public class RequestHandler implements Runnable {
                 // url로부터 html파일을 byte array로 읽어오기
                 byte[] body = resourceHandler.getByteArray(url);
 
-                String contentType = resourceHandler.getContentType(url);
-
-                response200Header(dos, body.length, contentType);
+                response200Header(dos, body.length, resourceHandler.getContentType(url));
                 responseBody(dos, body);
             }
         } catch (IOException e) {
