@@ -7,6 +7,9 @@ import java.io.IOException;
 public class FileContentReader {
     private static final FileContentReader instance = new FileContentReader();
 
+    private FileContentReader() {
+    }
+
     public static FileContentReader getInstance() {
         return instance;
     }
@@ -17,7 +20,7 @@ public class FileContentReader {
 
         // Not Found
         if (!file.exists() || !file.isFile()) {
-            return "<h1>404 NOT FOUND</h1>".getBytes();
+            return null;
         }
 
         FileInputStream fis = null;

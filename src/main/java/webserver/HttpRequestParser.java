@@ -12,6 +12,9 @@ public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
     private static final HttpRequestParser instance = new HttpRequestParser();
 
+    private HttpRequestParser() {
+    }
+
     public static HttpRequestParser getInstance() {
         return instance;
     }
@@ -37,13 +40,13 @@ public class HttpRequestParser {
         return headers;
     }
 
-    public String parseRequestURI(String requestLine) {
+    public String[] parseRequestFirstLine(String requestLine) {
         // Split the request line by spaces
         String[] tokens = requestLine.split("\\s+");
 
         // The request URI (path) is the second element in the tokens array
         if (tokens.length >= 2) {
-            return tokens[1];
+            return tokens;
         } else {
             throw new IllegalArgumentException("Invalid HTTP request line: " + requestLine);
         }

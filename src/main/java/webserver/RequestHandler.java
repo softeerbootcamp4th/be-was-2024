@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.mapping.MappingHandler;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,6 +14,7 @@ public class RequestHandler implements Runnable {
     private final Socket connection;
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
     private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
+    private final MappingHandler mappingHandler = MappingHandler.getInstance();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -34,15 +36,19 @@ public class RequestHandler implements Runnable {
             Map<String, String> headers = httpRequestParser.parseRequestHeaders(br);
 
             // Path 및 Content-Type 지정
-            String uri = httpRequestParser.parseRequestURI(firstLine);
-            String contentType = httpRequestParser.parseRequestContentType(uri);
+            String[] firstLines = httpRequestParser.parseRequestFirstLine(firstLine);
+            String contentType = httpRequestParser.parseRequestContentType(firstLines[1]);
 
 
             // Response
             DataOutputStream dos = new DataOutputStream(out);
 
             // File reader
-            byte[] body = fileContentReader.readStaticResource(uri);
+            byte[] body = fileContentReader.readStaticResource(firstLines[1]);
+
+            if (body == null) {
+                body = mappingHandler.mapping(firstLines);
+            }
 
             // Response
             response200Header(dos, contentType, body.length);
