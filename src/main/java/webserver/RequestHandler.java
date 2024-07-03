@@ -29,7 +29,7 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(dis);
 
             String startline = br.readLine();
-            HttpRequestHanlder req = new HttpRequestHanlder(startline);
+            HttpRequestHandler req = new HttpRequestHandler(startline);
 
             String headers = startline;
             logger.info("////// request header start //////");
@@ -48,7 +48,7 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response(DataOutputStream dos, HttpRequestHanlder req) {
+    private void response(DataOutputStream dos, HttpRequestHandler req) {
         try{
             if(req.getUri().contains("?")){ // 쿼리문이 있다면
                 String[] path = req.getUri().split("\\?");

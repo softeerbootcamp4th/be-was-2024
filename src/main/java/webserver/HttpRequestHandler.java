@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class HttpRequestHanlder {
+public class HttpRequestHandler {
     private String method;
     private String uri;
     private String body;
     private String protocol;
     private Map<String, String> headers = new HashMap<>();
 
-    public HttpRequestHanlder(String startline) {
+    public HttpRequestHandler(String startline) {
         String[] split = startline.split(" ");
         method =  split[0];
         uri = split[1];
