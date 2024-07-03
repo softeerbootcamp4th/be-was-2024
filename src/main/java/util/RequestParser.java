@@ -26,7 +26,7 @@ public class RequestParser {
             case "svg" -> "image/svg+xml";
             case "jpg" -> "image/jpeg";
             case "js" -> "application/javascript";
-            case "css" -> "test/css";
+            case "css" -> "text/css";
             case "gif" -> "image/gif";
             case "ico" -> "image/vnd.microsoft.icon";
             default -> "text/plain";
