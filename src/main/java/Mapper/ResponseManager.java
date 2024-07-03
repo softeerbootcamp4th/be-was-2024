@@ -1,6 +1,7 @@
 package Mapper;
 
 import byteReader.ByteReader;
+import byteReader.StaticFileReader;
 import requestForm.SignInForm;
 
 import java.io.FileNotFoundException;
@@ -16,8 +17,11 @@ public class ResponseManager {
     public ByteReader getByte(String originalUrl) {
         try{
             RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
+            if(requestInformation.getPath()[1].equals("index.html")){
+                return new StaticFileFounder().findFile("index.html");
+            }
             if (requestInformation.getPath()[1].equals("registration")) {
-                return new StaticFileFounder().findFile(originalUrl);
+                return new StaticFileFounder().findFile("registration/index.html");
             }
             if (requestInformation.getPath()[1].equals("create")) {
                 SignInForm signInForm = new SignInForm(requestInformation.getInformation());
@@ -26,10 +30,12 @@ public class ResponseManager {
             throw new IllegalArgumentException("404");
         }
         catch (FileNotFoundException e){
+            e.printStackTrace();
 
         }
         catch (IllegalArgumentException e){
 
+            e.printStackTrace();
         }
         throw new IllegalArgumentException("알수 없는 에러");
     }
