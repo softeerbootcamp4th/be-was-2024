@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final String root = "./src/main/resources/static";
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -28,7 +28,20 @@ public class RequestHandler implements Runnable {
             InputStreamReader dis = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(dis);
 
-            HttpRequestHanlder req = new HttpRequestHanlder(br);
+            String startline = br.readLine();
+            HttpRequestHanlder req = new HttpRequestHanlder(startline);
+
+            String headers = startline;
+            logger.info("////// request header start //////");
+            logger.info(startline);
+            while(!headers.isEmpty()){
+                headers = br.readLine();
+                logger.info(headers);
+                String[] parsedline = headers.split(". ");
+                if((parsedline.length) ==2) req.addHeader(parsedline[0],parsedline[1]);
+            }
+            logger.info("////// request header end //////");
+
             response(dos, req);
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -42,9 +55,9 @@ public class RequestHandler implements Runnable {
                 switch (path[0]){
                     case "/registration":
                         registration(path[1]);
-                        new HttpResponseBuilder(dos).response302header("http://localhost:8080/");
+                        dos.writeBytes(HttpHeaderBuilder.response302header("http://localhost:8080/"));
                     default:
-                        new HttpResponseBuilder(dos).response404Header();
+                        dos.writeBytes(HttpHeaderBuilder.response404Header());
                 }
             }else{
                 String[] path = req.getUri().split("/");
@@ -61,7 +74,7 @@ public class RequestHandler implements Runnable {
                     responseByContentType(dos, body, extension);
                 }
                 else
-                    new HttpResponseBuilder(dos).response404Header();
+                    dos.writeBytes(HttpHeaderBuilder.response404Header());
             }
         }catch (IOException e){
             logger.error(e.getMessage());
@@ -86,33 +99,33 @@ public class RequestHandler implements Runnable {
     }
 
 
-    private void responseByContentType(DataOutputStream dos,byte[] body, String contenttype){
-        logger.info(contenttype);
+    private void responseByContentType(DataOutputStream dos,byte[] body, String contenttype) throws IOException {
         switch (contenttype) { //content type에 따른 response
             case "html":
-                new HttpResponseBuilder(dos).response200Header(body.length, "text/html;charset=utf-8",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "text/html;charset=utf-8"));
                 break;
             case "css":
-                new HttpResponseBuilder(dos).response200Header(body.length, "text/css;charset=utf-8",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "text/css;charset=utf-8"));
                 break;
             case "js":
-                new HttpResponseBuilder(dos).response200Header(body.length, "text/javascript;charset=utf-8",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "text/javascript;charset=utf-8"));
                 break;
             case "ico":
-                new HttpResponseBuilder(dos).response200Header(body.length, "image/x-icon",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "image/x-icon"));
                 break;
             case "png":
-                new HttpResponseBuilder(dos).response200Header(body.length, "image/png",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "image/png"));
                 break;
             case "jpg":
-                new HttpResponseBuilder(dos).response200Header(body.length, "image/jpeg",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "image/jpeg"));
                 break;
             case "svg":
-                new HttpResponseBuilder(dos).response200Header(body.length, "image/svg+xml",body);
+                dos.writeBytes(HttpHeaderBuilder.response200Header(body.length, "image/svg+xml"));
                 break;
             default:
-                new HttpResponseBuilder(dos).response405Header();
+                dos.writeBytes(HttpHeaderBuilder.response405Header());
                 break;
         }
+        dos.write(body, 0, body.length);
     }
 }
