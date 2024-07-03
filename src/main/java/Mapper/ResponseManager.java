@@ -5,6 +5,7 @@ import byteReader.StaticFileReader;
 import requestForm.SignInForm;
 
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class ResponseManager {
@@ -14,12 +15,9 @@ public class ResponseManager {
         this.userMapper = userMapper;
         uriParser = new URIParser();
     }
-    public ByteReader getByte(String originalUrl) {
+    public ByteReader getByte(String originalUrl) throws FileNotFoundException {
         try{
             RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
-            if(requestInformation.getPath()[1].equals("index.html")){
-                return new StaticFileFounder().findFile("index.html");
-            }
             if (requestInformation.getPath()[1].equals("registration")) {
                 return new StaticFileFounder().findFile("registration/index.html");
             }
@@ -27,17 +25,12 @@ public class ResponseManager {
                 SignInForm signInForm = new SignInForm(requestInformation.getInformation());
                 return userMapper.addUser(signInForm);
             }
-            throw new IllegalArgumentException("404");
+            return new StaticFileFounder().findFile(originalUrl);
         }
-        catch (FileNotFoundException e){
+        catch (Exception e){
             e.printStackTrace();
-
+            return new StaticFileFounder().findFile("404Page.html");
         }
-        catch (IllegalArgumentException e){
-
-            e.printStackTrace();
-        }
-        throw new IllegalArgumentException("알수 없는 에러");
     }
 }
 class URIParser{
