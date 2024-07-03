@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collection;
 
 import db.Database;
 import model.User;
@@ -12,9 +13,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
+    private final Database database;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        database = Database.getInstance();
     }
 
     public void run() {
@@ -42,11 +45,11 @@ public class RequestHandler implements Runnable {
                 String[] params = splitURL[1].split("&");
 
                 String userId = params[0].split("=")[1];
-                String password = params[1].split("=")[1];
-                String name = params[2].split("=")[1];
+                String name = params[1].split("=")[1];
+                String password = params[2].split("=")[1];
                 String email = params[3].split("=")[1];
 
-                Database.addUser(new User(userId, password, name, email));
+                database.addUser(new User(userId, name, password, email));
 
                 String redirectResponse = "HTTP/1.1 302 Found\r\n" +
                         "Location: /\r\n" +

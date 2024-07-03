@@ -1,0 +1,146 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 113px;
+  gap: 32px;
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 16px;
+}
+
+.post__account {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.post__account__img {
+  width: 32px;
+  height: 32px;
+  background: #d9d9d9;
+  border-radius: 50%;
+}
+
+.post__account__nickname {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 25.6px;
+  color: #14212b;
+}
+
+.post__img {
+  width: 664px;
+  height: 664px;
+  border-radius: 8px;
+  background: #d9d9d9;
+}
+
+.post__article {
+  width: 664px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25.6px;
+  color: #14212b;
+}
+
+.post__menu {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  height: 48px;
+  border-bottom: 1px solid #ebebeb;
+}
+
+.post__menu__personal {
+  display: flex;
+  gap: 8px;
+}
+
+.post__menu__btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.comment {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.comment__item {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.comment__item.hidden {
+  display: none;
+}
+
+.comment__item__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment__item__user__img {
+  width: 32px;
+  height: 32px;
+  background: #d9d9d9;
+  border-radius: 50%;
+}
+
+.comment__item__user__nickname {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 25.6px;
+  color: #14212b;
+}
+
+.comment__item__article {
+  width: 664px;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 25.6px;
+  color: #14212b;
+}
+
+.nav {
+  width: 664px;
+  padding: 16px 0px;
+  border-top: 1px solid #ebebeb;
+}
+
+.nav__menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav__menu__item {
+}
+
+.nav__menu__item__btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  gap: 8px;
+  text-decoration: none;
+  color: #14212b;
+}
+
+.nav__menu__item__img {
+  width: 32px;
+  height: 32px;
+}

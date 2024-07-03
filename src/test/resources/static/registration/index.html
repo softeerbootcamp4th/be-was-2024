@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="../reset.css" rel="stylesheet"/>
+    <link href="../global.css" rel="stylesheet"/>
+    <script>
+        function sendRequest() {
+            const form = document.getElementById('dataForm');
+
+            const url = new URL('/user/create', window.location.origin);
+            const params = new URLSearchParams(new FormData(form));
+
+            window.location.href = url + '?' + params.toString();
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/registration">
+                    회원 가입
+                </a>
+            </li>
+        </ul>
+    </header>
+    <div class="page">
+        <h2 class="page-title">회원가입</h2>
+        <form class="form" id="dataForm">
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">아이디</p>
+                <label for="userId"></label>
+                <input
+                        class="input_textfield"
+                        placeholder="아이디를 입력해주세요"
+                        autocomplete="username"
+                        id="userId"
+                        name="userId"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">닉네임</p>
+                <label for="name"></label>
+                <input
+                        class="input_textfield"
+                        placeholder="닉네임을 입력해주세요"
+                        autocomplete="username"
+                        id="name"
+                        name="name"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">비밀번호</p>
+                <label for="password"></label>
+                <input
+                        class="input_textfield"
+                        type="password"
+                        placeholder="비밀번호를 입력해주세요"
+                        autocomplete="current-password"
+                        id="password"
+                        name="password"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">이메일</p>
+                <label for="email"></label>
+                <input
+                        class="input_textfield"
+                        type="email"
+                        placeholder="이메일을 입력해주세요"
+                        autocomplete="email"
+                        id="email"
+                        name="email"
+                />
+            </div>
+            <button
+                    id="registration-btn"
+                    class="btn btn_contained btn_size_m"
+                    style="margin-top: 24px"
+                    type="button"
+                    onclick="sendRequest()"
+            >
+                회원가입
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

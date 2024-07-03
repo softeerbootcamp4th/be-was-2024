@@ -13,6 +13,7 @@ public class RequestLogging {
         String line = br.readLine();
         if (line == null) return "/";
         String url = line.split(" ")[1];
+
         String request = "";
         while (!line.equals("")) {
             request += line + "\n";
