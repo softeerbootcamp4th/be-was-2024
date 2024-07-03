@@ -5,7 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface StaticByteReader extends ByteReader{
-    final String FILE_BASE_URL ="./src/main/resources/static";
+   String FILE_BASE_URL ="./src/main/resources/static/";
 }
 
 class StaticFileByteReader implements StaticByteReader{

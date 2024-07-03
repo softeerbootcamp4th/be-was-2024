@@ -1,6 +1,7 @@
 package webserver;
 
-import Mapper.UrlMapper;
+import Mapper.ResponseManager;
+import Mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import byteReader.ByteReader;
@@ -8,28 +9,27 @@ import byteReader.ByteReaderMapper;
 import returnType.ContentTypeFactory;
 
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ResponseMaker {
+public class ResponsePrinter {
 
-    private final Logger logger = LoggerFactory.getLogger(ResponseMaker.class);
+    private final Logger logger = LoggerFactory.getLogger(ResponsePrinter.class);
     private final ByteReaderMapper byteReaderMapper = new ByteReaderMapper();
     private final ByteReader byteReader;
-    private final UrlMapper urlMapper;
+    private final ResponseManager responseManager;
     private ContentTypeFactory contentTypeFactory;
     private String contentType;
 
-    public ResponseMaker( ContentTypeFactory contentTypeFactory){
+    public ResponsePrinter(ContentTypeFactory contentTypeFactory, UserMapper userMapper){
         this.contentTypeFactory = contentTypeFactory;
-        this.urlMapper = new UrlMapper();
+        this.responseManager = new ResponseManager(userMapper);
         this.byteReader = byteReaderMapper.returnByteReader(contentTypeFactory.getContentType());
     }
     public void makeResponse(HttpRequest httpRequest, OutputStream out) throws IOException {
         contentType = contentTypeFactory.getContentType();
         ByteReader byteReader = byteReaderMapper.returnByteReader(contentType);
-        String finalUrl = urlMapper.getMappedUrl(httpRequest.getUrl());
+        String finalUrl = responseManager.getMappedUrl(httpRequest.getUrl());
         try{
             byte[] body = byteReader.readBytes(finalUrl);
             DataOutputStream dos = new DataOutputStream(out);

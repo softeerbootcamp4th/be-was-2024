@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import Mapper.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import returnType.ContentTypeFactory;
@@ -12,7 +13,7 @@ public class RequestHandler implements Runnable {
     private final ContentTypeFactory contentTypeFactory = new ContentTypeFactory();
 
     private Socket connection;
-    private ResponseMaker responseMaker;
+    private ResponsePrinter responsePrinter;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -42,8 +43,8 @@ public class RequestHandler implements Runnable {
             }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = new HttpRequest(method,url,mimeTypeForClient);
-            responseMaker = new ResponseMaker(contentTypeFactory.getContentTypeFactory(httpRequest));
-            responseMaker.makeResponse(httpRequest,out);
+            responsePrinter = new ResponsePrinter(contentTypeFactory.getContentTypeFactory(httpRequest),new UserMapper());
+            responsePrinter.makeResponse(httpRequest,out);
 
         } catch (IOException e) {
             logger.error(e.getMessage());
