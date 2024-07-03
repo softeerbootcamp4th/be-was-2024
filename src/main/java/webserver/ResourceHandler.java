@@ -9,6 +9,7 @@ enum TYPE {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
     JS("js", "text/javascript"),
+    JSON("json", "application/json"),
     ICO("ico", "image/x-icon"),
     PNG("png", "image/png"),
     SVG("svg", "image/svg+xml"),
@@ -47,17 +48,17 @@ public class ResourceHandler {
         return body;
     }
 
-    //
+    // content-type을 반환하기 위한 메소드
     public String getContentType(String url) {
-        String type = url.split("\\.")[1];
-        System.out.println(type);
+        String type = url.substring(url.lastIndexOf(".") + 1);
 
+        // TYPE을 순회하면서 type에 해당하는 mime type 찾기
         for (TYPE t : TYPE.values()) {
             if (t.getType().equals(type)) {
                 return t.getMime();
             }
         }
 
-        return "text/html";
+        return "text/plain";
     }
 }
