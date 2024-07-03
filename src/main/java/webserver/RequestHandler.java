@@ -1,18 +1,16 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private FileContentReader fileContentReader;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -23,9 +21,29 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            // Request
+            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+            StringBuilder requestBuilder = new StringBuilder();
+            String line;
+
+            line = br.readLine();
+            String uri = HttpRequestParser.parseRequestURI(line);
+            requestBuilder.append(line).append("\n");
+            logger.debug("uri : {}", uri);
+
+            // 요청 메시지를 한 줄씩 읽어 StringBuilder 에 추가
+            while ((line = br.readLine()) != null && !line.isEmpty()) {
+                requestBuilder.append(line).append("\n");
+            }
+
+            logger.debug("HTTP Request : {}", requestBuilder);
+
+            // Response
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+
+            byte[] body = fileContentReader.readStaticResource(uri);
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
