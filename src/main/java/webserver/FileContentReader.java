@@ -15,7 +15,7 @@ public class FileContentReader {
     }
 
     public byte[] readStaticResource(String uri) throws IOException {
-        String path = "src/main/resources/static/";
+        String path = "src/main/resources/static";
         File file = new File(path + uri);
 
         // Not Found

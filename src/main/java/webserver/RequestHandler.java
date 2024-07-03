@@ -1,11 +1,14 @@
 package webserver;
 
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.mapping.MappingHandler;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
@@ -47,12 +50,15 @@ public class RequestHandler implements Runnable {
             byte[] body = fileContentReader.readStaticResource(firstLines[1]);
 
             if (body == null) {
-                body = mappingHandler.mapping(firstLines);
+                body = mappingHandler.mapping(firstLines[0], firstLines[1]);
             }
 
             // Response
             response200Header(dos, contentType, body.length);
             responseBody(dos, body);
+
+            Collection<User> all = Database.findAll();
+            all.stream().forEach(u -> logger.debug("user: {} ", u.toString()));
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

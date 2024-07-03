@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -66,5 +68,24 @@ public class HttpRequestParser {
         } else {
             return ContentType.html.getContentType();
         }
+    }
+
+    public Map<String, String> parseQuery(String path) {
+        String[] pathQuery = path.split("\\?");
+
+        if (pathQuery.length < 2) {
+            return null;
+        }
+
+        String[] query = pathQuery[1].split("&");
+        Map<String, String> queries = new HashMap<>();
+        for (String q : query) {
+            String[] keyValue = q.split("=");
+            String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
+            queries.put(key, value);
+        }
+
+        return queries;
     }
 }

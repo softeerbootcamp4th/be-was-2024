@@ -1,9 +1,15 @@
 package webserver.mapping.mapper;
 
-public class GetRegistrationMapper implements HttpMapper {
-    @Override
-    public byte[] handle() {
+import webserver.FileContentReader;
 
-        return "<h1>GET /registration Handler</h1>".getBytes();
+import java.io.IOException;
+
+public class GetRegistrationMapper implements HttpMapper {
+    private final FileContentReader fileContentReader = FileContentReader.getInstance();
+
+    @Override
+    public byte[] handle(String path) throws IOException {
+        String filePath = "/registration/index.html";
+        return fileContentReader.readStaticResource(filePath);
     }
 }
