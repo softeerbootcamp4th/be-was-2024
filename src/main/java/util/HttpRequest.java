@@ -14,6 +14,7 @@ public class HttpRequest {
     private String method;
     private String url;
     private String httpVersion;
+    private String content;
     private Map<String, String> headers = new HashMap<>();
 
     public HttpRequest(BufferedReader reader) {
@@ -31,6 +32,7 @@ public class HttpRequest {
             this.method = requestLine[0];
             this.url = requestLine[1];
             this.httpVersion = requestLine[2];
+            this.content = setContentType();
             logger.debug("Requested URL: " + url);
 
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -58,7 +60,9 @@ public class HttpRequest {
         return headers.get(headerName);
     }
 
-    public String getContentType() {
+    public String getContentType() {return content; }
+
+    public String setContentType() {
         if (url.endsWith(".html")) {
             return "text/html";
         } else if (url.endsWith(".css")) {
