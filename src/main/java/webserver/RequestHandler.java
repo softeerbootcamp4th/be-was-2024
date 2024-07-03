@@ -1,10 +1,8 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,13 +21,51 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+            StringBuilder headers = new StringBuilder();
+
+            String line = br.readLine();
+            headers.append(line);
+            String url = line.split(" ")[1];
+            while(!(line = br.readLine()).isEmpty()) {
+                    headers.append(line).append("\n");
+            }
+            logger.debug("Response Headers:\n {}", headers);
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            byte[] body = readFile("src/main/resources/static"+url);
+
+            if(body != null) {
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
+            else{
+                // url에 해당하는 파일이 없으면 404 error 응답
+                response404Error(dos);
+            }
+
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private byte[] readFile(String filePath) {
+        File file = new File(filePath);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] temp = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = fis.read(temp)) != -1) {
+                buffer.write(temp, 0, bytesRead);
+            }
+
+            return buffer.toByteArray();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return null;
         }
     }
 
@@ -49,6 +85,21 @@ public class RequestHandler implements Runnable {
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Error(DataOutputStream dos) throws IOException {
+        try {
+            String errorMessage = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>";
+            dos.writeBytes("HTTP/1.1 404 Not Found\r\n");
+            dos.writeBytes("Content-Type: text/html\r\n");
+            dos.writeBytes("Content-Length: " + errorMessage.length() + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.writeBytes(errorMessage);
+            dos.flush();
+        }
+        catch (IOException e){
             logger.error(e.getMessage());
         }
     }
