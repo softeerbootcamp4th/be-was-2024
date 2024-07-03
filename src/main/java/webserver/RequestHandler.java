@@ -11,8 +11,9 @@ import java.util.Map;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
-    private FileContentReader fileContentReader;
+    private final Socket connection;
+    private final FileContentReader fileContentReader = FileContentReader.getInstance();
+    private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -30,8 +31,8 @@ public class RequestHandler implements Runnable {
             Map<String, String> headers = new HashMap<>();
 
             line = br.readLine();
-            String uri = HttpRequestParser.parseRequestURI(line);
-            String extension = HttpRequestParser.parseRequestContentType(uri);
+            String uri = httpRequestParser.parseRequestURI(line);
+            String extension = httpRequestParser.parseRequestContentType(uri);
 
 
             String contentType = ContentType.html.getContentType();
@@ -52,13 +53,13 @@ public class RequestHandler implements Runnable {
                 }
             }
 
-//            logger.debug("HTTP Request : {}", requestBuilder);
+            logger.debug("HTTP Request : {}", requestBuilder);
 
             // Response
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            byte[] body = FileContentReader.readStaticResource(uri);
+            byte[] body = fileContentReader.readStaticResource(uri);
 
             response200Header(dos, contentType, body.length);
             responseBody(dos, body);

@@ -1,8 +1,13 @@
 package webserver;
 
 public class HttpRequestParser {
+    private static final HttpRequestParser instance = new HttpRequestParser();
 
-    public static String parseRequestURI(String requestLine) {
+    public static HttpRequestParser getInstance() {
+        return instance;
+    }
+
+    public String parseRequestURI(String requestLine) {
         // Split the request line by spaces
         String[] tokens = requestLine.split("\\s+");
 
@@ -14,7 +19,7 @@ public class HttpRequestParser {
         }
     }
 
-    public static String parseRequestContentType(String requestLine) {
+    public String parseRequestContentType(String requestLine) {
         String[] pathParts = requestLine.split("/");
         if (pathParts.length < 1) {
             return null;

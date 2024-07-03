@@ -1,13 +1,17 @@
 package webserver;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FileContentReader {
+    private static final FileContentReader instance = new FileContentReader();
 
-    public static byte[] readStaticResource(String uri) {
+    public static FileContentReader getInstance() {
+        return instance;
+    }
+
+    public byte[] readStaticResource(String uri) throws IOException {
         String path = "src/main/resources/static/";
         File file = new File(path + uri);
 
