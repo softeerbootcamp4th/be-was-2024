@@ -1,7 +1,8 @@
 package webserver.mapping.mapper;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface HttpMapper {
-    byte[] handle(String path) throws IOException;
+    Map<String, Object> handle(String path) throws IOException;
 }

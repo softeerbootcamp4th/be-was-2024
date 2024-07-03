@@ -6,6 +6,7 @@ import webserver.FileContentReader;
 import webserver.HttpRequestParser;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GetCreateUserMapper implements HttpMapper {
@@ -13,12 +14,16 @@ public class GetCreateUserMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override
-    public byte[] handle(String path) throws IOException {
+    public Map<String, Object> handle(String path) throws IOException {
+        Map<String, Object> response = new HashMap<>();
         Map<String, String> queryMap = httpRequestParser.parseQuery(path);
 
         Database.addUser(User.toEntity(queryMap));
 
-        String homePath = "/index.html";
-        return fileContentReader.readStaticResource(homePath);
+        response.put("code", 302);
+        response.put("location", "/");
+
+
+        return response;
     }
 }

@@ -29,7 +29,7 @@ public class MappingHandler {
 
     }
 
-    public byte[] mapping(String method, String path) throws IOException {
+    public Map<String, Object> mapping(String method, String path) throws IOException {
         int indexOfQuery = path.indexOf('?');
 
         String mappingPath = path;

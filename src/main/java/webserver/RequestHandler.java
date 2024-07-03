@@ -1,14 +1,11 @@
 package webserver;
 
-import db.Database;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.mapping.MappingHandler;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collection;
 import java.util.Map;
 
 public class RequestHandler implements Runnable {
@@ -48,17 +45,26 @@ public class RequestHandler implements Runnable {
 
             // File reader
             byte[] body = fileContentReader.readStaticResource(firstLines[1]);
+            int code = 200;
+            Map<String, Object> response = null;
 
             if (body == null) {
-                body = mappingHandler.mapping(firstLines[0], firstLines[1]);
+                response = mappingHandler.mapping(firstLines[0], firstLines[1]);
+                body = (byte[]) response.get("body");
+                code = (int) response.get("code");
             }
 
-            // Response
-            response200Header(dos, contentType, body.length);
-            responseBody(dos, body);
+            switch (code) {
+                case 200:
+                    response200Header(dos, contentType, body.length);
+                    break;
+                case 302:
+                    String location = (String) response.get("location");
+                    response302Header(dos, contentType, location);
 
-            Collection<User> all = Database.findAll();
-            all.stream().forEach(u -> logger.debug("user: {} ", u.toString()));
+            }
+
+            responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -69,6 +75,17 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String contentType, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());

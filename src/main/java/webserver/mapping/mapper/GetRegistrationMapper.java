@@ -3,13 +3,19 @@ package webserver.mapping.mapper;
 import webserver.FileContentReader;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GetRegistrationMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override
-    public byte[] handle(String path) throws IOException {
-        String filePath = "/registration/index.html";
-        return fileContentReader.readStaticResource(filePath);
+    public Map<String, Object> handle(String path) throws IOException {
+        Map<String, Object> response = new HashMap<>();
+
+        response.put("code", 200);
+        response.put("body", fileContentReader.readStaticResource("/registration/index.html"));
+
+        return response;
     }
 }
