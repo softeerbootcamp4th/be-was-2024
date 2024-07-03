@@ -16,18 +16,47 @@ public class FileContentReader {
             return "<h1>404 NOT FOUND</h1>".getBytes();
         }
 
-        StringBuilder contentBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                contentBuilder.append(line).append("\n");
+        FileInputStream fis = null;
+        byte[] byteArray = null;
+
+        try {
+            fis = new FileInputStream(file);
+            byteArray = new byte[(int) file.length()];
+
+            int bytesRead = 0;
+            int offset = 0;
+            while (offset < byteArray.length
+                    && (bytesRead = fis.read(byteArray, offset, byteArray.length - offset)) >= 0) {
+                offset += bytesRead;
             }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + path);
-            e.printStackTrace();
-            return null;
+
+            if (offset < byteArray.length) {
+                throw new IOException("Could not completely read the file " + file.getName());
+            }
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
-        return contentBuilder.toString().getBytes();
+        return byteArray;
+
+//        StringBuilder contentBuilder = new StringBuilder();
+//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                contentBuilder.append(line).append("\n");
+//            }
+//        } catch (IOException e) {
+//            System.err.println("Error reading file: " + path);
+//            e.printStackTrace();
+//            return null;
+//        }
+
+//        return contentBuilder.toString().getBytes();
     }
 }
