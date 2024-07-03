@@ -7,6 +7,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routehandler.RouteHandlerMatcher;
+import routehandler.StaticResourceHandler;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -21,6 +23,11 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
+        // RouteHandlerMatcher을 등록, 요청을 만들 때 같이 보내주자.
+        RouteHandlerMatcher matcher = new RouteHandlerMatcher(
+                new StaticResourceHandler("./src/main/resources/static")
+        );
+
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
@@ -31,7 +38,7 @@ public class WebServer {
             // new socket이 실행되므로, 각 요청마다 다른 처리가 가능.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                executor.submit(new RequestHandler(connection));
+                executor.submit(new RequestHandler(connection, matcher));
             }
         }
     }
