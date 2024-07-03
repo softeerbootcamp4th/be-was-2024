@@ -30,7 +30,7 @@ public class RequestHandler implements Runnable {
 
             String url = request.getUrl();
             String content = request.getContentType();
-            logger.debug("HTTP Request Content:\n" + request.toString());
+            logger.debug("HTTP Request Content:\n" + content);
 
             if ("/".equals(url)) {
                 String responseBody = "Hello World!";
