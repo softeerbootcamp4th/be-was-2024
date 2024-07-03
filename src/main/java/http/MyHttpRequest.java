@@ -1,19 +1,20 @@
 package http;
 
+import http.enums.HttpMethodType;
 import http.utils.HttpMethodTypeUtil;
 import http.utils.HttpParseUtil;
 
 import java.util.List;
 import java.util.Map;
 
-public class HttpRequest {
-    private HttpMethodType method;
-    private String url;
-    private String version;
+public class MyHttpRequest {
+    private final HttpMethodType method;
+    private final String url;
+    private final String version;
 
-    MyHttpHeaders headers;
+    private MyHttpHeaders headers;
 
-    public HttpRequest(String requestLine, List<String> headerLines) {
+    public MyHttpRequest(String requestLine, List<String> headerLines) {
         String[] reqLineTokens = HttpParseUtil.parseRequestLine(requestLine);
         this.method = HttpMethodTypeUtil.getHttpMethodType(reqLineTokens[0]);
         this.url = reqLineTokens[1];
@@ -37,5 +38,9 @@ public class HttpRequest {
 
     public Map<String, String> getHeaderMap() {
         return headers.getHeaders();
+    }
+
+    public MyHttpHeaders getHeaders() {
+        return headers;
     }
 }
