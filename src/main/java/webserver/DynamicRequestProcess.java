@@ -10,12 +10,12 @@ public class DynamicRequestProcess {
     public static String registration(String uri){
         String queryParameters = uri.split("\\?")[1];
         String[] queries = queryParameters.split("&");
-        Map<String, String> mp= new HashMap<>();
+        Map<String, String> map = new HashMap<>();
         for (String query : queries) {
             String[] entry = query.split("=");
-            mp.put(entry[0], entry[1]);
+            map.put(entry[0], entry[1]);
         }
-        Database.addUser(new User(mp.get("userId"), mp.get("password"), mp.get("name"), mp.get("email")));
+        Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email")));
         return "/index.html";
     }
 }
