@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
 import util.HttpRequestObject;
-import util.HttpRequestParser;
 import util.ContentType;
 
 public class RequestHandler implements Runnable {
@@ -27,14 +26,11 @@ public class RequestHandler implements Runnable {
              BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
             // 요청 Header 출력
             String line = br.readLine(); // Request Line (ex: "GET /index.html HTTP/1.1")
-            String[] requestLineElements = HttpRequestParser.parseRequestLine(line);
+            HttpRequestObject httpRequestObject = HttpRequestObject.from(line);
             while(!line.isEmpty()) {
                 logger.debug("header: {}", line);
                 line = br.readLine();
             }
-
-            // HttpRequestObject 생성
-            HttpRequestObject httpRequestObject = HttpRequestObject.from(requestLineElements);
 
             // 데이터 입출력 및 응답
             DataOutputStream dos = new DataOutputStream(out);

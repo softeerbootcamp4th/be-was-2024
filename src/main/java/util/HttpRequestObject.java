@@ -12,7 +12,8 @@ public class HttpRequestObject {
         this.httpVersion = httpVersion;
     }
 
-    public static HttpRequestObject from(String[] requestLineElements) {
+    public static HttpRequestObject from(String requestLine) {
+        String[] requestLineElements = requestLine.split(" ");
         return new HttpRequestObject(requestLineElements[0], requestLineElements[1], requestLineElements[2]);
     }
 

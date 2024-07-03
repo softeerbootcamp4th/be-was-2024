@@ -9,7 +9,7 @@ class HttpRequestParserTest {
 
     String line = "GET /index.html HTTP/1.1";
 
-    @DisplayName("RequestLine")
+    @DisplayName("RequestLine을 파싱하여 총 3가지 요소를 반환한다.")
     @Test
     void parseRequestLine() {
         // when
@@ -21,7 +21,7 @@ class HttpRequestParserTest {
         assertEquals("HTTP/1.1", requestLine[2]);
     }
 
-    @DisplayName("RequestMethod")
+    @DisplayName("RequestLine을 파싱하여 RequestMethod만을 반환한다.")
     @Test
     void parseRequestMethod() {
         // when
@@ -31,7 +31,7 @@ class HttpRequestParserTest {
         assertEquals("GET", requestMethod);
     }
 
-    @DisplayName("RequestURI")
+    @DisplayName("RequestLine을 파싱하여 RequestURI만을 반환한다.")
     @Test
     void parseRequestURI() {
         // when
