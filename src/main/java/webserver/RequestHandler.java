@@ -9,15 +9,14 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.management.openmbean.CompositeDataView;
+
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
     private final Socket connection;
-    private final Database database;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        database = Database.getInstance();
     }
 
     public void run() {
@@ -45,11 +44,11 @@ public class RequestHandler implements Runnable {
                 String[] params = splitURL[1].split("&");
 
                 String userId = params[0].split("=")[1];
-                String name = params[1].split("=")[1];
-                String password = params[2].split("=")[1];
+                String password = params[1].split("=")[1];
+                String name = params[2].split("=")[1];
                 String email = params[3].split("=")[1];
 
-                database.addUser(new User(userId, name, password, email));
+                Database.addUser(new User(userId, password, name, email));
 
                 String redirectResponse = "HTTP/1.1 302 Found\r\n" +
                         "Location: /\r\n" +
@@ -57,11 +56,13 @@ public class RequestHandler implements Runnable {
                         "\r\n";
 
                 out.write(redirectResponse.getBytes());
+                return;
             } else {
                 path += url;
             }
 
             byte[] body = FileHandler.getFileContent(path);
+
             String[] tokens = url.split("\\.");
             String type = tokens[tokens.length - 1];
 

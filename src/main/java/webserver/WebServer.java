@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import db.Database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +29,8 @@ public class WebServer {
             while ((connection = listenSocket.accept()) != null) {
                 Executor executor = Executors.newSingleThreadExecutor();
                 executor.execute(new RequestHandler(connection));
-
-//                Thread thread = new Thread(new RequestHandler(connection));
-//                thread.start();
             }
         }
     }
 }
+
