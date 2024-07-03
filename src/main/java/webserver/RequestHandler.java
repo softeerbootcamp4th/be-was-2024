@@ -1,11 +1,14 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
+import data.HttpRequestMessage;
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,18 +28,91 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
+            String requestString = getRequestString(in);
+            logger.debug(requestString);
+            HttpRequestMessage httpRequestMessage = getHttpRequestMessage(requestString);
+            String path = "src/main/resources/static" + mapUri(httpRequestMessage.getUri());
+            File file = new File(path);
+            byte[] body = readAllBytesFromFile(file);
+            response200Header(dos, path.split("\\.")[1] ,body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private String getRequestString(InputStream in) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+        String tempStr;
+        StringBuilder stringBuilder = new StringBuilder();
+        while (!(tempStr = bufferedReader.readLine()).equals("")) {
+            stringBuilder.append(tempStr);
+            stringBuilder.append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
+    private HttpRequestMessage getHttpRequestMessage(String requestMessage){
+        String[] messageSplit = requestMessage.split("\n\n",2);
+        String headerPart = messageSplit[0];
+        String bodyPart = "";
+        if (messageSplit.length > 1) {
+            bodyPart = messageSplit[1];
+        }
+
+        String[] headerSplit = headerPart.split("\n",2);
+        String startLine = headerSplit[0];
+
+        String[] startLineSplit = startLine.split(" ");
+        String method = startLineSplit[0];
+        String uri = startLineSplit[1];
+        String version = startLineSplit[2];
+
+        String[] headerArray =  headerSplit[1].split("\n");
+        Map<String, String> headers = new HashMap<>();
+        for (String header : headerArray) {
+            String[] headerParts = header.split(": ", 2);
+            headers.put(headerParts[0], headerParts[1]);
+        }
+
+        return new HttpRequestMessage(method,uri,version,headers,bodyPart);
+    }
+
+    private String mapUri(String uri){
+        //동적 기능
+        if (uri.startsWith("/create")){
+            return DynamicRequestProcess.registration(uri);
+        }
+
+        //정적 페이지 리턴
+        return switch (uri){
+            case "/registration.html" -> "/registration/index.html";
+            default -> uri;
+        };
+    }
+
+    private byte[] readAllBytesFromFile(File file) throws IOException {
+        byte[] bytes;
+        try (FileInputStream fileInputStream = new FileInputStream(file)){
+            bytes = fileInputStream.readAllBytes();
+        }
+        return bytes;
+    }
+
+    private void response200Header(DataOutputStream dos, String type, int lengthOfBodyContent) {
+        String contentType = switch (type) {
+            case "css" -> "text/css";
+            case "js" -> "application/javascript";
+            case "html" -> "text/html";
+            case "jpg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "ico" -> "image/x-icon";
+            case "svg" -> "image/svg+xml";
+            default -> "text/plain";
+        };
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType +";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
