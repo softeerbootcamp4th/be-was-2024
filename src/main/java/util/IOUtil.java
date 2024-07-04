@@ -2,10 +2,10 @@ package util;
 
 import java.io.*;
 
-public class FileUtil {
+public class IOUtil {
 
     // to prevent instantiation
-    private FileUtil() {
+    private IOUtil() {
     }
 
     public static final String STATIC_PATH = "src/main/resources/static";
@@ -29,6 +29,14 @@ public class FileUtil {
             return body;
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException();
+        }
+    }
+
+    public static byte[] convertObjectToBytes(Object obj) throws IOException {
+        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+        try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
+            ois.writeObject(obj);
+            return boas.toByteArray();
         }
     }
 }
