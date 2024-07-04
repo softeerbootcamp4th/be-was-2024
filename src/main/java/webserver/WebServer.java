@@ -26,12 +26,14 @@ public class WebServer {
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
 
+            ExecutorService executor = Executors.newFixedThreadPool(200);
+
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                ExecutorService executor = Executors.newFixedThreadPool(1);
 
                 Future<?> future = executor.submit(new RequestHandler(connection));
+
                 try{
                     future.get();
                 } catch (ExecutionException | InterruptedException e) {
