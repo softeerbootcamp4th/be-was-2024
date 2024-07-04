@@ -6,14 +6,14 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.PathPar;
+import util.RequestLine;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
 
-    private PathPar pathPar = new PathPar();
+    private RequestLine requestLine ;
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
@@ -27,25 +27,19 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
             logger.debug("request line : {} ",line);// 가장 첫번째 줄, 즉 request line
-            String url = pathPar.getUrl(line);
-            Map<String,String> queryParams=pathPar.getQueryParams(line);
+            requestLine = new RequestLine(line);
+            String path = requestLine.getPath();
+            //Map<String,String> queryParams=pathPar.getQueryParams(line);
             while(!line.equals(""))
             {
                 line = br.readLine();
                 logger.debug("request Headers : {}",line);
             }
-            //week1 task2 를 위한 주석
-            for(Map.Entry<String,String> entry : queryParams.entrySet())
-            {
-                System.out.println(entry.getKey()+" : "+entry.getValue());
-            }
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
 
-
             byte[] body;
-            url = pathPar.getDir("src/main/resources/static"+url);
-            File fi = new File(url);
+            File fi = new File(path);
             try(FileInputStream fin = new FileInputStream(fi);
                 BufferedInputStream bi = new BufferedInputStream(fin);)
             {
@@ -53,7 +47,7 @@ public class RequestHandler implements Runnable {
                 bi.read(body);
             }
 
-            response200Header(dos,body.length,url);
+            response200Header(dos,body.length,path);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());

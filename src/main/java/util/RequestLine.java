@@ -4,34 +4,36 @@ import java.io.*;
 import java.util.Map;
 import java.util.HashMap;
 
-public class PathPar {
+public class RequestLine {
 
-    public String getUrl(String line)
+
+    private String path;
+    private final String method;
+
+
+    public RequestLine(String line)
     {
-        return line.split(" ")[1];
+        this.method=line.split(" ")[0];
+        this.path = "src/main/resources/static"+line.split(" ")[1];
+        File fi = new File(path);
+        this.path = fi.isDirectory()? this.path+"/index.html" : this.path;
+    }
+    public String getPath()
+    {
+        return this.path;
     }
 
-    public String getHttpMethod(String line)
+    public String getMethod()
     {
-        return line.split(" ")[0];
+        return this.method;
     }
 
-    public String getDir(String line)
-    {
-        File fi = new File(line);
-        return fi.isDirectory() ? line+"/index.html" : line;
-    }
-
-    public Map<String, String> getQueryParams(String requestLine) {
+    /*public Map<String, String> getQueryParams(String requestLine) {
         Map<String, String> queryParams = new HashMap<>();
         if (requestLine == null || requestLine.isEmpty()) {
             return queryParams;
         }
-        String[] parts = requestLine.split(" ");
-        if (parts.length < 2) {
-            return queryParams;
-        }
-        String url = parts[1];
+        String url = getUrl(requestLine);
         int idx = url.indexOf('?');
         if (idx < 0) {
             return queryParams;
@@ -46,4 +48,5 @@ public class PathPar {
         }
         return queryParams;
     }
+     */
 }
