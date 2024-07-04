@@ -3,7 +3,7 @@ package util;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpRequestParserTest {
 
@@ -16,9 +16,7 @@ class HttpRequestParserTest {
         String[] requestLine = HttpRequestParser.parseRequestLine(line);
 
         // then
-        assertEquals("GET", requestLine[0]);
-        assertEquals("/index.html", requestLine[1]);
-        assertEquals("HTTP/1.1", requestLine[2]);
+        assertThat(requestLine).containsExactly("GET", "/index.html", "HTTP/1.1");
     }
 
     @DisplayName("RequestLine을 파싱하여 RequestMethod만을 반환한다.")
@@ -28,7 +26,7 @@ class HttpRequestParserTest {
         String requestMethod = HttpRequestParser.parseRequestMethod(line);
 
         // then
-        assertEquals("GET", requestMethod);
+        assertThat(requestMethod).isEqualTo("GET");
     }
 
     @DisplayName("RequestLine을 파싱하여 RequestURI만을 반환한다.")
@@ -38,6 +36,6 @@ class HttpRequestParserTest {
         String requestURI = HttpRequestParser.parseRequestURI(line);
 
         // then
-        assertEquals("/index.html", requestURI);
+        assertThat(requestURI).isEqualTo("/index.html");
     }
 }
