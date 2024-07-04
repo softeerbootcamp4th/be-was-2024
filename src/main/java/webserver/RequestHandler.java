@@ -19,9 +19,8 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        URLParser urlParser = new URLParser();
-        ResourceHandler resourceHandler = new ResourceHandler();
-        ResponseHandler responseHandler = new ResponseHandler();
+        Response response = new Response();
+        LogicProcessor logicProcessor = new LogicProcessor();
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
@@ -31,20 +30,24 @@ public class RequestHandler implements Runnable {
                 BufferedReader br = new BufferedReader(new InputStreamReader(in));
                 DataOutputStream dos = new DataOutputStream(out);
 
-
                 // 읽어들인 InputStream 모두 출력
                 String requestLine = br.readLine();
-                String method = urlParser.getHttpMethod(requestLine);
+                Request request = new Request(requestLine);
+                String method = request.getHttpMethod();
 
                 if (method.equals("GET")) {
-                    responseHandler.runGetResponse(requestLine, dos);
+                    if (request.isQueryString()) {
+                        logicProcessor.createUser(request);
+                        response.redirect("/index.html", dos);
+                    } else {
+                        response.response(request.getStaticPath(), dos);
+                    }
                 }
 
                 String line;
                 while (!(line = br.readLine()).isEmpty()) {
                     logger.debug(line); // 읽어들인 라인 출력
                 }
-
 //                String line; // 읽어들일 라인
 //                String url = ""; // 요청 파일
 //                while (!(line = br.readLine()).isEmpty()) {
