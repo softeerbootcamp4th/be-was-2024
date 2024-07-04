@@ -1,6 +1,8 @@
-package webserver;
+package webserver.back.operation;
 
-import byteReader.ByteReader;
+import webserver.back.data.StatusCode;
+import webserver.back.byteReader.ByteReader;
+import webserver.front.data.HttpResponse;
 
 public class ResponseDataMaker {
     private ByteReader byteReader;

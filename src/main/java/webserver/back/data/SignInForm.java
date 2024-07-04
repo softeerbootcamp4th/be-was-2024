@@ -1,4 +1,4 @@
-package requestForm;
+package webserver.back.data;
 
 import java.util.HashMap;
 

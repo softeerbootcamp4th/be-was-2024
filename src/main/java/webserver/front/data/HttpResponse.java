@@ -1,6 +1,9 @@
-package webserver;
+package webserver.front.data;
+
+import java.util.HashMap;
 
 public class HttpResponse {
+    private HashMap<String, String> headerInformations = new HashMap<>();
     public String httpVersion;
     public String contentType;
     public String statusCode;
@@ -10,16 +13,12 @@ public class HttpResponse {
     public byte[] body;
 
     public HttpResponse(String httpVersion, String statusCode, String statusText, byte[] body,String contentType) {
-        this.httpVersion = httpVersion;
-        this.statusCode = statusCode;
-        this.statusText = statusText;
+        headerInformations.put("httpVersion", httpVersion);
+        headerInformations.put("statusCode", statusCode);
+        headerInformations.put("statusText", statusText);
+        headerInformations.put("contentType", contentType);
+        headerInformations.put("contentLength", String.valueOf(body.length));
         this.body = body;
-        setContentInform(body, contentType);
-    }
-
-    public void setContentInform(byte[] body, String contentType){
-        this.contentLength = body.length;
-        this.contentType = contentType;
     }
     public String getHttpVersion() {
         return httpVersion;

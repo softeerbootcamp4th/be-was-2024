@@ -1,7 +1,8 @@
-package webserver;
+package webserver.front.operation;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.front.data.HttpRequest;
 
 import java.io.BufferedReader;
 import java.io.IOException;

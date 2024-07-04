@@ -1,4 +1,4 @@
-package byteReader;
+package webserver.back.byteReader;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

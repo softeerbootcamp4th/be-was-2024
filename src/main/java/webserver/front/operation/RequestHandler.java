@@ -1,12 +1,13 @@
-package webserver;
+package webserver.front.operation;
 
 import java.io.*;
 import java.net.Socket;
 
-import Mapper.UserMapper;
+import webserver.back.operation.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import returnType.ContentTypeMaker;
+import webserver.back.returnType.ContentTypeMaker;
+import webserver.front.data.HttpRequest;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

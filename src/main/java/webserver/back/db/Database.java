@@ -1,6 +1,6 @@
-package db;
+package webserver.back.db;
 
-import model.User;
+import webserver.back.model.User;
 
 import java.util.Collection;
 import java.util.HashMap;

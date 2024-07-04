@@ -1,10 +1,10 @@
-package Mapper;
+package webserver.back.operation;
 
-import byteReader.ByteReader;
-import byteReader.JsonReader;
-import db.Database;
-import model.User;
-import requestForm.SignInForm;
+import webserver.back.data.SignInForm;
+import webserver.back.byteReader.ByteReader;
+import webserver.back.byteReader.JsonReader;
+import webserver.back.db.Database;
+import webserver.back.model.User;
 
 public class UserMapper {
     public UserMapper() {

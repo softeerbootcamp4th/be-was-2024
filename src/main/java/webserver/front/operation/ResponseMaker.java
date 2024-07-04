@@ -1,10 +1,11 @@
-package webserver;
+package webserver.front.operation;
 
-import Mapper.ResponseManager;
-import Mapper.UserMapper;
+import webserver.back.operation.ResponseManager;
+import webserver.back.operation.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import byteReader.ByteReader;
+import webserver.front.data.HttpRequest;
+import webserver.front.data.HttpResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,8 +22,6 @@ public class ResponseMaker {
         this.responseWriter = responseWriter;
     }
     public void makeResponse(HttpRequest httpRequest, OutputStream out) throws IOException {
-        String statusCode;
-        ByteReader byteReader = null;
         HttpResponse httpResponse = responseManager.getResponse(httpRequest.getUrl());
         responseWriter.response(httpResponse,out);
     }

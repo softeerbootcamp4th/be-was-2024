@@ -1,4 +1,4 @@
-package webserver;
+package webserver.back.data;
 
 public enum StatusCode {
     OK("OK","200"),

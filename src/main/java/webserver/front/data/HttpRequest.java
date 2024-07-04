@@ -1,4 +1,4 @@
-package webserver;
+package webserver.front.data;
 
 public class HttpRequest {
     private String method;
