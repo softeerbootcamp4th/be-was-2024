@@ -30,7 +30,7 @@ class UserHandlerTest {
         params.put("email", "abc@naver.com");
 
         // when
-        User user = userHandler.createUser(params);
+        User user = userHandler.create(params);
 
         // then
         assertThat(user.getUserId()).isEqualTo("1");

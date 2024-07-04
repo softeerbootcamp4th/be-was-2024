@@ -5,19 +5,21 @@ import model.User;
 
 import java.util.Map;
 
-public class UserHandler {
+public class UserHandler implements ObjectHandler<User>{
 
-    private static UserHandler instance = null;
+    private UserHandler() {}
 
     public static UserHandler getInstance() {
-        if (instance == null) {
-            instance = new UserHandler();
-        }
-        return instance;
+        return LazyHolder.INSTANCE;
     }
 
-    public User createUser(Map<String, String> params) {
-        User user = User.from(params);
+    private static class LazyHolder {
+        private static final UserHandler INSTANCE = new UserHandler();
+    }
+
+    @Override
+    public User create(Map<String, String> fields) {
+        User user = User.from(fields);
         Database.addUser(user);
         System.out.println("New " + user);
         return user;
