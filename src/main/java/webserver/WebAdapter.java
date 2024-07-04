@@ -14,9 +14,10 @@ public class WebAdapter {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     /**
-     * treat various request cases - especially registration form
+     * handle specific requests
      */
     public String resolveRequestUri(String restUri, OutputStream out) throws IOException {
+        // registration
         if(restUri.split("\\?")[0].equals("/user/create")) {
             String userId = restUri.split("\\?")[1].split("&")[0].split("=")[1];
             String nickname = restUri.split("\\?")[1].split("&")[1].split("=")[1];
@@ -30,7 +31,9 @@ public class WebAdapter {
                     "\r\n";
             out.write(redirectResponse.getBytes());
             return "/index.html";
-        } else if(restUri.split("\\?")[0].equals("/user/list")) {
+        }
+        // get user list
+        else if(restUri.split("\\?")[0].equals("/user/list")) {
 
             Collection<User> users = Database.findAll();
             String jsonUser = JsonBuilder.buildJsonResponse(users);
@@ -42,19 +45,22 @@ public class WebAdapter {
                     jsonUser;
             out.write(response.getBytes());
             return "/index.html";
-        } else if(restUri.split("\\?")[0].equals("/database/init")) {
+        }
+        // initialize database
+        else if(restUri.split("\\?")[0].equals("/database/init")) {
             Database.initialize();
 
             String response = "HTTP/1.1 200 OK\r\n";
             out.write(response.getBytes());
             return "/index.html";
-        } else {
-            return resolveRequestUri(restUri);
         }
+
+
+        return resolveRequestUri(restUri);
     }
 
     /**
-     * map request uri to proper view uri
+     * map request uri to proper view
      */
     private String resolveRequestUri(String restUri) {
 

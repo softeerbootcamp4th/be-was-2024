@@ -12,6 +12,9 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * 명세의 단위 테스트와는 거리가 먼 통합 테스트
+ */
 public class RegistrationIntegrationTest {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);

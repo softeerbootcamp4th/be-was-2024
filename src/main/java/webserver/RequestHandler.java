@@ -31,14 +31,16 @@ public class RequestHandler implements Runnable {
             while(!(str = br.readLine()).isEmpty()) {
                 logger.debug("{}", str);
                 String[] headerLine = str.split(" ");
-                if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에서
+                if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에 request uri path가 존재하므로
                     path = headerLine[1]; // request uri path 추출하기
+                    // rest요청일 경우 - 적절한 view를 찾거나, 적절한 비즈니스 로직 수행
                     if(WebUtils.isRESTRequest(path)) {
-                        // GET Request
+                        // GET 요청일 경우
                         if(WebUtils.isGetRequest(headerLine[0])) {
                             path = webAdapter.resolveRequestUri(path, out);
                         }
                     }
+                    // 설정한 path를 바탕으로 확장자에 맞게 contentType에 맞게 뷰 파일을 찾아 응답
                     extension = path.substring(path.lastIndexOf(".")+1);
                     contentType = WebUtils.getProperContentType(extension);
                     readAndResponseFromPath(out, dirPath+path, contentType);
@@ -50,6 +52,9 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    /**
+     * 경로에서 적절한 뷰 파일을 찾아서 응답합니다.
+     */
     private void readAndResponseFromPath(OutputStream out, String path, String contentType) throws IOException{
         DataOutputStream dos = new DataOutputStream(out);
         File file = new File(path);

@@ -1,5 +1,8 @@
 package common;
 
+/**
+ * Web 요청을 처리할 때 공통으로 사용할 로직을 정리한 유틸리티 클래스
+ */
 public class WebUtils {
 
     public static boolean isMethodHeader(String method) {
