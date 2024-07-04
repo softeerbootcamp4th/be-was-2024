@@ -6,6 +6,7 @@ import java.net.Socket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.request.HttpRequest;
+import webserver.request.Path;
 import webserver.response.ResponseHandler;
 
 import static util.Utils.*;
@@ -29,7 +30,15 @@ public class RequestHandler implements Runnable {
             logger.debug(request);
 
             HttpRequest httpRequest = new HttpRequest(request);
-            ResponseHandler.response(out, httpRequest);
+
+            if(httpRequest.getPath().isStatic()){
+                ResponseHandler.response(200, out, httpRequest.getPath(), "");
+            }else {
+                if(httpRequest.getPath().get().equals("/registration")){
+                    ResponseHandler.response(302, out, new Path("/registration/index.html"), "/registration/index.html");
+                }
+            }
+
 
         } catch (IOException e) {
             logger.error(e.getMessage());
