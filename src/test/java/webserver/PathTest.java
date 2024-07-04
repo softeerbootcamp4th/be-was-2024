@@ -2,6 +2,7 @@ package webserver;
 
 import exception.NotExistException;
 import org.junit.jupiter.api.Test;
+import webserver.request.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 

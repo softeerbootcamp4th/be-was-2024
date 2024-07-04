@@ -1,4 +1,4 @@
-package webserver;
+package webserver.request;
 
 public class Method {
 

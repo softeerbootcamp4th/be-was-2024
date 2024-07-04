@@ -1,7 +1,6 @@
-package webserver;
+package webserver.request;
 
 import exception.NotExistException;
-import webserver.request.Parameter;
 
 import java.util.Optional;
 

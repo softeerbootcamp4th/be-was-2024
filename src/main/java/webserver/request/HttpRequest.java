@@ -1,4 +1,5 @@
-package webserver;
+package webserver.request;
+
 import java.io.IOException;
 
 public class HttpRequest {
