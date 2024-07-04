@@ -1,5 +1,7 @@
 package webserver;
 
+import exception.NotExistException;
+
 public class Path {
 
     private String path;
@@ -9,7 +11,24 @@ public class Path {
     }
 
     public String getExtension(){
-        return path.split("\\.")[1];
+        String extension = "";
+        try {
+            extension = path.split("\\.")[1];
+        }catch (ArrayIndexOutOfBoundsException e){
+            throw new NotExistException();
+        }
+        return extension;
+    }
+
+    public boolean isStatic(){
+
+        try {
+            getExtension();
+        }catch (NotExistException e){
+            return false;
+        }
+
+        return true;
     }
 
 }
