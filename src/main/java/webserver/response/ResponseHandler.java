@@ -8,10 +8,9 @@ import java.io.OutputStream;
 
 public class ResponseHandler {
 
-    public static void response(int status, OutputStream outputStream, Path path, String redirection) throws IOException {
+    public static void response(OutputStream outputStream, HttpResponse httpResponse) throws IOException {
         DataOutputStream dos = new DataOutputStream(outputStream);
-        HttpResponse httpResponse = new HttpResponse(status, path);
-        dos.write(httpResponse.toByte(path.getExtension(), redirection));
+        dos.write(httpResponse.toByte());
     }
 
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.request.HttpRequest;
 import webserver.request.Path;
+import webserver.response.HttpResponse;
 import webserver.response.ResponseHandler;
 
 import static util.Utils.*;
@@ -32,10 +33,21 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = new HttpRequest(request);
 
             if(httpRequest.getPath().isStatic()){
-                ResponseHandler.response(200, out, httpRequest.getPath(), "");
+
+                byte[] body = getFile(httpRequest.getPath().get());
+                HttpResponse response = new HttpResponse(200, body);
+                response.addHeader("Content-Type", getContentType(httpRequest.getPath().getExtension())+";charset=utf-8");
+                response.addHeader("Content-Length", String.valueOf(body.length));
+                ResponseHandler.response(out, response);
             }else {
                 if(httpRequest.getPath().get().equals("/registration")){
-                    ResponseHandler.response(302, out, new Path("/registration/index.html"), "/registration/index.html");
+
+                    byte[] body = "".getBytes();
+                    HttpResponse response = new HttpResponse(302, body);
+                    response.addHeader("Content-Length", String.valueOf(body.length));
+                    response.addHeader("Location", "/registration/index.html");
+
+                    ResponseHandler.response(out, response);
                 }
             }
 

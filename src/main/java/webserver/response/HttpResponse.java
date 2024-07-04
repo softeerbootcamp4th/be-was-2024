@@ -1,13 +1,9 @@
 package webserver.response;
 
-import webserver.request.Path;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static util.Utils.*;
 
 public class HttpResponse {
 
@@ -15,25 +11,32 @@ public class HttpResponse {
     private byte[] body;
     private Map<String, String> headers;
 
-    public HttpResponse(int status, Path path) throws IOException {
+    public HttpResponse(int status, byte[] body) throws IOException {
         this.status = status;
-        this.body = getFile(path.get());
+        this.body = body;
         this.headers = new HashMap<>();
     }
 
-    public byte[] toByte(String extension, String redirection){
+    public byte[] toByte(){
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         outputStream.writeBytes(("HTTP/1.1 "+status+" OK \r\n").getBytes());
-        outputStream.writeBytes(("Content-Type: "+getContentType(extension)+";charset=utf-8\r\n").getBytes());
-        outputStream.writeBytes(("Content-Length: " + body.length + "\r\n").getBytes());
-        if(status==302) outputStream.writeBytes(("Location: "+redirection).getBytes());
+
+        for( Map.Entry<String, String> entry : headers.entrySet() ){
+            String strKey = entry.getKey();
+            String strValue = entry.getValue();
+            outputStream.writeBytes( (strKey +": "+ strValue +"\r\n").getBytes());
+        }
         outputStream.writeBytes("\r\n".getBytes());
         outputStream.write(body, 0, body.length);
 
         return outputStream.toByteArray();
 
+    }
+
+    public void addHeader(String key, String value){
+        this.headers.put(key, value);
     }
 
 }
