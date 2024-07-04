@@ -16,10 +16,11 @@ public class UserHandler {
         return instance;
     }
 
-    public void createUser(Map<String, String> params) {
+    public User createUser(Map<String, String> params) {
         User user = User.from(params);
         Database.addUser(user);
         System.out.println("New " + user);
+        return user;
     }
 
     // 추후 update, read, delete 추가 가능

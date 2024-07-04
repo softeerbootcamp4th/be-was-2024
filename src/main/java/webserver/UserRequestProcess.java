@@ -1,6 +1,7 @@
 package webserver;
 
 import handler.UserHandler;
+import model.User;
 import util.HttpRequestObject;
 
 public class UserRequestProcess {
@@ -19,7 +20,7 @@ public class UserRequestProcess {
         this.userHandler = UserHandler.getInstance();
     }
 
-    public void createUser(HttpRequestObject httpRequestObject) {
-        userHandler.createUser(httpRequestObject.getRequestParams());
+    public User createUser(HttpRequestObject httpRequestObject) {
+        return userHandler.createUser(httpRequestObject.getRequestParams());
     }
 }
