@@ -82,14 +82,12 @@ public class RequestHandler implements Runnable {
     private void handleDynamicRequest(HttpRequest request, HttpResponse response) {
         String path = request.getPath();
         Map<String, String> queryParams = request.getQueryParams();
-        logger.debug("@@@@@@@@@@@@@@@@@@@@@@" + path+"@@@@@@@@@@@@@@@@@@");
         if (path.startsWith("/create")) {
             String userId = queryParams.get("userId");
             String password = queryParams.get("password");
             String name = queryParams.get("name");
             String email = queryParams.get("email");
 
-            // 회원가입 로직을 처리합니다.
             Database.addUser(new User(userId, password, name, email));
             response.sendRedirect("/index.html");
         }
