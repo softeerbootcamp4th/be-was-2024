@@ -5,6 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import processor.UserProcessor;
 import util.FileDetection;
 import util.RequestObject;
 
@@ -38,6 +39,7 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
             frontRequest(dos,requestObject);
 
+
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -47,12 +49,11 @@ public class RequestHandler implements Runnable {
     {
         String method = requestObject.getMethod();
         String path = requestObject.getPath();
-        if(method.equals("GET")&& path.equals("/user/create"))//GET방식의 회원가입 일 시
+        if(method.equals("GET") && path.equals("/user/create"))//GET방식의 회원가입 일 시
         {
-
+            UserProcessor.userCreate(requestObject);
             return ;
         }
-
 
         // 파일 요청이 들어왔다면
         byte[] body;

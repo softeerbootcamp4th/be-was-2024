@@ -1,6 +1,5 @@
 package util;
 
-import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,13 +9,22 @@ public class RequestObject {
 
     private String path;//  /user/create 가 들어옴
     private final String method;// GET이 들어옴
-    private Map<String,String> params; // { name : 1234 , password : 1} 들어옴
+    private String paramLine;
+    private Map<String,String> params = new HashMap<String,String>(); // { name : 1234 , password : 1} 들어옴
 
     public RequestObject(String line)
     {
-        this.method=line.split(" ")[0];
-        this.path = line.split(" ")[1];
-        getQueryParams();
+        String[] requestLine = line.split(" ");
+        this.method=requestLine[0];
+        String[] url = requestLine[1].split("\\?");
+        this.path = url[0];
+        if(url.length>1)
+        {
+            this.paramLine = url[1];
+            getQueryParams();
+            System.out.println(this.paramLine);
+        }
+
     }
     public String getPath()
     {
@@ -29,20 +37,16 @@ public class RequestObject {
     }
 
     public Map<String, String> getParams() {
-        return params;
+
+        return this.params;
     }
 
     public void getQueryParams()
     {
-        if (path == null || path.isEmpty()) {
+        if (paramLine == null || paramLine.isEmpty()) {
             return ;
         }
-        int idx = path.indexOf('?');
-        if (idx < 0) {
-            return ;
-        }
-        String queryString = path.substring(idx + 1);
-        String[] pairs = queryString.split("&");
+        String[] pairs = paramLine.split("&");
         for (String pair : pairs) {
             String[] keyValue = pair.split("=");
             if (keyValue.length == 2) {
