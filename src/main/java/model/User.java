@@ -1,16 +1,22 @@
 package model;
 
+import java.util.Map;
+
 public class User {
     private String userId;
     private String password;
     private String name;
     private String email;
 
-    public User(String userId, String password, String name, String email) {
+    protected User(String userId, String password, String name, String email) {
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User from(Map<String, String> params){
+        return new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
     }
 
     public String getUserId() {
