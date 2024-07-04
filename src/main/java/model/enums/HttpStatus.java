@@ -1,4 +1,4 @@
-package model;
+package model.enums;
 
 public enum HttpStatus {
 
@@ -6,6 +6,7 @@ public enum HttpStatus {
     CREATED(201, "Created"),
     ACCEPTED(202, "Accepted"),
     NO_CONTENT(204, "No Content"),
+    SEE_OTHER(303, "See Other"),
     BAD_REQUEST(400, "Bad Request"),
     UNAUTHORIZED(401, "Unauthorized"),
     FORBIDDEN(403, "Forbidden"),

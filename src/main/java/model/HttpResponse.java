@@ -1,10 +1,11 @@
 package model;
 
+import model.enums.HttpStatus;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
-import java.util.Map;
 
 public class HttpResponse {
     private String protocolVersion;
@@ -35,7 +36,6 @@ public class HttpResponse {
             for (String header : headers) {
                 dos.writeBytes(header);
             }
-            System.out.println("dos : "+dos.toString());
         } catch (IOException e) {
 //            logger.error(e.getMessage());
         }
