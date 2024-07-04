@@ -1,59 +1,21 @@
 package webserver;
 
-import java.util.Arrays;
-
-enum MethodType {
-    GET("GET"),
-    POST("POST");
-
-    private final String value;
-
-    MethodType(String value) { this.value = value; }
-
-    public String getValue() { return value; }
-}
-
-enum MIMEType {
-    HTML("html", "text/html"),
-    CSS("css", "text/css"),
-    JS("js", "application/javascript"),
-    ICO("ico", "image/x-icon"),
-    PNG("png", "image/png"),
-    JPG("jpg", "image/jpeg"),
-    SVG("svg", "image/svg+xml"),
-    DEFAULT("", "text/plain");
-
-    private final String value;
-    private final String contentType;
-
-    MIMEType(String value, String contentType) {
-        this.value = value;
-        this.contentType = contentType;
-    }
-
-    public static MIMEType findByContentType(String contentType) {
-        return Arrays.stream(MIMEType.values())
-                .filter(type -> type.getValue().equals(contentType.toLowerCase()))
-                .findAny()
-                .orElse(DEFAULT);
-    }
-
-    public String getValue() { return value; }
-
-    public String getContentType() { return contentType; }
-}
+import type.MIMEType;
+import type.MethodType;
+import type.StatusCodeType;
+import utils.FileUtils;
 
 public class RequestInfo {
+    private final static String STATIC_PATH = "./src/main/resources/static";
+
     private MethodType method;
     private MIMEType mime;
     private String path;
+    private Boolean isStaticRequest = false;
 
     public RequestInfo(String requestLine) {
         method = findMethod(requestLine);
         path = findPath(requestLine);
-        if (path.equals("/")) {
-            path = "/index.html";
-        }
         mime = findMIME(path);
     }
 
@@ -61,8 +23,24 @@ public class RequestInfo {
         return MethodType.valueOf(requestLine.split(" ")[0]);
     }
 
-    private static String findPath(String requestLine) {
-        return requestLine.split(" ")[1];
+    private String findPath(String requestLine) {
+        String reqPath = requestLine.split(" ")[1];
+
+        // 정적 파일이 있는지 확인
+        String staticPath = STATIC_PATH + reqPath;
+        if (FileUtils.isExists(staticPath)) {
+            if (FileUtils.isFile(staticPath)) {
+                setIsStaticRequestTrue();
+                return staticPath;
+            }
+            staticPath += (reqPath.endsWith("/") ? "index.html" : "/index.html");
+            if (FileUtils.isFile(staticPath)) {
+                setIsStaticRequestTrue();
+                return staticPath;
+            }
+        }
+
+        return reqPath;
     }
 
     private static MIMEType findMIME(String path) {
@@ -70,9 +48,13 @@ public class RequestInfo {
         return MIMEType.findByContentType(list[list.length - 1]);
     }
 
+    private void setIsStaticRequestTrue() { this.isStaticRequest = true; }
+
     public String getMethod() { return method.getValue(); }
 
     public String getContentType() { return mime.getContentType(); }
 
     public String getPath() { return path; }
+
+    public Boolean isStaticRequest() { return isStaticRequest; }
 }

@@ -30,50 +30,15 @@ public class RequestHandler implements Runnable {
             while ((line = reader.readLine()) != null && !line.equals("")) {
                 reqHeader.append("  ").append(line).append("\n");
             }
-            logger.debug("\n:: Request ::\n{}", reqHeader.toString());
+            logger.debug("\n:: Request ::\n{}", reqHeader);
 
             // Request 처리
-            RequestInfo reqInfo = new RequestInfo(reqLine);
+            RequestDispatcher dispatcher = new RequestDispatcher(reqLine);
+            RequestResult requestResult = dispatcher.dispatch();
 
-            String path = reqInfo.getPath();
-
-            byte[] body = readFileToBytes("./src/main/resources/static" + path);
-
-            DataOutputStream dos = new DataOutputStream(out);
-            response200Header(dos, reqInfo.getContentType(), body.length);
-            responseBody(dos, body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-
-    private static byte[] readFileToBytes(String filePath) throws IOException {
-        File file = new File(filePath);
-        byte[] bytes = new byte[(int) file.length()];
-
-        try (FileInputStream fis = new FileInputStream(file)) {
-            fis.read(bytes);
-        }
-
-        return bytes;
-    }
-
-    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
+            // Response 처리
+            ResponseHandler responseHandler = new ResponseHandler(new DataOutputStream(out), requestResult);
+            responseHandler.write();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
