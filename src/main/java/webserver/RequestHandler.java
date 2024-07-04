@@ -31,6 +31,8 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
             File file = new File(RESOURCE_PATH + httpRequest.getPath());
 
+            System.out.println("@@@@@@"+RESOURCE_PATH + httpRequest.getPath());
+
             //io를 사용하여 파일 읽어오기
             InputStream fileInputStream = new FileInputStream(file);
             byte[] body = fileInputStream.readAllBytes();

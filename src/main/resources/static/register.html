@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
+    <link href="reset.css" rel="stylesheet" />
+    <link href="global.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <a href="/"><img src="../img/signiture.svg" /></a>
+        <a href="/static"><img src="img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
             <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
           </li>
           <li class="header__menu__item">
-            <a class="btn btn_ghost btn_size_s" href="/registration">
+            <a class="btn btn_ghost btn_size_s" href="/register.html">
               회원 가입
             </a>
           </li>
@@ -23,21 +23,25 @@
       </header>
       <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form class="form">
+        <form class="form" action="/create" method="get">
           <div class="textfield textfield_size_s">
             <p class="title_textfield">아이디</p>
             <input
               class="input_textfield"
               placeholder="아이디를 입력해주세요"
-              autocomplete="username"
+              value="javajigi"
+              name="userId"
+
             />
           </div>
           <div class="textfield textfield_size_s">
-            <p class="title_textfield">닉네임</p>
+            <p class="title_textfield">이름</p>
             <input
               class="input_textfield"
-              placeholder="닉네임을 입력해주세요"
-              autocomplete="username"
+              placeholder="이름을 입력해주세요"
+              value="진우"
+              name="name"
+
             />
           </div>
           <div class="textfield textfield_size_s">
@@ -46,17 +50,27 @@
               class="input_textfield"
               type="password"
               placeholder="비밀번호를 입력해주세요"
-              autocomplete="current-password"
+              value="qwerty12345"
+              name="password"
+
             />
           </div>
-          <button
+          <div class="textfield textfield_size_s">
+            <p class="title_textfield">이메일</p>
+            <input
+                    class="input_textfield"
+                    placeholder="이메일을 입력해주세요"
+                    name="email"
+                    value="wlsdndml213@naver.com"
+
+            />
+          </div>
+          <input
+                  type="submit"
             id="registration-btn"
             class="btn btn_contained btn_size_m"
-            style="margin-top: 24px"
-            type="button"
-          >
-            회원가입
-          </button>
+            style="margin-top: 24px" value="가입"
+          />
         </form>
       </div>
     </div>
