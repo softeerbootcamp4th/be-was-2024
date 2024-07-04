@@ -2,7 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
@@ -13,9 +12,11 @@ public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private final UserRequestProcess userRequestProcess;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        this.userRequestProcess = UserRequestProcess.getInstance();
     }
 
     public void run() {
@@ -32,14 +33,36 @@ public class RequestHandler implements Runnable {
                 line = br.readLine();
             }
 
-            // 데이터 입출력 및 응답
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = FileUtil.readBytesFromFile(httpRequestObject.getRequestURI());
-            response200Header(dos, body.length, httpRequestObject.getRequestURI().split("\\.")[1]);
-            responseBody(dos, body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+            frontRequestProcess(out, httpRequestObject);
+        }  catch (IOException e) {
+            logger.error("error: {}", e.getStackTrace());
         }
+    }
+
+    private void frontRequestProcess(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
+        String path = httpRequestObject.getRequestPath();
+        if(path.equals("/user/create")) {
+            userRequestProcess.createUser(httpRequestObject);
+            dynamicResponse(out, httpRequestObject);
+        }
+        else {
+            staticResponse(out, httpRequestObject);
+        }
+    }
+
+    private void dynamicResponse(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        byte[] body = FileUtil.readBytesFromFile(FileUtil.STATIC_PATH + "/index.html");
+        response200Header(dos, body.length, ContentType.HTML.getExtension());
+        responseBody(dos, body);
+    }
+
+    private void staticResponse(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        byte[] body = FileUtil.readBytesFromFile(FileUtil.STATIC_PATH + httpRequestObject.getRequestPath());
+        boolean isDir = FileUtil.isDirectory(FileUtil.STATIC_PATH + httpRequestObject.getRequestPath());
+        response200Header(dos, body.length, isDir ? ContentType.HTML.getExtension() : httpRequestObject.getRequestPath().split("\\.")[1]);
+        responseBody(dos, body);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extension) {
