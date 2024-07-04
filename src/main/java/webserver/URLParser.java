@@ -5,13 +5,13 @@ import java.io.File;
 public class URLParser {
     public String getURL(String line) {
         String url = line.split(" ")[1];
+        return getStaticUrl(url);
+    }
 
-        if (!url.contains("?")) { // 쿼리 스트링이 아닌 경우
-            return getStaticUrl(url);
-        } else { // 쿼리스트링인 경우
-            System.out.println("asdfasdfasdf");
-            return "/index.html";
-        }
+    public boolean isQueryString(String line) {
+        // 일단은 "?"를 포함하는지만 검사.
+        // 이후 예외처리 고민해볼 필요 있음
+        return line.contains("?");
     }
 
     private String getStaticUrl(String url) {
