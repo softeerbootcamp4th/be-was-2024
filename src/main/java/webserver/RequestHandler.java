@@ -33,8 +33,7 @@ public class RequestHandler implements Runnable {
             logger.debug(requestString);
             HttpRequestMessage httpRequestMessage = HttpRequestParser.getHttpRequestMessage(requestString);
             String path = "src/main/resources/static" + UriMapper.mapUri(httpRequestMessage.getUri());
-            File file = new File(path);
-            byte[] body = FileUtil.readAllBytesFromFile(file);
+            byte[] body = FileUtil.readAllBytesFromFile(new File(path));
             response200Header(dos, path.split("\\.")[1] ,body.length);
             responseBody(dos, body);
         } catch (IOException e) {

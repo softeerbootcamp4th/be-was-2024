@@ -14,7 +14,7 @@ public class HttpRequestParser {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
         String tempStr;
         StringBuilder stringBuilder = new StringBuilder();
-        while (!(tempStr = bufferedReader.readLine()).equals("")) {
+        while ((tempStr = bufferedReader.readLine()) != null && !tempStr.isEmpty()) {
             stringBuilder.append(tempStr);
             stringBuilder.append("\n");
         }
