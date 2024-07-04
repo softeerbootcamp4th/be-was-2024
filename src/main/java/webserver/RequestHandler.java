@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.QueryParams;
 import util.RequestLine;
 
 public class RequestHandler implements Runnable {
@@ -28,13 +29,17 @@ public class RequestHandler implements Runnable {
             String line = br.readLine();
             logger.debug("request line : {} ",line);// 가장 첫번째 줄, 즉 request line
             requestLine = new RequestLine(line);
-            String path = requestLine.getPath();
-            //Map<String,String> queryParams=pathPar.getQueryParams(line);
             while(!line.equals(""))
             {
                 line = br.readLine();
                 logger.debug("request Headers : {}",line);
             }
+
+            String path = requestLine.getPath();
+            String method = requestLine.getMethod();
+            frontRequestProcess(method);
+            //Map<String,String> queryParams=pathPar.getQueryParams(line);
+
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
 
@@ -63,6 +68,14 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    private void frontRequestProcess(String method)
+    {
+        if(method.equals("GET"))
+        {
+
         }
     }
 

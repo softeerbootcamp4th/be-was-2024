@@ -28,25 +28,4 @@ public class RequestLine {
         return this.method;
     }
 
-    /*public Map<String, String> getQueryParams(String requestLine) {
-        Map<String, String> queryParams = new HashMap<>();
-        if (requestLine == null || requestLine.isEmpty()) {
-            return queryParams;
-        }
-        String url = getUrl(requestLine);
-        int idx = url.indexOf('?');
-        if (idx < 0) {
-            return queryParams;
-        }
-        String queryString = url.substring(idx + 1);
-        String[] pairs = queryString.split("&");
-        for (String pair : pairs) {
-            String[] keyValue = pair.split("=");
-            if (keyValue.length == 2) {
-                queryParams.put(keyValue[0], keyValue[1]);
-            }
-        }
-        return queryParams;
-    }
-     */
 }

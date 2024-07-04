@@ -1,26 +1,41 @@
 package util;
 
-import org.junit.jupiter.api.Assertions;
+import static org.assertj.core.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 
 class RequestLineTest {
 
-    private final String url = "GET /index.html HTTP/1.1";
-    private RequestLine requestLine = new RequestLine(url);
 
-    @DisplayName("path테스트")
+    @DisplayName("RequestLine을 분석해서 path를 파싱하는 테스트입니다.")
     @Test
-    public void path테스트()
+    void path테스트()
     {
-        Assertions.assertEquals("src/main/resources/static/index.html",requestLine.getPath());
+        //given
+        String url ="GET /index.html HTTP/1.1";
+
+        //when
+        RequestLine requestLine = new RequestLine(url);
+
+        //then
+        assertThat(requestLine.getPath()).isEqualTo("src/main/resources/static/index.html");
+
+
     }
 
-    @DisplayName("method테스트")
+    @DisplayName("RequestLine을 분석해서 method를 파싱하는 테스트입니다")
     @Test
-    public void method테스트() {
-        Assertions.assertEquals("GET",requestLine.getMethod());
+    void method테스트() {
+        //given
+        String url ="GET /index.html HTTP/1.1";
+
+        //when
+        RequestLine requestLine = new RequestLine(url);
+
+        //then
+        assertThat(requestLine.getMethod()).isEqualTo("GET");
     }
 
 }
