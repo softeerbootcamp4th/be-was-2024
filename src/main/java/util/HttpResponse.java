@@ -31,7 +31,7 @@ public class HttpResponse {
     public void sendRedirect(String location) {
         try {
             logger.info("Sending redirect to " + location);
-            writeStatusLine(302, "Found");
+            writeStatusLine(303, "See Other");
             writeHeader("Location", location);
             writeBlankLine();
             logger.info("완료 redirect to " + location);
