@@ -23,7 +23,7 @@
       </header>
       <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form action="/create" method="get" class="form">
+        <form action="/user/create" method="get" class="form">
           <div class="textfield textfield_size_s">
             <p class="title_textfield">아이디</p>
             <input
@@ -40,6 +40,15 @@
               placeholder="닉네임을 입력해주세요"
               autocomplete="username"
               name="name"
+            />
+          </div>
+          <div class="textfield textfield_size_s">
+            <p class="title_textfield">이메일</p>
+            <input
+                    class="input_textfield"
+                    placeholder="이메일을 입력해주세요"
+                    autocomplete="email"
+                    name="email"
             />
           </div>
           <div class="textfield textfield_size_s">

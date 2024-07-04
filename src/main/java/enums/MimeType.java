@@ -1,4 +1,4 @@
-package webserver;
+package enums;
 
 public enum MimeType {
     HTML("text/html"),
@@ -18,7 +18,6 @@ public enum MimeType {
     public String getMimeType() {
         return mimeType;
     }
-
 
     @Override
     public String toString() {

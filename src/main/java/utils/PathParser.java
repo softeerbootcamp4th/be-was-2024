@@ -1,4 +1,4 @@
-package webserver;
+package utils;
 
 public class PathParser {
 

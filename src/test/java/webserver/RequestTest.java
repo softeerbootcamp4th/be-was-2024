@@ -1,15 +1,11 @@
 package webserver;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import utils.HttpRequestParser;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class RequestTest {
 
