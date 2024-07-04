@@ -26,10 +26,18 @@ public class MyHttpResponse {
         return headers;
     }
 
+    /**
+     * 응답 바디 부분을 반환한다. (직접 변경은 권장 X)
+     * @return
+     */
     public byte[] getBody() {
         return body;
     }
 
+    /**
+     * 응답 상태를 지정한다
+     * @param statusInfo 응답 상태
+     */
     public void setStatusInfo(HttpStatusType statusInfo) {
         this.statusInfo = statusInfo;
     }
@@ -38,9 +46,21 @@ public class MyHttpResponse {
         return statusInfo;
     }
 
-    // 바디를 쓰면 Content-Length도 함께 설정해주기
+    /**
+     * body에 데이터를 쓴다. Content-Length 헤더를 함께 업데이트한다.
+     * @param body
+     */
     public void setBody(byte[] body) {
         this.body = body;
         getHeaders().putHeader("Content-Length", String.valueOf(body.length));
+    }
+
+    /**
+     * location 경로로 redirect 한다.
+     * @param location redirect 할 경로
+     */
+    public void redirect(String location) {
+        setStatusInfo(HttpStatusType.FOUND);
+        getHeaders().putHeader("Location", location);
     }
 }
