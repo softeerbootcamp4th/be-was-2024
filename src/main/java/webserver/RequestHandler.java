@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequest;
 import util.HttpResponse;
 
+import db.Database;
+import model.User;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -47,21 +50,53 @@ public class RequestHandler implements Runnable {
 
     private void handleRequest(HttpRequest request, HttpResponse response) {
         String url = request.getUrl();
-        if ("/".equals(url) || !url.contains(".")) {
-            url = url.endsWith("/") ? url + "index.html" : url + "/index.html";
+        switch (url){
+            case "/": url = "/index.html";
+                break;
+            case "/register.html": url = "/registration/index.html";
+                break;
+            case "/login.html": url = "/login/index.html";
+                break;
+            case "/article.html": url = "/article/index.html";
+                break;
+            case "/comment.html": url = "/comment/index.html";
+                break;
+            case "/main.html": url = "/main/index.html";
+                break;
+            default: url = url;
         }
 
-        request.setUrl(url);
-        String contentType = request.getContentType();
-        logger.debug("HTTP Request URL: " + request.getUrl());
-        logger.debug("HTTP Request Content-Type: " + contentType);
+        if(isDynamicRequest(request.getPath())){
+            handleDynamicRequest(request, response);
+        }else {
+            request.setUrl(url);
+            String contentType = request.getContentType();
+            handleFileRequest(url, contentType, response);
+        }
+    }
 
-        handleFileRequest(url, contentType, response);
+    private boolean isDynamicRequest(String path) {
+        return path.startsWith("/create") || path.startsWith("/update") || path.startsWith("/delete");
+    }
+
+    private void handleDynamicRequest(HttpRequest request, HttpResponse response) {
+        String path = request.getPath();
+        Map<String, String> queryParams = request.getQueryParams();
+        logger.debug("@@@@@@@@@@@@@@@@@@@@@@" + path+"@@@@@@@@@@@@@@@@@@");
+        if (path.startsWith("/create")) {
+            String userId = queryParams.get("userId");
+            String password = queryParams.get("password");
+            String name = queryParams.get("name");
+            String email = queryParams.get("email");
+
+            // 회원가입 로직을 처리합니다.
+            Database.addUser(new User(userId, password, name, email));
+            response.sendRedirect("/index.html");
+        }
     }
 
     private void handleFileRequest(String url, String contentType, HttpResponse response) {
         File file = new File(ROOT_DIRECTORY + url);
-        logger.debug("HTTP Request File: " + file.getAbsolutePath());
         if (file.exists() && !file.isDirectory()) {
             byte[] body = readFileToByteArray(file);
             response.sendResponse(200, "OK", contentType, body);
@@ -72,7 +107,7 @@ public class RequestHandler implements Runnable {
 
     private void send404Response(HttpResponse response) {
         String body = "<html><body><h1>404 Not Found</h1></body></html>";
-        response.sendResponse(404, "Not Found", "text/html;charset=utf-8", body.getBytes());
+        response.sendResponse(404, "Not Found", "text/html", body.getBytes());
     }
 
     private byte[] readFileToByteArray(File file) {
