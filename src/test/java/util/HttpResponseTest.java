@@ -45,4 +45,28 @@ public class HttpResponseTest {
                 "<html><body><h1>404 Not Found</h1></body></html>";
         assertThat(expectedResponse).isEqualTo(outputStream.toString());
     }
+
+    @Test
+    public void testSendRedirect() throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(outputStream);
+
+        // Mock the logger if it's used in your actual implementation
+
+
+        HttpResponse response = new HttpResponse(dos);
+        
+
+        String location = "http://example.com";
+        response.sendRedirect(location);
+
+        String expectedResponse = "HTTP/1.1 302 Found\r\n" +
+                "Location: http://example.com\r\n" +
+                "\r\n";
+
+        assertThat(expectedResponse).isEqualTo(outputStream.toString());
+
+        // Verify logger interactions if needed
+
+    }
 }
