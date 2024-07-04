@@ -18,7 +18,13 @@ public class StaticFileReader implements ByteReader {
     }
 
     @Override
-    public byte[] readBytes() throws IOException {
-        return fileInputStream.readAllBytes();
+    public byte[] readBytes()  {
+        try{
+            return fileInputStream.readAllBytes();
+        }
+        catch(IOException e){
+            return new byte[0];
+        }
+
     }
 }

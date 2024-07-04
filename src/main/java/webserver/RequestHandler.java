@@ -14,7 +14,7 @@ public class RequestHandler implements Runnable {
     private final RequestParser requestParser;
 
     private Socket connection;
-    private ResponsePrinter responsePrinter;
+    private ResponseWriter responseWriter;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -27,7 +27,7 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             HttpRequest httpRequest = requestParser.parseRequest(in);
-            ResponseMaker responseMaker = new ResponseMaker(new UserMapper(),new ResponsePrinter());
+            ResponseMaker responseMaker = new ResponseMaker(new UserMapper(),new ResponseWriter());
             responseMaker.makeResponse(httpRequest,out);
         } catch (IOException e) {
             logger.error(e.getMessage());

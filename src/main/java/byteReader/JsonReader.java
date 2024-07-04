@@ -17,13 +17,18 @@ public class JsonReader implements ByteReader{
     }
 
     @Override
-    public byte[] readBytes() throws IOException {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+    public byte[] readBytes()  {
+        try{
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
 
-        objectOutputStream.writeObject(object);
-        objectOutputStream.flush();
+            objectOutputStream.writeObject(object);
+            objectOutputStream.flush();
+            return byteArrayOutputStream.toByteArray();
+        }
+        catch (IOException e){
+            return new byte[0];
+        }
 
-        return byteArrayOutputStream.toByteArray();
     }
 }

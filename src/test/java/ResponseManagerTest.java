@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import requestForm.SignInForm;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 public class ResponseManagerTest {
@@ -20,7 +19,7 @@ public class ResponseManagerTest {
         FileInputStream fileInputStream = new FileInputStream(FILE_BASE_URL+"/index.html");
         String realFile = new String(fileInputStream.readAllBytes());
         System.out.println(realFile);
-        ByteReader helloPage = responseManager.getByte("/index.html");
+        ByteReader helloPage = responseManager.getResponse("/index.html");
         String foundFile = new String(helloPage.readBytes());
         Assertions.assertTrue(realFile.equals(foundFile));
     }
@@ -35,7 +34,7 @@ public class ResponseManagerTest {
             map.put(key[i],value[i]);
         }
         SignInForm signInForm = new SignInForm(map);
-        ByteReader newUserInform = responseManager.getByte("/create?" +
+        ByteReader newUserInform = responseManager.getResponse("/create?" +
                 "userId="+value[0] +
                 "&password="+value[1] +
                 "&name=" +value[2]+

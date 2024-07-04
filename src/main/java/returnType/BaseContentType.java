@@ -1,5 +1,7 @@
 package returnType;
 
+import java.util.Arrays;
+
 public enum BaseContentType {
     TEXT(new String[]{"html", "css"},"text"),
     IMAGE(new String[]{"png", "jpg", "ico", "svg"},"image"),
@@ -13,14 +15,11 @@ public enum BaseContentType {
         this.contentType = contentType;
     }
     public static String getBaseContentType(String extension) {
-        for(BaseContentType type : BaseContentType.values()) {
-            for(String ext : type.extensions) {
-                if(extension.endsWith(ext)) {
-                    return type.contentType;
-                }
-            }
-        }
-        return TEXT.contentType;
+        return Arrays.stream(BaseContentType.values())
+                .filter(type -> Arrays.stream(type.extensions).anyMatch(ext -> extension.endsWith(ext)))
+                .findAny()
+                .map(type -> type.contentType)
+                .orElse(TEXT.contentType);
         //없다면 text/plain
     }
 }

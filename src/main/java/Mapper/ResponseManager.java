@@ -3,6 +3,8 @@ package Mapper;
 import byteReader.ByteReader;
 import requestForm.SignInForm;
 import returnType.ContentTypeMaker;
+import webserver.HttpResponse;
+import webserver.ResponseDataMaker;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -10,29 +12,41 @@ import java.util.HashMap;
 public class ResponseManager {
     private final UserMapper userMapper;
     private final URIParser uriParser;
+    private ResponseDataMaker responseDataMaker;
     public ResponseManager(UserMapper userMapper){
         this.userMapper = userMapper;
         uriParser = new URIParser();
     }
-    public ByteReader getByte(String originalUrl) throws FileNotFoundException {
+    public HttpResponse getResponse(String originalUrl)  {
+        String message = "";
+        ByteReader byteReader = null;
         try{
             String changedUrl;
             RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
             System.out.println(requestInformation.getPath()[1]);
             if (requestInformation.getPath()[1].equals("registration")) {
                 changedUrl = "registration/index.html";
-                return new StaticFileFounder().findFile(changedUrl, ContentTypeMaker.getContentType(changedUrl));
+                byteReader= new StaticFileFounder().findFile(changedUrl, ContentTypeMaker.getContentType(changedUrl));
+                message ="OK";
             }
-            if (requestInformation.getPath()[1].equals("create")) {
+            else if (requestInformation.getPath()[1].equals("create")) {
                 SignInForm signInForm = new SignInForm(requestInformation.getInformation());
-                return userMapper.addUser(signInForm);
+                byteReader= userMapper.addUser(signInForm);
+                message ="OK";
             }
-            return new StaticFileFounder().findFile(originalUrl, ContentTypeMaker.getContentType(originalUrl));
+            else{
+                byteReader = new StaticFileFounder().findFile(originalUrl, ContentTypeMaker.getContentType(originalUrl));
+                message ="OK";
+            }
+        }
+        catch (FileNotFoundException e){
+            message = "NOT_FOUND";
         }
         catch (Exception e){
-            e.printStackTrace();
-            return new StaticFileFounder().findFile("404Page.html", ContentTypeMaker.getContentType(originalUrl));
+            message = "ERROR";
         }
+        ResponseDataMaker responseDataMaker = new ResponseDataMaker(byteReader, message);
+        return responseDataMaker.getHttpResponse();
     }
 }
 class URIParser{
