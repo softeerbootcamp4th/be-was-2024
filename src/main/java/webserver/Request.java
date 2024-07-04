@@ -15,37 +15,17 @@ public class Request{
     private String path;
     private String httpVersion;
     private Map<String, String> httpHeaders;
+    private Map<String, String> parameters;
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    public Request(BufferedReader br) throws IOException {
-        requestLineParse(br.readLine());
-        httpHeaders = new ConcurrentHashMap<>();
-        List<String> headerLines = new ArrayList<>();
-        String tmp;
-        while((tmp = br.readLine()) != null && !tmp.isEmpty()) {
-            headerLines.add(tmp);
-        }
-        requestHeaderParse(headerLines);
+    public Request() {}
+
+    public String getHeader(String HeaderKey) {
+        return httpHeaders.get(HeaderKey);
     }
 
-    public void requestHeaderParse(List<String> headerLines) throws IOException {
-        for(String headerLine: headerLines) {
-            logger.debug("header " + headerLine);
-            String[] headerkv = headerLine.split(": ");
-            httpHeaders.put(headerkv[0], headerkv[1]);
-        }
-    }
-
-    public void requestLineParse(String requestLine) throws IOException {
-        logger.debug("requestLine " + requestLine);
-        String[] s = requestLine.split(" ");
-        this.method = s[0];
-        this.path = s[1];
-        this.httpVersion = s[2];
-    }
-
-    public String getHeader(String HeaderName) {
-        return httpHeaders.get(HeaderName);
+    public String getParameter(String parameterKey) {
+        return parameters.get(parameterKey);
     }
 
     public String getMethod() {
@@ -58,5 +38,29 @@ public class Request{
 
     public String getHttpVersion() {
         return httpVersion;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public void setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
+
+    public Map<String, String> getHttpHeaders() {
+        return httpHeaders;
+    }
+
+    public void setHttpHeaders(Map<String, String> httpHeaders) {
+        this.httpHeaders = httpHeaders;
+    }
+
+    public void setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
     }
 }

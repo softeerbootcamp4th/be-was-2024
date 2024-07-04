@@ -23,14 +23,14 @@ public class RequestHandler implements Callable<Void> {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            Request request = new Request(br);
             DataOutputStream dos = new DataOutputStream(out);
+            HttpRequestParser httpRequestParser = new HttpRequestParser();
+            Request request = httpRequestParser.getRequest(in);
 
             // 파일 반환
             byte[] body;
             try(
-                    FileInputStream fis = new FileInputStream(new File("src/main/resources/static" + request.getPath()));
+                    FileInputStream fis = new FileInputStream("src/main/resources/static" + request.getPath());
                     BufferedInputStream bis = new BufferedInputStream(fis);
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     ) {
