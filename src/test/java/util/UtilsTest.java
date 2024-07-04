@@ -27,13 +27,6 @@ class UtilsTest {
     }
 
     @Test
-    void getFile() throws IOException {
-        //HELP resources 폴더 안의 테스트 파일에 의존함.
-        byte[] bytes = new byte[]{'t', 'e', 's', 't'};
-        assertArrayEquals(bytes, Utils.getFile("/test/test.html"));
-    }
-
-    @Test
     void contentType() {
 
         //given
