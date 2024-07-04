@@ -1,13 +1,26 @@
 package webserver;
 
 import exception.NotExistException;
+import webserver.request.Parameter;
+
+import java.util.Optional;
 
 public class Path {
 
-    private String path;
+    private final String path;
+    private final Optional<Parameter> parameter;
 
     public Path(String path){
         this.path = path;
+        String[] splitPath = path.split("\\?");
+        String parameters;
+        try{
+            parameters = splitPath[1];
+        }catch (ArrayIndexOutOfBoundsException e){
+            this.parameter = Optional.empty();
+            return;
+        }
+        this.parameter = Optional.of(new Parameter(parameters));
     }
 
     public String getExtension(){
@@ -29,6 +42,10 @@ public class Path {
         }
 
         return true;
+    }
+
+    public Optional<Parameter> getParameter(){
+        return this.parameter;
     }
 
 }
