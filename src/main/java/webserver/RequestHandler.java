@@ -41,20 +41,13 @@ public class RequestHandler implements Runnable {
 
     private void frontRequestProcess(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
         String path = httpRequestObject.getRequestPath();
-        if(path.equals("/user/create")) {
+        if(path.equals("/user/create") && httpRequestObject.getRequestMethod().equals("GET")) {
             userRequestProcess.createUser(httpRequestObject);
-            dynamicResponse(out, httpRequestObject);
+            response302Header(new DataOutputStream(out), "/index.html");
+            return;
         }
-        else {
-            staticResponse(out, httpRequestObject);
-        }
-    }
 
-    private void dynamicResponse(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
-        DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = FileUtil.readBytesFromFile(FileUtil.STATIC_PATH + "/index.html");
-        response200Header(dos, body.length, ContentType.HTML.getExtension());
-        responseBody(dos, body);
+        staticResponse(out, httpRequestObject);
     }
 
     private void staticResponse(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
@@ -70,6 +63,16 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + ContentType.getType(extension) + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String location) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
