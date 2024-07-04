@@ -53,21 +53,15 @@ public class RequestHandler implements Runnable {
 
     private void handleRequest(HttpRequest request, HttpResponse response) {
         String url = request.getUrl();
-        switch (url){
-            case "/": url = "/index.html";
-                break;
-            case "/register.html": url = "/registration/index.html";
-                break;
-            case "/login.html": url = "/login/index.html";
-                break;
-            case "/article.html": url = "/article/index.html";
-                break;
-            case "/comment.html": url = "/comment/index.html";
-                break;
-            case "/main.html": url = "/main/index.html";
-                break;
-            default: url = url;
-        }
+        url = switch (url) {
+            case "/" -> "/index.html";
+            case "/register.html" -> "/registration/index.html";
+            case "/login.html" -> "/login/index.html";
+            case "/article.html" -> "/article/index.html";
+            case "/comment.html" -> "/comment/index.html";
+            case "/main.html" -> "/main/index.html";
+            default -> url;
+        };
 
         if(isDynamicRequest(request.getPath())){
             handleDynamicRequest(request, response);
