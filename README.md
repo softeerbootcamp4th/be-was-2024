@@ -100,6 +100,8 @@ public void run() { //RequestHandler의 run 부분
 
 switch문을 이용하여 지원하는 content type에 따른 header 추가
 지원하지 않는 type의 경우 405 error를 띄우도록 만듬
+
+
 ```java
 switch (tokens[1].split("\\.")[1]) { //content type에 따른 response
     case "html":
@@ -137,3 +139,42 @@ switch (tokens[1].split("\\.")[1]) { //content type에 따른 response
 ```
 
 ### Task 3
+
+    학습 목표
+
+    HTTP GET 프로토콜을 이해한다.
+    HTTP GET에서 parameter를 전달하고 처리하는 방법을 학습한다.
+    HTTP 클라이언트에서 전달받은 값을 서버에서 처리하는 방법을 학습한다.
+
+    기능요구사항
+    
+    GET으로 회원가입 기능 구현
+
+    “회원가입” 메뉴를 클릭하면 http://localhost:8080/register.html 로 이동, 회원가입 폼을 표시한다.
+    이 폼을 통해서 회원가입을 할 수 있다.
+
+전반적인 코스 구성 수정 및 기능 추가가 진행됨
+#### 구조 변경
+    webserver
+    - WebServer : webserver 구동기
+    - RequestHandler : reqeust 입출력 처리
+        api
+        - ApiFuncion : static file 읽기, 회원가입 등 모든 function의 처리용 interface
+        - ReadFile : static file 읽는 용도 class
+        - Registration : 회원가입용 class
+        http
+        - url : url에 대한 path와 parameter의 정보가 담겨있는 class
+        - PathHandler : 해당 url path에 대하여 실행해야 하는 function을 찾는용도
+        - HttpRequest : request에 대한 모든 정보가 있는 class
+        - HttpResponse : response에 대한 모든 정보가 있는 class
+            enums
+            - Methods (enum) : methods들에 대한 enum
+            - Extention (enum) : 지원하는 모든 확장자들에 대한 content-type이 저장되어있음
+            - StatusCode (enum) : response code들에 대한 message가 저장되어있음
+
+#### 기능추가
+register내부의 index.html파일을 수정하여 회원가입 버튼을 누르면 id, username, password가 url을 통해서 전달되게끔 변경
+get 요청이 올 시에 path경로를 분석하여 회원가입 기능을 실행하게끔 변경
+
+
+
