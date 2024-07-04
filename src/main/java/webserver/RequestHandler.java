@@ -3,6 +3,7 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import model.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.RequestParser;
@@ -10,6 +11,7 @@ import util.RequestParser;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final String RESOURCE_PATH = "src/main/resources/static";
 
     private Socket connection;
 
@@ -22,19 +24,12 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            //inputStream을 문자열로 변환
-            BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = buffer.readLine();
-            String path = RequestParser.parseUriFromRequestHeaderStartLine(line);
-            String contentType = RequestParser.parseContentTypeFromRequestHeaderStartLine(line);
-
-            while (!line.isEmpty()) {
-                logger.debug(line);
-                line=buffer.readLine();
-            }
+            //inputstream을 HttpRequest 객체로 변환
+            HttpRequest httpRequest = RequestParser.convertInputStreamToHttpRequest(in);
+            String contentType = RequestParser.parseContentTypeFromRequestPath(httpRequest.getPath());
 
             DataOutputStream dos = new DataOutputStream(out);
-            File file = new File("src/main/resources/static" + path);
+            File file = new File(RESOURCE_PATH + httpRequest.getPath());
 
             //io를 사용하여 파일 읽어오기
             InputStream fileInputStream = new FileInputStream(file);
