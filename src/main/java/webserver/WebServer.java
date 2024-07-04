@@ -20,7 +20,8 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
         //스레드풀 생성
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+
 
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
         try (ServerSocket listenSocket = new ServerSocket(port)) {
