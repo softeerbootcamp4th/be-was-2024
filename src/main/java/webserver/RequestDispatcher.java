@@ -33,7 +33,10 @@ public class RequestDispatcher {
         HashMap<String, String> query = new HashMap<>();
         if (list.size() > 1 && !list.get(1).isEmpty()) {
             Arrays.stream(list.get(1).split("&"))
-                    .forEach(key -> query.put(key.split("=")[0], key.split("=")[1]));
+                    .forEach(key -> {
+                        String[] keyValue = key.split("=");
+                        query.put(keyValue[0], keyValue.length > 1 ? keyValue[1] : "");
+                    });
         }
 
         // 요청 경로에 따른 처리 분리
