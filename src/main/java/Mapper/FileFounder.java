@@ -6,5 +6,5 @@ import java.io.FileNotFoundException;
 
 public interface FileFounder {
 
-    ByteReader findFile(String fileUrl) throws FileNotFoundException;
+    ByteReader findFile(String fileUrl,String contentType) throws FileNotFoundException;
 }

@@ -6,9 +6,17 @@ import java.io.IOException;
 
 public class StaticFileReader implements ByteReader {
     private FileInputStream fileInputStream;
-    public StaticFileReader(String fileUrl) throws FileNotFoundException {
-        fileInputStream = new FileInputStream(fileUrl);
+    private String contentType;
+    public StaticFileReader(String fileUrl,String contentType) throws FileNotFoundException {
+        this.fileInputStream = new FileInputStream(fileUrl);
+        this.contentType = contentType;
     }
+
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
     @Override
     public byte[] readBytes() throws IOException {
         return fileInputStream.readAllBytes();

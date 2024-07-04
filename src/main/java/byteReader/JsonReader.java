@@ -6,9 +6,16 @@ import java.io.ObjectOutputStream;
 
 public class JsonReader implements ByteReader{
     private Object object;
+    private String contentType = "application/json";
     public JsonReader(Object object){
         this.object = object;
     }
+
+    @Override
+    public String getContentType() {
+        return contentType;
+    }
+
     @Override
     public byte[] readBytes() throws IOException {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

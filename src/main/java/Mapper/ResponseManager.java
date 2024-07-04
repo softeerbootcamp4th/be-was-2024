@@ -1,11 +1,10 @@
 package Mapper;
 
 import byteReader.ByteReader;
-import byteReader.StaticFileReader;
 import requestForm.SignInForm;
+import returnType.ContentTypeMaker;
 
 import java.io.FileNotFoundException;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class ResponseManager {
@@ -17,19 +16,22 @@ public class ResponseManager {
     }
     public ByteReader getByte(String originalUrl) throws FileNotFoundException {
         try{
+            String changedUrl;
             RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
+            System.out.println(requestInformation.getPath()[1]);
             if (requestInformation.getPath()[1].equals("registration")) {
-                return new StaticFileFounder().findFile("registration/index.html");
+                changedUrl = "registration/index.html";
+                return new StaticFileFounder().findFile(changedUrl, ContentTypeMaker.getContentType(changedUrl));
             }
             if (requestInformation.getPath()[1].equals("create")) {
                 SignInForm signInForm = new SignInForm(requestInformation.getInformation());
                 return userMapper.addUser(signInForm);
             }
-            return new StaticFileFounder().findFile(originalUrl);
+            return new StaticFileFounder().findFile(originalUrl, ContentTypeMaker.getContentType(originalUrl));
         }
         catch (Exception e){
             e.printStackTrace();
-            return new StaticFileFounder().findFile("404Page.html");
+            return new StaticFileFounder().findFile("404Page.html", ContentTypeMaker.getContentType(originalUrl));
         }
     }
 }
