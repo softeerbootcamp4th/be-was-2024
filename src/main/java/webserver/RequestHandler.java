@@ -34,30 +34,44 @@ public class RequestHandler implements Runnable {
                 logger.debug("request Headers : {}",line);
             }
 
-            String path = FileDetection.getPath(FileDetection.fixedPath+requestObject.getPath());
-            //디렉토리면 /index.html이 추가되어서 path가 설정된다
-
-
-
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
+            frontRequest(dos,requestObject);
 
-            byte[] body;
-            File fi = new File(path);
-            try(FileInputStream fin = new FileInputStream(fi);
-                BufferedInputStream bi = new BufferedInputStream(fin);)
-            {
-                body = new byte[(int)fi.length()];
-                bi.read(body);
-            }
-
-            response200Header(dos,body.length,path);
-            responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
+    private void frontRequest(DataOutputStream dos,RequestObject requestObject)
+    {
+        String method = requestObject.getMethod();
+        String path = requestObject.getPath();
+        if(method.equals("GET")&& path.equals("/user/create"))//GET방식의 회원가입 일 시
+        {
+
+            return ;
+        }
+
+
+        // 파일 요청이 들어왔다면
+        byte[] body;
+        path = FileDetection.getPath(FileDetection.fixedPath + path) ;
+        File fi = new File(path);
+        try(FileInputStream fin = new FileInputStream(fi);
+            BufferedInputStream bi = new BufferedInputStream(fin);)
+        {
+            body = new byte[(int)fi.length()];
+            bi.read(body);
+            response200Header(dos,body.length,path);
+            responseBody(dos, body);
+        }
+        catch(IOException e)
+        {
+            logger.error(e.getMessage());
+        }
+
+    }
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent,String url) {
         try {
             String[] temp = url.split("\\.");
@@ -67,14 +81,6 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
-        }
-    }
-
-    private void frontRequestProcess(String method,String path)
-    {
-        if(method.equals("GET")&&path.equals("/user/create"))//회원가입일시
-        {
-
         }
     }
 
