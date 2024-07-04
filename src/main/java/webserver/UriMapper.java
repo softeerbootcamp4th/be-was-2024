@@ -9,8 +9,8 @@ public class UriMapper {
 
         //정적 페이지 리턴
         return switch (uri){
-            case "/registration.html" -> "/registration/index.html";
-            default -> uri;
+            case "/registration.html" -> "src/main/resources/static/registration/index.html";
+            default -> "src/main/resources/static" + uri;
         };
     }
 }

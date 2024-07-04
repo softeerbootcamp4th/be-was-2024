@@ -32,13 +32,31 @@ public class RequestHandler implements Runnable {
             String requestString = HttpRequestParser.getRequestString(in);
             logger.debug(requestString);
             HttpRequestMessage httpRequestMessage = HttpRequestParser.getHttpRequestMessage(requestString);
-            String path = "src/main/resources/static" + UriMapper.mapUri(httpRequestMessage.getUri());
-            byte[] body = FileUtil.readAllBytesFromFile(new File(path));
-            response200Header(dos, path.split("\\.")[1] ,body.length);
-            responseBody(dos, body);
+            String path = UriMapper.mapUri(httpRequestMessage.getUri());
+            if (path.startsWith("redirect:")) redirect(dos,path.substring(9));
+            else response200(path, dos);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void redirect(DataOutputStream dos, String location) throws IOException {
+        try {
+            dos.writeBytes("HTTP/1.1 303 \r\n");
+            dos.writeBytes("Location: " + location + "\r\n");
+            dos.writeBytes("Content-Type: " + findContentType("html") +";charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: 0" + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response200(String path, DataOutputStream dos) throws IOException {
+        byte[] body = FileUtil.readAllBytesFromFile(new File(path));
+        response200Header(dos, path.split("\\.")[1] ,body.length);
+        responseBody(dos, body);
     }
 
     private void response200Header(DataOutputStream dos, String ext, int lengthOfBodyContent) {

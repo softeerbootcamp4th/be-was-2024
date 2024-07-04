@@ -16,6 +16,6 @@ public class DynamicRequestProcess {
             map.put(entry[0], entry[1]);
         }
         Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), map.get("email")));
-        return "/index.html";
+        return "redirect:/index.html";
     }
 }
