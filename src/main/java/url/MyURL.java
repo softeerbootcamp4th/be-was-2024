@@ -11,7 +11,7 @@ import java.util.Map;
 public class MyURL {
     private String protocol;
     private String domain;
-    private int port;
+    private Integer port;
     private String pathname;
     private Map<String, String> parameters;
 
@@ -19,7 +19,7 @@ public class MyURL {
         String[] urlParts = getUrlEachPart(url);
         protocol = urlParts[0];
         domain = urlParts[1];
-        port = Integer.parseInt(urlParts[2]);
+        port = urlParts[2] != null ? Integer.parseInt(urlParts[2]) : null;
         pathname = urlParts[3];
         parameters = parseParameter(urlParts[4]);
     }
@@ -82,12 +82,18 @@ public class MyURL {
      */
     public static Map<String, String> parseParameter(String parameterString) {
         Map<String, String> parameters = new HashMap<String, String>();
+        if (parameterString == null || parameterString.isEmpty()) return parameters;
 
         String[] paramLines = parameterString.split("&");
         for (String paramLine : paramLines) {
             // value 에 2개 나올 수 있음
             String[] keyValue = paramLine.split("=", 2);
-            if(keyValue.length != 2) continue; // TODO 예외처리 필요하면 교체
+
+            if(keyValue.length != 2) continue;
+
+            // key 값만 지정된 것은 전달되지 않은 것과 동일하다고 판단, 파라미터에 추가하지 않는다.
+            // 둘을 구분해야 한다면, 이 부분을 변경한다.
+            if(keyValue[1].isEmpty()) continue;
 
             String key = keyValue[0];
             String value = keyValue[1];
@@ -105,13 +111,14 @@ public class MyURL {
         return domain;
     }
 
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
 
     public String getPathname() {
         return pathname;
     }
+
 
     public Map<String, String> getParameters() {
         return Collections.unmodifiableMap(parameters);

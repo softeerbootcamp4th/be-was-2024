@@ -71,4 +71,16 @@ class MyURLTest {
         Assertions.assertThat(parts2[3]).isEqualTo(expectedToPathName2);
         Assertions.assertThat(parts2[4]).isEqualTo(expectedToQueryString2);
     }
+
+    @Test
+    @DisplayName("static 파일의 경우 pathname으로 얻을 수 있음")
+    void getUrlEachPart_CanGetStaticUrlByPathname() {
+        String input = "/index.html";
+        String expectedToPathname = "/index.html";
+
+        // pathname은 3번째
+        String[] parts = MyURL.getUrlEachPart(input);
+
+        Assertions.assertThat(parts[3]).isEqualTo(expectedToPathname);
+    }
 }
