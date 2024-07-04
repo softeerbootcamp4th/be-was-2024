@@ -10,8 +10,8 @@ public class Path {
     private final Optional<Parameter> parameter;
 
     public Path(String path){
-        this.path = path;
         String[] splitPath = path.split("\\?");
+        this.path = splitPath[0];
         String parameters;
         try{
             parameters = splitPath[1];

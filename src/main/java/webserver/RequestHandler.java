@@ -3,10 +3,13 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.request.HttpRequest;
 import webserver.request.Path;
+import webserver.request.Parameter;
 import webserver.response.HttpResponse;
 import webserver.response.ResponseHandler;
 
@@ -31,23 +34,37 @@ public class RequestHandler implements Runnable {
             logger.debug(request);
 
             HttpRequest httpRequest = new HttpRequest(request);
+            Path path = httpRequest.getPath();
 
             if(httpRequest.getPath().isStatic()){
 
-                byte[] body = getFile(httpRequest.getPath().get());
+                byte[] body = getFile(path.get());
                 HttpResponse response = new HttpResponse(200, body);
-                response.addHeader("Content-Type", getContentType(httpRequest.getPath().getExtension())+";charset=utf-8");
+                response.addHeader("Content-Type", getContentType(path.getExtension())+";charset=utf-8");
                 response.addHeader("Content-Length", String.valueOf(body.length));
                 ResponseHandler.response(out, response);
             }else {
-                if(httpRequest.getPath().get().equals("/registration")){
+                switch(path.get()){
+                    case "/registration":
+                        byte[] body = "".getBytes();
+                        HttpResponse response = new HttpResponse(302, body);
+                        response.addHeader("Content-Length", String.valueOf(body.length));
+                        response.addHeader("Location", "/registration/index.html");
 
-                    byte[] body = "".getBytes();
-                    HttpResponse response = new HttpResponse(302, body);
-                    response.addHeader("Content-Length", String.valueOf(body.length));
-                    response.addHeader("Location", "/registration/index.html");
+                        ResponseHandler.response(out, response);
+                        break;
 
-                    ResponseHandler.response(out, response);
+                    case "/create":
+                        Parameter parameter = path.getParameter().get();
+                        User user = new User(
+                                parameter.get("userId"),
+                                parameter.get("password"),
+                                parameter.get("name"),
+                                parameter.get("email")
+                        );
+                        Database.addUser(user);
+                        System.out.println(user);
+                        break;
                 }
             }
 
