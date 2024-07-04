@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -12,6 +13,8 @@ import util.HttpResponse;
 
 import db.Database;
 import model.User;
+
+import java.net.URLDecoder.*;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
@@ -83,12 +86,27 @@ public class RequestHandler implements Runnable {
         String path = request.getPath();
         Map<String, String> queryParams = request.getQueryParams();
         if (path.startsWith("/create")) {
-            String userId = queryParams.get("userId");
-            String password = queryParams.get("password");
-            String name = queryParams.get("name");
-            String email = queryParams.get("email");
+//            String userId = queryParams.get("userId");
+//            String password = queryParams.get("password");
+//            String name = queryParams.get("name");
+//            String email = queryParams.get("email");
+            //decode the url
+            try {
+                String userId = URLDecoder.decode(queryParams.get("userId"), "UTF-8");
+                String password = URLDecoder.decode(queryParams.get("password"), "UTF-8");
+                String name = URLDecoder.decode(queryParams.get("name"), "UTF-8");
+                String email = URLDecoder.decode(queryParams.get("email"), "UTF-8");
+                Database.addUser(new User(userId, password, name, email));
+            } catch (UnsupportedEncodingException e) {
+                logger.error(e.getMessage());
+            }
 
-            Database.addUser(new User(userId, password, name, email));
+            for(User user : Database.findAll()){
+                logger.debug("user: {}", user.getUserId());
+                logger.debug("user: {}", user.getPassword());
+                logger.debug("user: {}", user.getName());
+                logger.debug("user: {}", user.getEmail());
+            }
             response.sendRedirect("/index.html");
         }
     }
