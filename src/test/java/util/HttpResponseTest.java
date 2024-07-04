@@ -1,6 +1,8 @@
 package util;
 
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.ByteArrayOutputStream;
@@ -18,12 +20,13 @@ public class HttpResponseTest {
         String body = "Hello World!";
         response.sendResponse(200, "OK", "text/html;charset=utf-8", body.getBytes());
 
-        String expectedResponse = "HTTP/1.1 200 OK \r\n" +
+        String expectedResponse = "HTTP/1.1 200 OK\r\n" +
                 "Content-Type: text/html;charset=utf-8\r\n" +
                 "Content-Length: 12\r\n" +
                 "\r\n" +
                 "Hello World!";
-        assertEquals(expectedResponse, outputStream.toString());
+//        assertEquals(expectedResponse, outputStream.toString());
+        assertThat(expectedResponse).isEqualTo(outputStream.toString());
     }
 
     @Test
@@ -35,11 +38,11 @@ public class HttpResponseTest {
         String body = "<html><body><h1>404 Not Found</h1></body></html>";
         response.sendResponse(404, "Not Found", "text/html;charset=utf-8", body.getBytes());
 
-        String expectedResponse = "HTTP/1.1 404 Not Found \r\n" +
+        String expectedResponse = "HTTP/1.1 404 Not Found\r\n" +
                 "Content-Type: text/html;charset=utf-8\r\n" +
-                "Content-Length: 44\r\n" +
+                "Content-Length: 48\r\n" +
                 "\r\n" +
                 "<html><body><h1>404 Not Found</h1></body></html>";
-        assertEquals(expectedResponse, outputStream.toString());
+        assertThat(expectedResponse).isEqualTo(outputStream.toString());
     }
 }
