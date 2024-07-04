@@ -12,6 +12,9 @@ import util.HttpResponse;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
+    private static final String ROOT_DIRECTORY = "src/main/resources/static";
+    private static final String DEFAULT_PAGE = "/index.html";
+
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -44,24 +47,21 @@ public class RequestHandler implements Runnable {
 
     private void handleRequest(HttpRequest request, HttpResponse response) {
         String url = request.getUrl();
-        String content = request.getContentType();
-        logger.debug("HTTP Request Content:\n" + content);
-
-        if ("/".equals(url)) {
-            handleRootRequest(response);
-        } else {
-            handleFileRequest(url, content, response);
+        if ("/".equals(url) || !url.contains(".")) {
+            url = url.endsWith("/") ? url + "index.html" : url + "/index.html";
         }
-    }
 
-    private void handleRootRequest(HttpResponse response) {
-        String responseBody = "Hello World!";
-        response.sendResponse(200, "OK", "text/html;charset=utf-8", responseBody.getBytes());
+        request.setUrl(url);
+        String contentType = request.getContentType();
+        logger.debug("HTTP Request URL: " + request.getUrl());
+        logger.debug("HTTP Request Content-Type: " + contentType);
+
+        handleFileRequest(url, contentType, response);
     }
 
     private void handleFileRequest(String url, String contentType, HttpResponse response) {
-        File file = new File("src/main/resources/static" + url);
-
+        File file = new File(ROOT_DIRECTORY + url);
+        logger.debug("HTTP Request File: " + file.getAbsolutePath());
         if (file.exists() && !file.isDirectory()) {
             byte[] body = readFileToByteArray(file);
             response.sendResponse(200, "OK", contentType, body);
@@ -85,6 +85,4 @@ public class RequestHandler implements Runnable {
             return null;
         }
     }
-
-
 }

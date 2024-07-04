@@ -32,7 +32,7 @@ public class HttpRequest {
             this.method = requestLine[0];
             this.url = requestLine[1];
             this.httpVersion = requestLine[2];
-            this.content = setContentType();
+            this.content = setContentType(this.url);
             logger.debug("Requested URL: " + url);
 
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -52,6 +52,11 @@ public class HttpRequest {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+        this.content = setContentType(url);
+    }
+
     public String getHttpVersion() {
         return httpVersion;
     }
@@ -60,9 +65,11 @@ public class HttpRequest {
         return headers.get(headerName);
     }
 
-    public String getContentType() {return content; }
+    public String getContentType() {
+        return content;
+    }
 
-    public String setContentType() {
+    private String setContentType(String url) {
         if (url.endsWith(".html")) {
             return "text/html";
         } else if (url.endsWith(".css")) {
