@@ -25,20 +25,19 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO httpRequest에 toString을 적용해서 아래 로직을 없애기
-            String request = getAllStrings(in);
-
+            String request = convert(in);
             logger.debug(request);
 
-            HttpRequest httpRequest = convert(in);
-            ResponseHandler.response(out, request, httpRequest.getPath().getExtension());
+            HttpRequest httpRequest = new HttpRequest(request);
+            ResponseHandler.response(out, httpRequest);
 
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private HttpRequest convert(InputStream inputStream) throws IOException {
-        return new HttpRequest(getAllStrings(inputStream));
+    private String convert(InputStream inputStream) throws IOException {
+        return getAllStrings(inputStream);
     }
 
 }
