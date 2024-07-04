@@ -17,6 +17,7 @@ public class HttpResponse {
 
     public void sendResponse(int statusCode, String statusMessage, String contentType, byte[] body) {
         try {
+
             writeStatusLine(statusCode, statusMessage);
             writeHeader("Content-Type", contentType);
             writeHeader("Content-Length", String.valueOf(body.length));
@@ -24,6 +25,18 @@ public class HttpResponse {
             writeBody(body);
         } catch (IOException e) {
             logger.error("Error sending HTTP response: " + e.getMessage());
+        }
+    }
+
+    public void sendRedirect(String location) {
+        try {
+            logger.info("Sending redirect to " + location);
+            writeStatusLine(302, "Found");
+            writeHeader("Location", location);
+            writeBlankLine();
+            logger.info("완료 redirect to " + location);
+        } catch (IOException e) {
+            logger.error("Error sending redirect response: " + e.getMessage());
         }
     }
 
