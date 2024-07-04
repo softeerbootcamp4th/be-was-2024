@@ -43,6 +43,10 @@ public class Path {
         return true;
     }
 
+    public String get(){
+        return this.path;
+    }
+
     public Optional<Parameter> getParameter(){
         return this.parameter;
     }

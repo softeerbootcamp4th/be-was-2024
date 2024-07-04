@@ -1,5 +1,7 @@
 package webserver.response;
 
+import webserver.request.HttpRequest;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
@@ -9,8 +11,8 @@ public class HttpResponse {
 
     private byte[] body;
 
-    public HttpResponse(String request) throws IOException {
-        this.body = getFile(getUrl(request));
+    public HttpResponse(HttpRequest request) throws IOException {
+        this.body = getFile(request.getPath().get());
     }
 
     public byte[] toByte(String extension){

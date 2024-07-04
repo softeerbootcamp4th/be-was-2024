@@ -27,23 +27,6 @@ class UtilsTest {
     }
 
     @Test
-    void getUrl() throws IOException {
-
-        //given
-        String request = "GET /index.html HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "Connection: keep-alive\n" +
-                "Accept: */*\n";
-
-        //when
-        String url = Utils.getUrl(request);
-
-        //then
-        assertEquals(url, "index.html");
-
-    }
-
-    @Test
     void getFile() throws IOException {
         //HELP resources 폴더 안의 테스트 파일에 의존함.
         byte[] bytes = new byte[]{'t', 'e', 's', 't'};

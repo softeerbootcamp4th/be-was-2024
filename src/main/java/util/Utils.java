@@ -38,12 +38,6 @@ public class Utils {
         return sb.toString();
     }
 
-    public static String getUrl(String request) throws IOException {
-        BufferedReader br = new BufferedReader(new StringReader(request));
-        String url = br.readLine();
-        return url.split(" ")[1].substring(1);
-    }
-
     public static String getContentType(String extension){
         return switch (extension){
             case "html" -> "text/html";
