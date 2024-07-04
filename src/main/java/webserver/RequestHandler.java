@@ -80,12 +80,7 @@ public class RequestHandler implements Runnable {
         String path = request.getPath();
         Map<String, String> queryParams = request.getQueryParams();
         if (path.startsWith("/create")) {
-//            String userId = queryParams.get("userId");
-//            String password = queryParams.get("password");
-//            String name = queryParams.get("name");
-//            String email = queryParams.get("email");
-            //decode the url
-            try {
+         try {
                 String userId = URLDecoder.decode(queryParams.get("userId"), "UTF-8");
                 String password = URLDecoder.decode(queryParams.get("password"), "UTF-8");
                 String name = URLDecoder.decode(queryParams.get("name"), "UTF-8");
