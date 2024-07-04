@@ -1,9 +1,6 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -22,12 +19,36 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
+        URLParser urlParser = new URLParser();
+        ResourceHandler resourceHandler = new ResourceHandler();
+
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+
+            while (!Thread.currentThread().isInterrupted()) {
+                // InputStream을 BufferedReader로 변환
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
+                // 읽어들인 InputStream 모두 출력
+                String line; // 읽어들일 라인
+                String url = ""; // 요청 파일
+                while (!(line = br.readLine()).isEmpty()) {
+                    logger.debug(line); // 읽어들인 라인 출력
+                    // 요청이 GET일 경우
+                    if (urlParser.getHttpMethod(line).equals("GET")) {
+                        // 요청 파일 받아오기
+                        url = urlParser.getURL(line);
+                    }
+                }
+
+                DataOutputStream dos = new DataOutputStream(out);
+
+                // url로부터 html파일을 byte array로 읽어오기
+                byte[] body = resourceHandler.getByteArray(url);
+
+                response200Header(dos, body.length);
+                responseBody(dos, body);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
