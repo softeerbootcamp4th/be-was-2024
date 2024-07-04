@@ -1,5 +1,5 @@
 package model;
 
-public enum RequestMethod {
+public enum HttpMethod {
     GET, POST, PUT, PATCH, DELETE
 }
