@@ -20,7 +20,7 @@ public class UriMapperTest {
 
         //then
         assertThat(Database.findUserById("abc12")).isNotNull();
-        assertThat(mappedUri).isEqualTo("/index.html");
+        assertThat(mappedUri).isEqualTo("redirect:/index.html");
     }
 
     @Test
@@ -33,7 +33,7 @@ public class UriMapperTest {
         String mappedUri = UriMapper.mapUri("/index.html");
 
         //then
-        assertThat(mappedUri).isEqualTo("/index.html");
+        assertThat(mappedUri).isEqualTo("src/main/resources/static/index.html");
     }
 
     @Test
@@ -45,6 +45,6 @@ public class UriMapperTest {
         String mappedUri = UriMapper.mapUri("/registration.html");
 
         //then
-        assertThat(mappedUri).isEqualTo("/registration/index.html");
+        assertThat(mappedUri).isEqualTo("src/main/resources/static/registration/index.html");
     }
 }
