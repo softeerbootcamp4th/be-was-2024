@@ -1,13 +1,12 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.RequestParser;
+
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -23,13 +22,28 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
+            //inputStream을 문자열로 변환
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            String line = buffer.readLine();
+            String path = RequestParser.parseUriFromRequestHeader(line);
+
+            while (!line.isEmpty()) {
+                logger.debug(line);
+                line=buffer.readLine();
+            }
+
             DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
+            File file = new File("src/main/resources/static" + path);
+
+            //io를 사용하여 파일 읽어오기
+            InputStream fileInputStream = new FileInputStream(file);
+            byte[] body = fileInputStream.readAllBytes();
+
             response200Header(dos, body.length);
             responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
+
         }
     }
 
@@ -39,6 +53,8 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+            ;
+            logger.info(dos.toString());
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
