@@ -2,19 +2,18 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.QueryParams;
-import util.RequestLine;
+import util.FileDetection;
+import util.RequestObject;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
 
-    private RequestLine requestLine ;
+    private RequestObject requestObject ;
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
@@ -28,17 +27,17 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
             logger.debug("request line : {} ",line);// 가장 첫번째 줄, 즉 request line
-            requestLine = new RequestLine(line);
+            requestObject = new RequestObject(line);
             while(!line.equals(""))
             {
                 line = br.readLine();
                 logger.debug("request Headers : {}",line);
             }
 
-            String path = requestLine.getPath();
-            String method = requestLine.getMethod();
-            frontRequestProcess(method);
-            //Map<String,String> queryParams=pathPar.getQueryParams(line);
+            String path = FileDetection.getPath(FileDetection.fixedPath+requestObject.getPath());
+            //디렉토리면 /index.html이 추가되어서 path가 설정된다
+
+
 
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
@@ -71,9 +70,9 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void frontRequestProcess(String method)
+    private void frontRequestProcess(String method,String path)
     {
-        if(method.equals("GET"))
+        if(method.equals("GET")&&path.equals("/user/create"))//회원가입일시
         {
 
         }

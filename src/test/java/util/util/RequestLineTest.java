@@ -17,10 +17,10 @@ class RequestLineTest {
         String url ="GET /index.html HTTP/1.1";
 
         //when
-        RequestLine requestLine = new RequestLine(url);
+        RequestObject requestLine = new RequestObject(url);
 
         //then
-        assertThat(requestLine.getPath()).isEqualTo("src/main/resources/static/index.html");
+        assertThat(requestLine.getPath()).isEqualTo("/index.html");
 
 
     }
@@ -32,7 +32,7 @@ class RequestLineTest {
         String url ="GET /index.html HTTP/1.1";
 
         //when
-        RequestLine requestLine = new RequestLine(url);
+        RequestObject requestLine = new RequestObject(url);
 
         //then
         assertThat(requestLine.getMethod()).isEqualTo("GET");
