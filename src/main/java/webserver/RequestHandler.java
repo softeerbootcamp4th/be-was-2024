@@ -12,24 +12,39 @@ public class RequestHandler implements Runnable {
     private final String dirPath = "./src/main/resources/static";
 
     private Socket connection;
-    private WebAdapter webAdapter;
 
-    public RequestHandler(Socket connectionSocket, WebAdapter adapter) {
+//    public RequestHandler(Socket connectionSocket) {
+//        this.connection = connectionSocket;
+//    }
+
+    private RequestHandler() {
+    }
+
+    private static class InnerInstanceClass {
+        private static final RequestHandler instance = new RequestHandler();
+    }
+
+    public static synchronized RequestHandler getInstance() {
+        return InnerInstanceClass.instance;
+    }
+
+    public synchronized void setConnection(Socket connectionSocket) {
         this.connection = connectionSocket;
-        this.webAdapter = adapter;
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String str, path = "", extension = "", contentType = "";
-            System.out.println("\n====REQUEST====");
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("\n====REQUEST====\n");
 
             while(!(str = br.readLine()).isEmpty()) {
-                logger.debug("{}", str);
+//                sb.append(str+"\n");
+                logger.debug(str);
                 String[] headerLine = str.split(" ");
                 if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에 request uri path가 존재하므로
                     path = headerLine[1]; // request uri path 추출하기
@@ -37,7 +52,7 @@ public class RequestHandler implements Runnable {
                     if(WebUtils.isRESTRequest(path)) {
                         // GET 요청일 경우
                         if(WebUtils.isGetRequest(headerLine[0])) {
-                            path = webAdapter.resolveRequestUri(path, out);
+                            path = WebAdapter.resolveRequestUri(path, out);
                         }
                     }
                     // 설정한 path를 바탕으로 확장자에 맞게 contentType에 맞게 뷰 파일을 찾아 응답
@@ -47,8 +62,17 @@ public class RequestHandler implements Runnable {
                 }
             }
 
+            System.out.println();
+//            logger.debug("{}", sb);
+
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
     }
 

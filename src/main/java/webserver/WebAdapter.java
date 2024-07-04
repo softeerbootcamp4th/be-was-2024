@@ -16,7 +16,7 @@ public class WebAdapter {
     /**
      * handle specific requests
      */
-    public String resolveRequestUri(String restUri, OutputStream out) throws IOException {
+    public static String resolveRequestUri(String restUri, OutputStream out) throws IOException {
         // registration
         if(restUri.split("\\?")[0].equals("/user/create")) {
             String userId = restUri.split("\\?")[1].split("&")[0].split("=")[1];
@@ -62,7 +62,7 @@ public class WebAdapter {
     /**
      * map request uri to proper view
      */
-    private String resolveRequestUri(String restUri) {
+    private static String resolveRequestUri(String restUri) {
 
         return switch(restUri) {
             case "/login" -> "/login/index.html";
