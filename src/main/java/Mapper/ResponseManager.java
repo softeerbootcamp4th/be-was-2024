@@ -12,7 +12,6 @@ import java.util.HashMap;
 public class ResponseManager {
     private final UserMapper userMapper;
     private final URIParser uriParser;
-    private ResponseDataMaker responseDataMaker;
     public ResponseManager(UserMapper userMapper){
         this.userMapper = userMapper;
         uriParser = new URIParser();

@@ -19,8 +19,8 @@ public class ResponseManagerTest {
         FileInputStream fileInputStream = new FileInputStream(FILE_BASE_URL+"/index.html");
         String realFile = new String(fileInputStream.readAllBytes());
         System.out.println(realFile);
-        ByteReader helloPage = responseManager.getResponse("/index.html");
-        String foundFile = new String(helloPage.readBytes());
+        byte[] body = responseManager.getResponse("/index.html").body;
+        String foundFile = new String(body);
         Assertions.assertTrue(realFile.equals(foundFile));
     }
     @DisplayName("json to byte[]")
@@ -34,18 +34,12 @@ public class ResponseManagerTest {
             map.put(key[i],value[i]);
         }
         SignInForm signInForm = new SignInForm(map);
-        ByteReader newUserInform = responseManager.getResponse("/create?" +
+        byte[] bytes = responseManager.getResponse("/create?" +
                 "userId="+value[0] +
                 "&password="+value[1] +
                 "&name=" +value[2]+
-                "\n");
-        System.out.println(new String(newUserInform.readBytes()));
+                "\n").body;
+        System.out.println(new String(bytes));
 
-    }
-    public String byteArrayToHex(byte[] a) {
-        StringBuilder sb = new StringBuilder();
-        for(final byte b: a)
-            sb.append(String.format("%02x ", b&0xff));
-        return sb.toString();
     }
 }
