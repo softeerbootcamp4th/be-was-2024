@@ -6,33 +6,20 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class ResponseHandler {
-    private static final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
+public class Response {
+    private static final Logger logger = LoggerFactory.getLogger(Response.class);
 
-    private static final URLParser urlParser = new URLParser();
     private static final ResourceHandler resourceHandler = new ResourceHandler();
-    private static final LogicProcessor logicProcessor = new LogicProcessor();
 
-    public void runGetResponse(String requestLine, DataOutputStream dos) throws IOException {
-        String url = urlParser.getURL(requestLine);
+    public void runGetResponse() {
 
-        if (urlParser.isQueryString(url)) { // 쿼리 스트링인 경우
-            // 데이터 파싱 및 저장 로직
-            // logicProcessor 이용
-
-            logicProcessor.createUser(url);
-
-            response("/index.html", dos);
-        } else {
-            response(url, dos);
-        }
     }
 
     public void runPostResponse() {
 
     }
 
-    private void response(String url, DataOutputStream dos) throws IOException {
+    public void response(String url, DataOutputStream dos) throws IOException {
         // url로부터 html파일을 byte array로 읽어오기
         byte[] body = resourceHandler.getByteArray(url);
 
@@ -40,12 +27,26 @@ public class ResponseHandler {
         responseBody(dos, body);
     }
 
+    public void redirect(String url, DataOutputStream dos)  throws IOException {
+        response301Header(dos, url);
+    }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response301Header(DataOutputStream dos, String newLocation) {
+        try {
+            dos.writeBytes("HTTP/1.1 301 Moved Permanently \r\n");
+            dos.writeBytes("Location: " + newLocation + "\r\n");
+            dos.writeBytes("Content-Length: 0\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
