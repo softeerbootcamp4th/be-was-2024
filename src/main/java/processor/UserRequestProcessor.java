@@ -1,6 +1,7 @@
 package processor;
 
 import model.User;
+import type.MIMEType;
 import type.StatusCodeType;
 
 import java.util.HashMap;
@@ -23,14 +24,25 @@ public class UserRequestProcessor extends RequestProcessor {
         String password = getQuery().get("password");
         String email = getQuery().get("email");
 
+        HashMap<String, String> responseHeader = new HashMap<>();
+        responseHeader.put("Content-Type", MIMEType.HTML.getContentType());
         if (userId == null || name == null && password == null ||
                 userId.isEmpty() || name.isEmpty() || password.isEmpty()) {
-            setResult(StatusCodeType.BAD_REQUEST, "Fill all the required fields");
+
+            setResult(StatusCodeType.BAD_REQUEST, responseHeader, "" +
+                    "<script>" +
+                    "alert('Fill all the required fields');" +
+                    "location.href='/registration'" +
+                    "</script>");
             return;
         }
 
         User user = new User(userId, name, password, email);
-
-        setResult(StatusCodeType.FOUND, "/");
+        responseHeader.put("Location", "/index.html");
+        setResult(StatusCodeType.OK, responseHeader,"" +
+                "<script>" +
+                "alert('success');" +
+                "location.href='/';" +
+                "</script>");
     }
 }

@@ -30,12 +30,17 @@ public class RequestProcessor {
         return query;
     }
 
-    public void setResult(StatusCodeType statusCode, byte[] content)  {
-        this.requestResult = new RequestResult(statusCode, content);
+    public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] bodyContent)  {
+        responseHeader.put("Content-Length", Integer.toString(bodyContent.length));
+        this.requestResult = new RequestResult(statusCode, responseHeader, bodyContent);
     }
 
-    public void setResult(StatusCodeType statusCode, String content) {
-        setResult(statusCode, content.getBytes());
+    public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, String bodyContent)  {
+        setResult(statusCode, responseHeader, bodyContent.getBytes());
+    }
+
+    public void setResult(StatusCodeType statusCode, String bodyContent) {
+        setResult(statusCode, new HashMap<>(), bodyContent.getBytes());
     }
 
     public RequestResult getResult() { return requestResult; }

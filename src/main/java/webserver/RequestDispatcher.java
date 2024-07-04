@@ -23,7 +23,13 @@ public class RequestDispatcher {
         /* Static HTTP Request */
         if (requestInfo.isStaticRequest()) {
             String staticPath = requestInfo.getPath();
-            return new RequestResult(requestInfo.getContentType(), StatusCodeType.OK, FileUtils.readFileToBytes(staticPath));
+            byte[] body = FileUtils.readFileToBytes(staticPath);
+
+            HashMap<String, String> responseHeader = new HashMap<>();
+            responseHeader.put("Content-Type", requestInfo.getContentType());
+            responseHeader.put("Content-Length", String.valueOf(body.length));
+
+            return new RequestResult(StatusCodeType.OK, responseHeader, body);
         }
 
         /* Dynamic HTTP Request */
