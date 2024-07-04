@@ -2,14 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collection;
 
 import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.management.openmbean.CompositeDataView;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,13 +21,13 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
 
+            DataOutputStream dos = new DataOutputStream(out);
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
 
             // 로그 출력 후 요청 주소 반환
-            String url = RequestLogging.printRequest(br);
+            requestLogging(br);
             String path = "./src/main/resources/static";
 
             String[] splitURL = url.split("\\?");
@@ -104,5 +101,19 @@ public class RequestHandler implements Runnable {
             case "svg" -> "image/svg+xml";
             default -> "*/*";
         };
+    }
+
+    private void requestLogging(BufferedReader br) throws IOException {
+        String line = br.readLine();
+
+        String url = line.split(" ")[1];
+
+        StringBuilder request = new StringBuilder();
+        while (!line.isEmpty()) {
+            request.append(line).append("\n");
+            line = br.readLine();
+        }
+
+        logger.debug("\n\n***** REQUEST *****\n" + request);
     }
 }
