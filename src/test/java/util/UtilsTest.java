@@ -1,7 +1,6 @@
 package util;
 
 import org.junit.jupiter.api.Test;
-import webserver.HttpRequest;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
