@@ -8,15 +8,27 @@ public class FileUtil {
     private FileUtil() {
     }
 
-    private static final String STATIC_PATH = "src/main/resources/static";
+    public static final String STATIC_PATH = "src/main/resources/static";
+
+    public static boolean isDirectory(String path) {
+        File file = new File(path);
+        return file.isDirectory();
+    }
 
     public static byte[] readBytesFromFile(String path) throws IOException {
-        File file = new File(STATIC_PATH + path);
-        int lengthOfBodyContent = (int) file.length();
-        byte[] body = new byte[lengthOfBodyContent];
-        try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis)) {
-            bis.read(body);
+        try {
+            File file = new File(path);
+            if(file.isDirectory()){
+                file = new File(path + "/index.html");
+            }
+            int lengthOfBodyContent = (int) file.length();
+            byte[] body = new byte[lengthOfBodyContent];
+            try (FileInputStream fis = new FileInputStream(file); BufferedInputStream bis = new BufferedInputStream(fis)) {
+                bis.read(body);
+            }
+            return body;
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException();
         }
-        return body;
     }
 }
