@@ -1,15 +1,15 @@
-package webserver.response;
+package webserver.http.response;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpResponse {
+public class Response {
 
     private int status;
     private byte[] body;
     private Map<String, String> headers;
 
-    public HttpResponse(int status, byte[] body) {
+    public Response(int status, byte[] body) {
         this.status = status;
         this.body = body;
         this.headers = new HashMap<>();

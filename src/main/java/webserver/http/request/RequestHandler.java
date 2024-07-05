@@ -1,11 +1,12 @@
-package webserver.request;
+package webserver.http.request;
 
 import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.response.ResponseHandler;
+import util.Parser;
+import webserver.http.response.ResponseHandler;
 
 import static util.Utils.*;
 
@@ -27,15 +28,14 @@ public class RequestHandler implements Runnable {
             String request = convert(in);
             logger.debug(request);
 
-            HttpRequest httpRequest = new HttpRequest(request);
-            Path path = httpRequest.getPath();
+            Request httpRequest = Parser.parseRequest(request);
 
-            if(httpRequest.getPath().isStatic()){
-                ResponseHandler.responseStaticContents(out, path);
+            if(httpRequest.isStatic()){
+                ResponseHandler.responseStaticContents(out, httpRequest);
                 return;
             }
 
-            ResponseHandler.responseDynamicContents(out, path);
+            ResponseHandler.responseDynamicContents(out, httpRequest);
 
         } catch (IOException e) {
             logger.error(e.getMessage());
