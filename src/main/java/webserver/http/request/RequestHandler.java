@@ -5,10 +5,7 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.Parser;
-import webserver.http.response.ResponseHandler;
-
-import static util.Utils.*;
+import webserver.http.Processor;
 
 public class RequestHandler implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,26 +21,11 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO httpRequest에 toString을 적용해서 아래 로직을 없애기
-            String request = convert(in);
-            logger.debug(request);
-
-            Request httpRequest = Parser.parseRequest(request);
-
-            if(httpRequest.isStatic()){
-                ResponseHandler.responseStaticContents(out, httpRequest);
-                return;
-            }
-
-            ResponseHandler.responseDynamicContents(out, httpRequest);
+            Processor processor = new Processor(in, out);
+            processor.process();
 
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
-
-    private String convert(InputStream inputStream) throws IOException {
-        return getAllStrings(inputStream);
-    }
-
 }
