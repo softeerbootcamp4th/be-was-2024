@@ -4,24 +4,25 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 
+import chain.core.ChainManager;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.utils.HttpResponseMessageBuildUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.IRouteHandler;
-import routehandler.RouteHandlerMatcher;
+import routehandler.core.IRouteHandler;
+import url.MyURL;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private final Socket connection;
-    private final RouteHandlerMatcher matcher;
+    private final ChainManager chainManager;
 
-    public RequestHandler(Socket connectionSocket, RouteHandlerMatcher matcher )
+    public RequestHandler(Socket connectionSocket, ChainManager chainManager )
     {
         this.connection = connectionSocket;
-        this.matcher = matcher;
+        this.chainManager = chainManager;
     }
 
     public void run() {
@@ -31,21 +32,24 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
+            /** request parsing phase **/
+            // 맨 처음 요청 라인 읽기
             String requestLine = br.readLine();
-
+            // header 목록 읽기
             List<String> headerLines = new ArrayList<>();
-            String buffer;
-            while (!(buffer = br.readLine()).isEmpty()) {
-                headerLines.add(buffer);
+            String headerLine;
+            while (!(headerLine = br.readLine()).isEmpty()) {
+                headerLines.add(headerLine);
             }
             // body 부분은 나중에 추가적으로 확장
+
+            /** handle & response phase **/
+
             MyHttpRequest request = new MyHttpRequest(requestLine, headerLines);
             MyHttpResponse response = new MyHttpResponse(request.getVersion());
 
-            String url = request.getUrl();
-            IRouteHandler routeHandler = matcher.getMatchedRouteHandler(url);
+            chainManager.execute(request, response);
 
-            routeHandler.handle(request, response);
             DataOutputStream dos = new DataOutputStream(out);
 
             byte[] responseMessage = HttpResponseMessageBuildUtil.build(response);
