@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
+    private static final int NUMBER_OF_THREADS = 10;
 
     public static void main(String args[]) throws Exception {
         int port = 0;
@@ -27,20 +28,13 @@ public class WebServer {
             logger.info("Web Application Server started {} port.", port);
 
             // 스레드 풀 생성
-            ExecutorService executorService = Executors.newFixedThreadPool(10);
+            ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-
-
                 RequestHandler requestHandler = new RequestHandler(connection);
-//                Thread thread = new Thread(new RequestHandler(connection));
-//                thread.start();
-
                 executorService.submit(requestHandler);
-
-//                executorService.shutdown();
             }
         }
     }
