@@ -20,13 +20,23 @@ public class ResponseFactory {
         }
     }
 
-    public static void response302(DataOutputStream dos, String redirectUrl) {
+    public static void response302Header(DataOutputStream dos, String redirectUrl) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + redirectUrl + "\r\n");
             dos.writeBytes("Content-Length: 0\r\n");
             dos.writeBytes("\r\n");
 
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    public static void response404Header(DataOutputStream dos, int lengthOfBodyContent){
+        try {
+            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
