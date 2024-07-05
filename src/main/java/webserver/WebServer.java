@@ -32,6 +32,7 @@ public class WebServer {
             while ((connection = listenSocket.accept()) != null) {
                 executor.submit(new RequestHandler(connection)); // 요청이 올 시에 executor queue 작업 추가
             }
+            executor.shutdown();
         }
     }
 
