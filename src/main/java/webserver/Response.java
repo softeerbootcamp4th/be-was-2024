@@ -27,8 +27,12 @@ public class Response {
         responseBody(dos, body);
     }
 
-    public void redirect(String url, DataOutputStream dos)  throws IOException {
-        response301Header(dos, url);
+    public void redirect(String url, DataOutputStream dos, int redirectionCode)  throws IOException {
+        if (redirectionCode == 301) {
+            response301Header(dos, url);
+        } else {
+            response302Header(dos, url);
+        }
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
@@ -45,6 +49,17 @@ public class Response {
     private void response301Header(DataOutputStream dos, String newLocation) {
         try {
             dos.writeBytes("HTTP/1.1 301 Moved Permanently \r\n");
+            dos.writeBytes("Location: " + newLocation + "\r\n");
+            dos.writeBytes("Content-Length: 0\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response302Header(DataOutputStream dos, String newLocation) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + newLocation + "\r\n");
             dos.writeBytes("Content-Length: 0\r\n");
             dos.writeBytes("\r\n");
