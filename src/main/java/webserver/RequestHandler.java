@@ -32,6 +32,7 @@ public class RequestHandler implements Runnable {
 
             switch (method) {
                 case GET -> HandleGetRequest.handler(url, out);
+                default -> throw new RuntimeException();
             }
 
         } catch (IOException e) {

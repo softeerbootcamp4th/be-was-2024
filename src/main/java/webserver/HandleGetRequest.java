@@ -32,12 +32,9 @@ public class HandleGetRequest {
 
         Database.addUser(new User(userId, password, name, email));
 
-        String redirectResponse = "HTTP/1.1 302 Found\r\n" +
-                "Location: /\r\n" +
-                "Content-Length: 0\r\n" +
-                "\r\n";
 
-        out.write(redirectResponse.getBytes());
+        DataOutputStream dos = new DataOutputStream(out);
+        ResponseFactory.response302(dos, "/");
     }
 
     private static String getContentType(String type) {
