@@ -29,6 +29,7 @@ public class HttpRequestParser {
             }
             headers.put(headerKeyValue[0], headerKeyValue[1]);
         }
+        request.setHttpHeaders(headers);
     }
 
     private void requestLineParse(Request request, String requestLine) {

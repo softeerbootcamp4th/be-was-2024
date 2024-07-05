@@ -18,6 +18,7 @@ public class ApiProcessManager {
     private Map<String, ApiProcess> apiProcessStore;
 
     public ApiProcessManager() {
+        // 로직 처리를 위한 구체 클래스를 설정한다. (RequestMapping에서 추상화 된 객체를 사용하기 위해 인터페이스 사용)
        apiProcessStore = new ConcurrentHashMap<String, ApiProcess>(){{
            put("/", new HomepageApiProcess());
            put("/registration", new RegisterpageApiProcess());

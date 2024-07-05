@@ -6,6 +6,6 @@ import webserver.Response;
 public class NotFoundApiProcess implements ApiProcess {
     @Override
     public String process(Request request, Response response) {
-        return "/error/404.html";
+        return "/error/404";
     }
 }
