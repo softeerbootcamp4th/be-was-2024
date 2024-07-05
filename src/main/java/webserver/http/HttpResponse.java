@@ -26,12 +26,20 @@ public class HttpResponse{
     }
 
     public String getHeader() {
-        String header = statusCode.getStartline();
+        StringBuilder header = new StringBuilder();
+        header.append(statusCode.getStartline());
         for(Map.Entry<String, String> entry : headers.entrySet()) {
-            header += entry.getKey() + ": " + entry.getValue() + "\r\n";
+            header.append(entry.getKey());
+            header.append(": ");
+            header.append(entry.getValue());
+            header.append("\r\n");
         }
-        header += "\r\n";
-        return header;
+        header.append("\r\n");
+        return header.toString();
+    }
+
+    public StatusCode getStatusCode() {
+        return statusCode;
     }
 
     public byte[] getBody() {
