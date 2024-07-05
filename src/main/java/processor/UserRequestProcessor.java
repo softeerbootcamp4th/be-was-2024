@@ -1,5 +1,6 @@
 package processor;
 
+import db.Database;
 import model.User;
 import type.MIMEType;
 import type.StatusCodeType;
@@ -38,11 +39,13 @@ public class UserRequestProcessor extends RequestProcessor {
         }
 
         User user = new User(userId, name, password, email);
-        responseHeader.put("Location", "/index.html");
+        Database.addUser(user);
+//        responseHeader.put("Location", "/index.html");
+//        setResult(StatusCodeType.FOUND, responseHeader, "");
         setResult(StatusCodeType.OK, responseHeader,"" +
                 "<script>" +
                 "alert('success');" +
-                "location.href='/';" +
+                "location.href='/login';" +
                 "</script>");
     }
 }
