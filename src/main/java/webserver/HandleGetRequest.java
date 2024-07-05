@@ -1,11 +1,16 @@
 package webserver;
 
 import db.Database;
+import model.HttpStatus;
 import model.User;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+
+import static webserver.FileHandler.*;
+import static webserver.ResponseFactory.response200Header;
+import static webserver.ResponseFactory.response404Header;
 
 public class HandleGetRequest {
     private final static String staticPath = "./src/main/resources/static";
@@ -34,7 +39,7 @@ public class HandleGetRequest {
 
 
         DataOutputStream dos = new DataOutputStream(out);
-        ResponseFactory.response302(dos, "/");
+        ResponseFactory.response302Header(dos, "/");
     }
 
     private static String getContentType(String type) {
@@ -52,12 +57,19 @@ public class HandleGetRequest {
 
     private static void sendResponse(String requestUrl, OutputStream out) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
-        byte[] body = FileHandler.getFileContent(requestUrl);
 
         String[] tokens = requestUrl.split("\\.");
         String type = tokens[tokens.length - 1];
 
-        ResponseFactory.response200Header(dos, body.length, getContentType(type));
+        ResponseWithStatus response = getFileContent(requestUrl);
+
+        HttpStatus status = response.status;
+        byte[] body = response.body;
+
+        switch (status){
+            case OK -> response200Header(dos, body.length, getContentType(type));
+            case NOT_FOUND -> response404Header(dos, body.length);
+        }
         ResponseFactory.responseBody(dos, body);
     }
 
