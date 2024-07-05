@@ -14,18 +14,21 @@ public class User {
         this.name = name;
         this.email = email;
     }
-//    public static void createUserFromUrl(String urlPath) {
-//        int parameterIndex = urlPath.indexOf("?");
-//        if (parameterIndex != -1) {
-//            String[] userInfo = urlPath.substring(parameterIndex + 1).split("&");
-//            addUser(new User(
-//                    userInfo[0].substring(userInfo[0].indexOf("=") + 1),
-//                    userInfo[1].substring(userInfo[1].indexOf("=") + 1),
-//                    userInfo[2].substring(userInfo[2].indexOf("=") + 1),
-//                    userInfo[3].substring(userInfo[3].indexOf("=") + 1)
-//            ));
-//        }
-//    }
+
+    public static User createUserFromUrl(String urlPath) {
+        int parameterIndex = urlPath.indexOf("?");
+        if (parameterIndex != -1) {
+            String[] userInfo = urlPath.substring(parameterIndex + 1).split("&");
+            return new User(
+                    userInfo[0].substring(userInfo[0].indexOf("=") + 1),
+                    userInfo[1].substring(userInfo[1].indexOf("=") + 1),
+                    userInfo[2].substring(userInfo[2].indexOf("=") + 1),
+                    userInfo[3].substring(userInfo[3].indexOf("=") + 1)
+            );
+        }
+        return null;
+    }
+
     public String getUserId() {
         return userId;
     }

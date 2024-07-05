@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class FileHandler {
 
-
     public static byte[] readFileToByteArray(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file);
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
