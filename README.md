@@ -1,6 +1,19 @@
 # be-was-2024
 코드스쿼드 백엔드 교육용 WAS 2024 개정판
 
+## 전반적인 흐름
+1. 사용자가 요청을 보낸다. 요청은 RequestHandler로 표현되며, 별도의 스레드로 실행된다.
+2. RequestHandler은 요청을 파싱하여 만들고, 비어 있는 응답을 생성한다.
+3. 생성된 요청 및 응답은 ChainManager에 전달된다.
+4. ChainManager은 내부에 등록된 MiddlewareChain들에게 요청 및 응답을 넘긴다
+5. 각 MiddlewareChain은 각자의 로직에 따라 요청 및 응답을 처리하고, 다음 체인에게 넘기거나 넘기지 않는다.
+   - StaticResourceChain: 대응되는 정적 리소스를 반환한다.
+   - RouteHandleChain: 요청된 경로를 처리한다.
+      - IRouteHandler: 각 경로를 의미하는 객체. canMatch로 검사하고 handle로 작업한다.
+6. 모든 MiddlewareChain을 거친 응답은 HttpResponseMessageBuildUtil에 의해 Http 메시지로 가공된다
+7. 가공된 응답 메시지는 RequestHandler가 가진 sendResponse 메서드를 통해 사용자에게 응답된다.
+
+
 ## 요청 / 응답의 클래스 관계
 ```mermaid
 classDiagram
@@ -69,15 +82,37 @@ Http 메시지 처리 과정에서 사용되는 일종의 상수들이 있다.
 
 이러한 의미를 가진 상수들은 프로젝트에서 문자열 또는 숫자 그 자체로 사용되면 실수가 발생할 여지가 크다. 따라서 이들을 별도의 클래스(enum)로 분리하여 관리하기 쉽게 만들었다. 장기적으로 해당 enum에서 지원하는 타입 또는 관련 메서드가 추가되더라도 단순 문자열 처리 방식에 비해 변경이 적어질 것으로 예상된다.
 
-## 전반적인 흐름
-1. 사용자가 요청을 보낸다. 요청은 RequestHandler로 표현되며, 별도의 스레드로 실행된다.
-2. RequestHandler은 요청을 파싱하여 만들고, 비어 있는 응답을 생성한다.
-3. 생성된 요청 및 응답은 ChainManager에 전달된다.
-4. ChainManager은 내부에 등록된 MiddlewareChain들에게 요청 및 응답을 넘긴다
-5. 각 MiddlewareChain은 각자의 로직에 따라 요청 및 응답을 처리하고, 다음 체인에게 넘기거나 넘기지 않는다.
-    - StaticResourceChain: 대응되는 정적 리소스를 반환한다.
-    - RouteHandleChain: 요청된 경로를 처리한다.
-      - IRouteHandler: 각 경로를 의미하는 객체. canMatch로 검사하고 handle로 작업한다.
-6. 모든 MiddlewareChain을 거친 응답은 HttpResponseMessageBuildUtil에 의해 Http 메시지로 가공된다
-7. 가공된 응답 메시지는 RequestHandler가 가진 sendResponse 메서드를 통해 사용자에게 응답된다.
-
+## 미들웨어
+```mermaid
+classDiagram
+    class ChainManager {
+        - MiddlewareChain startChain
+        - MiddlewareChain endChain
+        
+        + putChain(Middleware chain)
+        + execute(req, res)
+    }
+    ChainManager o-- MiddlewareChain
+    
+    class MiddlewareChain {
+        <<abstract>>
+        # nextChain
+        + act(req, res)
+        + setNext(nextChain)
+        + next(req, res)
+    }
+    MiddlewareChain o-- MiddlewareChain
+    
+    class RouteHandleChain {
+        - List&lt;IRouteHandler&gt; routeHandlers
+        
+    }
+    RouteHandleChain o-- IRouteHandler
+    RouteHandleChain --|> MiddlewareChain
+    StaticResourceChain --|> MiddlewareChain
+    
+    class IRouteHandler {
+        <<interface>>
+    }
+    
+```
