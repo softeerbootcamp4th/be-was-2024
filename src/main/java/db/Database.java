@@ -21,8 +21,4 @@ public class Database {
         return users.values();
     }
 
-//    public static String getAddress() {
-//        return Database.class.getName() + "@" + Integer.toHexString(System.identityHashCode(Database.class));
-//    }
-
 }

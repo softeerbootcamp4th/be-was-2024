@@ -1,7 +1,5 @@
 package model;
 
-import static db.Database.addUser;
-
 public class User {
     private String userId;
     private String password;

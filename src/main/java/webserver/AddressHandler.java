@@ -27,7 +27,7 @@ public class AddressHandler {
         dos.writeBytes("\r\n");
     }
 
-    public static void handleUserCreation(String urlPath) throws IOException {
+    public static void handleUserCreation(String urlPath){
         User user = createUserFromUrl(urlPath);
         if (user != null) {
             addUser(user);
