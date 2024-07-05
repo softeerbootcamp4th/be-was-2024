@@ -138,5 +138,4 @@ public class RequestHandler implements Runnable {
             default -> "text/html";
         };
     }
-
 }
