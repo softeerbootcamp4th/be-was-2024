@@ -1,52 +1,39 @@
 package util;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Map;
 
-public class HttpRequestTest {
+class HttpRequestTest {
 
     @Test
-    public void testParseRequestLine() throws Exception {
-        String requestText = "GET /index.html HTTP/1.1\r\nHost: localhost\r\n\r\n";
-        BufferedReader reader = new BufferedReader(new StringReader(requestText));
-        HttpRequest request = new HttpRequest(reader);
+    void testHttpRequestCreation() {
+        String method = "GET";
+        String url = "/index.html";
+        String path = "/index.html";
+        String httpVersion = "HTTP/1.1";
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Host", "localhost:8080");
+        Map<String, String> queryParams = new HashMap<>();
 
-        assertEquals("GET", request.getMethod());
-        assertEquals("/index.html", request.getUrl());
-        assertEquals("HTTP/1.1", request.getHttpVersion());
+        HttpRequest request = new HttpRequest(method, url, path, httpVersion, headers, queryParams);
+
+        assertThat(request.getMethod()).isEqualTo(method);
+        assertThat(request.getUrl()).isEqualTo(url);
+        assertThat(request.getPath()).isEqualTo(path);
+        assertThat(request.getHttpVersion()).isEqualTo(httpVersion);
+        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getContentType()).isEqualTo("text/html");
     }
 
     @Test
-    public void testParseHeaders() throws Exception {
-        String requestText = "GET /index.html HTTP/1.1\r\nHost: localhost\r\nUser-Agent: JUnit\r\n\r\n";
-        BufferedReader reader = new BufferedReader(new StringReader(requestText));
-        HttpRequest request = new HttpRequest(reader);
+    void testContentTypeDetermination() {
+        HttpRequest request = new HttpRequest("GET", "/style.css", "/style.css", "HTTP/1.1", new HashMap<>(), new HashMap<>());
+        assertThat(request.getContentType()).isEqualTo("text/css");
 
-        assertEquals("localhost", request.getHeader("Host"));
-        assertEquals("JUnit", request.getHeader("User-Agent"));
-    }
-
-    @Test
-    public void testSetContentType() throws Exception {
-        String requestText = "GET /index.html HTTP/1.1\r\nHost: localhost\r\n\r\n";
-        BufferedReader reader = new BufferedReader(new StringReader(requestText));
-        HttpRequest request = new HttpRequest(reader);
-
-        assertEquals("text/html", request.getContentType());
-
-        String requestTextCss = "GET /style.css HTTP/1.1\r\nHost: localhost\r\n\r\n";
-        reader = new BufferedReader(new StringReader(requestTextCss));
-        request = new HttpRequest(reader);
-
-        assertEquals("text/css", request.getContentType());
-
-        String requestTextJs = "GET /script.js HTTP/1.1\r\nHost: localhost\r\n\r\n";
-        reader = new BufferedReader(new StringReader(requestTextJs));
-        request = new HttpRequest(reader);
-
-        assertEquals("application/javascript", request.getContentType());
+        request.setUrl("/script.js");
+        assertThat(request.getContentType()).isEqualTo("application/javascript");
     }
 }
