@@ -10,7 +10,8 @@ public class FileDetection
 
     public static String getPath(String path)
     {
-        File fi = new File(path);
-        return fi.isDirectory()? path+"/index.html" : path;
+
+        File file = new File(path);
+        return file.isDirectory()? path+"/index.html" : path;
     }
 }

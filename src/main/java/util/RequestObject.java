@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class RequestObject {
 
-    // GET /user/create?name="1234"&password="1" 이면
+    // GET /user/create?name="1234"&password="1" HTTP/1.1 이면
 
     private String path;//  /user/create 가 들어옴
     private final String method;// GET이 들어옴
@@ -21,8 +21,7 @@ public class RequestObject {
         if(url.length>1)
         {
             this.paramLine = url[1];
-            getQueryParams();
-            System.out.println(this.paramLine);
+            setParams();
         }
 
     }
@@ -41,7 +40,7 @@ public class RequestObject {
         return this.params;
     }
 
-    public void getQueryParams()
+    public void setParams()
     {
         if (paramLine == null || paramLine.isEmpty()) {
             return ;

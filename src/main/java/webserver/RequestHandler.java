@@ -29,13 +29,15 @@ public class RequestHandler implements Runnable {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF8"));
             String line = br.readLine();
-            logger.debug("request line : {} ",line);// 가장 첫번째 줄, 즉 request line
+            logger.debug("HTTP request first line : {} ",line);// 가장 첫번째 줄, 즉 request line
             requestObject = new RequestObject(line);
+            StringBuilder sb = new StringBuilder();//각 쓰레드가 막 출력하던걸 한번에 담아서 헷갈리지 않게
             while(!line.equals(""))
             {
                 line = br.readLine();
-                logger.debug("request Headers : {}",line);
+                sb.append(line).append("\n");
             }
+            logger.debug(sb.toString());
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
             frontRequest(dos,requestObject);
@@ -52,7 +54,7 @@ public class RequestHandler implements Runnable {
         {
             UserProcessor.userCreate(requestObject);
             responseAlert(dos,"로그인 성공");
-            return ;
+            return;
         }
 
         // 파일 요청이 들어왔다면 경로를 디렉토리인지 아닌지 판단해서 다시 설정해준다
