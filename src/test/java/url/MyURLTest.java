@@ -10,19 +10,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class MyURLTest {
     @Test
-    @DisplayName("정상적인 파라미터 문자열이 들어오면 파라미터 맵 반환. 공백도 인식")
+    @DisplayName("정상적인 파라미터 문자열이 들어오면 파라미터 맵 반환. 공백의 경우 null 반환")
     void parseParameter_ReturnParamMapIfInputValid() {
         String input = "id=hello&password=world&sort=&token=hedfmod=";
         String expectedToId = "hello";
         String expectedToPassword = "world";
-        String expectedToSort = "";
         String expectedToToken = "hedfmod=";
 
         Map<String, String> params = MyURL.parseParameter(input);
 
         Assertions.assertThat(params.get("id")).isEqualTo(expectedToId);
         Assertions.assertThat(params.get("password")).isEqualTo(expectedToPassword);
-        Assertions.assertThat(params.get("sort")).isEqualTo(expectedToSort);
+        Assertions.assertThat(params.get("sort")).isNull();
         Assertions.assertThat(params.get("token")).isEqualTo(expectedToToken);
     }
 
