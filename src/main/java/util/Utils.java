@@ -44,4 +44,16 @@ public class Utils {
         return url.split(" ")[1].substring(1);
     }
 
+    public static String getContentType(String extension){
+        return switch (extension){
+            case "html" -> "text/html";
+            case "css" -> "text/css";
+            case "js" -> "text/javascript";
+            case "ico", "png" -> "image/png";
+            case "jpg" -> "image/jpg";
+            case "svg" -> "image/svg+xml";
+            default -> throw new IllegalStateException("Unexpected value: " + extension);
+        };
+    }
+
 }
