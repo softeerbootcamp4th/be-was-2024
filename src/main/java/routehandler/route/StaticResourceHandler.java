@@ -8,7 +8,7 @@ import http.enums.MIMEType;
 import http.utils.MimeTypeUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.IRouteHandler;
+import routehandler.core.IRouteHandler;
 import utils.FileExtensionUtil;
 import utils.FileReadUtil;
 import webserver.WebServer;

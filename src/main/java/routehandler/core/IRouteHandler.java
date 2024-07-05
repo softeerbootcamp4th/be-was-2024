@@ -1,4 +1,4 @@
-package routehandler;
+package routehandler.core;
 
 import http.MyHttpRequest;
 import http.MyHttpResponse;
