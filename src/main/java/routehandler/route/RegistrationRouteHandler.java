@@ -12,7 +12,7 @@ import utils.FileReadUtil;
 import webserver.WebServer;
 
 public class RegistrationRouteHandler extends ApiRouteHandler {
-    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationRouteHandler.class);
 
     public RegistrationRouteHandler(String pathPrefix) {
         super(pathPrefix);

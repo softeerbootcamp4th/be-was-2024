@@ -20,7 +20,7 @@ import java.io.IOException;
  * 정적 경로 데이터 요청을 처리하는 핸들러
  */
 public class StaticResourceHandler implements IRouteHandler {
-    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+    private static final Logger logger = LoggerFactory.getLogger(StaticResourceHandler.class);
 
     @Override
     public boolean canMatch(Object... args) {
