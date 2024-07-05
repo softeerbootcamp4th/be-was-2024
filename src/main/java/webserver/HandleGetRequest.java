@@ -14,7 +14,6 @@ import static webserver.ResponseFactory.response404Header;
 
 public class HandleGetRequest {
     private final static String staticPath = "./src/main/resources/static";
-    private final static FileHandler fileHandler = new FileHandler();
 
     public static void handler(String url, OutputStream out) throws IOException {
         String[] splitUrl = url.split("\\?");
@@ -27,8 +26,7 @@ public class HandleGetRequest {
         }
     }
 
-    private static void createUser(String param, OutputStream out) throws IOException {
-        System.out.println("param = " + param);
+    private static void createUser(String param, OutputStream out){
         String[] params = param.split("&");
 
         String userId = params[0].split("=")[1];
