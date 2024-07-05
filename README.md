@@ -155,22 +155,49 @@ switch (tokens[1].split("\\.")[1]) { //content type에 따른 response
 
 전반적인 코스 구성 수정 및 기능 추가가 진행됨
 #### 구조 변경
-    webserver
-    - WebServer : webserver 구동기
-    - RequestHandler : reqeust 입출력 처리
-        api
-        - ApiFuncion : static file 읽기, 회원가입 등 모든 function의 처리용 interface
-        - ReadFile : static file 읽는 용도 class
-        - Registration : 회원가입용 class
-        http
-        - url : url에 대한 path와 parameter의 정보가 담겨있는 class
-        - PathHandler : 해당 url path에 대하여 실행해야 하는 function을 찾는용도
-        - HttpRequest : request에 대한 모든 정보가 있는 class
-        - HttpResponse : response에 대한 모든 정보가 있는 class
-            enums
-            - Methods (enum) : methods들에 대한 enum
-            - Extention (enum) : 지원하는 모든 확장자들에 대한 content-type이 저장되어있음
-            - StatusCode (enum) : response code들에 대한 message가 저장되어있음
+
+```
+├── db
+│   └── Database.java
+├── model
+│   └── User.java
+└── webserver
+    ├── RequestHandler.java
+    ├── WebServer.java
+    ├── api
+    │   ├── ApiFunction.java
+    │   ├── ReadFile.java
+    │   └── registration
+    │       └── Registration.java
+    └── http
+        ├── HttpRequest.java
+        ├── HttpResponse.java
+        ├── PathMap.java
+        ├── Url.java
+        └── enums
+            ├── Extension.java
+            ├── Methods.java
+            └── StatusCode.java
+```
+**webserver**
+- WebServer : webserver 구동기
+- RequestHandler : reqeust 입출력 처리
+  - **api**
+    - ApiFuncion : static file 읽기, 회원가입 등 모든 function의 처리용 interface
+    - ReadFile : static file 읽는 용도 class
+    - Registration : 회원가입용 class
+  - **http**
+    - url : url에 대한 path와 parameter의 정보가 담겨있는 class
+    - PathMap : 사이트의 모든 경로에 대해서 api function을 맵핑하는 pathtree가 있는 클래스 \
+    이 클래스를 이용하여 모든 경로들에 대한 function을 찾을 수 있는
+    - HttpRequest : request에 대한 모든 정보가 있는 class
+    - HttpResponse : response에 대한 모든 정보가 있는 class
+    - **enums**
+      - Methods (enum) : methods들에 대한 enum
+      - Extention (enum) : 지원하는 모든 확장자들에 대한 content-type이 저장되어있음
+      - StatusCode (enum) : response code들에 대한 message가 저장되어있음
+
+    
 
 #### 기능추가
 register내부의 index.html파일을 수정하여 회원가입 버튼을 누르면 id, username, password가 url을 통해서 전달되게끔 변경

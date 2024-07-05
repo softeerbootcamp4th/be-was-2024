@@ -24,9 +24,9 @@ public class Registration implements ApiFunction {
         String username = request.getUri().getParamsMap().get("username");
         String password = request.getUri().getParamsMap().get("password");
 
-        if(id == null || id == ""
-                || username == null || username.equals("")
-                || password == null || password.equals("")){
+        if(id == null || id.isEmpty()
+                || username == null || username.isEmpty()
+                || password == null || password.isEmpty()){
             return new HttpResponse(404);
         }
         Database.addUser(new User(id, password, username, ""));

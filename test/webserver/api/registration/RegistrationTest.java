@@ -14,7 +14,7 @@ class RegistrationTest {
         ApiFunction register = new Registration();
         HttpRequest request = new HttpRequest("GET /registration?id=1&username=3&password=5 HTTP/1.1");
         HttpResponse response  = register.funcion(request);
-        System.out.println(response.getHeader().toString());
+        System.out.println(response.getHeader());
     }
 
 }

@@ -14,7 +14,7 @@ public enum Methods {
     PUT("PUT"),
     DELETE("DELETE");
 
-    private String method;
+    private final String method;
 
     Methods(String method) {
         this.method = method;
