@@ -20,7 +20,7 @@ public class HandleGetRequest {
         String requestURL = splitUrl[0];
 
         switch (requestURL) {
-            case "/", "/registration" -> sendResponse(staticPath + requestURL + "/index.html", out);
+            case "/", "/registration", "/login" -> sendResponse(staticPath + requestURL + "/index.html", out);
             case "/user/create" -> createUser(splitUrl[1], out);
             default -> sendResponse(staticPath + requestURL, out);
         }
