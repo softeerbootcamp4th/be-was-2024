@@ -32,16 +32,18 @@ public class RequestHandler implements Runnable {
 
                 String requestLine = br.readLine();
                 Request request = Request.from(requestLine);
-                String method = request.getHttpMethod();
 
-                if (method.equals("GET")) {
-                    if (request.isQueryString()) {
-                        logicProcessor.createUser(request);
-                        response.redirect("/index.html", dos, 302);
-                    } else {
-                        response.response(request.getPath(), dos);
-                    }
-                }
+                Distributor distributor = Distributor.from(request, response);
+                distributor.process(dos);
+
+//                if (request.getHttpMethod().equals("GET")) {
+//                    if (request.isQueryString()) {
+//                        logicProcessor.createUser(request);
+//                        response.redirect("/index.html", dos, 302);
+//                    } else {
+//                        response.response(request.getPath(), dos);
+//                    }
+//                }
 
                 // 읽어들인 InputStream 모두 출력
                 String line;
