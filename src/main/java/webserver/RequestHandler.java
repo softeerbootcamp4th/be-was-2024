@@ -41,17 +41,13 @@ public class RequestHandler implements Runnable {
             while(!headers.isEmpty()){ //header들을 한줄씩 순회하면서 request에 header를 하나씩 추가함
                 headers = br.readLine();
                 logger.info(headers);
-                String[] parsedline = headers.split(". ");
+                String[] parsedline = headers.split(":");
                 if((parsedline.length) ==2) req.addHeader(parsedline[0],parsedline[1]);
             }
             logger.info("////// request header end //////");
 
             ApiFunction api = PathMap.getPathMethod(req.getMethod(),req.getUri().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
-            HttpResponse response;
-            if(api == null) {
-                response = new HttpResponse(404);
-            }else
-                response = api.funcion(req); // 해당 function을 실행
+            HttpResponse response = (api == null) ? new HttpResponse(404) : api.funcion(req); // 해당 function을 실행
 
             // response 출력
             dos.writeBytes(response.getHeader());
