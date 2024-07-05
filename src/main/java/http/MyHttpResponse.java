@@ -48,11 +48,23 @@ public class MyHttpResponse {
 
     /**
      * body에 데이터를 쓴다. Content-Length 헤더를 함께 업데이트한다.
-     * @param body
+     * @param body 작성할 byte 데이터
      */
     public void setBody(byte[] body) {
         this.body = body;
         getHeaders().putHeader("Content-Length", String.valueOf(body.length));
+    }
+
+    /**
+     * <pre>
+     * body에 데이터를 쓴다. Content-Length 헤더를 함께 업데이트한다.
+     * 문자열을 바이트로 변환하여 body에 작성한다.
+     * </pre>
+     * @param body String 타입의 바디
+     */
+    public void setBody(String body) {
+        byte[] bodyBytes = body.getBytes();
+        this.setBody(bodyBytes);
     }
 
     /**
