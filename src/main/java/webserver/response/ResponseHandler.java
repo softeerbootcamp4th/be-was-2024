@@ -39,7 +39,7 @@ public class ResponseHandler {
                 break;
 
             case "/create":
-                Parameter parameter = path.getParameter().get();
+                Parameter parameter = path.getParameter().orElseThrow(IllegalStateException::new);
                 User user = new User(
                         parameter.get("userId"),
                         parameter.get("password"),

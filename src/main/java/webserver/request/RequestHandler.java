@@ -1,12 +1,10 @@
-package webserver;
+package webserver.request;
 
 import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.request.HttpRequest;
-import webserver.request.Path;
 import webserver.response.ResponseHandler;
 
 import static util.Utils.*;

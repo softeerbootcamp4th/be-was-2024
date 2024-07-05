@@ -1,7 +1,5 @@
 package webserver.response;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,28 +9,28 @@ public class HttpResponse {
     private byte[] body;
     private Map<String, String> headers;
 
-    public HttpResponse(int status, byte[] body) throws IOException {
+    public HttpResponse(int status, byte[] body) {
         this.status = status;
         this.body = body;
         this.headers = new HashMap<>();
     }
 
-    public byte[] toByte(){
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        outputStream.writeBytes(("HTTP/1.1 "+status+" OK \r\n").getBytes());
-
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("HTTP/1.1 ").append(status).append(" OK \r\n");
         for( Map.Entry<String, String> entry : headers.entrySet() ){
             String strKey = entry.getKey();
             String strValue = entry.getValue();
-            outputStream.writeBytes( (strKey +": "+ strValue +"\r\n").getBytes());
+            sb.append(strKey).append(": ").append(strValue).append("\r\n");
         }
-        outputStream.writeBytes("\r\n".getBytes());
-        outputStream.write(body, 0, body.length);
+        sb.append("\r\n");
+        sb.append(new String(body));
+        return sb.toString();
+    }
 
-        return outputStream.toByteArray();
-
+    public byte[] toByte(){
+        return this.toString().getBytes();
     }
 
     public void addHeader(String key, String value){

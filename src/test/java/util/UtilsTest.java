@@ -12,7 +12,7 @@ class UtilsTest {
     void getAllStrings() throws IOException {
 
         //given
-        String input = "Hello, World!\nThis is a test.\nJava is fun.";
+        String input = "Hello, World!\nThis is a test.\nJava is fun.\n";
 
         byte[] inputBytes = input.getBytes();
 
@@ -22,7 +22,7 @@ class UtilsTest {
         String allStrings = Utils.getAllStrings(inputStream);
 
         //then
-        assertTrue(allStrings.equals(input));
+        assertEquals("Hello, World!\nThis is a test.\nJava is fun.", allStrings);
 
     }
 
