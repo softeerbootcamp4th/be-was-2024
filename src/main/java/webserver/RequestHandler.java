@@ -2,6 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestObject;
@@ -32,7 +34,8 @@ public class RequestHandler implements Runnable {
                 line = br.readLine();
             }
 
-            frontRequestProcess.handleRequest(out, httpRequestObject);
+            Map<String, String> responseInfo = frontRequestProcess.handleRequest(httpRequestObject);
+            frontRequestProcess.handleResponse(out, responseInfo);
         }  catch (IOException e) {
             logger.error("error: {}", e.getStackTrace());
         }

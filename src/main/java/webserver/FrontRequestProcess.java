@@ -10,13 +10,15 @@ import util.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
     private final ModelHandler<User> userHandler;
 
-    private FrontRequestProcess(){
+    private FrontRequestProcess() {
         this.userHandler = UserHandler.getInstance();
     }
 
@@ -28,26 +30,49 @@ public class FrontRequestProcess {
         private static final FrontRequestProcess INSTANCE = new FrontRequestProcess();
     }
 
-    public void handleRequest(OutputStream out, HttpRequestObject httpRequestObject) throws IOException {
+    public Map<String, String> handleRequest(HttpRequestObject httpRequestObject) {
         String path = httpRequestObject.getRequestPath();
         String method = httpRequestObject.getRequestMethod();
         // TODO: 추후 기능 확장 시 관심사별로 분리 필요
-        switch(HttpRequestMapper.of(path, method)){
+        Map<String, String> responseInfo = new HashMap<>();
+        switch (HttpRequestMapper.of(path, method)) {
             case USER_SIGNUP:
                 userHandler.create(httpRequestObject.getRequestParams());
-                response302Header(new DataOutputStream(out), "/index.html");
+                responseInfo.put("type", "dynamic");
+                responseInfo.put("path", "/index.html");
+                responseInfo.put("statusCode", "302");
                 break;
             case REGISTER:
-                response302Header(new DataOutputStream(out), "/registration");
+                responseInfo.put("type", "dynamic");
+                responseInfo.put("path", "/registration");
+                responseInfo.put("statusCode", "302");
                 break;
             default:
-                staticResponse(out, path);
+                responseInfo.put("type", "static");
+                responseInfo.put("path", path);
+                responseInfo.put("statusCode", "200");
+                break;
+        }
+        return responseInfo;
+    }
+
+    public void handleResponse(OutputStream out, Map<String, String> responseInfo) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+        if (responseInfo.get("type").equals("static")) {
+            staticResponse(dos, responseInfo.get("path"));
+            return;
+        }
+
+        switch(responseInfo.get("statusCode")) {
+            case "302":
+                response302Header(dos, responseInfo.get("path"));
+                break;
+            default:
                 break;
         }
     }
 
-    private void staticResponse(OutputStream out, String path) throws IOException {
-        DataOutputStream dos = new DataOutputStream(out);
+    private void staticResponse(DataOutputStream dos, String path) throws IOException {
         byte[] body = IOUtil.readBytesFromFile(IOUtil.STATIC_PATH + path);
         boolean isDir = IOUtil.isDirectory(IOUtil.STATIC_PATH + path);
         response200Header(dos, body.length, isDir ? "html" : path.split("\\.")[1]);
