@@ -9,7 +9,7 @@ public enum MimeType {
     JPG("image/jpeg"),
     SVG("image/svg+xml");
 
-    private String mimeType;
+    private final String mimeType;
 
     MimeType(String mimeType) {
        this.mimeType = mimeType;

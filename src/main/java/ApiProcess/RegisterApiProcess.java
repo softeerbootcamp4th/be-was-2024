@@ -6,6 +6,7 @@ import model.User;
 import webserver.Request;
 import webserver.Response;
 
+@GetMethod(apiPath = "/user/create")
 public class RegisterApiProcess implements ApiProcess {
     @Override
     public String process(Request request, Response response) {

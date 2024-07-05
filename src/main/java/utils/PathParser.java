@@ -1,6 +1,18 @@
 package utils;
 
+import java.nio.file.Path;
+
 public class PathParser {
+
+    private static class LazyManager {
+        public static PathParser instance = new PathParser();
+    }
+
+    private PathParser() {}
+
+    public static PathParser getInstance() {
+       return LazyManager.instance;
+    }
 
     public String fileExtExtract(String fileName) {
         int pointPos = fileName.lastIndexOf(".");

@@ -9,7 +9,17 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HttpRequestParser {
+public class RequestParser {
+
+    private static class LazyRequestParser {
+        public static RequestParser instance = new RequestParser();
+    }
+
+    public static RequestParser getRequestParser() {
+        return LazyRequestParser.instance;
+    }
+
+    private RequestParser() {}
 
     public Request getRequest(InputStream rawHttpRequest) throws IOException {
         Request request = new Request();

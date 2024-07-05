@@ -9,14 +9,15 @@ import ApiProcess.ApiProcess;
 import enums.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.HttpRequestParser;
 import utils.MimeTypeMapper;
 import utils.PathParser;
+import utils.RequestParser;
 
 public class RequestHandler implements Callable<Void> {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final PathParser fileParser = new PathParser();
+    private static final PathParser pathParser = PathParser.getInstance();
     public static final String DEFALUT_PATH = "src/main/resources/static";
+
 
     private Socket connection;
 
@@ -32,13 +33,14 @@ public class RequestHandler implements Callable<Void> {
             DataOutputStream dos = new DataOutputStream(out);
 
             // request, response 객체 생성
-            HttpRequestParser httpRequestParser = new HttpRequestParser();
-            Request request = httpRequestParser.getRequest(in);
+            RequestParser requestParser = RequestParser.getRequestParser();
+            Request request = requestParser.getRequest(in);
             Response response = new Response();
 
             /**
              * 경로에 따른 로직 처리
              * ApiProcess 인터페이스를 만들어 로직 처리를 추상화
+             * ApiProcessManager가 해당 하는 구체화 클래스를 주입 합니다.
              * RequestHandler는 로직 처리를 위한 구체화 클래스를 알지 못해도 된다.
              */
             ApiProcessManager apiProcessManager = new ApiProcessManager();
@@ -54,7 +56,7 @@ public class RequestHandler implements Callable<Void> {
             // 렌더링할 파일의 실제 위치
             String filePath = filePathResolver(fileName);
 
-            // 파일의 raw 파일 읽기
+            // 파일의 바이너리 데이터 읽기
             byte[] body = fileReadToBinary(filePath);
 
             // mimeType 변환
@@ -78,7 +80,7 @@ public class RequestHandler implements Callable<Void> {
 
     private MimeType extToMimetype(String filePath) {
         // 파일 확장자를 mimeType으로 바꾸는 과정
-        String fileExt = fileParser.fileExtExtract(filePath);
+        String fileExt = pathParser.fileExtExtract(filePath);
         MimeTypeMapper mimeTypeMapper = new MimeTypeMapper();
         return mimeTypeMapper.getMimeType(fileExt);
     }

@@ -1,11 +1,16 @@
 package webserver;
 
+import ApiProcess.ApiProcess;
+import db.Database;
+import model.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import utils.HttpRequestParser;
+import utils.RequestParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class RequestTest {
 
@@ -16,14 +21,14 @@ class RequestTest {
         ByteArrayInputStream bis = new ByteArrayInputStream(httpMessage.getBytes());
 
         // when
-        Request request = new HttpRequestParser().getRequest(bis);
+        Request request = RequestParser.getRequestParser().getRequest(bis);
 
         // then
-        Assertions.assertThat(request.getMethod()).isEqualTo("GET");
-        Assertions.assertThat(request.getPath()).isEqualTo("/index.html");
-        Assertions.assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
-        Assertions.assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        Assertions.assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getPath()).isEqualTo("/index.html");
+        assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
     }
 
     @Test
@@ -34,7 +39,28 @@ class RequestTest {
 
         // when, then
         Assertions.assertThatThrownBy(() -> {
-            new HttpRequestParser().getRequest(bis);
+            RequestParser.getRequestParser().getRequest(bis);
         }).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void registerTest() throws IOException {
+        // given
+        String httpMessage = "GET /user/create?userId=adsf&name=asf&email=sdf&password=sadf http/1.1\nConnection: keep-alive\nHost: localhost:8080\n";
+        ByteArrayInputStream bis = new ByteArrayInputStream(httpMessage.getBytes());
+        Request request = RequestParser.getRequestParser().getRequest(bis);
+        Response response = new Response();
+        String userId = request.getParameter("userId");
+        ApiProcessManager apiProcessManager = new ApiProcessManager();
+        ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath());
+
+        // when
+        String process = apiProcess.process(request, response);
+        User user= Database.findUserById(userId);
+
+        // then
+        assertThat(user.getEmail()).isEqualTo("sdf");
+        assertThat(user.getName()).isEqualTo("asf");
+        assertThat(user.getPassword()).isEqualTo("sadf");
     }
 }

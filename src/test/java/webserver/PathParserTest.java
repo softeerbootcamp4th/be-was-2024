@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PathParserTest {
 
-    static PathParser fileParser = new PathParser();
+    PathParser fileParser = PathParser.getInstance();
 
     @Test
     @DisplayName("파일 이름이 정상적으로 들어갔을 때")
