@@ -1,54 +1,95 @@
 package webserver;
 
-import java.io.*;
-import java.net.Socket;
-
 import common.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.net.Socket;
+
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final String dirPath = "/Users/eckrin/study/be-was-2024/src/main/resources/static";
+    private final String dirPath = "./src/main/resources/static";
 
     private Socket connection;
 
-    public RequestHandler(Socket connectionSocket) {
+//    public RequestHandler(Socket connectionSocket) {
+//        this.connection = connectionSocket;
+//    }
+
+    private RequestHandler() {
+    }
+
+    private static class InnerInstanceClass {
+        private static final RequestHandler instance = new RequestHandler();
+    }
+
+    public static synchronized RequestHandler getInstance() {
+        return InnerInstanceClass.instance;
+    }
+
+    public synchronized void setConnection(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String str, path = "", extension = "", contentType = "";
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("\n====REQUEST====\n");
 
             while(!(str = br.readLine()).isEmpty()) {
+//                sb.append(str+"\n");
+                logger.debug(str);
                 String[] headerLine = str.split(" ");
-                if(WebUtils.isMethodHeader(headerLine[0])) { // request uri path 추출하기
-                    path = headerLine[1];
+                if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에 request uri path가 존재하므로
+                    path = headerLine[1]; // request uri path 추출하기
+                    // rest요청일 경우 - 적절한 view를 찾거나, 적절한 비즈니스 로직 수행
+                    if(WebUtils.isRESTRequest(path)) {
+                        // GET 요청일 경우
+                        if(WebUtils.isGetRequest(headerLine[0])) {
+                            path = WebAdapter.resolveRequestUri(path, out);
+                        }
+                    }
+                    // 설정한 path를 바탕으로 확장자에 맞게 contentType에 맞게 뷰 파일을 찾아 응답
                     extension = path.substring(path.lastIndexOf(".")+1);
                     contentType = WebUtils.getProperContentType(extension);
+                    readAndResponseFromPath(out, dirPath+path, contentType);
                 }
-                logger.debug("{}", str);
             }
 
-            // read file
-            DataOutputStream dos = new DataOutputStream(out);
-            File file = new File(dirPath + path);
-            byte[] body = new byte[(int)file.length()];
+            System.out.println();
+//            logger.debug("{}", sb);
 
-            try(FileInputStream fis = new FileInputStream(file)) {
-                fis.read(body);
-            }
-
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
         }
+    }
+
+    /**
+     * 경로에서 적절한 뷰 파일을 찾아서 응답합니다.
+     */
+    private void readAndResponseFromPath(OutputStream out, String path, String contentType) throws IOException{
+        DataOutputStream dos = new DataOutputStream(out);
+        File file = new File(path);
+        byte[] body = new byte[(int)file.length()];
+
+        try(FileInputStream fis = new FileInputStream(file)) {
+            fis.read(body);
+        }
+
+        response200Header(dos, body.length, contentType);
+        responseBody(dos, body);
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
