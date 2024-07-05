@@ -4,13 +4,14 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+import constant.FileExtensionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -25,19 +26,26 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             StringBuilder headers = new StringBuilder();
 
+            // url 추출
             String line = br.readLine();
             headers.append(line);
             String url = line.split(" ")[1];
+
+            // 파일 확장자 추출
+            String[] parts = url.split("\\.");
+            String extensionType = parts[parts.length - 1];
+
+            // request header 출력
             while(!(line = br.readLine()).isEmpty()) {
                     headers.append(line).append("\n");
             }
-            logger.debug("Response Headers:\n {}", headers);
+            logger.debug("Request Headers:\n {}", headers);
 
             DataOutputStream dos = new DataOutputStream(out);
             byte[] body = readFile("src/main/resources/static"+url);
 
             if(body != null) {
-                response200Header(dos, body.length);
+                response200Header(dos, body.length, extensionType);
                 responseBody(dos, body);
             }
             else{
@@ -45,8 +53,11 @@ public class RequestHandler implements Runnable {
                 response404Error(dos);
             }
 
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             logger.error(e.getMessage());
+
+            // FileExtensionType에서 관리하지 않는 타입일 경우 404 error 응답
+            response404Error(connection);
         }
     }
 
@@ -69,10 +80,13 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extensionType){
         try {
+            FileExtensionType fileExtensionType = FileExtensionType.valueOf(extensionType.toUpperCase());
+
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + fileExtensionType.getContentType() + ";"
+                    + "charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -98,6 +112,16 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("\r\n");
             dos.writeBytes(errorMessage);
             dos.flush();
+        }
+        catch (IOException e){
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Error(Socket connection) {
+        try(OutputStream out = connection.getOutputStream();
+            DataOutputStream dos = new DataOutputStream(out)){
+            response404Error(dos);
         }
         catch (IOException e){
             logger.error(e.getMessage());
