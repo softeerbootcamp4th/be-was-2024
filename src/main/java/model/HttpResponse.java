@@ -8,6 +8,22 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class HttpResponse {
+    public String getProtocolVersion() {
+        return protocolVersion;
+    }
+
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
+
+    public List<String> getHeaders() {
+        return headers;
+    }
+
+    public byte[] getBody() {
+        return body;
+    }
+
     private String protocolVersion;
     private HttpStatus httpStatus;
     private List<String> headers;

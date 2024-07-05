@@ -22,7 +22,6 @@ public class InputStreamParser {
         String protocolVersion = line.split(" ")[2];
 
         List<String> headers = new ArrayList<>();
-
         while (!line.isEmpty()) {
             line=buffer.readLine();
             headers.add(line);
