@@ -2,10 +2,14 @@ package util;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Represents an HTTP response.
+ */
 public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
 
@@ -15,28 +19,28 @@ public class HttpResponse {
         this.dos = dos;
     }
 
-    public void sendResponse(int statusCode, String statusMessage, String contentType, byte[] body) {
+    /**
+     * Sends an HTTP response with the given status code, status message, headers, and body.
+     *
+     * @param statusCode the status code
+     * @param statusMessage the status message
+     * @param headers the headers
+     * @param body the body
+     */
+    public void sendResponse(int statusCode, String statusMessage, Map<String, String> headers, byte[] body) {
         try {
-
             writeStatusLine(statusCode, statusMessage);
-            writeHeader("Content-Type", contentType);
-            writeHeader("Content-Length", String.valueOf(body.length));
+            logger.debug("HTTP/1.1 " + statusCode + " " + statusMessage);
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                writeHeader(header.getKey(), header.getValue());
+                logger.debug(header.getKey() + ": " + header.getValue());
+            }
             writeBlankLine();
-            writeBody(body);
+            if (body != null) {
+                writeBody(body);
+            }
         } catch (IOException e) {
             logger.error("Error sending HTTP response: " + e.getMessage());
-        }
-    }
-
-    public void sendRedirect(String location) {
-        try {
-            logger.info("Sending redirect to " + location);
-            writeStatusLine(303, "See Other");
-            writeHeader("Location", location);
-            writeBlankLine();
-            logger.info("완료 redirect to " + location);
-        } catch (IOException e) {
-            logger.error("Error sending redirect response: " + e.getMessage());
         }
     }
 
