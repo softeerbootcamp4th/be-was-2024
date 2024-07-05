@@ -19,7 +19,12 @@ public class StaticResourceChain extends MiddlewareChain {
         HttpStatusType type = res.getStatusInfo();
 
         // 정상적으로 처리한 경우
-        if(type != null && type != HttpStatusType.UNSUPPORTED_MEDIA_TYPE) return;
+        if(
+                type != null
+                && type!= HttpStatusType.UNSUPPORTED_MEDIA_TYPE
+                && type!= HttpStatusType.NOT_FOUND
+        ) return;
+
         // 정상적으로 처리하지 못한 경우. 응답 정보를 초기화하고, 뒤에 매칭되는 부분 있는지 검사
         res.setStatusInfo(null);
         res.setBody(new byte[0]);
