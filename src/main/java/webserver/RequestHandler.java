@@ -4,8 +4,11 @@ import java.io.*;
 import java.net.Socket;
 import java.io.File;
 
+import db.Database;
+import exception.QueryParameterNotFoundException;
 import http.HttpRequest;
 import http.HttpStatus;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +17,7 @@ public class RequestHandler implements Runnable {
 
     private Socket connection;
 
-    private final String basePath = "src/main/resources/static";
+    private final String staticResourcePath = "src/main/resources/static";
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -26,17 +29,41 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            HttpRequest httpRequest = createHttpRequest(in);
-            logger.debug(httpRequest.toString());
+            HttpRequest request = readHttpRequest(in);
+            logger.debug(request.toString());
 
-            response(new DataOutputStream(out), httpRequest);
+            doServiceLogic(request);
+            response(new DataOutputStream(out), request);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
-    private HttpRequest createHttpRequest(InputStream in) throws IOException {
+    private void registration(HttpRequest httpRequest){
+        try{
+            String userId = httpRequest.getQueryParameterValue("userId");
+            String password = httpRequest.getQueryParameterValue("password");
+            String name = httpRequest.getQueryParameterValue("name");
+            String email = httpRequest.getQueryParameterValue("email");
+
+            Database.addUser(new User(userId, password, name, email));
+        } catch (QueryParameterNotFoundException qe){
+            // /registration/index.html form의 내용은 전부 required 이므로 유저가 임의로 url을 변경하여 접근했을때이다.
+            // 따라서 500번대는 아니고, 400 Bad Request, 404 Not Found 중에 무엇을...?
+        }
+    }
+
+    private void doServiceLogic(HttpRequest httpRequest) {
+        switch (httpRequest.getPath()) {
+            case "/create":
+                registration(httpRequest);
+                return;
+            default:
+        }
+    }
+
+    private HttpRequest readHttpRequest(InputStream in) throws IOException {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
         HttpRequest httpRequest = null;
@@ -50,7 +77,6 @@ public class RequestHandler implements Runnable {
                 isStartLine = false;
                 continue;
             }
-
             int colonIndex = line.indexOf(':');
             if (colonIndex == -1) {
                 throw new IOException("Invalid HTTP header: " + line);
@@ -64,7 +90,7 @@ public class RequestHandler implements Runnable {
     }
 
     private void response(DataOutputStream dos, HttpRequest httpRequest) {
-        File file = new File(basePath + httpRequest.getUrl());
+        File file = new File(staticResourcePath + httpRequest.getViewPath());
 
         if (!file.exists()) {
             //이 부분에서 보기 좋은 에러페이지 html 파일을 읽어들여서 내보내면 더 좋을듯
