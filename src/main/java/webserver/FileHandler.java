@@ -19,15 +19,15 @@ public class FileHandler {
     static ResponseWithStatus getFileContent(String path) throws IOException {
         try{
 
-            String str = "";
+            StringBuilder file = new StringBuilder();
             BufferedReader br = new BufferedReader(new FileReader(path));
             String fileLine = br.readLine();
 
             while (fileLine != null) {
-                str += fileLine;
+                file.append(fileLine);
                 fileLine = br.readLine();
             }
-            return new ResponseWithStatus(HttpStatus.OK, str.getBytes());
+            return new ResponseWithStatus(HttpStatus.OK, file.toString().getBytes());
 
         }catch (FileNotFoundException e){
 
