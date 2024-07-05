@@ -7,6 +7,7 @@ import java.io.File;
 import db.Database;
 import exception.QueryParameterNotFoundException;
 import http.HttpRequest;
+import http.HttpResponse;
 import http.HttpStatus;
 import model.User;
 import org.slf4j.Logger;
@@ -29,18 +30,51 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            HttpRequest request = readHttpRequest(in);
-            logger.debug(request.toString());
+            HttpRequest httpRequest = HttpRequest.read(in);
+            logger.debug(httpRequest.toString());
 
-            doServiceLogic(request);
-            response(new DataOutputStream(out), request);
+            HttpResponse httpResponse = doServiceLogic(httpRequest);
+
+            response(new DataOutputStream(out), httpResponse);
 
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void registration(HttpRequest httpRequest){
+    private HttpResponse doServiceLogic(HttpRequest httpRequest) {
+        switch (httpRequest.getPath()) {
+            case "/create":
+                return registration(httpRequest);
+            default:
+                return defaultLogic(httpRequest);
+        }
+    }
+
+    private HttpResponse defaultLogic(HttpRequest request) {
+        HttpResponse response = new HttpResponse();
+        File file = new File(staticResourcePath + request.getViewPath());
+
+        if (!file.exists()) {
+            return HttpResponse.error(HttpStatus.SC_NOT_FOUND, "Page Not Found!");
+        }
+
+        try (FileInputStream fis = new FileInputStream(file)) {
+            byte[] body = fis.readAllBytes();
+            response.setBody(body);
+            response.setStatusCode(HttpStatus.SC_OK);
+            response.addHeader("Content-Type", request.getContentType());
+            response.addHeader("Content-Length", String.valueOf(body.length));
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return HttpResponse.error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server Error!");
+        }
+
+        return response;
+    }
+
+    private HttpResponse registration(HttpRequest httpRequest){
+        HttpResponse response = new HttpResponse();
         try{
             String userId = httpRequest.getQueryParameterValue("userId");
             String password = httpRequest.getQueryParameterValue("password");
@@ -48,95 +82,21 @@ public class RequestHandler implements Runnable {
             String email = httpRequest.getQueryParameterValue("email");
 
             Database.addUser(new User(userId, password, name, email));
+
+            return HttpResponse.redirect("/index.html");
         } catch (QueryParameterNotFoundException qe){
             // /registration/index.html form의 내용은 전부 required 이므로 유저가 임의로 url을 변경하여 접근했을때이다.
-            // 따라서 500번대는 아니고, 400 Bad Request, 404 Not Found 중에 무엇을...?
+            logger.debug(qe.getMessage());
+            return HttpResponse.error(HttpStatus.SC_BAD_REQUEST, "Invalid Access");
         }
     }
 
-    private void doServiceLogic(HttpRequest httpRequest) {
-        switch (httpRequest.getPath()) {
-            case "/create":
-                registration(httpRequest);
-                return;
-            default:
-        }
+
+    private void response(DataOutputStream dos, HttpResponse httpResponse) throws IOException {
+        dos.writeBytes(httpResponse.headersToString());
+        byte[] body = httpResponse.getBody();
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 
-    private HttpRequest readHttpRequest(InputStream in) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-
-        HttpRequest httpRequest = null;
-        boolean isStartLine = true;
-
-        String line;
-        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다.
-            if (isStartLine) {
-                String[] tokens = line.split(" ");
-                httpRequest = new HttpRequest(tokens[0], tokens[1], tokens[2]);
-                isStartLine = false;
-                continue;
-            }
-            int colonIndex = line.indexOf(':');
-            if (colonIndex == -1) {
-                throw new IOException("Invalid HTTP header: " + line);
-            }
-            String key = line.substring(0, colonIndex).trim();
-            String value = line.substring(colonIndex + 1).trim();
-            httpRequest.addHeader(key, value);
-        }
-
-        return httpRequest;
-    }
-
-    private void response(DataOutputStream dos, HttpRequest httpRequest) {
-        File file = new File(staticResourcePath + httpRequest.getViewPath());
-
-        if (!file.exists()) {
-            //이 부분에서 보기 좋은 에러페이지 html 파일을 읽어들여서 내보내면 더 좋을듯
-            byte[] body = "<h1>Page Not Found!</h1>".getBytes();
-            responseHeader(dos, body.length, HttpStatus.SC_NOT_FOUND, "text/html;charset=utf-8");
-            responseBody(dos, body);
-            return;
-        }
-
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] body = fis.readAllBytes();
-            responseHeader(dos, body.length, HttpStatus.SC_OK, httpRequest.getContentType());
-            responseBody(dos, body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseHeader(DataOutputStream dos, int lengthOfBodyContent, int statusCode, String contentType) {
-        try {
-            StringBuilder statusInfo = new StringBuilder()
-                    .append(statusCode)
-                    .append(" ")
-                    .append(HttpStatus.getStautusCodeString(statusCode))
-                    .append("\r\n");
-
-            dos.writeBytes("HTTP/1.1  " + statusInfo.toString());
-            dos.writeBytes("Content-Type: " + contentType + "\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        } catch (IllegalStateException ie) {
-            logger.error(ie.getMessage());
-            byte[] body = "<h1>Server Error</h1>".getBytes();
-            responseHeader(dos, body.length, HttpStatus.SC_INTERNAL_SERVER_ERROR, "text/html;charset=utf-8");
-            responseBody(dos, body);
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
