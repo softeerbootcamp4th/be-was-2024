@@ -2,6 +2,6 @@ package handler;
 
 import java.util.Map;
 
-public interface ObjectHandler<T> {
+public interface ModelHandler<T> {
     T create(Map<String, String> fields);
 }

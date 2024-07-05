@@ -5,7 +5,7 @@ import model.User;
 
 import java.util.Map;
 
-public class UserHandler implements ObjectHandler<User>{
+public class UserHandler implements ModelHandler<User> {
 
     private UserHandler() {}
 

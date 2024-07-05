@@ -1,6 +1,6 @@
 package webserver;
 
-import handler.ObjectHandler;
+import handler.ModelHandler;
 import handler.UserHandler;
 import model.User;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import java.io.OutputStream;
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
-    private final ObjectHandler<User> userHandler;
+    private final ModelHandler<User> userHandler;
 
     private FrontRequestProcess(){
         this.userHandler = UserHandler.getInstance();
