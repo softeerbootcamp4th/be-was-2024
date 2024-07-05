@@ -9,12 +9,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Database {
-    private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
     private static Map<String, User> users = new HashMap<>();
 
     public static void addUser(User user) {
-        logger.info("Adding user: " + user.getName());
         users.put(user.getUserId(), user);
     }
 
