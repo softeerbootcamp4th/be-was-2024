@@ -48,6 +48,10 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
+            for(User u : findAll()){
+                System.out.println(u);
+            }
+
             byte[] body = readFileToByteArray(file);
             String contentType = determineContentType(file.getName());
 

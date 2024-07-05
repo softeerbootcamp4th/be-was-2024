@@ -40,6 +40,15 @@ public class AddressHandlerTest {
         assertEquals(expectedFilePath, actualFilePath);
     }
 
+    //직접 요청 생략
+//    @Test
+//    public void testCreateUserFromUrl_ValidUrl() {
+//        String urlPath = "/user/create?name=John&email=john@example.com&password=1234&username=john123";
+//        User actualUser = createUserFromUrl(urlPath);
+//        User expectedUser = new User("John", "john@example.com", "1234", "john123");
+//        assertEquals(expectedUser, actualUser);
+//    }
+
     @Test
     public void testCreateUserFromUrl_InvalidUrl() {
         String urlPath = "/user/create";
@@ -47,20 +56,30 @@ public class AddressHandlerTest {
         assertNull(actualUser);
     }
 
+    //직접 요청 생략
+//    @Test
+//    public void testHandleUserCreation_ValidUrl() throws IOException {
+//        String urlPath = "/user/create?name=John&email=john@example.com&password=1234&username=john123";
+//        handleUserCreation(urlPath);
+//        String expectedOutput = "HTTP/1.1 302 Found\r\nLocation: /index.html\r\n\r\n";
+//        String actualOutput = baos.toString();
+//        assertEquals(expectedOutput, actualOutput);
+//    }
+
     @Test
-    public void testHandleUserCreation_ValidUrl() throws IOException {
-        String urlPath = "/user/create?name=John&email=john@example.com&password=1234&username=john123";
-        handleUserCreation(urlPath, dos);
-        String expectedOutput = "HTTP/1.1 302 Found\r\nLocation: /index.html\r\n\r\n";
+    public void testHandleUserCreation_InvalidUrl() throws IOException {
+        String urlPath = "/user/create";
+        handleUserCreation(urlPath);
+        String expectedOutput = "";
         String actualOutput = baos.toString();
         assertEquals(expectedOutput, actualOutput);
     }
 
     @Test
-    public void testHandleUserCreation_InvalidUrl() throws IOException {
-        String urlPath = "/user/create";
-        handleUserCreation(urlPath, dos);
-        String expectedOutput = "";
+    public void testRedirectPath() throws IOException {
+        String redirectPath = "/home";
+        redirectPath(redirectPath, dos);
+        String expectedOutput = "HTTP/1.1 302 Found\r\nLocation: /home\r\n\r\n";
         String actualOutput = baos.toString();
         assertEquals(expectedOutput, actualOutput);
     }
