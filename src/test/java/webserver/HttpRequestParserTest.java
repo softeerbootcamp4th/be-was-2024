@@ -1,21 +1,14 @@
 package webserver;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HttpRequestParserTest {
 
-    private HttpRequestParser httpRequestParser;
-
-    @BeforeEach
-    void setUp() {
-        httpRequestParser = new HttpRequestParser();
-    }
+    private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @ParameterizedTest
     @CsvSource({"/favicon.ico", "/index.html", "/helloworld"})
@@ -25,7 +18,7 @@ public class HttpRequestParserTest {
         String requestFirstLine = "GET " + uri + " HTTP/1.1";
 
         // When
-        String path = HttpRequestParser.parseRequestURI(requestFirstLine);
+        String path = httpRequestParser.parseRequestURI(requestFirstLine);
 
         // Then
         assertEquals(uri, path);
