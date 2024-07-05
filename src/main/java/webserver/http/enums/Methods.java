@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 public enum Methods {
     GET("GET"),
     POST("POST"),
+    PUT("PUT"),
     DELETE("DELETE");
 
     private String method;

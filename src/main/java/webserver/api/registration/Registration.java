@@ -1,10 +1,11 @@
-package webserver.api;
+package webserver.api.registration;
 
 import db.Database;
 import model.User;
+import webserver.api.ApiFunction;
+import webserver.api.ReadFile;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-
 
 
 /*
@@ -13,6 +14,11 @@ import webserver.http.HttpResponse;
 public class Registration implements ApiFunction {
     @Override
     public HttpResponse funcion(HttpRequest request) {
+
+        if(request.getUri().getParamsMap().isEmpty()){
+            return new ReadFile().funcion(request);
+        }
+
 
         String id = request.getUri().getParamsMap().get("id");
         String username = request.getUri().getParamsMap().get("username");

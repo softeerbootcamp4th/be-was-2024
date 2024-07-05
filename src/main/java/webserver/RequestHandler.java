@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import webserver.api.ApiFunction;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.PathHandler;
+import webserver.http.PathMap;
 
 
 /*
@@ -48,8 +48,12 @@ public class RequestHandler implements Runnable {
             }
             logger.info("////// request header end //////");
 
-            ApiFunction api = PathHandler.getPath(req); //해당 path에 대한 function을 request정보를 이용하여 받아온다
-            HttpResponse response = api.funcion(req); // 해당 function을 실행
+            ApiFunction api = PathMap.getPathMethod(req.getMethod(),req.getUri().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            HttpResponse response;
+            if(api == null) {
+                response = new HttpResponse(404);
+            }else
+                response = api.funcion(req); // 해당 function을 실행
 
             // response 출력
             dos.writeBytes(response.getHeader());
