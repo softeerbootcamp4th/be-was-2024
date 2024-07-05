@@ -2,13 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.Map;
-
-import enums.FileType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.Handler;
 import utils.HttpRequestParser;
+import utils.HttpResponseHandler;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -27,60 +25,20 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             HttpRequestParser httpRequestParser = new HttpRequestParser(in);
+            HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
             // 읽은 헤더 로깅
-            StringBuilder sb = new StringBuilder();
-            Map<String, String> headers = httpRequestParser.getHeaders();
-            for (String key : headers.keySet()) {
-                sb.append(key).append(": ").append(headers.get(key));
-            }
-
-            logger.debug(sb.toString());
+            String headers = httpRequestParser.headersToString();
+            logger.debug(headers);
 
             // 요청 URL 파싱
             String url = httpRequestParser.getUrl();
             logger.info("요청 URL: " + url);
 
-            String extension = httpRequestParser.getExtension();
+            Router router = new Router();
+            Handler handler = router.getHandler(httpRequestParser);
+            handler.handle(httpRequestParser, httpResponseHandler);
 
-            DataOutputStream dos = new DataOutputStream(out);
-
-            // 파일 확장자가 존재하는 경우
-            if (extension != null) {
-                String contentType = FileType.getContentTypeByExtension(extension);
-                String filePath = "/Users/jungwoo/Desktop/study/be-was-2024/src/main/resources/static" + url;
-                logger.info("파일 확장자: " + extension);
-                logger.info("파일 경로: " + filePath);
-                logger.info("content-type: " + contentType);
-                byte[] body = Files.readAllBytes(new File(filePath).toPath());
-                response200Header(dos, body.length, contentType);
-                responseBody(dos, body);
-            } else {
-                byte[] body = "<h1>Hello World</h1>".getBytes();
-                response200Header(dos, body.length, "text/html");
-                responseBody(dos, body);
-            }
-
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
