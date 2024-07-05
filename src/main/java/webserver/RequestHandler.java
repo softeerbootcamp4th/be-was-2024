@@ -75,25 +75,4 @@ public class RequestHandler implements Callable<Void> {
         }
         return null;
     }
-
-    private void responseHeader(DataOutputStream dos, Response response) {
-        HttpCode httpCode = response.getHttpCode() == null ? HttpCode.OK : response.getHttpCode();
-        try {
-            dos.writeBytes("HTTP/1.1 " + httpCode.getCode() + " " + httpCode.getMessage() + "\r\n");
-            dos.writeBytes("Content-Type: " + response.getContentType() + "\r\n");
-            dos.writeBytes("Content-Length: " + response.getContentLength() + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
