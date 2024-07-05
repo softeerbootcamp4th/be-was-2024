@@ -21,7 +21,7 @@
   </header>
   <div class="page">
     <h2 class="page-title">회원가입</h2>
-    <form class="form" action="/user/create" method="get">
+    <form class="form" action="/user/create" method="get" onsubmit="showAlert(event)">
       <div class="textfield textfield_size_s">
         <p class="title_textfield">아이디</p>
         <input
@@ -70,5 +70,16 @@
     </form>
   </div>
 </div>
+
+
+<script>
+  function showAlert(event) {
+    event.preventDefault(); // 폼 제출 방지
+    const userId = document.querySelector('input[name="userId"]').value;
+    alert(`회원가입이 완료되었습니다! userId=${userId}`);
+    // 여기서 추가적으로 서버로 데이터 전송 등의 작업을 할 수 있음
+  }
+</script>
+
 </body>
 </html>
