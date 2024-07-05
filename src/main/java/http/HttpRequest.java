@@ -2,6 +2,10 @@ package http;
 
 import exception.QueryParameterNotFoundException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -11,16 +15,50 @@ public class HttpRequest {
 
     private final String defaultViewPath = "/index.html";
 
-    private final String method;
-    private final String url;
-    private final String path;
-    private final String version;
+    private String method;
+    private String url;
+    private String path;
+    private String httpVersion;
 
+    public HttpRequest() {}
 
-    public HttpRequest(String method, String url, String version) {
+    public static HttpRequest read(InputStream in) throws IOException {
+        HttpRequest request = new HttpRequest();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+        boolean isStartLine = true;
+
+        String line;
+        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다.
+            if (isStartLine) {
+                String[] tokens = line.split(" ");
+                request.setMethod(tokens[0]);
+                request.setUrl(tokens[1]);
+                request.setPath(tokens[1]);
+                request.setHttpVersion(tokens[2]);
+                isStartLine = false;
+                continue;
+            }
+            int colonIndex = line.indexOf(':');
+            if (colonIndex == -1) {
+                throw new IOException("Invalid HTTP header: " + line);
+            }
+            String key = line.substring(0, colonIndex).trim();
+            String value = line.substring(colonIndex + 1).trim();
+            request.addHeader(key, value);
+        }
+
+        return request;
+    }
+
+    public void setMethod(String method) {
         this.method = method;
+    }
+
+    public void setUrl(String url) {
         this.url = url;
-        this.version = version;
+    }
+    public void setPath(String url) {
         if(hasQueryParameters(url)) {
             setQueryParameters(url);
             this.path = url.substring(0, url.indexOf('?'));
@@ -29,6 +67,9 @@ public class HttpRequest {
             this.path = url;
         }
     }
+    public void setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
 
     //Map<> queryParameters를 외부에서 접근 불가능하게 설정했으므로 getter 작성
     public String getQueryParameterValue(String key) throws QueryParameterNotFoundException {
@@ -36,15 +77,6 @@ public class HttpRequest {
             return queryParameters.get(key);
         } else throw new QueryParameterNotFoundException("Cannot find Query Parameter names :  " + key);
     }
-
-    /*
-    public String getQueryParameter() {
-        StringBuilder queries = new StringBuilder();
-        for (String key : queryParameters.keySet()) {
-            queries.append(key).append("=").append(queryParameters.get(key)).append("\n");
-        }
-        return queries.toString();
-    }*/
 
     private boolean hasQueryParameters(String url){
         return url != null && url.contains("?");
@@ -84,8 +116,8 @@ public class HttpRequest {
     public String getPath() {
         return path;
     }
-    public String getVersion() {
-        return version;
+    public String getHttpVersion() {
+        return httpVersion;
     }
 
     public String getContentType(){
@@ -110,7 +142,7 @@ public class HttpRequest {
         StringBuilder sb = new StringBuilder("\n")
                 .append(method).append(" ")
                 .append(url).append(" ")
-                .append(version).append("\n");
+                .append(httpVersion).append("\n");
 
         for(Map.Entry<String, String> entry : headers.entrySet()){
             sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
