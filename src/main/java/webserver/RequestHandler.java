@@ -31,7 +31,7 @@ public class RequestHandler implements Runnable {
             String url = httpRequest.url();
 
             switch (method) {
-                case GET -> HandleGetRequest.handler(url, out);
+                case GET -> GetRequestHandler.handler(url, out);
                 default -> throw new RuntimeException();
             }
 

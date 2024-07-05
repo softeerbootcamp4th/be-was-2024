@@ -12,7 +12,7 @@ import static webserver.FileHandler.*;
 import static webserver.ResponseFactory.response200Header;
 import static webserver.ResponseFactory.response404Header;
 
-public class HandleGetRequest {
+public class GetRequestHandler {
     private final static String staticPath = "./src/main/resources/static";
 
     public static void handler(String url, OutputStream out) throws IOException {
@@ -35,7 +35,6 @@ public class HandleGetRequest {
         String email = params[3].split("=")[1];
 
         Database.addUser(new User(userId, password, name, email));
-
 
         DataOutputStream dos = new DataOutputStream(out);
         ResponseFactory.response302Header(dos, "/");
