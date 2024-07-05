@@ -1,9 +1,6 @@
 package webserver;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 import org.slf4j.Logger;
@@ -24,30 +21,24 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            DataOutputStream dos = new DataOutputStream(out);
-            byte[] body = "<h1>Hello World</h1>".getBytes();
-            response200Header(dos, body.length);
-            responseBody(dos, body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            StringBuilder reqHeader = new StringBuilder();
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+            // Request Header 출력
+            String reqLine = reader.readLine(), line;
+            reqHeader.append("  ").append(reqLine).append("\n");
+            while ((line = reader.readLine()) != null && !line.equals("")) {
+                reqHeader.append("  ").append(line).append("\n");
+            }
+            logger.debug("\n:: Request ::\n{}", reqHeader);
 
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
+            // Request 처리
+            RequestDispatcher dispatcher = new RequestDispatcher(reqLine);
+            RequestResult requestResult = dispatcher.dispatch();
+
+            // Response 처리
+            ResponseHandler responseHandler = new ResponseHandler(new DataOutputStream(out), requestResult);
+            responseHandler.write();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
