@@ -21,7 +21,6 @@ public class UserHandler implements ModelHandler<User> {
     public User create(Map<String, String> fields) {
         User user = User.from(fields);
         Database.addUser(user);
-        System.out.println("New " + user);
         return user;
     }
 
