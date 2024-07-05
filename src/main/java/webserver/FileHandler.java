@@ -16,7 +16,7 @@ public class FileHandler {
             this.body = body;
         }
     }
-    public static ResponseWithStatus getFileContent(String path) throws IOException {
+    static ResponseWithStatus getFileContent(String path) throws IOException {
         try{
 
             String str = "";

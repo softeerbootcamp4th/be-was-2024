@@ -14,6 +14,7 @@ import static webserver.ResponseFactory.response404Header;
 
 public class HandleGetRequest {
     private final static String staticPath = "./src/main/resources/static";
+    private final static FileHandler fileHandler = new FileHandler();
 
     public static void handler(String url, OutputStream out) throws IOException {
         String[] splitUrl = url.split("\\?");
