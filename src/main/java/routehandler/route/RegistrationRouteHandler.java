@@ -11,10 +11,10 @@ import routehandler.core.ApiRouteHandler;
 import utils.FileReadUtil;
 import webserver.WebServer;
 
-public class RegistrationRouter extends ApiRouteHandler {
+public class RegistrationRouteHandler extends ApiRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
 
-    public RegistrationRouter(String pathPrefix) {
+    public RegistrationRouteHandler(String pathPrefix) {
         super(pathPrefix);
     }
 

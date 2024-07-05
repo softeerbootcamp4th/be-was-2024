@@ -10,11 +10,11 @@ import routehandler.core.IRouteHandler;
 import utils.FileReadUtil;
 import webserver.WebServer;
 
-public class IndexRouter implements IRouteHandler {
+public class IndexRouteHandler implements IRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private final String routePrefix;
 
-    public IndexRouter(String routePrefix) {
+    public IndexRouteHandler(String routePrefix) {
         this.routePrefix = routePrefix;
     }
 
