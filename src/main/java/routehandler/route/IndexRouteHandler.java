@@ -25,16 +25,16 @@ public class IndexRouteHandler implements IRouteHandler {
     }
 
     @Override
-    public void handle(MyHttpRequest request, MyHttpResponse response) {
+    public void handle(MyHttpRequest req, MyHttpResponse res) {
         try {
             byte[] body = FileReadUtil.read(AppConfig.STATIC_RESOURCES_PATH + "/index.html");
-            response.setBody(body);
+            res.setBody(body);
 
-            response.setStatusInfo(HttpStatusType.OK);
+            res.setStatusInfo(HttpStatusType.OK);
         } catch(Exception e) {
             logger.error("error on read index.html");
             logger.error(e.getMessage());
-            response.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
+            res.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
         }
     }
 }

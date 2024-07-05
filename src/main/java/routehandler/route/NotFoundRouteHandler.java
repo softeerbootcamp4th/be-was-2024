@@ -16,8 +16,8 @@ public class NotFoundRouteHandler implements IRouteHandler {
     }
 
     @Override
-    public void handle(MyHttpRequest request, MyHttpResponse response) {
-        response.setStatusInfo(HttpStatusType.NOT_FOUND);
-        response.setBody("<h1>Resource Not Found</h1>");
+    public void handle(MyHttpRequest req, MyHttpResponse res) {
+        res.setStatusInfo(HttpStatusType.NOT_FOUND);
+        res.setBody("<h1>Resource Not Found</h1>");
     }
 }

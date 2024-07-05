@@ -19,8 +19,8 @@ public class RegistrationRouteHandler extends ApiRouteHandler {
     }
 
     @Override
-    public void handle(MyHttpRequest request, MyHttpResponse response) {
-        var url = request.getUrl();
+    public void handle(MyHttpRequest req, MyHttpResponse res) {
+        var url = req.getUrl();
 
         var userId = url.getParameter("userId");
         var password = url.getParameter("password");
@@ -29,19 +29,19 @@ public class RegistrationRouteHandler extends ApiRouteHandler {
 
         logger.debug("id: {}, password: {}", userId, password);
 
-        if(userId != null && password != null && name != null && email != null) {
+        if (userId != null && password != null && name != null && email != null) {
             var user = new User(userId, password, name, email);
             logger.debug("user: {}", user);
-            response.redirect("/");
+            res.redirect("/");
             return;
         }
         try {
             byte[] body = FileReadUtil.read(AppConfig.STATIC_RESOURCES_PATH + "/registration/index.html");
-            response.setBody(body);
-            response.setStatusInfo(HttpStatusType.OK);
+            res.setBody(body);
+            res.setStatusInfo(HttpStatusType.OK);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            response.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
+            res.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
         }
     }
 }
