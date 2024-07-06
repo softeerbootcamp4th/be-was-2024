@@ -24,16 +24,16 @@ public class RequestHandler implements Runnable {
         private static final RequestHandler instance = new RequestHandler();
     }
 
-    public static synchronized RequestHandler getInstance() {
+    public static RequestHandler getInstance() {
         return InnerInstanceClass.instance;
     }
 
-    public synchronized void setConnection(Socket connectionSocket) {
+    public void setConnection(Socket connectionSocket) {
         this.connection = connectionSocket;
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {

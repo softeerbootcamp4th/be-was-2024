@@ -1,5 +1,8 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,9 +10,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -34,7 +34,7 @@ public class WebServer {
             Socket connection;
             RequestHandler requestHandler = RequestHandler.getInstance();
             while ((connection = listenSocket.accept()) != null) {
-                setConnAndExecute(threadPool, connection, requestHandler);
+                executeInSeperateThread(threadPool, connection, requestHandler);
             }
         } catch (IOException e) {
             logger.error("Server Start Error: " + e.getMessage());
@@ -43,13 +43,19 @@ public class WebServer {
         }
     }
 
+    private static void executeInSeperateThread(ExecutorService threadPool, Socket connection, RequestHandler handler) {
+        threadPool.submit(() -> {
+            setConnAndExecute(threadPool, connection, handler);
+        });
+    }
+
     // execute하기 전에 다른 스레드가 다른 connection을 주입하는 것을 방지하기 위해 동기화
     private static synchronized void setConnAndExecute(ExecutorService threadPool, Socket connection, RequestHandler handler) {
         logger.debug("connection = " + connection);
         handler.setConnection(connection);
 
         Future<?> future = threadPool.submit(handler);
-        try{
+        try {
             future.get();
         } catch (ExecutionException | InterruptedException e) {
             logger.error(e.getMessage(), e);
