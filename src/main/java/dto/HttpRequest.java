@@ -2,6 +2,7 @@ package dto;
 
 import constant.HttpMethod;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ public class HttpRequest {
     private String path;
     private Map<String, String> queryParams;
     private String extensionType;
+    private Map<String, String> headers = new HashMap<>();
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
@@ -27,6 +29,10 @@ public class HttpRequest {
         return Optional.ofNullable(extensionType);
     }
 
+    public Optional<String> getHeader(String key) {
+        return Optional.ofNullable(headers.get(key));
+    }
+
     public void setHttpMethod(String httpMethod) {
         this.httpMethod = HttpMethod.valueOf(httpMethod);
     }
@@ -41,5 +47,9 @@ public class HttpRequest {
 
     public void setExtensionType(String extensionType) {
         this.extensionType = extensionType;
+    }
+
+    public void setHeader(String headerName, String headerValue) {
+        headers.put(headerName, headerValue);
     }
 }
