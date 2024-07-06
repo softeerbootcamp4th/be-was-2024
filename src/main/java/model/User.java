@@ -16,6 +16,10 @@ public class User {
     }
 
     public User(Map<String, String> map) {
+        if (map.get("userId") == null || map.get("password") == null || map.get("name") == null || map.get("email") == null) {
+            throw new IllegalArgumentException("User information cannot be null");
+        }
+
         this.userId = map.get("userId");
         this.password = map.get("password");
         this.name = map.get("name");

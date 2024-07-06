@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import dto.HttpRequest;
+import exception.HttpRequestParsingException;
 import handler.Handler;
 import handler.HandlerManager;
 import org.slf4j.Logger;
@@ -27,7 +28,11 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
                 connection.getPort());
 
-        try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
+        InputStream in = null;
+        OutputStream out = null;
+        try {
+            in = connection.getInputStream();
+            out = connection.getOutputStream();
 
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
             DataOutputStream dos = new DataOutputStream(out);
@@ -40,11 +45,23 @@ public class RequestHandler implements Runnable {
             handler.handle(dos, parseResult.getQueryParams().orElse(new HashMap<>()));
 
 
-        } catch (IOException | IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException | HttpRequestParsingException e) {
             logger.error(e.getMessage());
 
             // FileExtensionType에서 관리하지 않는 타입일 경우 404 error 응답
             response404Error(connection);
+        }
+        finally{
+            try {
+                if (in != null) in.close();
+            } catch (IOException e) {
+                logger.error("Failed to close input stream", e);
+            }
+            try {
+                if (out != null) out.close();
+            } catch (IOException e) {
+                logger.error("Failed to close output stream", e);
+            }
         }
     }
 

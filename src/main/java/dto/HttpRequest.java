@@ -1,6 +1,7 @@
 package dto;
 
 import constant.HttpMethod;
+import exception.HttpRequestParsingException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,7 +35,13 @@ public class HttpRequest {
     }
 
     public void setHttpMethod(String httpMethod) {
-        this.httpMethod = HttpMethod.valueOf(httpMethod);
+        try{
+            this.httpMethod = HttpMethod.valueOf(httpMethod);
+        }
+        catch (IllegalArgumentException e){
+            throw new HttpRequestParsingException("Incorrect HttpMethod");
+        }
+
     }
 
     public void setPath(String path) {
