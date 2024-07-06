@@ -1,8 +1,12 @@
 package webserver;
 
+import file.ViewFile;
+import web.HttpRequest;
 import common.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HttpResponse;
+import web.ResponseCode;
 
 import java.io.*;
 import java.net.Socket;
@@ -12,10 +16,6 @@ public class RequestHandler implements Runnable {
     private final String dirPath = "./src/main/resources/static";
 
     private Socket connection;
-
-//    public RequestHandler(Socket connectionSocket) {
-//        this.connection = connectionSocket;
-//    }
 
     private RequestHandler() {
     }
@@ -37,33 +37,19 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String str, path = "", extension = "", contentType = "";
-//            StringBuilder sb = new StringBuilder();
-//            sb.append("\n====REQUEST====\n");
 
-            while(!(str = br.readLine()).isEmpty()) {
-//                sb.append(str+"\n");
-                logger.debug(str);
-                String[] headerLine = str.split(" ");
-                if(WebUtils.isMethodHeader(headerLine[0])) { // request method 헤더에 request uri path가 존재하므로
-                    path = headerLine[1]; // request uri path 추출하기
-                    // rest요청일 경우 - 적절한 view를 찾거나, 적절한 비즈니스 로직 수행
-                    if(WebUtils.isRESTRequest(path)) {
-                        // GET 요청일 경우
-                        if(WebUtils.isGetRequest(headerLine[0])) {
-                            path = WebAdapter.resolveRequestUri(path, out);
-                        }
-                    }
-                    // 설정한 path를 바탕으로 확장자에 맞게 contentType에 맞게 뷰 파일을 찾아 응답
-                    extension = path.substring(path.lastIndexOf(".")+1);
-                    contentType = WebUtils.getProperContentType(extension);
-                    readAndResponseFromPath(out, dirPath+path, contentType);
-                }
-            }
+            StringBuilder requestString = readHttpRequest(in);
 
-            System.out.println();
-//            logger.debug("{}", sb);
+            // 요청 헤더를 파싱하여 Request객체 생성
+            HttpRequest httpRequest = WebAdapter.parseRequest(requestString.toString());
+            // Request객체의 정보를 바탕으로 적절한 응답 뷰 파일 탐색
+            ViewFile viewFile = ViewResolver.getProperFileFromPath(httpRequest.getPath(), out);
+            // 뷰 파일에 맞게 적절한 Response객체 생성
+            HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.SUCCESS, WebUtils.getProperContentType(viewFile.getExtension()));
+            // Stream을 이용하여 HTTP 응답
+            readAndResponseFromPath(out, dirPath+ viewFile.getPath(), httpResponse.getContentType());
+
+            logger.debug("{}", requestString);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -76,6 +62,18 @@ public class RequestHandler implements Runnable {
         }
     }
 
+    private StringBuilder readHttpRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        String str;
+        StringBuilder sb = new StringBuilder();
+
+        while(!(str = br.readLine()).isEmpty()) {
+            sb.append(str).append("\n");
+        }
+
+        return sb;
+    }
+
     /**
      * 경로에서 적절한 뷰 파일을 찾아서 응답합니다.
      */
@@ -86,15 +84,18 @@ public class RequestHandler implements Runnable {
 
         try(FileInputStream fis = new FileInputStream(file)) {
             fis.read(body);
+            responseHeader(ResponseCode.SUCCESS, dos, body.length, contentType);
+            responseBody(dos, body);
+        } catch (Exception e) {
+            responseHeader(ResponseCode.INTERNAL_SERVER_ERROR, dos, body.length, contentType);
+            responseBody(dos, body);
+            e.printStackTrace();
         }
-
-        response200Header(dos, body.length, contentType);
-        responseBody(dos, body);
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
+    private void responseHeader(ResponseCode code, DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("HTTP/1.1 "+code.getCode()+" OK \r\n");
             dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");

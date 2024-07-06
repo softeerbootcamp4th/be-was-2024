@@ -34,7 +34,7 @@ public class WebServer {
             Socket connection;
             RequestHandler requestHandler = RequestHandler.getInstance();
             while ((connection = listenSocket.accept()) != null) {
-                executeInSeperateThread(threadPool, connection, requestHandler);
+                executeRequestHandlerThread(threadPool, connection, requestHandler);
             }
         } catch (IOException e) {
             logger.error("Server Start Error: " + e.getMessage());
@@ -43,10 +43,9 @@ public class WebServer {
         }
     }
 
-    private static void executeInSeperateThread(ExecutorService threadPool, Socket connection, RequestHandler handler) {
-        threadPool.submit(() -> {
-            setConnAndExecute(threadPool, connection, handler);
-        });
+    // RequestHandler에 커넥션을 연결하고 콜백 대기하는 스레드를 분리
+    private static void executeRequestHandlerThread(ExecutorService threadPool, Socket connection, RequestHandler handler) {
+        threadPool.submit(() -> setConnAndExecute(threadPool, connection, handler));
     }
 
     // execute하기 전에 다른 스레드가 다른 connection을 주입하는 것을 방지하기 위해 동기화
