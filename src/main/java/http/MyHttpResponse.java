@@ -12,6 +12,7 @@ public class MyHttpResponse {
     public MyHttpResponse(String version) {
         this.version = version;
         this.headers = new MyHttpHeaders();
+        this.body = new byte[0];
     }
 
     public String getVersion() {
@@ -28,7 +29,7 @@ public class MyHttpResponse {
 
     /**
      * 응답 바디 부분을 반환한다. (직접 변경은 권장 X)
-     * @return
+     * @return 바이트로 구성된 바디 부분
      */
     public byte[] getBody() {
         return body;
@@ -51,7 +52,7 @@ public class MyHttpResponse {
      * @param body 작성할 byte 데이터
      */
     public void setBody(byte[] body) {
-        this.body = body;
+        this.body = body != null ? body : new byte[0];
         getHeaders().putHeader("Content-Length", String.valueOf(body.length));
     }
 

@@ -3,6 +3,7 @@ package http.utils;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HttpResponseMessageBuildUtil {
@@ -33,9 +34,16 @@ public class HttpResponseMessageBuildUtil {
         // 빈 라인
         builder.append("\r\n");
 
-        // body
-        if(response.getBody() != null)
-            builder.append(new String(response.getBody()));
-        return builder.toString().getBytes();
+        // 헤더 바이트 획득
+        byte[] startLineAndHeaderBytes = builder.toString().getBytes(StandardCharsets.UTF_8);
+
+        // 헤더 + 바디를 모두 포함할 수 있는 바이트 배열 생성, 반환
+
+        byte[] httpResMessageBytes = new byte[startLineAndHeaderBytes.length + response.getBody().length];
+
+        System.arraycopy(startLineAndHeaderBytes, 0, httpResMessageBytes, 0, startLineAndHeaderBytes.length);
+        System.arraycopy(response.getBody(), 0, httpResMessageBytes, startLineAndHeaderBytes.length, response.getBody().length);
+
+        return httpResMessageBytes;
     }
 }
