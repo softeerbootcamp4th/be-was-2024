@@ -23,11 +23,17 @@ public class AddressHandlerTest {
         dos = new DataOutputStream(baos);
     }
 
+    //@DisplayName("")
     @Test
     public void testGetFilePath_Registration() throws IOException {
+        //Given
         String urlPath = "/registration";
         String expectedFilePath = "src/main/resources/static/registration/index.html";
+
+        // When
         String actualFilePath = getFilePath(urlPath, dos);
+
+        // Then
         assertEquals(expectedFilePath, actualFilePath);
     }
 
@@ -39,12 +45,13 @@ public class AddressHandlerTest {
         assertEquals(expectedFilePath, actualFilePath);
     }
 
-    //직접 요청 생략
+//    //직접 요청 생략
 //    @Test
 //    public void testCreateUserFromUrl_ValidUrl() {
 //        String urlPath = "/user/create?name=John&email=john@example.com&password=1234&username=john123";
-//        User actualUser = createUserFromUrl(urlPath);
-//        User expectedUser = new User("John", "john@example.com", "1234", "john123");
+//        User actualUser = createUserFromUrl(urlPath); // main db 객체
+//        User expectedUser = new User("John", "john@example.com", "1234", "john123"); // test 단에서의 객체
+//        // main
 //        assertEquals(expectedUser, actualUser);
 //    }
 
@@ -55,7 +62,7 @@ public class AddressHandlerTest {
         assertNull(actualUser);
     }
 
-    //직접 요청 생략
+//  //  직접 요청 생략
 //    @Test
 //    public void testHandleUserCreation_ValidUrl() throws IOException {
 //        String urlPath = "/user/create?name=John&email=john@example.com&password=1234&username=john123";

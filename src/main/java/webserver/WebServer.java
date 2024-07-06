@@ -30,6 +30,7 @@ public class WebServer {
             while ((connection = listenSocket.accept()) != null) {
                 executor.execute(new RequestHandler(connection));
             }
+
             executor.shutdown();
         }
     }
