@@ -4,40 +4,22 @@ import db.Database;
 import model.User;
 import webserver.http.request.Request;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
-import static util.Utils.getContentType;
 import static util.Utils.getFile;
 
 public class ResponseHandler {
 
-    public static void response(OutputStream outputStream, Response response) throws IOException {
-        DataOutputStream dos = new DataOutputStream(outputStream);
-        dos.write(response.toByte());
-    }
+    public static Response response(Request request) throws IOException {
+        Response response = new Response.Builder(Status.NOT_FOUND).build();
 
-    public static void responseStaticContents(OutputStream out, Request request) throws IOException {
-        byte[] body = getFile(request.getPath());
-        Response response = new Response(200, body);
-        response.addHeader("Content-Type", getContentType(request.getExtension())+";charset=utf-8");
-        response.addHeader("Content-Length", String.valueOf(body.length));
-        ResponseHandler.response(out, response);
-    }
+        switch(request.getPath()) {
+            case "/registration" ->
+                response = new Response.Builder(Status.SEE_OTHER)
+                        .addHeader("Location", "/registration/index.html")
+                        .build();
 
-    public static void responseDynamicContents(OutputStream out, Request request) throws IOException {
-
-        switch(request.getPath()){
-            case "/registration":
-                byte[] body = "".getBytes();
-                Response response = new Response(303, body);
-                response.addHeader("Content-Length", String.valueOf(body.length));
-                response.addHeader("Location", "/registration/index.html");
-                ResponseHandler.response(out, response);
-                break;
-
-            case "/create":
+            case "/create" -> {
                 User user = new User(
                         request.getParameterValue("userId"),
                         request.getParameterValue("password"),
@@ -45,9 +27,28 @@ public class ResponseHandler {
                         request.getParameterValue("email")
                 );
                 Database.addUser(user);
-                break;
+            }
+
+            default ->
+                response = new Response.Builder(Status.OK)
+                        .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
+                        .body(getFile(request.getPath()))
+                        .build();
         }
 
+        return response;
+    }
+
+    private static String getContentType(String extension){
+        return switch (extension){
+            case "html" -> "text/html";
+            case "css" -> "text/css";
+            case "js" -> "text/javascript";
+            case "ico", "png" -> "image/png";
+            case "jpg" -> "image/jpg";
+            case "svg" -> "image/svg+xml";
+            default -> throw new IllegalStateException("Unexpected value: " + extension);
+        };
     }
 
 }
