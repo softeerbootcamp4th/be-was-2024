@@ -33,7 +33,7 @@ public class RequestHandler implements Runnable {
 
             logger.debug("request line : {}", line);
 
-            String[] url = line.split(" ");
+            String[] url = line.trim().split("\\s+");
             while ((line = br.readLine()) != null && !line.isEmpty()) {
                 logger.debug("header : {}", line);
             }
