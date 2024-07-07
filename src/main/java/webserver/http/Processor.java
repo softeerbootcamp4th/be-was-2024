@@ -1,6 +1,5 @@
 package webserver.http;
 
-import util.Parser;
 import webserver.http.request.Request;
 import webserver.http.response.ResponseHandler;
 
@@ -25,7 +24,7 @@ public class Processor {
         String request = convert(inputStream);
         logger.debug(request);
 
-        Request httpRequest = Parser.parseRequest(request);
+        Request httpRequest = Request.parseRequest(request);
 
         if(httpRequest.isStatic()){
             ResponseHandler.responseStaticContents(outputStream, httpRequest);
