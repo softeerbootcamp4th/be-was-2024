@@ -2,6 +2,10 @@ plugins {
     id 'java'
 }
 
+ext{
+    staticPath = "./src/main/resources/static"
+}
+
 group 'codesquad'
 version '1.0-SNAPSHOT'
 
@@ -15,10 +19,16 @@ dependencies {
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
-
-
 }
 
 test {
     useJUnitPlatform()
 }
+
+task writeProperties{
+    doLast{
+        file('src/main/resources/config.properties').text = "staticPath = \"./src/main/resources/static\""
+    }
+}
+
+processResources.dependsOn(writeProperties)
