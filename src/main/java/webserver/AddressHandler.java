@@ -1,16 +1,14 @@
 package webserver;
 
+import db.Database;
 import model.User;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static db.Database.addUser;
-import static model.User.createUserFromUrl;
-
 public class AddressHandler {
 
-    private static final String staticResourceDir = System.getProperty("staticResourceDir", "src/main/resources/static");
+    private static final String staticResourceDir = System.getProperty("staticResourceDir");
 
     public static String getFilePath(String urlPath, DataOutputStream dos) throws IOException {
         String filePath = staticResourceDir + urlPath;
@@ -30,9 +28,9 @@ public class AddressHandler {
     }
 
     public static void handleUserCreation(String urlPath){
-        User user = createUserFromUrl(urlPath);
+        User user = User.createUser(urlPath);
         if (user != null) {
-            addUser(user);
+            Database.addUser(user);
         }
     }
 

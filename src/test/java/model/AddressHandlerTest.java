@@ -2,12 +2,13 @@ package model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import webserver.AddressHandler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import static model.User.createUserFromUrl;
+import static model.User.createUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static webserver.AddressHandler.*;
@@ -58,7 +59,7 @@ public class AddressHandlerTest {
     @Test
     public void testCreateUserFromUrl_InvalidUrl() {
         String urlPath = "/user/create";
-        User actualUser = createUserFromUrl(urlPath);
+        User actualUser = createUser(urlPath);
         assertNull(actualUser);
     }
 
@@ -75,7 +76,7 @@ public class AddressHandlerTest {
     @Test
     public void testHandleUserCreation_InvalidUrl() throws IOException {
         String urlPath = "/user/create";
-        handleUserCreation(urlPath);
+        AddressHandler.handleUserCreation(urlPath);
         String expectedOutput = "";
         String actualOutput = baos.toString();
         assertEquals(expectedOutput, actualOutput);

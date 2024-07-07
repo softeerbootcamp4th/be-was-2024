@@ -3,13 +3,8 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static db.Database.*;
-import static webserver.FileHandler.*;
-import static webserver.AddressHandler.*;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -40,7 +35,7 @@ public class RequestHandler implements Runnable {
 
             DataOutputStream dos = new DataOutputStream(out);
 
-            String filePath = getFilePath(url[1], dos);
+            String filePath = AddressHandler.getFilePath(url[1], dos);
 
             File file = new File(filePath);
             if (!file.exists()) {
@@ -48,8 +43,8 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-            byte[] body = readFileToByteArray(file);
-            String contentType = determineContentType(file.getName());
+            byte[] body = FileHandler.readFileToByteArray(file);
+            String contentType = FileHandler.determineContentType(file.getName());
 
             response200Header(dos, body.length, contentType);
             responseBody(dos, body);
