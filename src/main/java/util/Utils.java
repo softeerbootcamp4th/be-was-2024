@@ -4,50 +4,29 @@ import java.io.*;
 
 public class Utils {
 
-    public static byte[] getFile(String url) throws IOException {
+    final static char[] endCharacters = {'\r', '\n', '\r', '\n'};
 
-        File file = new File("src/main/resources/static/" + url);
-
-        FileInputStream inputStream = new FileInputStream(file);
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        int len;
-        byte[] buf = new byte[1024];
-        while((len = inputStream.read(buf))!=-1){
-            byteArrayOutputStream.write(buf, 0, len);
-        }
-
-        return byteArrayOutputStream.toByteArray();
+    public static byte[] getFile(String fileName) throws IOException {
+        File file = new File("src/main/resources/static/"+fileName);
+        FileInputStream fis = new FileInputStream(file);
+        return fis.readAllBytes();
     }
 
     public static String getAllStrings(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         StringBuilder sb = new StringBuilder();
+        int endCharactersCount=0;
 
-        while(true){
-            String inputLine = br.readLine();
-            if(inputLine!=null) {
-                if(inputLine.isEmpty()) break;
-            }else break;
-            sb.append(inputLine)
-                    .append("\n");
+        while(endCharactersCount!=endCharacters.length){
+
+            int read = br.read();
+            if(endCharacters[endCharactersCount]==read) endCharactersCount++;
+            else endCharactersCount = 0;
+            sb.append((char)read);
+
         }
 
-        sb.setLength(sb.length()-1);
-
         return sb.toString();
-    }
-
-    public static String getContentType(String extension){
-        return switch (extension){
-            case "html" -> "text/html";
-            case "css" -> "text/css";
-            case "js" -> "text/javascript";
-            case "ico", "png" -> "image/png";
-            case "jpg" -> "image/jpg";
-            case "svg" -> "image/svg+xml";
-            default -> throw new IllegalStateException("Unexpected value: " + extension);
-        };
     }
 
 }
