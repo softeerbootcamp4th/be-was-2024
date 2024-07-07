@@ -1,18 +1,54 @@
 package webserver.http.response;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Response {
 
-    private int status;
-    private byte[] body;
+    private final String version = "HTTP/1.1";
+    private Status status;
     private Map<String, String> headers;
+    private byte[] body;
 
-    public Response(int status, byte[] body) {
-        this.status = status;
-        this.body = body;
-        this.headers = new HashMap<>();
+    private Response(Builder builder){
+        this.status = builder.status;
+        this.headers = builder.headers;
+        this.body = builder.body;
+    }
+
+    static class Builder {
+
+        private Status status;
+        private Map<String, String> headers;
+        private byte[] body;
+
+        public Builder(Status status){
+            this.status = status;
+            headers = new HashMap<>();
+            body = new byte[0];
+        }
+
+        public Builder headers(Map<String, String> headers){
+            this.headers = headers;
+            return this;
+        }
+
+        public Builder body(byte[] body){
+            this.body = body;
+            return this;
+        }
+
+        public Builder addHeader(String key, String value){
+            this.headers.put(key, value);
+            return this;
+        }
+
+        public Response build(){
+            addHeader("Content-length", String.valueOf(body.length));
+            return new Response(this);
+        }
+
     }
 
     @Override
@@ -33,8 +69,16 @@ public class Response {
         return this.toString().getBytes();
     }
 
-    public void addHeader(String key, String value){
-        this.headers.put(key, value);
+    @Override
+    public boolean equals(Object o){
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Response response = (Response) o;
+        if(!status.equals(response.status)) return false;
+        if(!headers.equals(response.headers)) return false;
+        if(!Arrays.equals(body, response.body)) return false;
+        return true;
     }
 
 }
