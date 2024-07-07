@@ -27,8 +27,9 @@ public class RequestHandler implements Runnable {
 
             // 로그 출력 후 요청 주소 반환
             HttpRequest httpRequest = requestLogging(br);
+
             HttpMethod method = httpRequest.method();
-            String url = httpRequest.url();
+             String url = httpRequest.url();
 
             switch (method) {
                 case GET -> GetRequestHandler.handler(url, out);

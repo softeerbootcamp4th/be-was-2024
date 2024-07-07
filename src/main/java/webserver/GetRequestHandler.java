@@ -49,7 +49,7 @@ public class GetRequestHandler {
             case "png" -> "image/png";
             case "jpg" -> "image/jpg";
             case "svg" -> "image/svg+xml";
-            default -> "*/*";
+            default -> "*/*"; // 이건 작동 안함 -> 406 에러 반환
         };
     }
 

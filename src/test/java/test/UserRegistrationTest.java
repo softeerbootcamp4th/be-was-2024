@@ -13,6 +13,7 @@ public class UserRegistrationTest {
 //        connection.setRequestMethod("GET");
 //        connection.getInputStream();
 
+
         Database.addUser(new User("testId", "testPassword", "testName", "testEmail"));
 
         User user = Database.findUserById("testId");

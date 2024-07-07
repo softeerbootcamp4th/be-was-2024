@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class FileHandler {
+
     static class ResponseWithStatus {
         HttpStatus status;
         byte[] body;
@@ -16,6 +17,7 @@ public class FileHandler {
             this.body = body;
         }
     }
+
     static ResponseWithStatus getFileContent(String path) throws IOException {
         try{
 
@@ -27,6 +29,7 @@ public class FileHandler {
                 file.append(fileLine);
                 fileLine = br.readLine();
             }
+
             return new ResponseWithStatus(HttpStatus.OK, file.toString().getBytes());
 
         }catch (FileNotFoundException e){
