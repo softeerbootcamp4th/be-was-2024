@@ -6,6 +6,10 @@ import java.util.Map;
 
 public class Response {
 
+    private final String CRLF = "\r\n";
+    private final char SPACE = ' ';
+    private final char COLON = ':';
+
     private final String version = "HTTP/1.1";
     private Status status;
     private Map<String, String> headers;
@@ -45,7 +49,7 @@ public class Response {
         }
 
         public Response build(){
-            addHeader("Content-length", String.valueOf(body.length));
+            addHeader("Content-Length", String.valueOf(body.length));
             return new Response(this);
         }
 
@@ -54,14 +58,15 @@ public class Response {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append("HTTP/1.1 ").append(status).append(" OK \r\n");
+        sb.append(version).append(SPACE).append(status).append(SPACE).append(status.getMessage()).append(CRLF);
         for( Map.Entry<String, String> entry : headers.entrySet() ){
             String strKey = entry.getKey();
             String strValue = entry.getValue();
-            sb.append(strKey).append(": ").append(strValue).append("\r\n");
+            sb.append(strKey).append(COLON).append(SPACE).append(strValue).append(CRLF);
         }
-        sb.append("\r\n");
+        sb.append(CRLF);
         sb.append(new String(body));
+        sb.append(CRLF).append(CRLF);
         return sb.toString();
     }
 

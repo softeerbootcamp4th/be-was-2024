@@ -5,10 +5,9 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.http.response.Response;
 import webserver.http.response.ResponseHandler;
 
-import static util.Utils.getAllStrings;
+import static webserver.http.request.RequestReader.readRequest;
 
 public class RequestHandler implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -24,16 +23,16 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            String request = getAllStrings(in);
-            logger.debug(request);
-
-            Request httpRequest = Request.parseRequest(request);
-            Response response = ResponseHandler.response(httpRequest);
-
-            out.write(response.toByte());
-
+            out.write(
+                    ResponseHandler.response(
+                            Request.parseRequest(
+                                    readRequest(in)
+                            )
+                    ).toByte()
+            );
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
+
 }
