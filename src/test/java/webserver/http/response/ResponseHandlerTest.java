@@ -5,18 +5,13 @@ import model.User;
 import org.junit.jupiter.api.Test;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
+import static util.Utils.getFile;
 
 import java.io.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseHandlerTest {
-
-    private byte[] getFile(String fileName) throws IOException {
-        File file = new File("src/main/resources/static/"+fileName);
-        FileInputStream fis = new FileInputStream(file);
-        return fis.readAllBytes();
-    }
 
     @Test
     void testResponseIndexHtmlSuccess() throws IOException {
