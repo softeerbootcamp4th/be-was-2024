@@ -9,10 +9,17 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    staticResourceDir = "src/main/resources/static"
+}
+
+tasks.withType(JavaExec) {
+    systemProperty "staticResourceDir", staticResourceDir
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-//    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.0-M2'
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'

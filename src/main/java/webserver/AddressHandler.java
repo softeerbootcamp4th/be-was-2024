@@ -10,11 +10,13 @@ import static model.User.createUserFromUrl;
 
 public class AddressHandler {
 
+    private static final String staticResourceDir = System.getProperty("staticResourceDir", "src/main/resources/static");
+
     public static String getFilePath(String urlPath, DataOutputStream dos) throws IOException {
-        String filePath = "src/main/resources/static" + urlPath;
+        String filePath = staticResourceDir + urlPath;
         if (urlPath.equals("/registration")) {
-            filePath = "src/main/resources/static/registration/index.html";
-        }else if(urlPath.startsWith("/user/create")){
+            filePath = staticResourceDir + "/registration/index.html";
+        } else if (urlPath.startsWith("/user/create")) {
             handleUserCreation(urlPath);
             redirectPath("/index.html", dos);
         }
