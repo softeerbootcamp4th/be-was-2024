@@ -61,14 +61,11 @@ public class RequestHandler implements Runnable {
         {
             path = FileDetection.getPath(FileDetection.fixedPath+path);
             getHandler.staticFileHandler(dos,path);
-            //404 redirect
-            return;
         }
         else if(method.equals("POST"))
         {
             UserProcessor.userCreate(requestObject);
             responseAlert(dos,"로그인 성공");
-            return;
         }
     }
     private void response302Header(DataOutputStream dos,String loc)
