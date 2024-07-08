@@ -5,7 +5,7 @@ import webserver.back.data.RequestInformation;
 import java.util.HashMap;
 
 public class URIParser {
-    public RequestInformation getParsedUrl(String originalUrl) {
+    public static RequestInformation getParsedUrl(String originalUrl) {
         String[] uriSeperated = originalUrl.split("\\?");
         String pathUrl = uriSeperated[0];
         String[] pathSeperated = pathUrl.split("/");
