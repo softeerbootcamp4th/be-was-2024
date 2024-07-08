@@ -22,15 +22,14 @@ public class HttpRequestParser {
     }
 
     public static HttpRequestMessage getHttpRequestMessage(String requestMessage){
-        Map<String, String> queryParams = new HashMap<>();
-
         String[] messageSplit = requestMessage.split("\n\n",2);
         String headerPart = messageSplit[0];
-        String bodyPart = "";
-        if (messageSplit.length > 1) {
-            bodyPart = messageSplit[1];
-        }
+        String bodyPart = messageSplit.length > 1 ? messageSplit[1] : "";
+        return parseAndCreateHttpRequestMessage(headerPart, bodyPart);
+    }
 
+    private static HttpRequestMessage parseAndCreateHttpRequestMessage(String headerPart, String bodyPart) {
+        Map<String, String> queryParams = new HashMap<>();
         String[] headerSplit = headerPart.split("\n",2);
         String startLine = headerSplit[0];
 
@@ -41,11 +40,9 @@ public class HttpRequestParser {
         if (uri.contains("?")) {
             uri = processQuery(uri, queryParams);
         }
-
         String[] headerArray =  headerSplit[1].split("\n");
         Map<String, String> headers = getHeaderMap(headerArray);
-
-        return new HttpRequestMessage(method,uri,version,queryParams,headers,bodyPart);
+        return new HttpRequestMessage(method,uri,version,queryParams,headers, bodyPart);
     }
 
     private static Map<String, String> getHeaderMap(String[] headerArray) {
