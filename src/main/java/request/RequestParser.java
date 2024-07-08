@@ -1,11 +1,14 @@
 package request;
 
 import http.HttpMethod;
+import http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
+
+import static handler.Router.requestMapping;
 
 public class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
@@ -23,6 +26,7 @@ public class RequestParser {
         HashMap<String, String> header = new HashMap<>();
 
         StringBuilder log = new StringBuilder().append("\n\n***** REQUEST *****\n").append(firstLine + "\n");
+
         String headerLine = bufferedReader.readLine();
         while (headerLine != null && !headerLine.isEmpty()) {
             log.append(headerLine + "\n");
@@ -35,10 +39,9 @@ public class RequestParser {
 
             headerLine = bufferedReader.readLine();
         }
-
         logger.debug(log.toString());
 
         HttpRequest httpRequest = new HttpRequest(method, requestUrl, header);
-
+        requestMapping(httpRequest, out);
     }
 }

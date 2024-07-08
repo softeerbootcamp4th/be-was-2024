@@ -12,3 +12,4 @@ restassured : 알아보기 -> 통합테스트 라이브러리
 
 헤더 저장하기 -> 지금은 method, url만 저장했는데, 나머지도 저장하기
 
+싱글톤 -> LazyHolder 방식이 스레드 safe 
