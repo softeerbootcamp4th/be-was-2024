@@ -52,6 +52,11 @@ public class RequestHandler implements Runnable {
         String path = requestObject.getPath();
         if(method.equals("GET") && path.equals("/user/create"))//GET방식의 회원가입 일 시
         {
+            //404 redirect
+            return;
+        }
+        else if(method.equals("POST")&&path.equals("/user/create"))
+        {
             UserProcessor.userCreate(requestObject);
             responseAlert(dos,"로그인 성공");
             return;
