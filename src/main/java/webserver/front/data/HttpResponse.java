@@ -1,63 +1,33 @@
 package webserver.front.data;
 
-import java.io.IOException;
 import java.util.HashMap;
 
-public class HttpResponse {
-    private HashMap<String, String> headerInformations = new HashMap<>();
-    public String httpVersion;
-    public String contentType;
+public class HttpResponse extends HttpMessage{
+    private final HashMap<String, String> additionalHeader = new HashMap<>();
     public String statusCode;
     public String statusText;
-    public int contentLength;
-    public byte[] body;
-
+    private String firstLine;
     public HttpResponse(String httpVersion, String statusCode, String statusText, byte[] body,String contentType) {
-        this.httpVersion = httpVersion;
+        super(httpVersion,body,contentType);
         this.statusCode = statusCode;
         this.statusText = statusText;
-        this.body = body;
-        this.contentType = contentType;
-        this.contentLength   = body.length;
-        putMap(httpVersion, statusCode, statusText, body, contentType);
+        makeFirstLine();
     }
 
-    private void putMap(String httpVersion, String statusCode, String statusText, byte[] body, String contentType) {
-        headerInformations.put("httpVersion", httpVersion);
-        headerInformations.put("statusCode", statusCode);
-        headerInformations.put("statusText", statusText);
-        headerInformations.put("contentType", contentType);
-        headerInformations.put("contentLength", String.valueOf(body.length));
+    private void makeFirstLine() {
+        this.firstLine = this.getHttpVersion()+" " +statusCode+" "+ statusText;
     }
     public void addLocation(String location){
-        headerInformations.put("location", location);
+        additionalHeader.put("Location", location);
     }
-    public HashMap<String, String> getHeaderInformations() {
-        return headerInformations;
-    }
-
-    public byte[] getBody() {
-        return body;
+    public HashMap<String, String> getAdditionalHeader() {
+        return additionalHeader;
     }
 
-    public String getHttpVersion() {
-        return httpVersion;
+    public String getFirstLine() {
+        return firstLine;
     }
 
-    public String getContentType() {
-        return contentType;
-    }
 
-    public String getStatusCode() {
-        return statusCode;
-    }
-
-    public String getStatusText() {
-        return statusText;
-    }
-
-    public int getContentLength() {
-        return contentLength;
-    }
 }
 

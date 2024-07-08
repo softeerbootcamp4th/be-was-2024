@@ -7,7 +7,7 @@ import webserver.back.contentType.ContentTypeMaker;
 import java.io.FileNotFoundException;
 
 public class StaticFileFounder implements FileFounder{
-    private final String FILE_BASE_URL ="./src/main/resources/static/";
+    private final String FILE_BASE_URL ="./src/main/resources/static";
 
     @Override
     public ByteReader findFile(String fileUrl) throws FileNotFoundException {
