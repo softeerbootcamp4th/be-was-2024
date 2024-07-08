@@ -1,14 +1,6 @@
 package common;
 
-import file.ViewFile;
 import web.HttpMethod;
-import web.HttpRequest;
-import webserver.WebAdapter;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 /**
  * Web 요청을 처리할 때 공통으로 사용할 로직을 정리한 유틸리티 클래스
@@ -25,11 +17,19 @@ public class WebUtils {
     }
 
     public static boolean isGetRequest(String method) {
-        return method.equals("GET");
+        try {
+            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.GET);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public static boolean isPostRequest(String method) {
-        return method.equals("POST");
+        try {
+            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.POST);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public static String getProperContentType(String extension) {
