@@ -1,16 +1,14 @@
 package webserver;
 
-public class UriMapper {
-    public static String mapUri(String uri){
-        //동적 기능
-        if (uri.startsWith("/create")){
-            return DynamicRequestProcess.registration(uri);
-        }
+import data.HttpRequestMessage;
 
-        //정적 페이지 리턴
-        return switch (uri){
+public class UriMapper {
+    public static String mapUri(HttpRequestMessage httpRequestMessage){
+        //Exact Matching
+        return switch (httpRequestMessage.getUri()){
+            case "/create" -> DynamicRequestProcess.registration(httpRequestMessage.getQueryParam());
             case "/registration.html" -> "src/main/resources/static/registration/index.html";
-            default -> "src/main/resources/static" + uri;
+            default -> "src/main/resources/static" + httpRequestMessage.getUri();
         };
     }
 }

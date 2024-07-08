@@ -32,7 +32,7 @@ public class RequestHandler implements Runnable {
             String requestString = HttpRequestParser.getRequestString(in);
             logger.debug(requestString);
             HttpRequestMessage httpRequestMessage = HttpRequestParser.getHttpRequestMessage(requestString);
-            String path = UriMapper.mapUri(httpRequestMessage.getUri());
+            String path = UriMapper.mapUri(httpRequestMessage);
             if (path.startsWith("redirect:")) redirect(dos,path.substring(9));
             else response200(path, dos);
         } catch (IOException e) {

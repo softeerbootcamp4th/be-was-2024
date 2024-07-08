@@ -22,6 +22,8 @@ public class HttpRequestParser {
     }
 
     public static HttpRequestMessage getHttpRequestMessage(String requestMessage){
+        Map<String, String> queryParams = new HashMap<>();
+
         String[] messageSplit = requestMessage.split("\n\n",2);
         String headerPart = messageSplit[0];
         String bodyPart = "";
@@ -36,14 +38,33 @@ public class HttpRequestParser {
         String method = startLineSplit[0];
         String uri = startLineSplit[1];
         String version = startLineSplit[2];
-
-        String[] headerArray =  headerSplit[1].split("\n");
-        Map<String, String> headers = new HashMap<>();
-        for (String header : headerArray) {
-            String[] headerParts = header.split(": ", 2);
-            headers.put(headerParts[0], headerParts[1]);
+        if (uri.contains("?")) {
+            uri = processQuery(uri, queryParams);
         }
 
-        return new HttpRequestMessage(method,uri,version,headers,bodyPart);
+        String[] headerArray =  headerSplit[1].split("\n");
+        Map<String, String> headers = getHeaderMap(headerArray);
+
+        return new HttpRequestMessage(method,uri,version,queryParams,headers,bodyPart);
+    }
+
+    private static Map<String, String> getHeaderMap(String[] headerArray) {
+        Map<String, String> headers = new HashMap<>();
+        for (String header : headerArray) {
+            String[] headerParts = header.split(":", 2);
+            headers.put(headerParts[0].strip(), headerParts[1].strip());
+        }
+        return headers;
+    }
+
+    private static String processQuery(String uri, Map<String, String> queryParams) {
+        String queryString = uri.substring(uri.indexOf("?") + 1);
+        String[] queries = queryString.split("&");
+        for (String query : queries) {
+            String[] entry = query.split("=");
+            queryParams.put(entry[0], entry[1]);
+        }
+        uri = uri.substring(0, uri.indexOf("?"));
+        return uri;
     }
 }

@@ -7,13 +7,15 @@ public class HttpRequestMessage {
     String method;
     String uri;
     String version;
+    Map<String, String> queryParam;
     Map<String,String> headers;
     String body;
 
-    public HttpRequestMessage(String method, String uri, String version, Map<String, String> headers, String body) {
+    public HttpRequestMessage(String method, String uri, String version, Map<String,String> queryParam, Map<String, String> headers, String body) {
         this.method = method;
         this.uri = uri;
         this.version = version;
+        this.queryParam = queryParam;
         this.headers = headers;
         this.body = body;
     }
@@ -26,6 +28,10 @@ public class HttpRequestMessage {
         return uri;
     }
 
+    public Map<String,String> getQueryParam() {
+        return queryParam;
+    }
+
     public String getVersion() {
         return version;
     }
@@ -36,25 +42,5 @@ public class HttpRequestMessage {
 
     public String getBody() {
         return body;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
     }
 }
