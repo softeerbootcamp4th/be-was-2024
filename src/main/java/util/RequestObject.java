@@ -9,20 +9,14 @@ public class RequestObject {
 
     private String path;//  /user/create 가 들어옴
     private final String method;// GET이 들어옴
-    private String paramLine;
-    private Map<String,String> params = new HashMap<String,String>(); // { name : 1234 , password : 1} 들어옴
+    private final String version;//HTTP version
 
     public RequestObject(String line)
     {
         String[] requestLine = line.split(" ");
         this.method=requestLine[0];
-        String[] url = requestLine[1].split("\\?");
-        this.path = url[0];
-        if(url.length>1)
-        {
-            this.paramLine = url[1];
-            setParams();
-        }
+        this.path = requestLine[1];
+        this.version=requestLine[2];
     }
     public String getPath()
     {
@@ -34,22 +28,9 @@ public class RequestObject {
         return this.method;
     }
 
-    public Map<String, String> getParams() {
-
-        return this.params;
-    }
-
-    public void setParams()
+    public String getVersion()
     {
-        if (paramLine == null || paramLine.isEmpty()) {
-            return ;
-        }
-        String[] pairs = paramLine.split("&");
-        for (String pair : pairs) {
-            String[] keyValue = pair.split("=");
-            if (keyValue.length == 2) {
-                params.put(keyValue[0], keyValue[1]);
-            }
-        }
+        return this.version;
     }
+
 }
