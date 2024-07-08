@@ -11,7 +11,7 @@ public class HttpResponse{
     private byte[] body;
 
 
-    public HttpResponse( int statusCode) {
+    public HttpResponse(int statusCode) {
         this.statusCode = StatusCode.valueOfCode(statusCode);
         if(this.statusCode == null) this.statusCode = StatusCode.CODE404;
     }

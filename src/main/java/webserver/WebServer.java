@@ -10,7 +10,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WebServer {
-    private static ExecutorService executor = Executors.newFixedThreadPool(10); // thread 갯수 제한을 위한 thread pool
+    private static final int MAX_THREAD = 10;
+    private static ExecutorService executor = Executors.newFixedThreadPool(MAX_THREAD); // thread 갯수 제한을 위한 thread pool
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
 

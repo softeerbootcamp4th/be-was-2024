@@ -9,20 +9,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PathMap {
-    private static Pathnode root;
+    private static PathNode root;
 
     static{
         buildPathMap();
     }
 
-        private static class Pathnode{
+        private static class PathNode {
             String nodename;
 
             Map<Methods, ApiFunction> methods;
 
-            Map<String, Pathnode> childnode;
+            Map<String, PathNode> childnode;
 
-        public Pathnode(String nodename) {
+        public PathNode(String nodename) {
             this.nodename = nodename;
             this.methods = new HashMap<>();
             this.childnode = new HashMap<>();
@@ -33,12 +33,12 @@ public class PathMap {
             return methods.get(method);
         }
 
-        public Pathnode getChild(String nodename) {
+        public PathNode getChild(String nodename) {
             return childnode.get(nodename);
         }
 
-        public Pathnode addChild(String nodename) {
-            Pathnode child = new Pathnode(nodename);
+        public PathNode addChild(String nodename) {
+            PathNode child = new PathNode(nodename);
             childnode.put(nodename, child);
             return child;
         }
@@ -57,18 +57,18 @@ public class PathMap {
         }
     }
 
-    public static Pathnode getRoot() {
+    public static PathNode getRoot() {
         return root;
     }
 
     public static ApiFunction getPathMethod(Methods method, String path) {
         String[] routes = path.split("/");
-        Pathnode current = root;
+        PathNode current = root;
         if(routes.length == 1){
             return current.getMethod(method);
         }
         for(int i = 1; i < routes.length; i++){
-            Pathnode next = current.getChild(routes[i]);
+            PathNode next = current.getChild(routes[i]);
             if(next == null) break;
             current = next;
         }
@@ -77,9 +77,9 @@ public class PathMap {
 
 
     private static void buildPathMap(){
-        root = new Pathnode("root");
+        root = new PathNode("root");
 
         //  /registration/~
-        root.addChild("registration").addGetMethod(new Registration());
+        root.addChild("create").addPostMethod(new Registration());
     }
 }

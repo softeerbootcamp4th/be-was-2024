@@ -28,7 +28,7 @@ public enum Methods {
             Stream.of(values()).collect(Collectors.toMap(Methods::getMethod, e -> e));
 
     public static Methods valueOfMethod(String method) {
-        return BY_METHOD.get(method);
+        return BY_METHOD.get(method.toUpperCase());
     }
 
 }
