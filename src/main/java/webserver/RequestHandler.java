@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.mapper.MappingHandler;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -40,7 +41,7 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            String filePath = AddressHandler.getFilePath(httpRequest, dos);
+            String filePath = MappingHandler.mapRequest(httpRequest, dos);
 
             File file = new File(filePath);
             if (!file.exists()) {
