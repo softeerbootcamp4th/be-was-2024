@@ -9,5 +9,5 @@ import webserver.http.HttpResponse;
 * all api and static file call should implement this interface
 * */
 public interface ApiFunction {
-    HttpResponse funcion(HttpRequest request);
+    HttpResponse function(HttpRequest request);
 }

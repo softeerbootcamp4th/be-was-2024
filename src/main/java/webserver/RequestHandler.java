@@ -58,7 +58,7 @@ public class RequestHandler implements Runnable {
             HttpResponse response =
                     (api == null)
                             ? new HttpResponse.ResponseBuilder(404).build()
-                            : api.funcion(request); // 해당 function을 실행
+                            : api.function(request); // 해당 function을 실행
 
             // response 출력
             dos.writeBytes(response.getHeader());

@@ -16,7 +16,7 @@ import java.util.Map;
 * */
 public class Registration implements ApiFunction {
     @Override
-    public HttpResponse funcion(HttpRequest request) {
+    public HttpResponse function(HttpRequest request) {
 
         Map<String, String> params = new HashMap<>();
 

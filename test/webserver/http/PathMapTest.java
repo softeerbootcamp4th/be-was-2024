@@ -12,8 +12,8 @@ class PathMapTest {
 
     @Test
     void getPathMethodTest(){
-        Methods method = Methods.GET;
-        String path = "/registration";
+        Methods method = Methods.POST;
+        String path = "/create";
         ApiFunction function = PathMap.getPathMethod(method, path);
         assertEquals(function.getClass(), Registration.class);
     }

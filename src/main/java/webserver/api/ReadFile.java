@@ -21,7 +21,7 @@ public class ReadFile implements ApiFunction {
     private static final String root = "./src/main/resources/static";
 
     @Override
-    public HttpResponse funcion(HttpRequest request) {
+    public HttpResponse function(HttpRequest request) {
         try{
             Extension extension;
             String pathname = root + request.getUri().getPath();

@@ -21,7 +21,7 @@ class ReadFileTest {
     void readFile() {
         String fileroute = "/index.html";
         request = new HttpRequest.ReqeustBuilder("GET " + fileroute + " HTTP/1.1").build();
-        HttpResponse response = readFile.funcion(request);
+        HttpResponse response = readFile.function(request);
         assertNotNull(response.getBody());
     }
 
