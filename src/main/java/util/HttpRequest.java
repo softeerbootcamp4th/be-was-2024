@@ -14,6 +14,7 @@ public class HttpRequest {
     private String httpVersion;
     private Map<String, String> headers;
     private Map<String, String> queryParams;
+    private String body;
 
     /**
      * Creates a new HttpRequest.
@@ -26,7 +27,7 @@ public class HttpRequest {
      * @param queryParams the query parameters
      */
     public HttpRequest(String method, String url, String path, String httpVersion,
-                       Map<String, String> headers, Map<String, String> queryParams) {
+                       Map<String, String> headers, Map<String, String> queryParams, String body) {
         this.method = method;
         this.url = url;
         this.path = path;
@@ -34,11 +35,12 @@ public class HttpRequest {
         this.headers = new HashMap<>(headers);
         this.queryParams = new HashMap<>(queryParams);
         this.contentType = determineContentType(url);
+        this.body = body;
     }
 
 
     public HttpRequest withUrl(String newUrl) {
-        return new HttpRequest(this.method, newUrl, this.path, this.httpVersion, this.headers, this.queryParams);
+        return new HttpRequest(this.method, newUrl, this.path, this.httpVersion, this.headers, this.queryParams, this.body);
     }
 
     public String getMethod() {
@@ -63,6 +65,10 @@ public class HttpRequest {
 
     public Map<String, String> getQueryParams() {
         return queryParams;
+    }
+
+    public String getBody() {
+        return body;
     }
 
     public void setUrl(String url) {

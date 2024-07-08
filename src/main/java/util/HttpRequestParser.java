@@ -30,6 +30,7 @@ public class HttpRequestParser {
         String path = "";
         Map<String, String> headers = new HashMap<>();
         Map<String, String> queryParams = new HashMap<>();
+        String body = "";
 
         String line = reader.readLine();
         if (line != null && !line.isEmpty()) {
@@ -48,9 +49,16 @@ public class HttpRequestParser {
                     headers.put(matcher.group(1).trim(), matcher.group(2).trim());
                 }
             }
+            if("POST".equals(method)) {
+                int contentLength = Integer.parseInt(headers.get("Content-Length"));
+                char[] buffer = new char[contentLength];
+                reader.read(buffer, 0, contentLength);
+                body = new String(buffer);
+            }
         }
-
-        return new HttpRequest(method, url, path, httpVersion, headers, queryParams);
+        logger.debug("&&&&&&&&&&&&&&&&&&&&\nParsed request: method={}, url={}, path={}, httpVersion={}, headers={}, queryParams={}, body={}",
+                method, url, path, httpVersion, headers, queryParams, body+"\n&&&&&&&&&&&&&&&&&&&&&&");
+        return new HttpRequest(method, url, path, httpVersion, headers, queryParams, body);
     }
 
     /**
@@ -60,7 +68,7 @@ public class HttpRequestParser {
      * @param queryParams the map to store the query parameters for case: /path?key=value
      */
     private void parseUrl(String url, Map<String, String> queryParams) {
-        
+
         String[] urlParts = url.split("\\?", 2);
         queryParams.put("path", urlParts[0]);
         if (urlParts.length > 1) {
