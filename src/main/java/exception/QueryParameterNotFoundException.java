@@ -1,6 +1,6 @@
 package exception;
 
-public class QueryParameterNotFoundException extends Exception {
+public class QueryParameterNotFoundException extends RuntimeException {
     // 기본 생성자
     public QueryParameterNotFoundException() {
         super();
