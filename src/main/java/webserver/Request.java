@@ -1,14 +1,22 @@
 package webserver;
 
-import java.io.File;
+import handler.RequestHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.util.HashMap;
 
 public class Request {
+    private static final Logger logger = LoggerFactory.getLogger(Request.class);
+
     private final String method;
     private final String path;
     private final String queryString;
 
-    protected Request(String requestLine) {
+    protected Request(InputStream inputStream) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        String requestLine = br.readLine();
         this.method = requestLine.split(" ")[0];
         String url = requestLine.split(" ")[1];
         if (url.contains("?")) {
@@ -18,10 +26,16 @@ public class Request {
             this.path = url;
             this.queryString = "";
         }
+
+        //읽어들인 InputStream 모두 출력
+        String line;
+        while (!(line = br.readLine()).isEmpty()) {
+            logger.debug(line); // 읽어들인 라인 출력
+        }
     }
 
-    public static Request from(String line) {
-        return new Request(line);
+    public static Request from(InputStream inputStream) throws IOException {
+        return new Request(inputStream);
     }
 
     public boolean isQueryString() {
