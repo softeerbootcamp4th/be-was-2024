@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 class UserProcessorTest {
 
 
+    private UserProcessor userProcessor = UserProcessor.getInstance();
     @DisplayName("User가 정상적으로 생성되고 저장되는지 확인하는 테스트")
     @Test
     void 저장Test()
@@ -22,7 +23,7 @@ class UserProcessorTest {
         RequestObject requestObject = new RequestObject("GET /user/create?userId=1234&name=bjh3311&password=1q2w&email=abc@naver.com HTTP/1.1");
 
         //when
-        UserProcessor.userCreate(requestObject);
+        userProcessor.userCreate(requestObject);
         Collection<User> result = Database.findAll();
 
         //Then

@@ -1,17 +1,14 @@
-package webserver;
+package handler;
 
 import java.io.*;
 import java.net.Socket;
 
-import handler.GetHandler;
-import handler.PostHandler;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import processor.UserProcessor;
 import util.FileDetection;
 import util.RequestObject;
-
-import javax.xml.crypto.Data;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -21,11 +18,15 @@ public class RequestHandler implements Runnable {
     private RequestObject requestObject ;
     private final GetHandler getHandler;
     private final PostHandler postHandler;
+    private final UserProcessor userProcessor;
+
+
     public RequestHandler(Socket connectionSocket)
     {
         this.connection = connectionSocket;
         this.getHandler =GetHandler.getInstance();
         this.postHandler=PostHandler.getInstance();
+        this.userProcessor=UserProcessor.getInstance();
     }
 
     public void run() {
@@ -47,13 +48,13 @@ public class RequestHandler implements Runnable {
             logger.debug(sb.toString());
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            frontRequest(dos,requestObject);
+            requestDistribute(dos,requestObject);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void frontRequest(DataOutputStream dos,RequestObject requestObject)
+    private void requestDistribute(DataOutputStream dos,RequestObject requestObject)
     {
         String method = requestObject.getMethod();
         String path = requestObject.getPath();
@@ -64,34 +65,12 @@ public class RequestHandler implements Runnable {
         }
         else if(method.equals("POST"))
         {
-            UserProcessor.userCreate(requestObject);
-            responseAlert(dos,"로그인 성공");
+            userProcessor.userCreate(requestObject);
+            postHandler.responseAlert(dos,"로그인 성공");
         }
     }
-    private void response302Header(DataOutputStream dos,String loc)
-    {
-        try {
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: "+loc+"\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-    private void responseAlert(DataOutputStream dos, String content) {
-        try {
-            String body = "<html><head><script type='text/javascript'>alert('" + content + "');window.location='/login/index.html';</script></head></html>";
-            byte[] bodyBytes = body.getBytes("UTF-8");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
-            dos.writeBytes("\r\n");
-            dos.write(bodyBytes);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+
+
 
 
 }

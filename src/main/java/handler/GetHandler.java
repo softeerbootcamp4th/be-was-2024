@@ -9,7 +9,6 @@ public class GetHandler
 {
     private GetHandler() {}
 
-
     private static final Logger logger = LoggerFactory.getLogger(GetHandler.class);
     private static class LazyHolder{
         private static final GetHandler INSTANCE = new GetHandler();
@@ -58,8 +57,6 @@ public class GetHandler
             logger.error(e.getMessage());
         }
     }
-
-
     public String match(String extensions)
     {
         return switch (extensions) {
