@@ -26,19 +26,21 @@ public class HttpRequest {
         HttpRequest request = new HttpRequest();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
-        boolean isStartLine = true;
+        String line = bufferedReader.readLine();
+        if(line == null || line.isEmpty()){
+            throw new IOException("Empty request line.");
+        }
 
-        String line;
-        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다.
-            if (isStartLine) {
-                String[] tokens = line.split(" ");
-                request.setMethod(tokens[0]);
-                request.setUrl(tokens[1]);
-                request.setPath(tokens[1]);
-                request.setHttpVersion(tokens[2]);
-                isStartLine = false;
-                continue;
-            }
+        String[] startLine = line.split(" ");
+        if(startLine.length != 3){
+            throw new IOException("Invalid HTTP request line:" + line);
+        }
+
+        request.setMethod(startLine[0].trim());
+        request.setUrl(startLine[1].trim());
+        request.setHttpVersion(startLine[2].trim());
+
+        while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다..?
             int colonIndex = line.indexOf(':');
             if (colonIndex == -1) {
                 throw new IOException("Invalid HTTP header: " + line);
@@ -57,6 +59,7 @@ public class HttpRequest {
 
     public void setUrl(String url) {
         this.url = url;
+        setPath(url);
     }
     public void setPath(String url) {
         if(hasQueryParameters(url)) {
@@ -71,7 +74,6 @@ public class HttpRequest {
         this.httpVersion = httpVersion;
     }
 
-    //Map<> queryParameters를 외부에서 접근 불가능하게 설정했으므로 getter 작성
     public String getQueryParameterValue(String key) throws QueryParameterNotFoundException {
         if(queryParameters.containsKey(key)) {
             return queryParameters.get(key);
