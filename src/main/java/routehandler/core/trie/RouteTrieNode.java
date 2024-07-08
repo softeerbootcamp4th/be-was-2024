@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RouteTrieNode {
-    private Map<String, RouteTrieNode> children;
+    private final Map<String, RouteTrieNode> children;
     private RouteTrieNode pathVariableNode;
     private String pathVariableName;
 
@@ -17,7 +17,7 @@ public class RouteTrieNode {
 
     public RouteTrieNode() {
         children = new HashMap<>();
-        children.computeIfAbsent("key", k -> new RouteTrieNode());
+        handlers = new HashMap<>();
     }
 
     /**
@@ -53,6 +53,11 @@ public class RouteTrieNode {
         handlers.put(method, handler);
     }
 
+    /**
+     * 등록된 핸들러를 반환하는 메서드. 만약 핸들러가 없다면 예외 발생 ( 차후 null 반환으로 변경될 수 있음 )
+     * @param method
+     * @return
+     */
     public IRouteHandler getHandler(HttpMethodType method) {
         IRouteHandler handler = handlers.get(method);
         // 핸들러가 없다면 예외 상황

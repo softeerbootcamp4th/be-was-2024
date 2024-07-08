@@ -47,6 +47,7 @@ public class RequestHandler implements Runnable {
 
             MyHttpRequest request = new MyHttpRequest(requestLine, headerLines);
             MyHttpResponse response = new MyHttpResponse(request.getVersion());
+            logger.debug("request url: {}", request.getUrl().getPathname());
 
             chainManager.execute(request, response);
 

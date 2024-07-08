@@ -5,15 +5,17 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import chain.NotFoundHandleChain;
 import chain.RouteHandleChain;
 import chain.StaticResourceChain;
 import chain.core.ChainManager;
+import chain.core.MiddlewareChain;
 import config.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.route.NotFoundRouteHandler;
 import routehandler.route.IndexRouteHandler;
 import routehandler.route.RegistrationRouteHandler;
+import routehandler.utils.Route;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -25,14 +27,22 @@ public class WebServer {
         } else {
             port = Integer.parseInt(args[0]);
         }
+        MiddlewareChain chain = new RouteHandleChain(
+                        Route.at("/registration")
+                                .GET(new RegistrationRouteHandler())
+                                .routes(
+                                        Route.at("{test}")
+                                                .GET(new IndexRouteHandler())
+                                ),
+                        Route.at("/")
+                                .GET(new IndexRouteHandler())
+                                .POST(new IndexRouteHandler())
+                );
 
         ChainManager chainManager = new ChainManager(
                 new StaticResourceChain(),
-                new RouteHandleChain(
-                    new RegistrationRouteHandler("/registration"),
-                    new IndexRouteHandler("/"),
-                    new NotFoundRouteHandler()
-                )
+                chain,
+                new NotFoundHandleChain()
         );
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(AppConfig.THREAD_POOL_SIZE);

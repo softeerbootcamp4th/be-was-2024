@@ -12,17 +12,6 @@ import webserver.WebServer;
 
 public class IndexRouteHandler implements IRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(IndexRouteHandler.class);
-    private final String routePrefix;
-
-    public IndexRouteHandler(String routePrefix) {
-        this.routePrefix = routePrefix;
-    }
-
-    @Override
-    public boolean canMatch(Object... args) {
-        String path = (String) args[0];
-        return path.equals(routePrefix);
-    }
 
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {

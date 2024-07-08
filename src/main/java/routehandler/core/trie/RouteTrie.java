@@ -1,7 +1,10 @@
 package routehandler.core.trie;
 
 import http.enums.HttpMethodType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
+import routehandler.utils.RouteRecord;
 import routehandler.utils.RouteUtil;
 
 public class RouteTrie {
@@ -31,7 +34,7 @@ public class RouteTrie {
 
         for(String pathSegment: pathSegments) {
             var newNode = node.nextForSearch(pathSegment);
-            if(newNode != null) throw new RuntimeException("no route found matching " + pathSegment);
+            if(newNode == null) throw new RuntimeException("no route found matching " + pathSegment);
 
             node = newNode;
         }

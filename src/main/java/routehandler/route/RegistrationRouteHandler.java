@@ -1,24 +1,17 @@
 package routehandler.route;
 
-import config.AppConfig;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.core.ApiRouteHandler;
+import routehandler.core.IRouteHandler;
 import utils.FileReadUtil;
-import webserver.WebServer;
 
-public class RegistrationRouteHandler extends ApiRouteHandler {
+public class RegistrationRouteHandler implements IRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(RegistrationRouteHandler.class);
 
-    public RegistrationRouteHandler(String pathPrefix) {
-        super(pathPrefix);
-    }
-
-    @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         var url = req.getUrl();
 
