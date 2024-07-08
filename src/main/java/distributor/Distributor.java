@@ -1,10 +1,13 @@
-package webserver;
+package distributor;
+
+import webserver.Request;
+import webserver.Response;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public interface Distributor {
-    public static Distributor from(Request request, Response response) {
+    static Distributor from(Request request, Response response) {
         String method = request.getHttpMethod();
         if (method.equals("GET")) {
             return new GetDistributor(request, response);
@@ -14,5 +17,5 @@ public interface Distributor {
         return null;
     }
 
-    public void process(DataOutputStream dos) throws IOException;
+    void process(DataOutputStream dos) throws IOException;
 }
