@@ -51,7 +51,7 @@ public class HttpResponseObject {
 
     public String getTotalHeaders(){
         StringBuilder sb = new StringBuilder();
-        sb.append(httpVersion).append(StringUtil.SPACE).append(statusCode).append(StringUtil.SPACE).append(HttpStatusCode.getHttpStatusMessage(statusCode)).append(StringUtil.CRLF);
+        sb.append(httpVersion).append(StringUtil.SPACE).append(statusCode).append(StringUtil.SPACE).append(HttpCode.getMessage(statusCode)).append(StringUtil.CRLF);
         for (Map.Entry<String, String> entry : header.entrySet()) {
             sb.append(entry.getKey()).append(StringUtil.COLON_WITH_SPACE).append(entry.getValue()).append(StringUtil.CRLF);
         }

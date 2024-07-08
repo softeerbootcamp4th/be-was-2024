@@ -14,4 +14,8 @@ public class StringUtil {
     public static final String EQUAL = "=";
     public static final String DOT = "\\.";
     public static final String QUESTION_MARK = "\\?";
+
+    public static final String DYNAMIC = "dynamic";
+    public static final String FAULT = "fault";
+    public static final String STATIC = "static";
 }
