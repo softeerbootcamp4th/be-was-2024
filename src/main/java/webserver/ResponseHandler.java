@@ -24,11 +24,11 @@ public class ResponseHandler {
     public void writeHeader(StatusCodeType statusCode, HashMap<String, String> responseHeader) throws IOException {
         dos.writeBytes("HTTP/1.1 " + statusCode.getCode() + " " + statusCode.getText() + "\r\n");
         switch (statusCode) {
-            // [200, 300)
+            // 2XX
             case OK -> write200Header(responseHeader);
-            // [300, 400)
+            // 3XX
             case FOUND -> write302Header(responseHeader);
-            // [400, 500)
+            // 4XX
             case BAD_REQUEST -> write400Header(responseHeader);
             case NOT_FOUND -> write404Header(responseHeader);
         }

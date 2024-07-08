@@ -1,36 +1,39 @@
 package processor;
 
 import db.Database;
+import exception.StatusCodeException;
 import model.User;
 import type.MIMEType;
 import type.StatusCodeType;
+import utils.StringUtils;
+import webserver.RequestInfo;
 
 import java.util.HashMap;
 
 public class UserRequestProcessor extends RequestProcessor {
 
-    public UserRequestProcessor(String method, String path, HashMap<String, String> query) {
-        init(method, path, query);
+    public UserRequestProcessor(RequestInfo requestInfo) throws StatusCodeException {
+        init(requestInfo);
 
-        switch (method + " " + path) {
-            case "GET /create" -> createUser();
-//            default
+        switch (methodPath()) {
+            case "POST /create" -> createUser();
+            default -> throw new StatusCodeException(StatusCodeType.NOT_FOUND);
         }
     }
 
-    // GET "/create?"
+    // POST "/create"
     private void createUser() {
-        String userId = getQuery().get("userId");
-        String name = getQuery().get("name");
-        String password = getQuery().get("password");
-        String email = getQuery().get("email");
+        HashMap<String, String> param = StringUtils.param2Map(getBody());
+        String userId = param.get("userId");
+        String name = param.get("name");
+        String password = param.get("password");
+        String email = param.get("email");
 
-        HashMap<String, String> responseHeader = new HashMap<>();
-        responseHeader.put("Content-Type", MIMEType.HTML.getContentType());
-        if (userId == null || name == null && password == null ||
-                userId.isEmpty() || name.isEmpty() || password.isEmpty()) {
+        insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
+        if (userId == null || name == null || password == null || email == null ||
+                userId.isEmpty() || name.isEmpty() || password.isEmpty() || email.isEmpty()) {
 
-            setResult(StatusCodeType.BAD_REQUEST, responseHeader, "" +
+            setResult(StatusCodeType.BAD_REQUEST, getResponseHeader(), "" +
                     "<script>" +
                     "alert('Fill all the required fields');" +
                     "location.href='/registration'" +
@@ -40,12 +43,7 @@ public class UserRequestProcessor extends RequestProcessor {
 
         User user = new User(userId, name, password, email);
         Database.addUser(user);
-//        responseHeader.put("Location", "/index.html");
-//        setResult(StatusCodeType.FOUND, responseHeader, "");
-        setResult(StatusCodeType.OK, responseHeader,"" +
-                "<script>" +
-                "alert('success');" +
-                "location.href='/login';" +
-                "</script>");
+        insert2ResponseHeader("Location", "/index.html");
+        setResult(StatusCodeType.FOUND, getResponseHeader(), "");
     }
 }

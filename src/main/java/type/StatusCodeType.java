@@ -1,11 +1,11 @@
 package type;
 
 public enum StatusCodeType {
-    // [200, 300)
+    // 2XX
     OK(200, "OK"),
-    // [300, 400)
+    // 3XX
     FOUND(302, "Found"),
-    // [400, 500)
+    // 4XX
     BAD_REQUEST(400, "Bad Request"),
     NOT_FOUND(404, "Not Found");
 

@@ -1,33 +1,52 @@
 package processor;
 
 import type.StatusCodeType;
+import webserver.RequestInfo;
 import webserver.RequestResult;
 
 import java.util.HashMap;
 
 public class RequestProcessor {
-    private String method;
-    private String path;
-    private HashMap<String, String> query;
+    public  final static String STATIC_PATH = "./src/main/resources/static";
+    private RequestInfo requestInfo;
+    private HashMap<String, String> responseHeader = new HashMap<>();
 
     RequestResult requestResult;
 
-    public void init(String method, String path, HashMap<String, String> query) {
-        this.method = method;
-        this.path = path;
-        this.query = query;
+    public void init(RequestInfo requestInfo) {
+        this.requestInfo = requestInfo;
+    }
+
+    public String methodPath() {
+        return requestInfo.getMethod() + " " + requestInfo.getPath();
     }
 
     public String getMethod() {
-        return method;
+        return requestInfo.getMethod();
     }
 
     public String getPath() {
-        return path;
+        return requestInfo.getPath();
+    }
+
+    public String getContentType() {
+        return requestInfo.getContentType();
     }
 
     public HashMap<String, String> getQuery() {
-        return query;
+        return requestInfo.getQuery();
+    }
+
+    public String getBody() {
+        return requestInfo.getBody();
+    }
+
+    public void insert2ResponseHeader(String key, String value) {
+        responseHeader.put(key, value);
+    }
+
+    public HashMap<String, String> getResponseHeader() {
+        return responseHeader;
     }
 
     public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] bodyContent)  {
