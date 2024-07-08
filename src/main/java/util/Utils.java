@@ -1,13 +1,32 @@
 package util;
 
 import http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import request.RequestParser;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Properties;
 
 public class Utils {
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    private static String staticPath;
+    private static final Properties properties = new Properties();
+
+    static {
+        try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                logger.error("Unable to find config.properties");
+            }
+            properties.load(input);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static String getStaticPath() {
+        return properties.getProperty("staticPath");
+    }
 
     public static class ResponseWithStatus {
         public HttpStatus status;

@@ -27,7 +27,7 @@ test {
 
 task writeProperties{
     doLast{
-        file('src/main/resources/config.properties').text = "staticPath = \"./src/main/resources/static\""
+        file('src/main/resources/config.properties').text = "staticPath = ./src/main/resources/static"
     }
 }
 
