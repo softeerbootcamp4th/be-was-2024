@@ -16,6 +16,16 @@ public class Request{
     private String httpVersion;
     private Map<String, String> httpHeaders;
     private Map<String, String> parameters;
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    private String body;
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     public Request() {}

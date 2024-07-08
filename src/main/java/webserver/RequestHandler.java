@@ -12,13 +12,11 @@ import org.slf4j.LoggerFactory;
 import utils.MimeTypeMapper;
 import utils.PathParser;
 import utils.RequestParser;
+import utils.ResourcesLoader;
 
 public class RequestHandler implements Callable<Void> {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private static final PathParser pathParser = PathParser.getInstance();
-    public static final String DEFALUT_PATH = "src/main/resources/static";
-
-
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -35,6 +33,7 @@ public class RequestHandler implements Callable<Void> {
             // request, response 객체 생성
             RequestParser requestParser = RequestParser.getRequestParser();
             Request request = requestParser.getRequest(in);
+            logger.debug("body test = {}", request.getBody());
             Response response = new Response();
 
             /**
@@ -53,14 +52,13 @@ public class RequestHandler implements Callable<Void> {
                return null;
             }
 
-            // 렌더링할 파일의 실제 위치
-            String filePath = filePathResolver(fileName);
+            fileName = filePathResolver(fileName);
 
             // 파일의 바이너리 데이터 읽기
-            byte[] body = fileReadToBinary(filePath);
+            byte[] body = fileReadToBinary(fileName);
 
             // mimeType 변환
-            MimeType mimeType = extToMimetype(filePath);
+            MimeType mimeType = extToMimetype(fileName);
             response.setContentType(mimeType);
 
             // 클라이언트에게 파일 반환
@@ -73,9 +71,9 @@ public class RequestHandler implements Callable<Void> {
 
     private String filePathResolver(String fileName) {
        if(fileName.contains(".")) {
-          return DEFALUT_PATH + fileName;
+          return fileName;
        }
-       return DEFALUT_PATH + fileName + ".html";
+       return fileName + ".html";
     }
 
     private MimeType extToMimetype(String filePath) {
@@ -85,17 +83,19 @@ public class RequestHandler implements Callable<Void> {
         return mimeTypeMapper.getMimeType(fileExt);
     }
 
-    private byte[] fileReadToBinary(String filePath) throws IOException {
-       // binary로 파일읽기
-        byte[] body;
-        try(
-                FileInputStream fis = new FileInputStream(filePath);
-                BufferedInputStream bis = new BufferedInputStream(fis);
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ) {
-            bis.transferTo(bos);
-            body = bos.toByteArray();
+    private byte[] fileReadToBinary(String filePath) {
+        if(filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
         }
-        return body;
+
+        try (InputStream inputStream = RequestHandler.class.getClassLoader().getResourceAsStream(filePath)) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found: " + filePath);
+            }
+            return inputStream.readAllBytes();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+            return null;
+        }
     }
 }

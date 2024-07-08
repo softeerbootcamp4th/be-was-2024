@@ -32,17 +32,21 @@ class RequestTest {
     }
 
     @Test
-    void wrongRequestTest() throws IOException {
+    void whiteSpaceTest() throws IOException {
         // given
-        String httpMessage = "GET /index.html http/1.1\nConnection: keep-alive: k\nHost: localhost:8080\n";
+        String httpMessage = "GET /index.html http/1.1\nConnection :    keep-alive\nHost: localhost:8080   \n";
         ByteArrayInputStream bis = new ByteArrayInputStream(httpMessage.getBytes());
 
-        // when, then
-        Assertions.assertThatThrownBy(() -> {
-            RequestParser.getRequestParser().getRequest(bis);
-        }).isInstanceOf(IllegalStateException.class);
-    }
+        // when
+        Request request = RequestParser.getRequestParser().getRequest(bis);
 
+        // then
+        assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getPath()).isEqualTo("/index.html");
+        assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
+        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
+        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+    }
     @Test
     void registerTest() throws IOException {
         // given

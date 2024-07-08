@@ -29,11 +29,11 @@ public class ApiProcessManager {
     public ApiProcess getApiProcess(String path) {
         int qmLoc = path.indexOf("/");
         String apiPath = path.substring(0, qmLoc);
-        File file = new File(RequestHandler.DEFALUT_PATH + path);
+        String lastPath = path.substring(qmLoc + 1);
 
         logger.debug(apiPath);
 
-        if(apiPath.isEmpty() && file.isFile()) {
+        if(apiPath.isEmpty() && lastPath.contains(".")) {
            return new StaticApiProcess();
         }
 
