@@ -30,8 +30,8 @@ public class StaticResourceHandler implements IRouteHandler {
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         String fileName = req.getUrl().getPathname();
-        String filePath = AppConfig.STATIC_RESOURCES_PATH + fileName;
-        logger.debug(filePath);
+//        String filePath = AppConfig.STATIC_RESOURCES_PATH + fileName;
+        String filePath = fileName;
 
         // 헤더 작성
         try {

@@ -1,31 +1,51 @@
 package utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
+
+import java.io.*;
 
 public class FileReadUtil {
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     /**
      * 파일 경로에서 데이터를 읽어오는 메서드. 길이 0의 파일을 읽는 것과 파일을 읽지 않는 것은 다르다.
       */
     public static byte[] read(String filePath) throws IOException {
-        File targetFile = new File(filePath);
+        // classloader로 경로를 얻는 경우 처음에 슬래시가 오면 안된다.
+        if(filePath.startsWith("/")) filePath = filePath.substring(1);
 
-        byte[] buffer;
+        // classloader로부터 경로를 받아 읽어야 build.gradle에 정의한 경로를 얻을 수 있음.
+        // FileInputStream으로 바로 얻으면 static 경로 모두 정의해야 함.
+        try(InputStream is = FileReadUtil.class.getClassLoader().getResourceAsStream(filePath)) {
+            if(is == null) throw new FileNotFoundException("파일을 찾을 수 없음");
 
-        if(!targetFile.exists() || targetFile.isDirectory())
-            throw new FileNotFoundException("파일을 찾을 수 없음");
-
-        int bodyLength = (int)targetFile.length();
-        buffer = new byte[bodyLength];
-
-        try(FileInputStream fis = new FileInputStream(targetFile)) {
-            fis.read(buffer, 0, buffer.length);
-        } catch (IOException e) {
+            return is.readAllBytes();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             throw e;
         }
 
-        return buffer;
     }
 }
+
+
+//        if(filePath.startsWith("\\/")) filePath = filePath.substring(1);
+//
+////        File targetFile = new File(filePath);
+////
+////        byte[] buffer;
+////
+////        if(!targetFile.exists() || targetFile.isDirectory())
+////            throw new FileNotFoundException("파일을 찾을 수 없음");
+////
+////        int bodyLength = (int)targetFile.length();
+//
+//        try(InputStream is = FileReadUtil.class.getClassLoader().getResourceAsStream(filePath)) {
+//        if(is == null) throw new IOException("resource not found: " + filePath);
+//
+//            return is.readAllBytes();
+//        } catch (Exception e) {
+//        logger.error(e.getMessage());
+//        throw e;
+//        }

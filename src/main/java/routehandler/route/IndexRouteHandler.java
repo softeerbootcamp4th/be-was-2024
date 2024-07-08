@@ -27,7 +27,7 @@ public class IndexRouteHandler implements IRouteHandler {
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         try {
-            byte[] body = FileReadUtil.read(AppConfig.STATIC_RESOURCES_PATH + "/index.html");
+            byte[] body = FileReadUtil.read("/index.html");
             res.setBody(body);
 
             res.setStatusInfo(HttpStatusType.OK);

@@ -36,7 +36,7 @@ public class RegistrationRouteHandler extends ApiRouteHandler {
             return;
         }
         try {
-            byte[] body = FileReadUtil.read(AppConfig.STATIC_RESOURCES_PATH + "/registration/index.html");
+            byte[] body = FileReadUtil.read("/registration/index.html");
             res.setBody(body);
             res.setStatusInfo(HttpStatusType.OK);
         } catch (Exception e) {
