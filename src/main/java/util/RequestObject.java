@@ -23,7 +23,6 @@ public class RequestObject {
             this.paramLine = url[1];
             setParams();
         }
-
     }
     public String getPath()
     {

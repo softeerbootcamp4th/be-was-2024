@@ -31,6 +31,7 @@ public class UserProcessor {
         User user = new User(map.getOrDefault("userId",""),map.getOrDefault("password"," "),
                              map.getOrDefault("name"," "),map.getOrDefault("email"," "));
         Database.addUser(user);
+        logger.debug(user.toString()+"12312321");
 
     }
 }
