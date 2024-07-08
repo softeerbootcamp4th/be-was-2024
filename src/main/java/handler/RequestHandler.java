@@ -28,7 +28,6 @@ public class RequestHandler implements Runnable {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
 
             while (!Thread.currentThread().isInterrupted()) {
-                // InputStream을 BufferedReader로 변환
                 DataOutputStream dos = new DataOutputStream(out);
 
                 Request request = Request.from(in);
