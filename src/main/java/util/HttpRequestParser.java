@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +40,12 @@ public class HttpRequestParser {
             parseUrl(url, queryParams);
             path = queryParams.remove("path");  // parseUrl에서 설정한 path
 
+            Pattern headerPattern = Pattern.compile("^(.*?):\\s*(.*)$");
+
             while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                String[] header = line.split(": ");
-                if (header.length == 2) {
-                    headers.put(header[0], header[1]);
+                Matcher matcher = headerPattern.matcher(line);
+                if (matcher.matches()) {
+                    headers.put(matcher.group(1).trim(), matcher.group(2).trim());
                 }
             }
         }
@@ -56,19 +60,19 @@ public class HttpRequestParser {
      * @param queryParams the map to store the query parameters for case: /path?key=value
      */
     private void parseUrl(String url, Map<String, String> queryParams) {
-        int queryIndex = url.indexOf("?");
-        if (queryIndex != -1) {
-            queryParams.put("path", url.substring(0, queryIndex));
-            String queryString = url.substring(queryIndex + 1);
-            String[] pairs = queryString.split("&");
-            for (String pair : pairs) {
-                String[] keyValue = pair.split("=");
+        
+        String[] urlParts = url.split("\\?", 2);
+        queryParams.put("path", urlParts[0]);
+        if (urlParts.length > 1) {
+            String[] queryParamsArray = urlParts[1].split("&");
+            for (String param : queryParamsArray) {
+                String[] keyValue = param.split("=", 2);
                 if (keyValue.length == 2) {
                     queryParams.put(keyValue[0], keyValue[1]);
+                } else {
+                    queryParams.put(keyValue[0], "");
                 }
             }
-        } else {
-            queryParams.put("path", url);
         }
     }
 }
