@@ -3,6 +3,8 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 
+import handler.GetHandler;
+import handler.PostHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import processor.UserProcessor;
@@ -17,8 +19,13 @@ public class RequestHandler implements Runnable {
     private Socket connection;
 
     private RequestObject requestObject ;
-    public RequestHandler(Socket connectionSocket) {
+    private final GetHandler getHandler;
+    private final PostHandler postHandler;
+    public RequestHandler(Socket connectionSocket)
+    {
         this.connection = connectionSocket;
+        this.getHandler =GetHandler.getInstance();
+        this.postHandler=PostHandler.getInstance();
     }
 
     public void run() {
@@ -50,43 +57,20 @@ public class RequestHandler implements Runnable {
     {
         String method = requestObject.getMethod();
         String path = requestObject.getPath();
-        if(method.equals("GET") && path.equals("/user/create"))//GET방식의 회원가입 일 시
+        if(method.equals("GET") )//GET방식 들어올 경우
         {
+            path = FileDetection.getPath(FileDetection.fixedPath+path);
+            getHandler.staticFileHandler(dos,path);
             //404 redirect
             return;
         }
-        else if(method.equals("POST")&&path.equals("/user/create"))
+        else if(method.equals("POST"))
         {
             UserProcessor.userCreate(requestObject);
             responseAlert(dos,"로그인 성공");
             return;
         }
-
-        // 파일 요청이 들어왔다면 경로를 디렉토리인지 아닌지 판단해서 다시 설정해준다
-        path = FileDetection.getPath(FileDetection.fixedPath + path) ;
-        staticFileHandler(dos,path);
     }
-
-
-    //static html 파일은 여기서 다뤄준다
-    private void staticFileHandler(DataOutputStream dos,String path)
-    {
-        byte[] body;
-        File fi = new File(path);
-        try(FileInputStream fin = new FileInputStream(fi);
-            BufferedInputStream bi = new BufferedInputStream(fin);)
-        {
-            body = new byte[(int)fi.length()];
-            bi.read(body);
-            response200Header(dos,body.length,path);
-            responseBody(dos, body);
-        }
-        catch(IOException e)
-        {
-            logger.error(e.getMessage());
-        }
-    }
-
     private void response302Header(DataOutputStream dos,String loc)
     {
         try {
@@ -97,27 +81,6 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent,String url) {
-        try {
-            String[] temp = url.split("\\.");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: "+match(temp[1])+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
     private void responseAlert(DataOutputStream dos, String content) {
         try {
             String body = "<html><head><script type='text/javascript'>alert('" + content + "');window.location='/login/index.html';</script></head></html>";
@@ -133,16 +96,5 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    public String match(String extensions)
-    {
-        return switch (extensions) {
-            case "css" -> "text/css";
-            case "svg" -> "image/svg+xml";
-            case "jpg" -> "image/jpeg";
-            case "png" -> "image/png";
-            case "ico" -> "image/vnd.microsoft.icon";
-            case "js" -> "text/javascript";
-            default -> "text/html";
-        };
-    }
+
 }

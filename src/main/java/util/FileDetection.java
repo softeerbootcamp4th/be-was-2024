@@ -23,8 +23,6 @@ public class FileDetection
             e.printStackTrace();
         }
     }
-
-
     public static String getPath(String path)
     {
         File file = new File(path);
