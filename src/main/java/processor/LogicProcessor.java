@@ -1,7 +1,8 @@
-package webserver;
+package processor;
 
 import db.Database;
 import model.User;
+import webserver.Request;
 
 import java.util.HashMap;
 
