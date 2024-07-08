@@ -2,8 +2,12 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+
+import exception.InvalidHttpRequestException;
 import http.HttpRequest;
+import http.HttpRequestParser;
 import http.HttpResponse;
+import http.HttpStatus;
 import logic.Logic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -23,16 +27,21 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            HttpRequest httpRequest = HttpRequest.read(in);
+            HttpRequest httpRequest = HttpRequestParser.parse(in);
             logger.debug(httpRequest.toString());
 
             HttpResponse httpResponse = Logic.serve(httpRequest);
 
             response(out, httpResponse);
 
+        } catch (InvalidHttpRequestException ie) {
+            try {
+                response(connection.getOutputStream(), HttpResponse.error(HttpStatus.SC_BAD_REQUEST, ie.getMessage()));
+            } catch (IOException e) {logger.error(e.getMessage());}
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+
     }
 
     private void response(OutputStream out, HttpResponse httpResponse) throws IOException {
