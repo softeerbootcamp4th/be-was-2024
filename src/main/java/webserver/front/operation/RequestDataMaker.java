@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-public class RequestParser {
+public class RequestDataMaker {
 
-    private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(RequestDataMaker.class);
     public HttpRequest parseRequest(InputStream in) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String methodLine = br.readLine();

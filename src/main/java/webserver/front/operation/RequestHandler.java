@@ -10,14 +10,14 @@ import webserver.front.data.HttpRequest;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final RequestParser requestParser;
+    private final RequestDataMaker requestDataMaker;
 
     private Socket connection;
     private ResponseWriter responseWriter;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
-        requestParser = new RequestParser();
+        requestDataMaker = new RequestDataMaker();
     }
 
     public void run() {
@@ -25,7 +25,7 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-            HttpRequest httpRequest = requestParser.parseRequest(in);
+            HttpRequest httpRequest = requestDataMaker.parseRequest(in);
             ResponseMaker responseMaker = new ResponseMaker(new UserMapper(),new ResponseWriter());
             responseMaker.makeResponse(httpRequest,out);
         } catch (IOException e) {
