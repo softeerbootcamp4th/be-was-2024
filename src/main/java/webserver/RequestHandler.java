@@ -1,10 +1,10 @@
 package webserver;
 
-import file.ViewFile;
-import web.HttpRequest;
 import common.WebUtils;
+import file.ViewFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HttpRequest;
 import web.HttpResponse;
 import web.ResponseCode;
 
@@ -46,7 +46,7 @@ public class RequestHandler implements Runnable {
             // Request객체의 정보를 바탕으로 적절한 응답 뷰 파일 탐색
             ViewFile viewFile = ViewResolver.getProperFileFromRequest(httpRequest, out);
             // 뷰 파일에 맞게 적절한 Response객체 생성
-            HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.SUCCESS, WebUtils.getProperContentType(viewFile.getExtension()));
+            HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.OK, WebUtils.getProperContentType(viewFile.getExtension()));
             // Stream을 이용하여 HTTP 응답
             readAndResponseFromPath(out, dirPath+viewFile.getPath(), httpResponse.getContentType());
 
@@ -98,7 +98,7 @@ public class RequestHandler implements Runnable {
 
         try(FileInputStream fis = new FileInputStream(file)) {
             fis.read(body);
-            responseHeader(ResponseCode.SUCCESS, dos, body.length, contentType);
+            responseHeader(ResponseCode.OK, dos, body.length, contentType);
             responseBody(dos, body);
         } catch (Exception e) {
             responseHeader(ResponseCode.INTERNAL_SERVER_ERROR, dos, body.length, contentType);

@@ -11,10 +11,13 @@ import java.io.OutputStream;
 import java.util.*;
 
 /**
- * 하드코딩이 많음
- * 모든 key값들을 enum으로 대체할 수는 있으나 일단 더 좋은 방법 생각중
+ * 요청 헤더에서 필요한 정보를 추출하는 클래스
+ * TODO(키워드 프로퍼티 파일로 관리)
  */
 public class WebAdapter {
+    static final String ACCEPT = "Accept";
+    static final String CONTENT_TYPE = "Content-Type";
+    static final String CONTENT_LENGTH = "Content-Length";
 
     /**
      * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
@@ -47,14 +50,14 @@ public class WebAdapter {
                 String value = line_N[1].trim();
 
                 // Accept헤더 MimeType 설정
-                if(key.equals("Accept")) {
-                    String[] acceptLine = value.split(";");
-                    String[] mimeType = acceptLine[0].split(",");
-                    accept.addAll(Arrays.asList(mimeType));
-                } else if(key.equals("Content-Length")) {
-                    contentLength = Integer.parseInt(value);
-                } else if(key.equals("Content-Type")) {
-                    contentType = value;
+                switch (key) {
+                    case ACCEPT -> {
+                        String[] acceptLine = value.split(";");
+                        String[] mimeType = acceptLine[0].split(",");
+                        accept.addAll(Arrays.asList(mimeType));
+                    }
+                    case CONTENT_LENGTH -> contentLength = Integer.parseInt(value);
+                    case CONTENT_TYPE -> contentType = value;
                 }
             }
         }
@@ -63,7 +66,7 @@ public class WebAdapter {
     }
 
     public static HttpResponse createResponse(ResponseCode code, String contentType) {
-        return new HttpResponse().code(code).contentType(contentType);
+        return new HttpResponse.HttpResponseBuilder().code(code).contentType(contentType).build();
     }
 
     public static String resolveRequestUri(HttpRequest request, OutputStream out) throws IOException {
@@ -85,11 +88,11 @@ public class WebAdapter {
             Map<String, String> map = parseBodyInForm(body);
             Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
-            String redirectResponse = "HTTP/1.1 302 Found\r\n" +
-                    "Location: /\r\n" +
-                    "Content-Length: 0\r\n" +
-                    "\r\n";
-            out.write(redirectResponse.getBytes());
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.FOUND)
+                    .build();
+
+            out.write(response.getBytes());
         }
 
         return "/index.html";
@@ -112,10 +115,12 @@ public class WebAdapter {
     private static String resolveGetRequestUri(String restUri, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
         if(restUri.split("\\?")[0].equals("/signUp")) {
-            String redirectResponse = "HTTP/1.1 400 Bad Request\r\n" +
-                    "Content-Length: 0\r\n" +
-                    "\r\n";
-            out.write(redirectResponse.getBytes());
+
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.BAD_REQUEST)
+                    .build();
+
+            out.write(response.getBytes());
         }
         // 유저 리스트 찾아서 json으로 반환
         if(restUri.split("\\?")[0].equals("/user/list")) {
@@ -123,18 +128,23 @@ public class WebAdapter {
             Collection<User> users = Database.findAll();
             String jsonUser = JsonBuilder.buildJsonResponse(users);
 
-            String response = "HTTP/1.1 200 OK\r\n" +
-                    "Content-Type: application/json\r\n" +
-                    "Content-Length: " + jsonUser.length() + "\r\n" +
-                    "\r\n" +
-                    jsonUser;
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.OK)
+                    .contentType(MIME.JSON.getType())
+                    .contentLength(jsonUser.length())
+                    .body(jsonUser)
+                    .build();
+
             out.write(response.getBytes());
         }
-        // 데이터베이스 쵝화
+        // 데이터베이스 초기화
         else if(restUri.split("\\?")[0].equals("/database/init")) {
             Database.initialize();
 
-            String response = "HTTP/1.1 200 OK\r\n";
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.OK)
+                    .build();
+
             out.write(response.getBytes());
         }
 

@@ -1,7 +1,7 @@
 package common;
 
-import web.MIME;
 import web.HttpMethod;
+import web.MIME;
 
 /**
  * Web 요청을 처리할 때 공통으로 사용할 로직을 정리한 유틸리티 클래스
