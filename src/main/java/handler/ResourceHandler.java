@@ -1,4 +1,6 @@
-package webserver;
+package handler;
+
+import enums.Type;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -26,7 +28,7 @@ public class ResourceHandler {
         String type = url.substring(url.lastIndexOf(".") + 1);
 
         // TYPE을 순회하면서 type에 해당하는 mime type 찾기
-        for (TYPE t : TYPE.values()) {
+        for (Type t : Type.values()) {
             if (t.getType().equals(type)) {
                 return t.getMime();
             }

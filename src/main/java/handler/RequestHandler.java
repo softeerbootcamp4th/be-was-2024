@@ -1,10 +1,13 @@
-package webserver;
+package handler;
 
 import java.io.*;
 import java.net.Socket;
 
+import distributor.Distributor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.Request;
+import webserver.Response;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -20,7 +23,6 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         Response response = new Response();
-        LogicProcessor logicProcessor = new LogicProcessor();
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
@@ -35,15 +37,6 @@ public class RequestHandler implements Runnable {
 
                 Distributor distributor = Distributor.from(request, response);
                 distributor.process(dos);
-
-//                if (request.getHttpMethod().equals("GET")) {
-//                    if (request.isQueryString()) {
-//                        logicProcessor.createUser(request);
-//                        response.redirect("/index.html", dos, 302);
-//                    } else {
-//                        response.response(request.getPath(), dos);
-//                    }
-//                }
 
                 // 읽어들인 InputStream 모두 출력
                 String line;
