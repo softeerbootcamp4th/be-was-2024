@@ -35,13 +35,13 @@ public class ReadFile implements ApiFunction {
             byte[] body = Files.readAllBytes(new File(pathname).toPath());
 
             if(body.length >0 ){
-                HttpResponse response = new HttpResponse(200);
-                response.addHeaders("Content-Type", extension.getContentType());
-                response.addHeaders("Content-Length", String.valueOf(body.length));
-                response.setBody(body);
-                return response;
+                return new HttpResponse.ResponseBuilder(200)
+                        .addheader("Content-Type", extension.getContentType())
+                        .addheader("Content-Length", String.valueOf(body.length))
+                        .setBody(body)
+                        .build();
             }
-            else return new HttpResponse(404);
+            else return new HttpResponse.ResponseBuilder(404).build();
 
         }catch(IOException e){
             logger.error(e.getMessage());

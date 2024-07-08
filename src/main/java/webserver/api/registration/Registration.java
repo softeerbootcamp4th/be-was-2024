@@ -35,13 +35,13 @@ public class Registration implements ApiFunction {
                 || username == null || username.isEmpty()
                 || password == null || password.isEmpty()
                 || email == null || email.isEmpty()){
-            return new HttpResponse(404);
+            return new HttpResponse.ResponseBuilder(404).build();
         }
         Database.addUser(new User(id, password, username, email));
 
-        HttpResponse response = new HttpResponse(302);
-        response.addHeaders("Location", "http://localhost:8080/");
-        response.addHeaders("Content-Type", "text/html; charset=utf-8");
-        return response;
+        return new HttpResponse.ResponseBuilder(302)
+                .addheader("Location", "http://localhost:8080/")
+                .addheader("Content-Type", "text/html; charset=utf-8")
+                .build();
     }
 }

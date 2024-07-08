@@ -8,7 +8,7 @@ class PathHandlerTest {
 
     @Test
     void getPathTest(){
-        HttpRequest request = new HttpRequest("GET /registration?id=1&username=2&password=3 HTTP/1.1");
+        HttpRequest request = new HttpRequest.ReqeustBuilder("GET /registration?id=1&username=2&password=3 HTTP/1.1").build();
 
     }
 

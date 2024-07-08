@@ -21,29 +21,7 @@ public class HttpRequest {
     private Url url; //하나의 클래스로 분리를 하면
     private String body;
     private String protocol;
-    private Map<String, String> headers = new HashMap<>();
-
-
-    /*
-    * initialized by first line of request
-    * initialize method, url, protocol
-    * */
-    public HttpRequest(String startline) {
-        String[] split = startline.split(" ");
-        method =  Methods.valueOfMethod(split[0]);
-        url = new Url(split[1]);
-        protocol = split[2];
-    }
-
-
-    //add header one by one
-    public void addHeader(String key, String value){
-        headers.put(key, value);
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
+    private Map<String, String> headers;
 
     public Methods getMethod() {
         return method;
@@ -63,5 +41,41 @@ public class HttpRequest {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    private HttpRequest(ReqeustBuilder builder) {
+        this.method = builder.method;
+        this.url = builder.url;
+        this.protocol = builder.protocol;
+        this.body = builder.body;
+        this.headers = builder.headers;
+    }
+
+    public static class ReqeustBuilder{
+        private Methods method;
+        private Url url;
+        private String body;
+        private String protocol;
+        private Map<String, String> headers= new HashMap<>();
+
+        public ReqeustBuilder(String startline) {
+            String[] split = startline.split(" ");
+            method =  Methods.valueOfMethod(split[0]);
+            url = new Url(split[1]);
+            protocol = split[2];
+        }
+
+        public ReqeustBuilder addHeader(String key, String value){
+            headers.put(key, value);
+            return this;
+        }
+
+        public ReqeustBuilder setBody(String body) {
+            this.body = body;
+            return this;
+        }
+        public HttpRequest build(){
+            return new HttpRequest(this);
+        }
     }
 }
