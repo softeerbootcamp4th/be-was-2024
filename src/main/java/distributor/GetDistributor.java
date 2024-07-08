@@ -20,13 +20,13 @@ public class GetDistributor extends Distributor {
     @Override
     public void process(DataOutputStream dos) throws IOException {
         if (request.isQueryString()) {
-            processQeury(dos);
+            processQuery(dos);
         } else {
             response.response(request.getPath(), dos);
         }
     }
 
-    private void processQeury(DataOutputStream dos) throws IOException {
+    private void processQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
             logicProcessor.createUser(request);
