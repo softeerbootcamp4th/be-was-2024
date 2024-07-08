@@ -1,6 +1,6 @@
-package webserver;
+package enums;
 
-enum TYPE {
+public enum Type {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
     JS("js", "text/javascript"),
@@ -13,7 +13,7 @@ enum TYPE {
     private final String type;
     private final String mime;
 
-    TYPE(String type, String mime) {
+    Type(String type, String mime) {
         this.type = type;
         this.mime = mime;
     }
