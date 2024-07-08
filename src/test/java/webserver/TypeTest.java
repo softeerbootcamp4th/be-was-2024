@@ -1,12 +1,12 @@
 package webserver;
 
-import org.junit.jupiter.api.BeforeEach;
+import handler.ResourceHandler;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
-class TYPETest {
+class TypeTest {
 
     @Test
     @DisplayName("resource handler get mime 테스트")
