@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Request {
     private static final Logger logger = LoggerFactory.getLogger(Request.class);
@@ -13,6 +14,8 @@ public class Request {
     private final String method;
     private final String path;
     private final String queryString;
+    private final String body;
+    private Map<String, String> headers = new HashMap<>();
 
     protected Request(InputStream inputStream) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
@@ -31,7 +34,22 @@ public class Request {
         String line;
         while (!(line = br.readLine()).isEmpty()) {
             logger.debug(line); // 읽어들인 라인 출력
+            int colonIndex = line.indexOf(":");
+            String key = line.substring(0, colonIndex);
+            String value = line.substring(colonIndex + 1);
+            headers.put(key.trim(), value.trim());
         }
+
+        int length = 0;
+        if (headers.containsKey("Content-Length")) {
+            length = Integer.parseInt(headers.get("Content-Length"));
+        }
+        char[] buf = new char[length]; // http body 읽어오기
+        if (length > 0) {
+            br.read(buf);
+            System.out.println(buf);
+        }
+        this.body = new String(buf);
     }
 
     public static Request from(InputStream inputStream) throws IOException {
@@ -68,6 +86,16 @@ public class Request {
 
     public HashMap<String, String> parseQueryString() {
         String[] splitedQeuryString = queryString.split("&");
+        HashMap<String, String> userData = new HashMap<>();
+        for (String s : splitedQeuryString) {
+            String[] fieldData = s.split("=");
+            userData.put(fieldData[0], fieldData[1]);
+        }
+        return userData;
+    }
+
+    public HashMap<String, String> parseBody() {
+        String[] splitedQeuryString = body.split("&");
         HashMap<String, String> userData = new HashMap<>();
         for (String s : splitedQeuryString) {
             String[] fieldData = s.split("=");
