@@ -23,11 +23,11 @@ public class Logic {
             case "/create":
                 return registration(request);
             default:
-                return defaultLogic(request);
+                return serveStaticResource(request);
         }
     }
 
-    private static HttpResponse defaultLogic(HttpRequest request) {
+    private static HttpResponse serveStaticResource(HttpRequest request) {
         HttpResponse response = new HttpResponse();
         File file = new File(staticResourcePath + request.getViewPath());
 
@@ -61,7 +61,7 @@ public class Logic {
 
             return HttpResponse.redirect("/index.html");
         } catch (QueryParameterNotFoundException qe){
-            // /registration/index.html form의 내용은 전부 required 이므로 유저가 임의로 url을 변경하여 접근했을때이다.
+            // /registration/index.html form의 내용은 전부 required 이므로 파라미터를 찾지 못하는건 유저가 임의로 url을 변경하여 접근했을때이다.
             logger.debug(qe.getMessage());
             return HttpResponse.error(HttpStatus.SC_BAD_REQUEST, "Invalid Access");
         }
