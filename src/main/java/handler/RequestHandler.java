@@ -35,12 +35,6 @@ public class RequestHandler implements Runnable {
 
                 Distributor distributor = Distributor.from(request, response);
                 distributor.process(dos);
-
-                // 읽어들인 InputStream 모두 출력
-//                String line;
-//                while (!(line = br.readLine()).isEmpty()) {
-//                    logger.debug(line); // 읽어들인 라인 출력
-//                }
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
