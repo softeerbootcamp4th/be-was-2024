@@ -41,6 +41,10 @@ public class HttpRequest {
         headers.put(key, value);
     }
 
+    public void setBody(String body) {
+        this.body = body;
+    }
+
     public Methods getMethod() {
         return method;
     }

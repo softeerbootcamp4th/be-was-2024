@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.text.ParseException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import webserver.api.ApiFunction;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.PathMap;
+import webserver.http.enums.Methods;
 
 
 /*
@@ -42,7 +44,14 @@ public class RequestHandler implements Runnable {
                 headers = br.readLine();
                 logger.info(headers);
                 String[] parsedline = headers.split(":");
-                if((parsedline.length) ==2) req.addHeader(parsedline[0],parsedline[1]);
+                if((parsedline.length) ==2) req.addHeader(parsedline[0].trim(),parsedline[1].trim());
+            }
+            String contentLength = req.getHeaders().get("Content-Length");
+            if(contentLength != null) {
+                int length = Integer.parseInt(contentLength.trim());
+                char[] body = new char[length];
+                br.read(body, 0,length);
+                req.setBody(new String(body));
             }
             logger.info("////// request header end //////");
 
@@ -53,7 +62,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes(response.getHeader());
             dos.write(response.getBody());
             dos.flush();
-        } catch (IOException e) {
+        } catch (IOException | NumberFormatException e) {
             logger.error(e.getMessage());
         }
     }
