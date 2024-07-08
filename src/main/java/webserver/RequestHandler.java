@@ -2,11 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestObject;
+import util.HttpResponseObject;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -32,9 +32,19 @@ public class RequestHandler implements Runnable {
             while(!line.isEmpty()) {
                 //logger.debug("header: {}", line);
                 line = br.readLine();
+                httpRequestObject.putHeaders(line);
             }
 
-            Map<String, String> responseInfo = frontRequestProcess.handleRequest(httpRequestObject);
+            // Request Body
+            StringBuilder body = new StringBuilder();
+            while(br.ready()) {
+                body.append((char) br.read());
+            }
+            if(!body.isEmpty()) {
+                httpRequestObject.putBody(body.toString());
+            }
+
+            HttpResponseObject responseInfo = frontRequestProcess.handleRequest(httpRequestObject);
             frontRequestProcess.handleResponse(out, responseInfo);
         }  catch (IOException e) {
             logger.error("error: {}", e.getStackTrace());
