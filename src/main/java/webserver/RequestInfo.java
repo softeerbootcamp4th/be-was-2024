@@ -20,7 +20,7 @@ public class RequestInfo {
     }
 
     private static MethodType findMethod(String requestLine) {
-        return MethodType.valueOf(requestLine.split(" ")[0]);
+        return MethodType.valueOf(requestLine.split("\\s+")[0]);
     }
 
     private String findPath(String requestLine) {
