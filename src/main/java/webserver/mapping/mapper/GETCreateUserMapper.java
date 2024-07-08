@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetCreateUserMapper implements HttpMapper {
+public class GETCreateUserMapper implements HttpMapper {
     private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
@@ -18,7 +18,8 @@ public class GetCreateUserMapper implements HttpMapper {
         Map<String, Object> response = new HashMap<>();
         Map<String, String> queryMap = httpRequestParser.parseQuery(path);
 
-        Database.addUser(User.toEntity(queryMap));
+        User newUser = new User(queryMap.get("userId"), queryMap.get("password"), queryMap.get("username"), queryMap.get("email"));
+        Database.addUser(newUser);
 
         response.put("code", 302);
         response.put("location", "/");

@@ -1,8 +1,8 @@
 package webserver.mapping;
 
-import webserver.mapping.mapper.GetCreateUserMapper;
-import webserver.mapping.mapper.GetHomeMapper;
-import webserver.mapping.mapper.GetRegistrationMapper;
+import webserver.mapping.mapper.GETCreateUserMapper;
+import webserver.mapping.mapper.GETHomeMapper;
+import webserver.mapping.mapper.GETRegistrationFormMapper;
 import webserver.mapping.mapper.HttpMapper;
 
 import java.io.IOException;
@@ -23,9 +23,9 @@ public class MappingHandler {
     }
 
     static {
-        getHandlers.put("/", new GetHomeMapper());
-        getHandlers.put("/registration", new GetRegistrationMapper());
-        getHandlers.put("/user/create", new GetCreateUserMapper());
+        getHandlers.put("/", new GETHomeMapper());
+        getHandlers.put("/registration", new GETRegistrationFormMapper());
+        getHandlers.put("/user/create", new GETCreateUserMapper());
 
     }
 

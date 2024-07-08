@@ -18,10 +18,10 @@ public class HttpRequestParserTest {
         String requestFirstLine = "GET " + uri + " HTTP/1.1";
 
         // When
-        String path = httpRequestParser.parseRequestURI(requestFirstLine);
+        String[] path = httpRequestParser.parseRequestFirstLine(requestFirstLine);
 
         // Then
-        assertEquals(uri, path);
+        assertEquals(uri, path[1]);
     }
 
 

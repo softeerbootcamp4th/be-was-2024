@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetRegistrationMapper implements HttpMapper {
+public class GETRegistrationFormMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override

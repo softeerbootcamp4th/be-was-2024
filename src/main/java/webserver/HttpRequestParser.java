@@ -23,12 +23,10 @@ public class HttpRequestParser {
 
     public Map<String, String> parseRequestHeaders(BufferedReader br) throws IOException {
         String line;
-        StringBuilder log = new StringBuilder();
         Map<String, String> headers = new HashMap<>();
 
         // 요청 메시지를 한 줄씩 읽어 StringBuilder 에 추가
         while ((line = br.readLine()) != null && !line.isEmpty()) {
-            log.append(line).append("\n");
             int index = line.indexOf(':');
             if (index > 0) {
                 String headerName = line.substring(0, index).trim();
@@ -37,7 +35,7 @@ public class HttpRequestParser {
             }
         }
 
-        logger.debug("Http Request Header : {} ", log);
+        logger.debug("Http Request Header : {} ", headers);
 
         return headers;
     }

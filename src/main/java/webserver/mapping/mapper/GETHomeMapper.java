@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GetHomeMapper implements HttpMapper {
+public class GETHomeMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override
