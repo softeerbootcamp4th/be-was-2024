@@ -2,22 +2,19 @@ package webserver;
 
 import common.JsonBuilder;
 import db.Database;
+import exception.CannotResolveRequestException;
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import web.HttpMethod;
-import web.HttpRequest;
-import web.HttpResponse;
-import web.ResponseCode;
+import web.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
+/**
+ * 하드코딩이 많음
+ * 모든 key값들을 enum으로 대체할 수는 있으나 일단 더 좋은 방법 생각중
+ */
 public class WebAdapter {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     /**
      * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
@@ -26,8 +23,10 @@ public class WebAdapter {
      */
     public static HttpRequest parseRequest(String request) {
         HttpMethod method;
-        String path;
+        String path, contentType = MIME.UNKNOWN.getType();
         LinkedList<String> accept = new LinkedList<>();
+        int contentLength = 0;
+        StringBuilder body = new StringBuilder();
 
         String[] requestLine = request.split("\n");
 
@@ -38,45 +37,88 @@ public class WebAdapter {
 
         for(int i=1; i<requestLine.length; i++) {
             String[] line_N = requestLine[i].split(":");
-            String key = line_N[0].trim();
-            String value = line_N[1].trim();
+            // body
+            if(line_N.length==1) {
+                body.append(line_N[0]).append("\n");
+            }
+            // header
+            else {
+                String key = line_N[0].trim();
+                String value = line_N[1].trim();
 
-            // Accept헤더 MimeType 설정
-            if(key.equals("Accept")) {
-                String[] acceptLine = value.split(";");
-                String[] mimeType = acceptLine[0].split(",");
-                accept.addAll(Arrays.asList(mimeType));
+                // Accept헤더 MimeType 설정
+                if(key.equals("Accept")) {
+                    String[] acceptLine = value.split(";");
+                    String[] mimeType = acceptLine[0].split(",");
+                    accept.addAll(Arrays.asList(mimeType));
+                } else if(key.equals("Content-Length")) {
+                    contentLength = Integer.parseInt(value);
+                } else if(key.equals("Content-Type")) {
+                    contentType = value;
+                }
             }
         }
 
-        return new HttpRequest().method(method).path(path).accept(accept).build();
+        return new HttpRequest().method(method).path(path).accept(accept).contentLength(contentLength).contentType(contentType).body(body.toString()).build();
     }
 
     public static HttpResponse createResponse(ResponseCode code, String contentType) {
         return new HttpResponse().code(code).contentType(contentType);
     }
 
+    public static String resolveRequestUri(HttpRequest request, OutputStream out) throws IOException {
+        if(request.isGetRequest()) {
+            return resolveGetRequestUri(request.getPath(), out);
+        } else if(request.isPostRequest()) {
+            return resolvePostRequestUri(request.getPath(), request.getBody(), out);
+        }
+
+        throw new CannotResolveRequestException("Cannot Resolve Request Method");
+    }
+
     /**
-     * handle specific requests
+     * POST 요청을 처리
      */
-    public static String resolveRequestUri(String restUri, OutputStream out) throws IOException {
-        // registration
-        if(restUri.split("\\?")[0].equals("/user/create")) {
-            String userId = restUri.split("\\?")[1].split("&")[0].split("=")[1];
-            String nickname = restUri.split("\\?")[1].split("&")[1].split("=")[1];
-            String password = restUri.split("\\?")[1].split("&")[2].split("=")[1];
-            Database.addUser(new User(userId, password, nickname, null));
-            logger.info("User Added - Database.findAll().size() = {}", Database.findAll().size());
+    private static String resolvePostRequestUri(String restUri, String body, OutputStream out) throws IOException {
+        // POST registration
+        if(restUri.split("\\?")[0].equals("/signUp")) {
+            Map<String, String> map = parseBodyInForm(body);
+            Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
             String redirectResponse = "HTTP/1.1 302 Found\r\n" +
                     "Location: /\r\n" +
                     "Content-Length: 0\r\n" +
                     "\r\n";
             out.write(redirectResponse.getBytes());
-            return "/index.html";
         }
-        // get user list
-        else if(restUri.split("\\?")[0].equals("/user/list")) {
+
+        return "/index.html";
+    }
+
+    private static Map<String, String> parseBodyInForm(String body) {
+        HashMap<String, String> map = new HashMap<>();
+        String[] chunks = body.split("&");
+        for (String chunk : chunks) {
+            String key = chunk.split("=")[0];
+            String value = chunk.split("=")[1];
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    /**
+     * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답
+     */
+    private static String resolveGetRequestUri(String restUri, OutputStream out) throws IOException {
+        // GET으로 회원가입 요청시 400 응답
+        if(restUri.split("\\?")[0].equals("/signUp")) {
+            String redirectResponse = "HTTP/1.1 400 Bad Request\r\n" +
+                    "Content-Length: 0\r\n" +
+                    "\r\n";
+            out.write(redirectResponse.getBytes());
+        }
+        // 유저 리스트 찾아서 json으로 반환
+        if(restUri.split("\\?")[0].equals("/user/list")) {
 
             Collection<User> users = Database.findAll();
             String jsonUser = JsonBuilder.buildJsonResponse(users);
@@ -87,25 +129,23 @@ public class WebAdapter {
                     "\r\n" +
                     jsonUser;
             out.write(response.getBytes());
-            return "/index.html";
         }
-        // initialize database
+        // 데이터베이스 쵝화
         else if(restUri.split("\\?")[0].equals("/database/init")) {
             Database.initialize();
 
             String response = "HTTP/1.1 200 OK\r\n";
             out.write(response.getBytes());
-            return "/index.html";
         }
 
-
-        return resolveRequestUri(restUri);
+        // 최종적으로 뷰를 찾아 반환
+        return resolveGetRequestUri(restUri);
     }
 
     /**
-     * map request uri to proper view
+     * GET 요청에 적절한 뷰를 응답해준다
      */
-    private static String resolveRequestUri(String restUri) {
+    private static String resolveGetRequestUri(String restUri) {
 
         return switch(restUri) {
             case "/login" -> "/login/index.html";

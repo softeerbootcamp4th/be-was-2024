@@ -1,6 +1,6 @@
 package common;
 
-import web.ContentType;
+import web.MIME;
 import web.HttpMethod;
 
 /**
@@ -17,24 +17,8 @@ public class WebUtils {
         }
     }
 
-    public static boolean isGetRequest(String method) {
-        try {
-            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.GET);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public static boolean isPostRequest(String method) {
-        try {
-            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.POST);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     public static String getProperContentType(String extension) {
-        return ContentType.findByKey(extension).getType();
+        return MIME.findByKey(extension).getType();
     }
 
     /**

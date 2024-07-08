@@ -33,4 +33,6 @@ public class HttpResponse {
     public String getContentType() {
         return contentType;
     }
+
+    public byte[] get
 }
