@@ -1,6 +1,6 @@
-package webserver;
+package response;
 
-import model.HttpStatus;
+import http.HttpStatus;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,16 +9,16 @@ import java.io.IOException;
 
 public class FileHandler {
 
-    static class ResponseWithStatus {
-        HttpStatus status;
-        byte[] body;
+    public static class ResponseWithStatus {
+        public HttpStatus status;
+        public byte[] body;
         ResponseWithStatus(HttpStatus status, byte[] body){
             this.status = status;
             this.body = body;
         }
     }
 
-    static ResponseWithStatus getFileContent(String path) throws IOException {
+    public static ResponseWithStatus getFileContent(String path) throws IOException {
         try{
 
             StringBuilder file = new StringBuilder();

@@ -1,19 +1,21 @@
-package webserver;
+package request;
 
 import java.io.*;
 import java.net.Socket;
 
-import model.HttpMethod;
-import model.HttpRequest;
+import http.HttpMethod;
+import http.HttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
+    private final RequestParser requestParser;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
+        requestParser = new RequestParser();
     }
 
     public void run() {
@@ -25,16 +27,17 @@ public class RequestHandler implements Runnable {
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
 
+            requestParser.ParsingRequest(in, out);
             // 로그 출력 후 요청 주소 반환
-            HttpRequest httpRequest = requestLogging(br);
-
-            HttpMethod method = httpRequest.method();
-             String url = httpRequest.url();
-
-            switch (method) {
-                case GET -> GetRequestHandler.handler(url, out);
-                default -> throw new RuntimeException();
-            }
+//            HttpRequest httpRequest = requestLogging(br);
+//
+//            HttpMethod method = httpRequest.method();
+//            String url = httpRequest.url();
+//
+//            switch (method) {
+//                case GET -> GetRequestHandler.handler(url, out);
+//                default -> throw new RuntimeException();
+//            }
 
         } catch (IOException e) {
             logger.error(e.getMessage());

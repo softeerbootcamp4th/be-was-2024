@@ -1,32 +1,52 @@
-package webserver;
+package request;
 
+import response.ResponseFactory;
 import db.Database;
-import model.HttpStatus;
+import http.HttpStatus;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Properties;
 
-import static webserver.FileHandler.*;
-import static webserver.ResponseFactory.response200Header;
-import static webserver.ResponseFactory.response404Header;
+import static response.FileHandler.*;
+import static response.ResponseFactory.response200Header;
+import static response.ResponseFactory.response404Header;
 
 public class GetRequestHandler {
-    private final static String staticPath = "./src/main/resources/static";
+    private static final Logger log = LoggerFactory.getLogger(GetRequestHandler.class);
+    static Properties properties = new Properties();
+    private static String staticPath;
 
     public static void handler(String url, OutputStream out) throws IOException {
+
+        try (InputStream input = GetRequestHandler.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) {
+                log.error("Unable to find config.properties");
+            }
+            properties.load(input);
+            staticPath = properties.getProperty("staticPath");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
         String[] splitUrl = url.split("\\?");
         String requestURL = splitUrl[0];
 
         switch (requestURL) {
             case "/", "/registration", "/login" -> sendResponse(staticPath + requestURL + "/index.html", out);
-            case "/user/create" -> createUser(splitUrl[1], out);
+
             default -> sendResponse(staticPath + requestURL, out);
         }
     }
 
-    private static void createUser(String param, OutputStream out){
+    private static void createUser(String param, OutputStream out) {
         String[] params = param.split("&");
 
         String userId = params[0].split("=")[1];
@@ -64,7 +84,7 @@ public class GetRequestHandler {
         HttpStatus status = response.status;
         byte[] body = response.body;
 
-        switch (status){
+        switch (status) {
             case OK -> response200Header(dos, body.length, getContentType(type));
             case NOT_FOUND -> response404Header(dos, body.length);
         }
