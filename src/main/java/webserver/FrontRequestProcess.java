@@ -10,8 +10,6 @@ import util.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FrontRequestProcess {
 
@@ -30,80 +28,63 @@ public class FrontRequestProcess {
         private static final FrontRequestProcess INSTANCE = new FrontRequestProcess();
     }
 
-    public Map<String, String> handleRequest(HttpRequestObject httpRequestObject) {
-        String path = httpRequestObject.getRequestPath();
-        String method = httpRequestObject.getRequestMethod();
-        // TODO: 추후 기능 확장 시 관심사별로 분리 필요
-        Map<String, String> responseInfo = new HashMap<>();
-        switch (HttpRequestMapper.of(path, method)) {
-            case USER_SIGNUP:
-                userHandler.create(httpRequestObject.getRequestParams());
-                responseInfo.put("type", "dynamic");
-                responseInfo.put("path", "/index.html");
-                responseInfo.put("statusCode", "302");
-                break;
-            case REGISTER:
-                responseInfo.put("type", "dynamic");
-                responseInfo.put("path", "/registration");
-                responseInfo.put("statusCode", "302");
-                break;
-            default:
-                responseInfo.put("type", "static");
-                responseInfo.put("path", path);
-                responseInfo.put("statusCode", "200");
-                break;
-        }
-        return responseInfo;
+    public HttpResponseObject handleRequest(HttpRequestObject request) {
+        String path = request.getRequestPath();
+        String method = request.getRequestMethod();
+        return switch (HttpRequestMapper.of(path, method)) {
+            case USER_SIGNUP -> {
+                userHandler.create(request.getRequestBody());
+                yield new HttpResponseObject(StringUtil.DYNAMIC, "/index.html", HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
+            }
+            case REGISTER -> new HttpResponseObject(StringUtil.DYNAMIC, "/registration", HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
+            case MESSAGE_NOT_ALLOWED -> new HttpResponseObject(StringUtil.FAULT, "/405.html", HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion(), null);
+            default -> new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion(), null);
+        };
     }
 
-    public void handleResponse(OutputStream out, Map<String, String> responseInfo) throws IOException {
+    public void handleResponse(OutputStream out, HttpResponseObject response) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
-        if (responseInfo.get("type").equals("static")) {
-            staticResponse(dos, responseInfo.get("path"));
+
+        if (response.getType().equals(StringUtil.STATIC)) {
+            staticResponse(dos, response.getPath());
             return;
         }
+        sendHeader(dos, response);
+        sendBody(dos, response.getBodyToByte());
+    }
 
-        switch(responseInfo.get("statusCode")) {
-            case "302":
-                response302Header(dos, responseInfo.get("path"));
+    private void sendHeader(DataOutputStream dos, HttpResponseObject response) throws IOException{
+        String path = response.getPath();
+        switch(HttpCode.of(response.getStatusCode())){
+            case OK:
+                response.addHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.DOT)[1] : String.valueOf(ContentType.HTML)));
+                response.addHeader("Content-Length", response.getBodyToByte().length + "");
+                break;
+            case FOUND:
+                response.addHeader("Location", path);
+                break;
+            case METHOD_NOT_ALLOWED:
                 break;
             default:
                 break;
         }
+        dos.writeBytes(response.getTotalHeaders());
+    }
+
+    private void sendBody(DataOutputStream dos, byte[] body) throws IOException{
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
         byte[] body = IOUtil.readBytesFromFile(IOUtil.STATIC_PATH + path);
         boolean isDir = IOUtil.isDirectory(IOUtil.STATIC_PATH + path);
-        response200Header(dos, body.length, isDir ? "html" : path.split("\\.")[1]);
-        responseBody(dos, body);
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extension) {
+        String extension = isDir ? ContentType.HTML.getExtension() : path.split(StringUtil.DOT)[1];
         try {
-            logger.debug("200 OK 응답을 보냅니다.");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + ContentType.getType(extension) + "\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String location) {
-        try {
-            logger.debug("302 리다이렉트 발생하여 {}로 이동합니다.", location);
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
+            dos.writeBytes("HTTP/1.1 200 OK " + StringUtil.CRLF);
+            dos.writeBytes("Content-Type: " + ContentType.getType(extension) + StringUtil.CRLF);
+            dos.writeBytes("Content-Length: " + body.length + StringUtil.CRLF);
+            dos.writeBytes(StringUtil.CRLF);
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
