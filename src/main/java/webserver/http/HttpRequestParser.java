@@ -15,6 +15,8 @@ import java.util.Map;
 public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
     private static final HttpRequestParser instance = new HttpRequestParser();
+    
+    public static final String CONTENT_LENGTH = "Content-Length";
 
     private HttpRequestParser() {
     }
@@ -59,8 +61,8 @@ public class HttpRequestParser {
 
 //         Read the request body
         char[] requestBody = null;
-        if (requestHeaders.containsKey("Content-Length")) {
-            int contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
+        if (requestHeaders.containsKey(CONTENT_LENGTH)) {
+            int contentLength = Integer.parseInt(requestHeaders.get(CONTENT_LENGTH));
             requestBody = new char[contentLength];
             br.read(requestBody, 0, contentLength);
         }

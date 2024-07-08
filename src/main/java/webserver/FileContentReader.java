@@ -10,6 +10,9 @@ import java.util.HashMap;
 public class FileContentReader {
     private static final FileContentReader instance = new FileContentReader();
 
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String CONTENT_TYPE = "Content-Type";
+
     private FileContentReader() {
     }
 
@@ -49,8 +52,8 @@ public class FileContentReader {
 
             return new MyHttpResponse(200, "OK", new HashMap<>() {
                 {
-                    put("Content-Type", contentType);
-                    put("Content-Length", String.valueOf(byteArray.length));
+                    put(CONTENT_TYPE, contentType);
+                    put(CONTENT_LENGTH, String.valueOf(byteArray.length));
                 }
             }, byteArray);
 
@@ -63,20 +66,5 @@ public class FileContentReader {
                 }
             }
         }
-
-
-//        StringBuilder contentBuilder = new StringBuilder();
-//        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                contentBuilder.append(line).append("\n");
-//            }
-//        } catch (IOException e) {
-//            System.err.println("Error reading file: " + path);
-//            e.printStackTrace();
-//            return null;
-//        }
-
-//        return contentBuilder.toString().getBytes();
     }
 }
