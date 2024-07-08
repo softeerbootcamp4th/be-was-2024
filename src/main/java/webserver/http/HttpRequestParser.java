@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -21,7 +23,9 @@ public class HttpRequestParser {
         return instance;
     }
 
-    public MyHttpRequest parseRequest(BufferedReader br) throws IOException {
+    public MyHttpRequest parseRequest(InputStream in) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+
         // Read the request line
         String requestLine = br.readLine();
         if (requestLine == null) {
@@ -53,7 +57,7 @@ public class HttpRequestParser {
             }
         }
 
-        // Read the request body
+//         Read the request body
         char[] requestBody = null;
         if (requestHeaders.containsKey("Content-Length")) {
             int contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
@@ -77,12 +81,12 @@ public class HttpRequestParser {
         }
     }
 
-    public Map<String, String> parseQuery(Map<String, String> queries, String path) {
-        String[] query = path.split("&");
-        for (String q : query) {
-            String[] keyValue = q.split("=");
-            String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-            String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
+    public Map<String, String> parseQuery(Map<String, String> queries, String query) {
+        String[] keyValues = query.split("&");
+        for (String keyValue : keyValues) {
+            String[] keyAndValue = keyValue.split("=");
+            String key = URLDecoder.decode(keyAndValue[0], StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(keyAndValue[1], StandardCharsets.UTF_8);
             queries.put(key, value);
         }
 

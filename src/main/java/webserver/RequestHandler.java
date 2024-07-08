@@ -6,7 +6,10 @@ import webserver.http.HttpRequestParser;
 import webserver.http.HttpResponseParser;
 import webserver.http.MyHttpRequest;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class RequestHandler implements Runnable {
@@ -27,8 +30,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // Request
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            MyHttpRequest httpRequest = httpRequestParser.parseRequest(br);
+            MyHttpRequest httpRequest = httpRequestParser.parseRequest(in);
             logger.debug("httpRequest : {}", httpRequest);
 
             // Response

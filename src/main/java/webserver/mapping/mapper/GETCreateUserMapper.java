@@ -8,6 +8,7 @@ import webserver.http.MyHttpResponse;
 import java.io.IOException;
 import java.util.Map;
 
+@Deprecated
 public class GETCreateUserMapper implements HttpMapper {
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {

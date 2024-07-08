@@ -23,24 +23,24 @@
     </header>
     <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form class="form" id="registration-form" action="/user/create" method="GET">
+        <form class="form" id="registration-form" action="/user/create" method="POST">
             <div class="textfield textfield_size_s">
                 <p class="title_textfield">아이디</p>
                 <input
                         class="input_textfield"
-                        name="username"
+                        name="userId"
                         placeholder="아이디를 입력해주세요"
-                        autocomplete="username"
+                        autocomplete="userId"
                         required
                 />
             </div>
             <div class="textfield textfield_size_s">
-                <p class="title_textfield">닉네임</p>
+                <p class="title_textfield">이름</p>
                 <input
                         class="input_textfield"
-                        name="nickname"
-                        placeholder="닉네임을 입력해주세요"
-                        autocomplete="nickname"
+                        name="name"
+                        placeholder="이름을 입력해주세요"
+                        autocomplete="name"
                         required
                 />
             </div>

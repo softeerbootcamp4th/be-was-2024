@@ -2,10 +2,10 @@ package webserver.mapping;
 
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
-import webserver.mapping.mapper.GETCreateUserMapper;
 import webserver.mapping.mapper.GETHomeMapper;
 import webserver.mapping.mapper.GETRegistrationFormMapper;
 import webserver.mapping.mapper.HttpMapper;
+import webserver.mapping.mapper.POSTCreateUserMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -27,8 +27,9 @@ public class MappingHandler {
     static {
         getHandlers.put("/", new GETHomeMapper());
         getHandlers.put("/registration", new GETRegistrationFormMapper());
-        getHandlers.put("/user/create", new GETCreateUserMapper());
+//        getHandlers.put("/user/create", new GETCreateUserMapper());
 
+        postHandlers.put("/user/create", new POSTCreateUserMapper());
     }
 
     public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
