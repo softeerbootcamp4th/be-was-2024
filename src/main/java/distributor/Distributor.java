@@ -12,12 +12,11 @@ public class Distributor {
         if (method.equals("GET")) {
             return new GetDistributor(request, response);
         } else if (method.equals("POST")) {
-            // return new PostDistributor(request, response);
+            return new PostDistributor(request, response);
         }
         return null;
     }
 
     public void process(DataOutputStream dos) throws IOException {
-
     }
 }
