@@ -1,5 +1,7 @@
 package webserver.mapping;
 
+import webserver.http.MyHttpRequest;
+import webserver.http.MyHttpResponse;
 import webserver.mapping.mapper.GETCreateUserMapper;
 import webserver.mapping.mapper.GETHomeMapper;
 import webserver.mapping.mapper.GETRegistrationFormMapper;
@@ -29,17 +31,13 @@ public class MappingHandler {
 
     }
 
-    public Map<String, Object> mapping(String method, String path) throws IOException {
-        int indexOfQuery = path.indexOf('?');
-
-        String mappingPath = path;
-        if (indexOfQuery != -1) {
-            mappingPath = path.substring(0, indexOfQuery);
-        }
+    public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
+        String method = httpRequest.getMethod();
+        String path = httpRequest.getPath();
 
         return switch (method) {
-            case "GET" -> getHandlers.get(mappingPath).handle(path);
-            case "POST" -> postHandlers.get(mappingPath).handle(path);
+            case "GET" -> getHandlers.get(path).handle(httpRequest);
+            case "POST" -> postHandlers.get(path).handle(httpRequest);
             default -> null;
         };
     }

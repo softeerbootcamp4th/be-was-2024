@@ -1,8 +1,10 @@
 package webserver.mapping.mapper;
 
+import webserver.http.MyHttpRequest;
+import webserver.http.MyHttpResponse;
+
 import java.io.IOException;
-import java.util.Map;
 
 public interface HttpMapper {
-    Map<String, Object> handle(String path) throws IOException;
+    MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException;
 }

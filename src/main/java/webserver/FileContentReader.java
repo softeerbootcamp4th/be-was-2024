@@ -1,8 +1,11 @@
 package webserver;
 
+import webserver.http.MyHttpResponse;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class FileContentReader {
     private static final FileContentReader instance = new FileContentReader();
@@ -14,21 +17,21 @@ public class FileContentReader {
         return instance;
     }
 
-    public byte[] readStaticResource(String uri) throws IOException {
+    public boolean isStaticResource(String uri) {
+        String path = "src/main/resources/static";
+        File file = new File(path + uri);
+        return file.exists() && file.isFile();
+    }
+
+    public MyHttpResponse readStaticResource(String uri) throws IOException {
         String path = "src/main/resources/static";
         File file = new File(path + uri);
 
-        // Not Found
-        if (!file.exists() || !file.isFile()) {
-            return null;
-        }
-
         FileInputStream fis = null;
-        byte[] byteArray = null;
 
         try {
             fis = new FileInputStream(file);
-            byteArray = new byte[(int) file.length()];
+            byte[] byteArray = new byte[(int) file.length()];
 
             int bytesRead = 0;
             int offset = 0;
@@ -40,6 +43,17 @@ public class FileContentReader {
             if (offset < byteArray.length) {
                 throw new IOException("Could not completely read the file " + file.getName());
             }
+
+            String extension = uri.substring(uri.lastIndexOf(".") + 1);
+            String contentType = ContentType.valueOf(extension).getContentType();
+
+            return new MyHttpResponse(200, "OK", new HashMap<>() {
+                {
+                    put("Content-Type", contentType);
+                    put("Content-Length", String.valueOf(byteArray.length));
+                }
+            }, byteArray);
+
         } finally {
             if (fis != null) {
                 try {
@@ -50,7 +64,6 @@ public class FileContentReader {
             }
         }
 
-        return byteArray;
 
 //        StringBuilder contentBuilder = new StringBuilder();
 //        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
