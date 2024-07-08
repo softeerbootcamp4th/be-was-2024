@@ -17,14 +17,8 @@ public class RequestParser {
         String firstLine = bufferedReader.readLine();
         String[] request = firstLine.split(" ");
 
-        HttpMethod method = switch (request[0]) {
-            case "GET" -> HttpMethod.GET;
-            case "POST" -> HttpMethod.POST;
-            case "PUT" -> HttpMethod.PUT;
-            case "PATCH" -> HttpMethod.PATCH;
-            case "DELETE" -> HttpMethod.DELETE;
-            default -> throw new IllegalStateException("Unexpected value: " + request[0]);
-        };
+        HttpMethod method = HttpMethod.getMethod(request[0]);
+
         String requestUrl = request[1];
         HashMap<String, String> header = new HashMap<>();
 
