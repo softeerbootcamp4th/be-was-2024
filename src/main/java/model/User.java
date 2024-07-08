@@ -31,17 +31,13 @@ public class User {
     }
 
     public static Map<String, String> extractUserInfoFromUrl(String urlPath) {
-        int parameterIndex = urlPath.indexOf("?");
-        if (parameterIndex != -1) {
-            String[] params = urlPath.substring(parameterIndex + 1).split("&");
-            Map<String, String> userInfo = new HashMap<>();
-            for (String param : params) {
-                String[] keyValue = param.split("=");
-                userInfo.put(keyValue[0], keyValue[1]);
-            }
-            return userInfo;
+        String[] params = urlPath.split("&");
+        Map<String, String> userInfo = new HashMap<>();
+        for (String param : params) {
+            String[] keyValue = param.split("=");
+            userInfo.put(keyValue[0], keyValue[1]);
         }
-        return null;
+        return userInfo;
     }
 
     public String getUserId() {

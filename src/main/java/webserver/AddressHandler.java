@@ -10,12 +10,18 @@ public class AddressHandler {
 
     private static final String staticResourceDir = System.getProperty("staticResourceDir");
 
-    public static String getFilePath(String urlPath, DataOutputStream dos) throws IOException {
+    public static String getFilePath(HttpRequestParser requestParser, DataOutputStream dos) throws IOException {
+
+        String method = requestParser.getMethod();
+        String urlPath = requestParser.getUrl();
+        byte[] body = requestParser.getBody();
         String filePath = staticResourceDir + urlPath;
+        System.out.println(filePath);
         if (urlPath.equals("/registration")) {
             filePath = staticResourceDir + "/registration/index.html";
         } else if (urlPath.startsWith("/user/create")) {
-            handleUserCreation(urlPath);
+            System.out.println(new String(body, "UTF-8"));
+            handleUserCreation(new String(body, "UTF-8"));
             redirectPath("/index.html", dos);
         }
         return filePath;
