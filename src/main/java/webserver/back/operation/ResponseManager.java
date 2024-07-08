@@ -2,10 +2,8 @@ package webserver.back.operation;
 
 import webserver.back.data.RequestInformation;
 import webserver.back.data.SignInForm;
-import webserver.back.fileFounder.FileFounder;
 import webserver.back.fileFounder.StaticFileFounder;
 import webserver.back.byteReader.ByteReader;
-import webserver.back.returnType.ContentTypeMaker;
 import webserver.front.data.HttpResponse;
 
 import java.io.FileNotFoundException;
@@ -18,34 +16,38 @@ public class ResponseManager {
         uriParser = new URIParser();
     }
     public HttpResponse getResponse(String originalUrl)  {
+        ResponseDataMaker responseDataMaker = new ResponseDataMaker();
         String message = "";
         ByteReader byteReader = null;
         try{
-            String changedUrl;
+            String changedPath;
             RequestInformation requestInformation = uriParser.getParsedUrl(originalUrl);
-            if (requestInformation.getPath()[1].equals("registration")) {
-                changedUrl = "registration/index.html";
-                byteReader = new StaticFileFounder().findFile(changedUrl);
+            String path = requestInformation.getPath()[1];
+            if (path.equals("registration")) {
+                changedPath = "registration/index.html";
+                byteReader = new StaticFileFounder().findFile(changedPath);
                 message ="OK";
+                return responseDataMaker.makeHttpResponse(byteReader,message);
             }
-            else if (requestInformation.getPath()[1].equals("create")) {
+            if (path.equals("create")) {
                 SignInForm signInForm = new SignInForm(requestInformation.getInformation());
                 byteReader= userMapper.addUser(signInForm);
-                message ="OK";
+                message ="FOUND";
+                String location ="/index.html";
+                return responseDataMaker.makeHttpResponse(byteReader,message,location);
             }
-            else{
-                byteReader = new StaticFileFounder().findFile(originalUrl);
+            if(path.equals("index.html")){
+                byteReader = new StaticFileFounder().findFile(path);
                 message ="OK";
+                return responseDataMaker.makeHttpResponse(byteReader,message);
             }
-        }
-        catch (FileNotFoundException e){
-            message = "NOT_FOUND";
+            message ="NOT_FOUND";
+            return responseDataMaker.makeHttpResponse(byteReader,message);
         }
         catch (Exception e){
             message = "ERROR";
+            return responseDataMaker.makeHttpResponse(byteReader,message);
         }
-        ResponseDataMaker responseDataMaker = new ResponseDataMaker(byteReader, message);
-        return responseDataMaker.getHttpResponse();
     }
 }
 

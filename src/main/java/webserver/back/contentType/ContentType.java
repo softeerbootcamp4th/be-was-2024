@@ -1,4 +1,4 @@
-package webserver.back.returnType;
+package webserver.back.contentType;
 
 import java.util.stream.Stream;
 

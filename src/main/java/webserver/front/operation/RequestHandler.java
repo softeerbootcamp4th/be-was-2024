@@ -6,12 +6,10 @@ import java.net.Socket;
 import webserver.back.operation.UserMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.back.returnType.ContentTypeMaker;
 import webserver.front.data.HttpRequest;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final ContentTypeMaker contentTypeMaker = new ContentTypeMaker();
     private final RequestParser requestParser;
 
     private Socket connection;

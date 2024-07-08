@@ -1,7 +1,6 @@
-package webserver.back.returnType;
+package webserver.back.contentType;
 public class ContentTypeMaker {
     public static String getContentType(String extension) {
-        System.out.println(BaseContentType.getBaseContentType(extension)+"/"+ContentType.getContentType(extension));
         return BaseContentType.getBaseContentType(extension)+"/"+ContentType.getContentType(extension);
     }
 }

@@ -3,7 +3,8 @@ package webserver.back.data;
 public enum StatusCode {
     OK("OK","200"),
     NOT_FOUND("NOT_FOUND","404"),
-    ERROR("ERROR","500");
+    ERROR("ERROR","500"),
+    FOUND("FOUND","302");
     private String code;
     private String message;
     StatusCode(String message,String code) {

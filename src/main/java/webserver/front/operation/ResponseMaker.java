@@ -9,6 +9,8 @@ import webserver.front.data.HttpResponse;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
+
 public class ResponseMaker {
 
     private final Logger logger = LoggerFactory.getLogger(ResponseMaker.class);

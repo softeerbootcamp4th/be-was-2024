@@ -7,6 +7,7 @@ import webserver.front.data.HttpResponse;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 public class ResponseWriter {
     private final Logger logger = LoggerFactory.getLogger(ResponseWriter.class);
@@ -15,14 +16,16 @@ public class ResponseWriter {
         byte[] data = httpResponse.body;
         responseHeader(dos, httpResponse);
         responseBody(dos,data);
+
     }
     private void responseHeader(DataOutputStream dos, HttpResponse httpResponse) {
         try {
+
             dos.writeBytes("HTTP/"+httpResponse.getHttpVersion()+" "+
                             httpResponse.getStatusCode()+" "+
                             httpResponse.getStatusText()+" \r\n");
-            dos.writeBytes("Content-Type: "+httpResponse.contentType+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + httpResponse.contentLength + "\r\n");
+            dos.writeBytes("Content-Type: "+httpResponse.getContentType()+"; charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + httpResponse.getContentLength() + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -38,3 +41,4 @@ public class ResponseWriter {
         }
     }
 }
+

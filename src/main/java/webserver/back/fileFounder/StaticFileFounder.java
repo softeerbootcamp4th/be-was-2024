@@ -2,7 +2,7 @@ package webserver.back.fileFounder;
 
 import webserver.back.byteReader.ByteReader;
 import webserver.back.byteReader.StaticFileReader;
-import webserver.back.returnType.ContentTypeMaker;
+import webserver.back.contentType.ContentTypeMaker;
 
 import java.io.FileNotFoundException;
 
