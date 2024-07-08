@@ -1,5 +1,7 @@
 package model;
 
+import db.Database;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -17,7 +19,7 @@ public class User {
         this.email = email;
     }
 
-    public static User createUser(String urlPath) {
+    public static void createUser(String urlPath) {
         Map<String, String> userInfo = extractUserInfoFromUrl(urlPath);
         String userId = userInfo.get("userId");
         String password = userInfo.get("password");
@@ -25,9 +27,8 @@ public class User {
         String email = userInfo.get("email");
 
         if (userId != null && password != null && name != null && email != null) {
-            return new User(userId, password, name, email);
+            Database.addUser(new User(userId, password, name, email));
         }
-        return null;
     }
 
     public static Map<String, String> extractUserInfoFromUrl(String urlPath) {

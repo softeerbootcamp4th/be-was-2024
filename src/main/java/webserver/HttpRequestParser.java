@@ -17,55 +17,54 @@ public class HttpRequestParser {
         headers = new HashMap<>();
     }
 
-    public void parse(InputStream inputStream) throws IOException {
+    public HttpRequest parse(InputStream inputStream) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+
+        // Read request line
         String line = br.readLine();
-
         if (line == null || line.isEmpty()) {
-            return;
+            return null;
         }
-
-        String[] requestLine = line.trim().split("\\s+");
-        method = requestLine[0]; // e.g., "GET" or "POST"
-        url = requestLine[1];
+        parseRequestLine(line);
 
         // Parse headers
         while ((line = br.readLine()) != null && !line.isEmpty()) {
-            int colonIndex = line.indexOf(':');
-            if (colonIndex != -1) {
-                String headerName = line.substring(0, colonIndex).trim();
-                String headerValue = line.substring(colonIndex + 1).trim();
-                headers.put(headerName, headerValue);
-            }
+            parseHeaderLine(line);
         }
 
+        // Parse body if Content-Length header is present
         if (headers.containsKey("Content-Length")) {
             int contentLength = Integer.parseInt(headers.get("Content-Length"));
-            char[] buffer = new char[contentLength];
-            int bytesRead = 0;
-            int totalRead = 0;
+            parseBody(br, contentLength);
+        }
 
-            while (totalRead < contentLength && (bytesRead = br.read(buffer, totalRead, contentLength - totalRead)) != -1) {
-                totalRead += bytesRead;
-            }
+        return new HttpRequest(method, url, headers, body);
+    }
 
-            body = new String(buffer, 0, totalRead).getBytes("UTF-8");
+    private void parseRequestLine(String requestLine) {
+        String[] parts = requestLine.trim().split("\\s+");
+        method = parts[0];
+        url = parts[1];
+    }
+
+    private void parseHeaderLine(String headerLine) {
+        int colonIndex = headerLine.indexOf(':');
+        if (colonIndex != -1) {
+            String headerName = headerLine.substring(0, colonIndex).trim();
+            String headerValue = headerLine.substring(colonIndex + 1).trim();
+            headers.put(headerName, headerValue);
         }
     }
 
-    public String getMethod() {
-        return method;
-    }
+    private void parseBody(BufferedReader br, int contentLength) throws IOException {
+        char[] buffer = new char[contentLength];
+        int bytesRead = 0;
+        int totalRead = 0;
 
-    public String getUrl() {
-        return url;
-    }
+        while (totalRead < contentLength && (bytesRead = br.read(buffer, totalRead, contentLength - totalRead)) != -1) {
+            totalRead += bytesRead;
+        }
 
-    public Map<String, String> getHeaders() {
-        return headers;
-    }
-
-    public byte[] getBody() {
-        return body;
+        body = new String(buffer, 0, totalRead).getBytes("UTF-8");
     }
 }

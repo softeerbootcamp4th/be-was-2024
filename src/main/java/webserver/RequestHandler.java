@@ -4,8 +4,6 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Map;
 
-import db.Database;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +16,7 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
+    @Override
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
@@ -25,34 +24,28 @@ public class RequestHandler implements Runnable {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
             HttpRequestParser requestParser = new HttpRequestParser();
-            requestParser.parse(in);
+            HttpRequest httpRequest = requestParser.parse(in);
 
-            String method = requestParser.getMethod();
-            String url = requestParser.getUrl();
-            Map<String, String> headers = requestParser.getHeaders();
-            byte[] body = requestParser.getBody();
-
-            logger.debug("request line : {} {}", method, url);
+            logger.debug("request line : {} {}", httpRequest.getMethod(), httpRequest.getUrl());
 
             // Use headers as needed
-            headers.forEach((key, value) -> logger.debug("header : {}={}", key, value));
+            for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
+                logger.debug("header : {}={}", entry.getKey(), entry.getValue());
+            }
 
             // Handle body if present
+            byte[] body = httpRequest.getBody();
             if (body != null && body.length > 0) {
                 logger.debug("body : {}", new String(body, "UTF-8"));
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            String filePath = AddressHandler.getFilePath(requestParser, dos);
+            String filePath = AddressHandler.getFilePath(httpRequest, dos);
 
             File file = new File(filePath);
             if (!file.exists()) {
                 response404Header(dos);
                 return;
-            }
-
-            for(User u :Database.findAll()){
-                System.out.println(u);
             }
 
             byte[] fileBody = FileHandler.readFileToByteArray(file);
