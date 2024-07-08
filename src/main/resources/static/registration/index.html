@@ -6,14 +6,6 @@
     <link href="../reset.css" rel="stylesheet"/>
     <link href="../global.css" rel="stylesheet"/>
     <script>
-        function sendRequest() {
-            const form = document.getElementById('dataForm');
-
-            const url = new URL('/user/create', window.location.origin);
-            const params = new URLSearchParams(new FormData(form));
-
-            window.location.href = url + '?' + params.toString();
-        }
     </script>
 </head>
 <body>
@@ -33,7 +25,7 @@
     </header>
     <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form class="form" id="dataForm">
+        <form class="form" id="dataForm" action="/user/create" method="POST">
             <div class="textfield textfield_size_s">
                 <p class="title_textfield">아이디</p>
                 <label for="userId"></label>
@@ -73,7 +65,6 @@
                 <label for="email"></label>
                 <input
                         class="input_textfield"
-                        type="email"
                         placeholder="이메일을 입력해주세요"
                         autocomplete="email"
                         id="email"
@@ -84,8 +75,7 @@
                     id="registration-btn"
                     class="btn btn_contained btn_size_m"
                     style="margin-top: 24px"
-                    type="button"
-                    onclick="sendRequest()"
+                    type="submit"
             >
                 회원가입
             </button>

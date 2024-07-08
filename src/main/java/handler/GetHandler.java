@@ -38,7 +38,7 @@ public class GetHandler {
         String requestURL = splitUrl[0];
 
         switch (requestURL) {
-            case "/", "/registration", "/login" -> sendResponse(staticPath + requestURL + "index.html", out);
+            case "/", "/registration", "/login" -> sendResponse(staticPath + requestURL + "/index.html", out);
             default -> sendResponse(staticPath + requestURL, out);
         }
     }
