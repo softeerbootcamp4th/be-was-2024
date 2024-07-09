@@ -27,7 +27,7 @@ public class SignInHandler implements IRouteHandler {
 
         User user = Database.findUserById(userId);
         // 유저가 없거나, 비밀번호가 일치하지 않는 경우
-        if(user == null || !password.equals(user.getPassword())) {
+        if(user == null || !user.getPassword().equals(password)) {
             res.setStatusInfo(HttpStatusType.UNAUTHORIZED);
             try {
                 byte[] html = FileReadUtil.read("/login/index.html");
