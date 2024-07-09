@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import webserver.http.HttpRequestParser;
 import webserver.http.HttpResponseParser;
 import webserver.http.MyHttpRequest;
+import webserver.mapping.MappingHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -17,8 +18,10 @@ public class RequestHandler implements Runnable {
 
     private final Socket connection;
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
+    private final MappingHandler mappingHandler = MappingHandler.getInstance();
     private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
-    private final HttpResponseParser httpResponseParser = HttpResponseParser.getInstance();
+    
+    private final HttpResponseParser httpResponseParser = new HttpResponseParser(fileContentReader, mappingHandler);
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;

@@ -10,16 +10,13 @@ import java.io.IOException;
 
 public class HttpResponseParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseParser.class);
-    private final FileContentReader fileContentReader = FileContentReader.getInstance();
-    private final MappingHandler mappingHandler = MappingHandler.getInstance();
 
-    private static final HttpResponseParser instance = new HttpResponseParser();
+    private final FileContentReader fileContentReader;
+    private final MappingHandler mappingHandler;
 
-    private HttpResponseParser() {
-    }
-
-    public static HttpResponseParser getInstance() {
-        return instance;
+    public HttpResponseParser(FileContentReader fileContentReader, MappingHandler mappingHandler) {
+        this.fileContentReader = fileContentReader;
+        this.mappingHandler = mappingHandler;
     }
 
 
