@@ -24,9 +24,9 @@ public class MyHttpRequest {
      * message-body
      * <p>
      */
-    private final char[] body;
+    private final byte[] body;
 
-    public MyHttpRequest(String method, String path, Map<String, String> query, String version, Map<String, String> headers, char[] body) {
+    public MyHttpRequest(String method, String path, Map<String, String> query, String version, Map<String, String> headers, byte[] body) {
         this.method = method;
         this.path = path;
         this.query = query;
@@ -55,7 +55,7 @@ public class MyHttpRequest {
         return headers;
     }
 
-    public char[] getBody() {
+    public byte[] getBody() {
         return body;
     }
 
