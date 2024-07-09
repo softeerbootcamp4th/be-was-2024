@@ -76,18 +76,24 @@ public class HandlerManager {
 
         // 정적 파일 요청인 경우
         if(httpRequest.getExtensionType().isPresent()){
-            return (dos, queryParams) -> {
-                handleStaticResource(dos, httpRequest.getPath().orElseThrow(
-                        () -> new IllegalArgumentException("An invalid Http request was received"))
-                        , httpRequest.getExtensionType().get());
+            return (dos, _httpRequest) -> {
+                handleStaticResource(dos, _httpRequest.getPath().orElseThrow(
+                        () -> new InvalidHttpRequestException("uri path is empty"))
+                        , _httpRequest.getExtensionType().get());
             };
         }
         // API 요청인 경우
         else{
             HttpMethod httpMethod = httpRequest.getHttpMethod();
             String path = httpRequest.getPath().orElseThrow(
-                    () -> new IllegalArgumentException("An invalid Http request was received"));
-            return handlers[httpMethod.getHandlerMapIdx()].get(path);
+                    () -> new InvalidHttpRequestException("uri path is empty"));
+            Handler handler = handlers.get(httpMethod.getHandlerMapIdx()).get(path);
+
+            // HttpRequest를 처리할 handler가 없을 경우, 예외 발생
+            if(handler == null)
+                throw new InvalidHttpRequestException("handler not found");
+
+            return handler;
         }
     }
 
