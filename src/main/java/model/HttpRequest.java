@@ -1,6 +1,8 @@
 package model;
 
 import db.Database;
+import model.HttpResponse;
+import model.User;
 import model.enums.HttpStatus;
 import util.FileMapper;
 
@@ -11,23 +13,27 @@ import java.io.*;
 import java.util.Map;
 
 public class HttpRequest {
-    private String httpMethod;
-    private String path;
-    private String protocolVersion;
-    private Map<String, String> headers;
+    private final String httpMethod;
+    private final String path;
+    private final String protocolVersion;
+    private final Map<String, String> headers;
+    private final List<Character> bodys;
 
-    private HttpRequest(String httpMethod, String path, String protocolVersion, Map<String, String> headers) {
+    private HttpRequest(String httpMethod, String path, String protocolVersion, Map<String, String> headers, List<Character> bodys) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.protocolVersion = protocolVersion;
         this.headers = headers;
+        this.bodys = bodys;
     }
 
+    public static HttpRequest of(String httpMethod, String path, String protocolVersion, Map<String, String> headers,List<Character> bodys) {
+        return new HttpRequest(httpMethod, path, protocolVersion, headers,bodys);
+    }
     /**
      * HTTP request의 path를 이용하여 확장자를 알아내는 로직
      * Request path를 .으로 분리 한뒤, 마지막 리스트 값을 가져옴.
      * https://developer.mozilla.org/ko/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
-     *
      * @return : HttpRequest에 대한 응답헤더의 Content-type
      */
     private String getContentTypeFromRequestPath() {
@@ -95,8 +101,5 @@ public class HttpRequest {
         return new HttpResponse("HTTP/1.1", HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
 
-    public static HttpRequest from(String httpMethod, String path, String protocolVersion, Map<String, String> headers) {
-        return new HttpRequest(httpMethod, path, protocolVersion, headers);
 
-    }
 }

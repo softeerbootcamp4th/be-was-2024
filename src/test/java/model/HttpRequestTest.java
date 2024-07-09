@@ -18,7 +18,7 @@ class HttpRequestTest {
         Map<String, String> headers = new HashMap<>();
         headers.put("Host", "localhost:8080");
         headers.put("Connection", "keep-alive");
-        HttpRequest httpRequest =  HttpRequest.from("GET", "/index.html", "HTTP/1.1", headers);
+        HttpRequest httpRequest =  HttpRequest.of("GET", "/index.html", "HTTP/1.1", headers);
 
         //when
         HttpResponse httpResponse = httpRequest.createHttpResponse();
