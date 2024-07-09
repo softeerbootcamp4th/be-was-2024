@@ -39,8 +39,24 @@ public class HandlerManager {
 
         // 각 HttpRequest를 처리하는 Handler 등록
 
-        handlers[HttpMethod.GET.getHandlerMapIdx()].put("/user/create", (dos, queryParams) -> {
-            User user = new User(queryParams);
+        handlers.get(HttpMethod.POST.getHandlerMapIdx()).put("/user/create", (dos, httpRequest) -> {
+
+            List<String> valueList = httpRequest.getHeader(CONTENT_TYPE).orElseThrow(
+                    () -> new InvalidHttpRequestException("content type is empty")
+            );
+
+            MimeType contentType = null;
+            for(String value : valueList){
+                contentType = MimeType.findByTypeName(value);
+                if(contentType != null)
+                    break;
+            }
+            if(contentType == null)
+                throw new InvalidHttpRequestException("content type is empty");
+
+            Map<String, String> bodyParams = HttpRequestParser.parseRequestBody(httpRequest.getBody().orElseThrow(
+                    () -> new InvalidHttpRequestException("request body is empty")),contentType);
+            User user = new User(bodyParams);
             Database.addUser(user);
 
             response302Header(dos,"/login/index.html");
