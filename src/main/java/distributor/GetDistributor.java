@@ -1,6 +1,5 @@
 package distributor;
 
-import processor.LogicProcessor;
 import webserver.Request;
 import webserver.Response;
 
@@ -10,7 +9,6 @@ import java.io.IOException;
 public class GetDistributor extends Distributor {
     Request request;
     Response response;
-    LogicProcessor logicProcessor = new LogicProcessor();
 
     protected GetDistributor(Request request, Response response) {
         this.request = request;
