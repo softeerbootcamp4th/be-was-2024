@@ -20,4 +20,5 @@ public class Database {
     public static Collection<User> findAll() {
         return users.values();
     }
+
 }
