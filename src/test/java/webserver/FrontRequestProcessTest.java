@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import util.HttpRequestObject;
 import util.HttpResponseObject;
 
+import java.io.IOException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class FrontRequestProcessTest {
@@ -21,7 +23,7 @@ class FrontRequestProcessTest {
 
     @DisplayName("정적 자원 요청을 매핑하여 응답에 대한 정보를 반환한다.")
     @Test
-    void staticResourceTest() {
+    void staticResourceTest() throws IOException {
         // given
         httpRequestObject = HttpRequestObject.from("GET /index.html HTTP/1.1");
 
@@ -36,7 +38,7 @@ class FrontRequestProcessTest {
 
     @DisplayName("회원가입 요청을 매핑 및 처리하고 응답에 대한 정보를 반환한다.")
     @Test
-    void signUpTest() {
+    void signUpTest() throws IOException {
         // given
         httpRequestObject = HttpRequestObject.from("POST /user/create HTTP/1.1");
         httpRequestObject.putBody("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
