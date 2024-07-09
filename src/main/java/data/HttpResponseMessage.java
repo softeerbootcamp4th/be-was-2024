@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 /**
- *
+ *Http 응답 객체
  */
 public class HttpResponseMessage {
     private String statusCode;
