@@ -11,7 +11,7 @@ public class HttpRequestObject {
     private Map<String, String> requestParams;
     private String httpVersion;
     private Map<String, String> requestHeaders;
-    private Map<String, String> requestBody;
+    private byte[] requestBody;
 
     private HttpRequestObject(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
         this.requestMethod = requestMethod;
@@ -19,7 +19,6 @@ public class HttpRequestObject {
         this.requestParams = requestParams;
         this.httpVersion = httpVersion;
         this.requestHeaders = new HashMap<>();
-        this.requestBody = new HashMap<>();
     }
 
     public static HttpRequestObject from(String requestLine) {
@@ -59,8 +58,22 @@ public class HttpRequestObject {
         return requestHeaders;
     }
 
-    public Map<String, String> getRequestBody() {
+    public byte[] getBody(){
         return requestBody;
+    }
+
+    public String getBodyString() {
+        return new String(requestBody);
+    }
+
+    public Map<String, String> getBodyMap() {
+        Map<String, String> bodyMap = new HashMap<>();
+        String[] bodyElements = new String(requestBody).split(StringUtil.AND);
+        for (String bodyElement : bodyElements) {
+            String[] keyValue = bodyElement.split(StringUtil.EQUAL);
+            bodyMap.put(keyValue[0], keyValue[1]);
+        }
+        return bodyMap;
     }
 
     public void putHeaders(String headerLine){
@@ -75,11 +88,6 @@ public class HttpRequestObject {
     }
 
     public void putBody(String body){
-        String[] bodyElements = body.split(StringUtil.AND);
-        if(bodyElements.length == 0) throw new IllegalArgumentException("Body is empty");
-        for (String bodyElement : bodyElements) {
-            String[] keyValue = bodyElement.split(StringUtil.EQUAL);
-            requestBody.put(keyValue[0], keyValue[1]);
-        }
+        this.requestBody = body.getBytes();
     }
 }

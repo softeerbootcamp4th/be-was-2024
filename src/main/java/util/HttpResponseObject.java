@@ -10,15 +10,15 @@ public class HttpResponseObject {
     private String path;
     private String statusCode;
     private Map<String, String> header;
-    private Map<String, String> body;
+    private byte[] body;
 
-    public HttpResponseObject(String type, String path, String statusCode, String httpVersion, Map<String, String> responseBody) {
+    public HttpResponseObject(String type, String path, String statusCode, String httpVersion, byte[] responseBody) {
         this.type = type;
         this.path = path;
         this.statusCode = statusCode;
         this.httpVersion = httpVersion;
         this.header = new HashMap<>();
-        this.body = (responseBody == null ? new HashMap<>() : responseBody);
+        this.body = responseBody;
     }
 
     public String getType() {
@@ -33,16 +33,8 @@ public class HttpResponseObject {
         return statusCode;
     }
 
-    public Map<String, String> getBody(){
+    public byte[] getBody(){
         return body;
-    }
-
-    public byte[] getBodyToByte() {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, String> entry : body.entrySet()) {
-            sb.append(entry.getKey()).append(StringUtil.COLON_WITH_SPACE).append(entry.getValue()).append(StringUtil.CRLF);
-        }
-        return sb.toString().getBytes();
     }
 
     public void addHeader(String key, String value){
