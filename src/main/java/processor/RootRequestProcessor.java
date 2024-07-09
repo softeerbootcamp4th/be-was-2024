@@ -14,7 +14,6 @@ public class RootRequestProcessor extends RequestProcessor {
     public RootRequestProcessor(RequestInfo requestInfo) throws IOException, StatusCodeException {
         init(requestInfo);
 
-        System.out.println(methodPath());
         switch (methodPath()) {
             case "GET /" -> index();
             default -> staticResource();
@@ -25,7 +24,7 @@ public class RootRequestProcessor extends RequestProcessor {
         String path = STATIC_PATH + getPath() + "index.html";
         byte[] body = FileUtils.readFileToBytes(path);
 
-        insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
+        insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType() + CONTENT_CHARSET);
         insert2ResponseHeader("Content-Length", String.valueOf(body.length));
 
         setResult(StatusCodeType.OK, getResponseHeader(), body);
@@ -36,7 +35,7 @@ public class RootRequestProcessor extends RequestProcessor {
         if (FileUtils.isFile(staticPath)) {
             byte[] body = FileUtils.readFileToBytes(staticPath);
 
-            insert2ResponseHeader("Content-Type", getContentType());
+            insert2ResponseHeader("Content-Type", FileUtils.findMIME(getPath()) + CONTENT_CHARSET);
             insert2ResponseHeader("Content-Length", String.valueOf(body.length));
 
             setResult(StatusCodeType.OK, getResponseHeader(), body);

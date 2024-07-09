@@ -12,7 +12,6 @@ public class RequestResult {
 
     public RequestResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] content) {
         this.statusCode = statusCode;
-        responseHeader.computeIfAbsent("Content-Type", k -> MIMEType.DEFAULT.getContentType());
         this.responseHeader = responseHeader;
         this.bodyContent = content;
     }
@@ -20,7 +19,6 @@ public class RequestResult {
     public RequestResult(StatusCodeType statusCode, String content) {
         this.statusCode = statusCode;
         this.responseHeader = new HashMap<>();
-        setResponseHeader("Content-Type", MIMEType.DEFAULT.getContentType());
         this.bodyContent = content.getBytes();
     }
 

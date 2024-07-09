@@ -21,7 +21,6 @@ public class RequestInfo {
     private final static String STATIC_PATH = "./src/main/resources/static";
 
     private MethodType method;
-    private MIMEType mime;
     private String path;
     private HashMap<String, String> query;
     private HashMap<String, String> header;
@@ -54,7 +53,6 @@ public class RequestInfo {
         String[] seperatedPath = requestLine.split("\\s+")[1].split("\\?");
         this.path = seperatedPath[0];
         if (seperatedPath.length > 1) this.query = StringUtils.param2Map(seperatedPath[1]);
-        this.mime = findMIME(path);
     }
 
     private static MethodType findMethod(String requestLine) {
@@ -63,12 +61,10 @@ public class RequestInfo {
 
     private static MIMEType findMIME(String path) {
         String[] list = path.split("\\.");
-        return MIMEType.findByContentType(list[list.length - 1]);
+        return MIMEType.findByContentType(list.length > 1 ? list[list.length - 1] : "");
     }
 
     public String getMethod() { return method.getValue(); }
-
-    public String getContentType() { return mime.getContentType(); }
 
     public String getPath() { return path; }
 

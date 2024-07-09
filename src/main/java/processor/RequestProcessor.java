@@ -7,7 +7,8 @@ import webserver.RequestResult;
 import java.util.HashMap;
 
 public class RequestProcessor {
-    public  final static String STATIC_PATH = "./src/main/resources/static";
+    public final static String STATIC_PATH = "./src/main/resources/static";
+    public final static String CONTENT_CHARSET = ";charset=utf-8\r\n";
     private RequestInfo requestInfo;
     private HashMap<String, String> responseHeader = new HashMap<>();
 
@@ -27,10 +28,6 @@ public class RequestProcessor {
 
     public String getPath() {
         return requestInfo.getPath();
-    }
-
-    public String getContentType() {
-        return requestInfo.getContentType();
     }
 
     public HashMap<String, String> getQuery() {
