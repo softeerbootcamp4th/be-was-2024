@@ -22,7 +22,6 @@ public class RequestHandler implements Runnable {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 
             HttpRequestParser requestParser = new HttpRequestParser();
             HttpRequest httpRequest = requestParser.parse(in);
@@ -41,19 +40,25 @@ public class RequestHandler implements Runnable {
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-            String filePath = MappingHandler.mapRequest(httpRequest, dos);
+            RequestResponse requestResponse = new RequestResponse(httpRequest, dos);
+            MappingHandler.mapRequest(httpRequest, requestResponse);
 
-            File file = new File(filePath);
-            if (!file.exists()) {
-                response404Header(dos);
-                return;
-            }
-
-            byte[] fileBody = FileHandler.readFileToByteArray(file);
-            String contentType = FileHandler.determineContentType(file.getName());
-
-            response200Header(dos, fileBody.length, contentType);
-            responseBody(dos, fileBody);
+//            DataOutputStream dos = new DataOutputStream(out);
+//            String filePath = MappingHandler.mapRequest(httpRequest, dos);
+//
+//            if(filePath != null){
+//                File file = new File(filePath);
+//                if (!file.exists()) {
+//                    response404Header(dos);
+//                    return;
+//                }
+//
+//                byte[] fileBody = FileHandler.readFileToByteArray(file);
+//                String contentType = FileHandler.determineContentType(file.getName());
+//
+//                response200Header(dos, fileBody.length, contentType);
+//                responseBody(dos, fileBody);
+//            }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -65,6 +70,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }

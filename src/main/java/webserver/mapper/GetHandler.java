@@ -2,14 +2,16 @@ package webserver.mapper;
 
 public class GetHandler {
 
+    private static final String staticResourceDir = System.getProperty("staticResourceDir");
+
     public static String handle(String url) {
         switch (url) {
             case "/registration":
-                return "/registration/index.html";
+                return staticResourceDir + "/registration/index.html";
             case "/login":
-                return "/login/index.html";
+                return staticResourceDir + "/login/index.html";
             default:
-                return url;
+                return staticResourceDir + url;
         }
     }
 }
