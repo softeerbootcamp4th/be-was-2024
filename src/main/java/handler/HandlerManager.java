@@ -172,15 +172,6 @@ public class HandlerManager {
         }
     }
 
-    // Response Body 생성 및 HttpResponse를 client에게 전송
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 
 
 }
