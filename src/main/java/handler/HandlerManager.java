@@ -2,21 +2,33 @@ package handler;
 
 import constant.FileExtensionType;
 import constant.HttpMethod;
+import constant.HttpStatus;
+import constant.MimeType;
 import db.Database;
 import dto.HttpRequest;
+import exception.InvalidHttpRequestException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestParser;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HandlerManager {
     private static final Logger logger = LoggerFactory.getLogger(HandlerManager.class);
 
-    private Map<String, Handler>[] handlers;
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String HTTP_VERSION = "HTTP/1.1";
+    private static final String CRLF = "\r\n";
+    private static final String CHARSET_UTF8 = "UTF-8";
+    private static final String LOCATION = "Location";
+
+    private final List<Map<String, Handler>> handlers;
 
     private HandlerManager(){
         // Http Method 종류별로 Handler를 저장하는 Map 생성
@@ -103,11 +115,10 @@ public class HandlerManager {
         try {
             FileExtensionType fileExtensionType = FileExtensionType.valueOf(extensionType.toUpperCase());
 
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + fileExtensionType.getContentType() + ";"
-                    + "charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
+            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.OK.getStatusCode() + " " + HttpStatus.OK.getMessage() + CRLF);
+            dos.writeBytes(CONTENT_TYPE + ": " + fileExtensionType.getContentType() + ";"
+                    + CHARSET_UTF8 + CRLF);
+            dos.writeBytes(CONTENT_LENGTH + ": " + lengthOfBodyContent + CRLF+CRLF);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
@@ -116,9 +127,9 @@ public class HandlerManager {
     // Http Status 302 응답 메서드
     private static void response302Header(DataOutputStream dos, String redirectUrl){
         try {
-            dos.writeBytes("HTTP/1.1 302 FOUND\r\n");
-            dos.writeBytes("Location: " + redirectUrl + "\r\n");
-            dos.writeBytes("\r\n");
+            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.FOUND.getStatusCode() + " "
+                    + HttpStatus.FOUND.getMessage() + CRLF);
+            dos.writeBytes(LOCATION + ": " + redirectUrl + CRLF + CRLF);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
@@ -129,10 +140,10 @@ public class HandlerManager {
     public void response404Error(DataOutputStream dos) throws IOException {
         try {
             String errorMessage = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>";
-            dos.writeBytes("HTTP/1.1 404 Not Found\r\n");
-            dos.writeBytes("Content-Type: text/html\r\n");
-            dos.writeBytes("Content-Length: " + errorMessage.length() + "\r\n");
-            dos.writeBytes("\r\n");
+            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.NOT_FOUND.getStatusCode() + " "
+                            + HttpStatus.NOT_FOUND.getMessage() + CRLF);
+            dos.writeBytes(CONTENT_TYPE + ": " + FileExtensionType.HTML.getContentType() + CRLF);
+            dos.writeBytes(CONTENT_LENGTH + ": " + errorMessage.length() + CRLF + CRLF);
             dos.writeBytes(errorMessage);
             dos.flush();
         }
