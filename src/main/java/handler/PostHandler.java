@@ -2,15 +2,23 @@ package handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import processor.UserProcessor;
+import util.RequestObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class PostHandler
 {
-    private PostHandler() {}
+
 
     private static final Logger logger = LoggerFactory.getLogger(PostHandler.class);
+
+    private final UserProcessor userProcessor;
+
+    private PostHandler() {
+        this.userProcessor=UserProcessor.getInstance();
+    }
 
     private static class LazyHolder{
         private static final PostHandler INSTANCE = new PostHandler();
@@ -20,7 +28,22 @@ public class PostHandler
         return LazyHolder.INSTANCE;
     }
 
-    public void response302Header(DataOutputStream dos, String loc)
+    public void handlePostRequest(DataOutputStream dos, RequestObject requestObject) {
+
+
+        if(requestObject.getPath().equals("/user/create"))
+        {
+            userProcessor.userCreate(requestObject);
+        }
+        else if(requestObject.getPath().equals("/user/login"))
+        {
+
+        }
+        response302Header(dos, "/index.html");
+    }
+
+
+    private void response302Header(DataOutputStream dos, String loc)
     {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");

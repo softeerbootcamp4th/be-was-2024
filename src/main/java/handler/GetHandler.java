@@ -2,6 +2,8 @@ package handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.FileDetection;
+import util.RequestObject;
 
 import java.io.*;
 
@@ -18,8 +20,16 @@ public class GetHandler
         return LazyHolder.INSTANCE;
     }
 
+    public void handleGetRequest(DataOutputStream dos, RequestObject requestObject)
+    {
+        String path = requestObject.getPath();
+        path= FileDetection.getPath(FileDetection.fixedPath+path);
+        staticFileHandler(dos,path);
+    }
+
+
     //static html 파일은 여기서 다뤄준다
-    public void staticFileHandler(DataOutputStream dos, String path)
+    private void staticFileHandler(DataOutputStream dos, String path)
     {
         byte[] body;
         File fi = new File(path);
@@ -83,7 +93,7 @@ public class GetHandler
     }
 
 
-    public String match(String extensions)
+    private String match(String extensions)
     {
         return switch (extensions) {
             case "css" -> "text/css";

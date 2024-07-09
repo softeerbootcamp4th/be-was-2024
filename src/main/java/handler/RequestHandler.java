@@ -5,8 +5,6 @@ import java.net.Socket;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import processor.UserProcessor;
-import util.FileDetection;
 import util.RequestObject;
 
 public class RequestHandler implements Runnable {
@@ -17,17 +15,12 @@ public class RequestHandler implements Runnable {
     private RequestObject requestObject;
     private final GetHandler getHandler;
     private final PostHandler postHandler;
-    private final UserProcessor userProcessor;
-
-
-
 
     public RequestHandler(Socket connectionSocket)
     {
         this.connection = connectionSocket;
         this.getHandler =GetHandler.getInstance();
         this.postHandler=PostHandler.getInstance();
-        this.userProcessor=UserProcessor.getInstance();
     }
 
     public void run() {
@@ -43,19 +36,18 @@ public class RequestHandler implements Runnable {
             logger.error(e.getMessage());
         }
     }
+
+    //각 요청을 메소드에 맞게 뿌려준다
     private void requestDistribute(DataOutputStream dos,RequestObject requestObject)
     {
         String method = requestObject.getMethod();
-        String path = requestObject.getPath();
         if(method.equals("GET") )//GET방식 들어올 경우
         {
-            path = FileDetection.getPath(FileDetection.fixedPath+path);
-            getHandler.staticFileHandler(dos,path);
+            getHandler.handleGetRequest(dos,requestObject);
         }
         else if(method.equals("POST"))
         {
-            userProcessor.userCreate(requestObject);
-            postHandler.response302Header(dos,"/index.html");
+            postHandler.handlePostRequest(dos,requestObject);
         }
     }
 
