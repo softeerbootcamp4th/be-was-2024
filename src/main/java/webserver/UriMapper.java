@@ -7,8 +7,9 @@ public class UriMapper {
         //Exact Matching
         if (httpRequestMessage.getMethod().equals("GET")){
             return switch (httpRequestMessage.getUri()){
+                case "/", "/index.html" -> "src/main/resources/static/index.html";
                 case "/registration.html" -> "src/main/resources/static/registration/index.html";
-                case "/index.html" -> "src/main/resources/static/index.html";
+                case "/login" -> "src/main/resources/static/login/index.html";
                 default -> "src/main/resources/static" + httpRequestMessage.getUri();
             };
         }
