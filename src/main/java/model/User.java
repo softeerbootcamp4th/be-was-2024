@@ -4,7 +4,6 @@ import db.Database;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class User {
     private String userId;
