@@ -1,5 +1,6 @@
 package processor;
 
+import type.MIMEType;
 import type.StatusCodeType;
 import webserver.RequestInfo;
 import webserver.RequestResult;
@@ -40,9 +41,13 @@ public class RequestProcessor {
         return requestInfo.getBody();
     }
 
-    public void insert2ResponseHeader(String key, String value) {
+    public void insertToResponseHeader(String key, String value) {
         responseHeader.put(key, value);
     }
+
+    public void insertContentTypeToHeader(String value) { responseHeader.put("Content-Type", value + CONTENT_CHARSET); }
+
+    public void insertHTMLTypeToHeader() { insertContentTypeToHeader(MIMEType.HTML.getContentType()); }
 
     public HashMap<String, String> getResponseHeader() {
         return responseHeader;

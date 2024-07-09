@@ -23,8 +23,7 @@ public class RegistrationRequestProcessor extends RequestProcessor {
         String path = STATIC_PATH + getPath() + "/index.html";
         byte[] body = FileUtils.readFileToBytes(path);
 
-        insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
-        insert2ResponseHeader("Content-Length", String.valueOf(body.length));
+        insertHTMLTypeToHeader();
 
         setResult(StatusCodeType.OK, getResponseHeader(), body);
     }

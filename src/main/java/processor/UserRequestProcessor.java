@@ -32,7 +32,7 @@ public class UserRequestProcessor extends RequestProcessor {
         if (userId == null || name == null || password == null || email == null ||
                 userId.isEmpty() || name.isEmpty() || password.isEmpty() || email.isEmpty()) {
 
-            insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
+            insertHTMLTypeToHeader();
             setResult(StatusCodeType.BAD_REQUEST, getResponseHeader(), "" +
                     "<script>" +
                     "alert('Fill all the required fields');" +
@@ -44,7 +44,7 @@ public class UserRequestProcessor extends RequestProcessor {
 
         User user = new User(userId, name, password, email);
         Database.addUser(user);
-        insert2ResponseHeader("Location", "/index.html");
+        insertToResponseHeader("Location", "/index.html");
         setResult(StatusCodeType.FOUND, getResponseHeader(), "");
     }
 }
