@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class Response {
 
-    private final String CRLF = "\r\n";
+    public final String CRLF = "\r\n";
     private final char SPACE = ' ';
     private final char COLON = ':';
 
@@ -55,10 +55,18 @@ public class Response {
 
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public String getHeaderValue(String key){
+        return headers.get(key);
+    }
+
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(version).append(SPACE).append(status).append(SPACE).append(status.getMessage()).append(CRLF);
+        sb.append(version).append(SPACE).append(status.getCode()).append(SPACE).append(status.getMessage()).append(CRLF);
         for( Map.Entry<String, String> entry : headers.entrySet() ){
             String strKey = entry.getKey();
             String strValue = entry.getValue();

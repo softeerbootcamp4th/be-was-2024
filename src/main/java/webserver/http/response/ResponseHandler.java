@@ -2,9 +2,11 @@ package webserver.http.response;
 
 import db.Database;
 import model.User;
+import webserver.http.request.Method;
 import webserver.http.request.Request;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static util.Utils.getFile;
 
@@ -20,13 +22,22 @@ public class ResponseHandler {
                         .build();
 
             case "/create" -> {
-                User user = new User(
-                        request.getParameterValue("userId"),
-                        request.getParameterValue("password"),
-                        request.getParameterValue("name"),
-                        request.getParameterValue("email")
-                );
-                Database.addUser(user);
+                if(request.getMethod().equals(Method.POST)) {
+                    byte[] body = request.getBody();
+                    Map<String, String> parameterMap = Request.parseParameterMap(new String(body));
+                    User user = new User(
+                            parameterMap.get("userId"),
+                            parameterMap.get("password"),
+                            parameterMap.get("name"),
+                            parameterMap.get("email")
+                    );
+                    Database.addUser(user);
+
+                    response = new Response.Builder(Status.SEE_OTHER)
+                            .addHeader("Location", "/index.html")
+                            .build();
+
+                }
             }
 
             default ->

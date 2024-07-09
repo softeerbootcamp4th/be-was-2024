@@ -1,14 +1,14 @@
 package webserver.http.response;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.http.request.Method;
-import webserver.http.request.Request;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseTest {
 
     @Test
+    @DisplayName("Response 객체의 값 동등성에 대해 참")
     void testEqualsTrue() {
 
         //given
@@ -50,6 +50,7 @@ class ResponseTest {
     }
 
     @Test
+    @DisplayName("Response 객체의 값 동등성에 대해 Status 가 다르면 거짓")
     void testEqualsFalseByStatus(){
         //given
         Response response1 = new Response.Builder(Status.OK)
@@ -66,6 +67,7 @@ class ResponseTest {
     }
 
     @Test
+    @DisplayName("Response 객체의 값 동등성에 대해 Header 가 다르면 거짓")
     void testEqualsFalseByHeader(){
         //given
         Response response1 = new Response.Builder(Status.OK)
@@ -84,6 +86,7 @@ class ResponseTest {
     }
 
     @Test
+    @DisplayName("Response 객체의 값 동등성에 대해 Body 가 다르면 거짓")
     void testEqualsFalseByBody(){
         //given
         Response response1 = new Response.Builder(Status.OK)

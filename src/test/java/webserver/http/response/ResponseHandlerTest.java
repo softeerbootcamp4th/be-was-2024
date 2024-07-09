@@ -2,6 +2,7 @@ package webserver.http.response;
 
 import db.Database;
 import model.User;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
@@ -14,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ResponseHandlerTest {
 
     @Test
+    @DisplayName("index.html 요청에 대한 응답 성공")
     void testResponseIndexHtmlSuccess() throws IOException {
         //given
         Request request = new Request.Builder(Method.GET, "/index.html")
@@ -34,6 +36,7 @@ class ResponseHandlerTest {
     }
 
     @Test
+    @DisplayName("png 요청에 대한 응답 성공")
     void testAccessStaticResourcePngSuccess() throws IOException {
         //given
         Request request = new Request.Builder(Method.GET, "/img/signiture.png")
@@ -55,6 +58,7 @@ class ResponseHandlerTest {
     }
 
     @Test
+    @DisplayName("svg 요청에 대한 응답 성공")
     void testAccessStaticResourceSvgSuccess() throws IOException {
 
         //given
@@ -77,6 +81,7 @@ class ResponseHandlerTest {
 
 
     @Test
+    @DisplayName("css 요청에 대한 응답 성공")
     void testAccessStaticResourceCssSuccess() throws IOException {
 
         //given
@@ -99,6 +104,7 @@ class ResponseHandlerTest {
     }
 
     @Test
+    @DisplayName("ico 요청에 대한 응답 성공")
     void testAccessStaticResourceIcoSuccess() throws IOException {
 
         //given
@@ -121,6 +127,7 @@ class ResponseHandlerTest {
     }
 
     @Test
+    @DisplayName("/registration 요청에 대한 응답 성공")
     void testAccessRegistrationSuccess() throws IOException {
 
         //given
@@ -142,16 +149,35 @@ class ResponseHandlerTest {
     }
 
     @Test
-    void testRegistrationSuccess() throws IOException {
+    @DisplayName("GET 으로 회원가입 할 경우 실패")
+    void testRegistrationGETFailure() throws IOException {
+        Database.deleteAll();
 
+        //given
         Request request = new Request.Builder(Method.GET, "/create")
                 .addParameter("userId", "javajigi")
                 .addParameter("password", "password")
                 .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
                 .addParameter("email", "javajigi%40slipp.net")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .addHeader("Accept", "*/*")
+                .build();
+
+        //when
+        ResponseHandler.response(request);
+        User actual = Database.findUserById("javajigi");
+
+        //then
+        assertNull(actual);
+
+    }
+
+    @Test
+    @DisplayName("POST 회원가입이 정상 동작")
+    void testRegistrationSuccessful() throws IOException {
+        Database.deleteAll();
+
+        //given
+        Request request = new Request.Builder(Method.POST, "/create")
+                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
                 .build();
 
         User expected = new User("javajigi", "password", "%EB%B0%95%EC%9E%AC%EC%84%B1", "javajigi%40slipp.net");
@@ -165,6 +191,23 @@ class ResponseHandlerTest {
 
     }
 
+    @Test
+    @DisplayName("가입을 완료하면 /index.html 페이지로 이동")
+    void testRegistrationRedirection() throws IOException {
+        Database.deleteAll();
 
+        //given
+        Request request = new Request.Builder(Method.POST, "/create")
+                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
+                .build();
+
+        //when
+        Response response = ResponseHandler.response(request);
+
+        //then
+        assertEquals(response.getStatus(), Status.SEE_OTHER);
+        assertEquals(response.getHeaderValue("Location"), "/index.html");
+
+    }
 
 }
