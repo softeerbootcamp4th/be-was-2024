@@ -32,9 +32,9 @@ public class HandlerManager {
 
     private HandlerManager(){
         // Http Method 종류별로 Handler를 저장하는 Map 생성
-        handlers = new HashMap[5];
-        for (int i = 0; i < handlers.length; i++) {
-            handlers[i] = new HashMap<>();
+        handlers = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            handlers.add(new HashMap<>());
         }
 
         // 각 HttpRequest를 처리하는 Handler 등록
