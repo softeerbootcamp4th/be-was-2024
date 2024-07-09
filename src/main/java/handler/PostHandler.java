@@ -33,12 +33,14 @@ public class PostHandler
         if(requestObject.getPath().equals("/user/create"))
         {
             userProcessor.userCreate(requestObject);
+            response302Header(dos,"/index.html");
         }
         else if(requestObject.getPath().equals("/user/login"))
         {
             if(!userProcessor.findUser(requestObject))//해당하는 사용자가 없다면
             {
                 logger.debug("False, 해당 Id는 존재하지 않는 Id입니다");
+                responseAlert(dos,"해당 Id는 존재하지 않는 Id입니다");
             }
             else
             {
