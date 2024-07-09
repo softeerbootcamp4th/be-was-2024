@@ -29,8 +29,7 @@ public class GetDistributor extends Distributor {
     private void processQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            logicProcessor.createUser(request);
-            response.redirect("/index.html", dos, 302);
+            response.redirect("/not_found.html", dos, 404);
         }
     }
 }
