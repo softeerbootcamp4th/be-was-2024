@@ -77,7 +77,7 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-# Android studio 3.1+ serialized cache file
+# Android studio 3.1+ serialized cache viewFile
 .idea/caches/build_file_checksums.ser
 
 ### Intellij Patch ###
@@ -102,7 +102,7 @@ fabric.properties
 .idea/**/markdown-navigator-enh.xml
 .idea/**/markdown-navigator/
 
-# Cache file creation bug
+# Cache viewFile creation bug
 # See https://youtrack.jetbrains.com/issue/JBR-2257
 .idea/$CACHE_FILE$
 
@@ -115,10 +115,10 @@ fabric.properties
 .idea/**/azureSettings.xml
 
 ### Java ###
-# Compiled class file
+# Compiled class viewFile
 *.class
 
-# Log file
+# Log viewFile
 *.log
 
 # BlueJ files
@@ -181,7 +181,7 @@ Temporary Items
 # Ignore Gradle GUI config
 gradle-app.setting
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+# Avoid ignoring Gradle wrapper jar viewFile (.jar files are usually ignored)
 !gradle-wrapper.jar
 
 # Avoid ignore Gradle wrappper properties
