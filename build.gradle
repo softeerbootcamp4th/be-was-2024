@@ -23,3 +23,23 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+ext {
+    staticDirPath = "${projectDir}/src/main/resources/static"
+    templatesDirPath = "${projectDir}/src/main/resources/templates"
+}
+
+task generatePropertiesFile {
+    doLast {
+        def file = file("${buildDir}/generated-resources/project.properties")
+        file.parentFile.mkdirs()
+        file.text = """
+            static.dir=${staticDirPath}
+            templates.dir=${templatesDirPath}
+        """.stripIndent()
+    }
+}
+
+processResources.dependsOn generatePropertiesFile
+
+sourceSets.main.resources.srcDir "${buildDir}/generated-resources"
