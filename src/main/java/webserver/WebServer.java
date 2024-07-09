@@ -11,10 +11,11 @@ import chain.StaticResourceChain;
 import chain.core.ChainManager;
 import chain.core.MiddlewareChain;
 import config.AppConfig;
+import config.RouteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.route.IndexRouteHandler;
-import routehandler.route.RegistrationRouteHandler;
+import routehandler.route.RegistrationPageHandler;
 import routehandler.utils.Route;
 
 public class WebServer {
@@ -27,22 +28,11 @@ public class WebServer {
         } else {
             port = Integer.parseInt(args[0]);
         }
-        MiddlewareChain chain = new RouteHandleChain(
-                        Route.at("/registration")
-                                .GET(new RegistrationRouteHandler())
-                                .routes(
-                                        Route.at("{test}")
-                                                .GET(new IndexRouteHandler())
-                                ),
-                        Route.at("/")
-                                .GET(new IndexRouteHandler())
-                                .POST(new IndexRouteHandler())
-                );
 
         ChainManager chainManager = new ChainManager(
-                new StaticResourceChain(),
-                chain,
-                new NotFoundHandleChain()
+            new StaticResourceChain(),
+            RouteConfig.routeHandleChain(),
+            new NotFoundHandleChain()
         );
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(AppConfig.THREAD_POOL_SIZE);

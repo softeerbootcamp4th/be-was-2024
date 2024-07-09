@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import utils.FileReadUtil;
 
-public class RegistrationRouteHandler implements IRouteHandler {
-    private static final Logger logger = LoggerFactory.getLogger(RegistrationRouteHandler.class);
+public class RegistrationPageHandler implements IRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationPageHandler.class);
 
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         var url = req.getUrl();
