@@ -6,7 +6,7 @@ import model.User;
 import java.util.Map;
 import java.util.Optional;
 
-public class UserHandler {
+public class UserHandler implements ModelHandler<User>{
 
     private UserHandler() {}
 
@@ -22,6 +22,7 @@ public class UserHandler {
         return Optional.ofNullable(Database.login(fields.get("userId"), fields.get("password")));
     }
 
+    @Override
     public User create(Map<String, String> fields) {
         User user = User.from(fields);
         Database.addUser(user);

@@ -1,5 +1,6 @@
 package webserver;
 
+import handler.ModelHandler;
 import handler.UserHandler;
 import model.User;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import java.io.OutputStream;
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
-    private final UserHandler userHandler;
+    private final ModelHandler<User> userHandler;
 
     private FrontRequestProcess() {
         this.userHandler = UserHandler.getInstance();
@@ -47,10 +48,12 @@ public class FrontRequestProcess {
                 User user = userHandler.create(request.getBodyMap());
                 yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
             }
-            case LOGIN_REQUEST ->
-                userHandler.login(request.getBodyMap())
-                        .map(user -> new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null))
-                        .orElse(new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null));
+            case LOGIN_REQUEST -> {
+                UserHandler specificUserHandler = (UserHandler) userHandler;
+                yield specificUserHandler.login(request.getBodyMap())
+                            .map(user -> new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null))
+                            .orElse(new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null));
+            }
             case USER_LOGIN_FAIL -> {
                 byte[] body = IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML);
                 yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.OK.getStatus(), request.getHttpVersion(), body);
@@ -74,7 +77,8 @@ public class FrontRequestProcess {
         }
 
         sendHeader(dos, response);
-        sendBody(dos, response.getBody());
+        if(response.getBody() != null)
+            sendBody(dos, response.getBody());
     }
 
     private void sendHeader(DataOutputStream dos, HttpResponseObject response) throws IOException {
