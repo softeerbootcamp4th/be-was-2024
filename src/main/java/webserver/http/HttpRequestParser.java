@@ -77,7 +77,7 @@ public class HttpRequestParser {
             while ((nextByte = in.read()) != -1) {
                 requestLineBuffer.write(nextByte);
                 // 개행 문자('\r', '\n')가 나타나면 request line을 완료함
-                if (nextByte == '\r' || nextByte == '\n') {
+                if (nextByte == '\n') {
                     break;
                 }
             }
@@ -168,7 +168,7 @@ public class HttpRequestParser {
             if (keyAndValue.length != 2) {
                 throw new IllegalArgumentException("Invalid query: " + query);
             }
-            
+
             String key = URLDecoder.decode(keyAndValue[0], StandardCharsets.UTF_8);
             String value = URLDecoder.decode(keyAndValue[1], StandardCharsets.UTF_8);
 
