@@ -55,8 +55,6 @@ public class RequestObject {
                 break;
             }
         }
-
-
         if(contentLength>0)
         {
             body = new byte[contentLength];
@@ -70,7 +68,6 @@ public class RequestObject {
         {
             body =null;
         }
-
 
 
     }

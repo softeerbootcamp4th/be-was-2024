@@ -33,13 +33,18 @@ public class UserProcessor {
         for (String pair : pairs) {
             String[] keyValue = pair.split("=");
             String key = keyValue[0];
-            String value = keyValue[1];
+            String value ="";
+            try{
+                 value = keyValue[1];
+            }
+            catch(IndexOutOfBoundsException e)
+            {
+                logger.debug(key +" 값이 비어 있습니다");
+            }
             map.put(key, value);
         }
 
-        User user = new User(map.getOrDefault("userId",""),map.getOrDefault("password"," "),
-                map.getOrDefault("name"," "),map.getOrDefault("email"," "));
-        logger.debug(user.toString());
+        User user = new User(map.get("userId"),map.get("password"), map.get("name"),map.get("email"));
         Database.addUser(user);
     }
 
