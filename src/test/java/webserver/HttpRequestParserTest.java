@@ -3,6 +3,7 @@ package webserver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import webserver.http.HttpRequestParser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
