@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="../reset.css" rel="stylesheet"/>
     <link href="../global.css" rel="stylesheet"/>
-    <script>
-    </script>
 </head>
 <body>
 <div class="container">
@@ -25,7 +23,7 @@
     </header>
     <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form class="form" id="dataForm" action="/user/create" method="POST">
+        <form class="form" id="dataForm" method="post" action="/user/create">
             <div class="textfield textfield_size_s">
                 <p class="title_textfield">아이디</p>
                 <label for="userId"></label>
@@ -35,6 +33,7 @@
                         autocomplete="username"
                         id="userId"
                         name="userId"
+                        type="text"
                 />
             </div>
             <div class="textfield textfield_size_s">
@@ -46,6 +45,7 @@
                         autocomplete="username"
                         id="name"
                         name="name"
+                        type="text"
                 />
             </div>
             <div class="textfield textfield_size_s">
