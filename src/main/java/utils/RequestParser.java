@@ -1,5 +1,6 @@
 package utils;
 
+import enums.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.Request;
@@ -30,7 +31,7 @@ public class RequestParser {
 
         // request line parse
         String[] requestLines = requestLineParse(br.readLine());
-        String method = requestLines[0];
+        HttpMethod method = HttpMethod.from(requestLines[0]);
         Map<String, String> queryParameters = pathParse(requestLines[1]);
         String path = queryParameters.get("path");
         queryParameters.remove("path");
@@ -86,7 +87,9 @@ public class RequestParser {
         String[] rawKeyValues= queryString.split("\\&");
         for(String rawKeyValue: rawKeyValues) {
             String[] keyValue = rawKeyValue.split("\\=");
-            tmpStore.put(keyValue[0], keyValue[1]);
+            if(keyValue.length == 2) {
+                tmpStore.put(keyValue[0], keyValue[1].trim());
+            }
         }
         return tmpStore;
     }
@@ -104,7 +107,9 @@ public class RequestParser {
         String[] rawQueryParameters = rawQueryParameter.split("\\&");
         for(String queryParameter: rawQueryParameters) {
             String[] queryKeyValue = queryParameter.split("\\=");
-            queryParameters.put(queryKeyValue[0], queryKeyValue[1]);
+            if(queryKeyValue.length == 2) {
+                queryParameters.put(queryKeyValue[0], queryKeyValue[1]);
+            }
         }
         return queryParameters;
     }

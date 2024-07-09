@@ -33,6 +33,8 @@ public class WebServer {
                     executor.submit(new RequestHandler(connection));
                 } catch(RuntimeException re) {
                     logger.error(re.getMessage());
+                } catch (Exception e) {
+                    logger.error(e.getMessage());
                 }
             }
         }
