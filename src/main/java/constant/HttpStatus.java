@@ -10,10 +10,11 @@ public enum HttpStatus {
     INTERNAL_SERVER_ERROR(500, "INTERNAL SERVICE ERROR");
 
     final int statusCode;
-    String message;
+    final String message;
 
     HttpStatus(int statusCode, String message) {
         this.statusCode = statusCode;
+        this.message = message;
     }
 
     public int getStatusCode() {

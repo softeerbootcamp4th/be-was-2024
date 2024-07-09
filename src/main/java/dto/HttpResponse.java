@@ -2,6 +2,9 @@ package dto;
 
 import constant.FileExtensionType;
 import constant.HttpStatus;
+import handler.HandlerManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.crypto.Data;
 import java.io.DataOutputStream;
@@ -12,12 +15,17 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpResponse {
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
 
     private HttpStatus status;
-    private final Map<String, List<String>> headers = new HashMap<>();
+    private Map<String, List<String>> headers;
     private byte[] body;
+
+    public HttpResponse(){
+        headers = new HashMap<>();
+    }
 
     // client에 HttpResponse 응답
     public void sendHttpResponse(DataOutputStream dos) throws IOException {
@@ -30,17 +38,22 @@ public class HttpResponse {
     private void makeHttpResponse(DataOutputStream dos) throws IOException {
 
         // status line 생성
-        dos.writeBytes(HTTP_VERSION + " " + status.getStatusCode() + " " + status.getMessage() + " " + CRLF);
-
+        dos.writeBytes(HTTP_VERSION + " " + status.getStatusCode() + " " + status.getMessage() + CRLF);
         // header 생성
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             List<String> headerValueList = entry.getValue();
 
-            for (String headerValue : headerValueList) {
-                dos.writeBytes(headerName + ": " + headerValue + ";");
+            if (!headerValueList.isEmpty()) {
+                // 첫 번째 헤더 값은 headerName: headerValue 형식으로 작성
+                dos.writeBytes(headerName + ": " + headerValueList.get(0));
+
+                // 나머지 값들은 ;로 이어붙임
+                for (int i = 1; i < headerValueList.size(); i++) {
+                    dos.writeBytes(";" + headerValueList.get(i));
+                }
+                dos.writeBytes(CRLF);
             }
-            dos.writeBytes(CRLF);
         }
         dos.writeBytes(CRLF);
 
@@ -54,11 +67,11 @@ public class HttpResponse {
     }
 
     public void addHeader(String headerName, String headerValue) {
-        List<String> headerValueList = headers.get(headerName);
-        if (headerValueList == null) {
-            headerValueList = new ArrayList<>();
+
+        if(!headers.containsKey(headerName)){
+            headers.put(headerName, new ArrayList<>());
         }
-        headerValueList.add(headerValue);
+        headers.get(headerName).add(headerValue);
     }
 
     public void setBody(byte[] body) {

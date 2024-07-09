@@ -1,6 +1,7 @@
 package webserver;
 
 import com.sun.net.httpserver.Request;
+import constant.FileExtensionType;
 import constant.HttpStatus;
 import dto.HttpRequest;
 import dto.HttpResponse;
@@ -14,12 +15,17 @@ import util.HttpRequestParser;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
 
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
     private final HandlerManager handlerManager = HandlerManager.getInstance();
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String ERROR_MESSAGE_404 =
+            "<html>" +
+                    "<head><title>404 Not Found</title></head>" +
+                    "<body><h1>404 Not Found</h1></body>" +
+            "</html>";
 
     private Dispatcher() {}
 
@@ -54,6 +60,9 @@ public class Dispatcher {
             // 에러 응답을 저장할 HttpResponse 객체 생성
             HttpResponse httpResponse = new HttpResponse();
             httpResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
+            httpResponse.setBody(ERROR_MESSAGE_404.getBytes());
             httpResponse.sendHttpResponse(dos);
         }
     }

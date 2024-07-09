@@ -24,7 +24,7 @@ public class HandlerManager {
 
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String CHARSET_UTF8 = "UTF-8";
+    private static final String CHARSET_UTF8 = "utf-8";
     private static final String LOCATION = "Location";
     private static final String ERROR_MESSAGE_404 =
             "<html>" +
@@ -53,7 +53,7 @@ public class HandlerManager {
 
             // 302 응답 생성
             httpResponse.setHttpStatus(HttpStatus.FOUND);
-            httpResponse.addHeader(LOCATION, "login/index.html");
+            httpResponse.addHeader(LOCATION, "/login/index.html");
         });
     }
 
@@ -114,10 +114,12 @@ public class HandlerManager {
         byte[] body = readFile(httpRequest.getPath().orElseThrow(
                 () -> new InvalidHttpRequestException("invalid path")));
 
+        String extensionType = httpRequest.getExtensionType().get().toUpperCase();
+
         if(body != null) {
             // 정적 파일 응답 생성
             httpResponse.setHttpStatus(HttpStatus.OK);
-            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.valueOf(extensionType).getContentType());
             httpResponse.addHeader(CONTENT_TYPE, CHARSET_UTF8);
             httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(body.length));
             httpResponse.setBody(body);
@@ -125,7 +127,7 @@ public class HandlerManager {
         else{
             // url에 해당하는 파일이 없으면 404 error 응답
             httpResponse.setHttpStatus(HttpStatus.NOT_FOUND);
-            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.valueOf(extensionType).getContentType());
             httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
             httpResponse.setBody(ERROR_MESSAGE_404.getBytes(CHARSET_UTF8));
         }
