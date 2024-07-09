@@ -6,17 +6,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import chain.NotFoundHandleChain;
-import chain.RouteHandleChain;
 import chain.StaticResourceChain;
 import chain.core.ChainManager;
-import chain.core.MiddlewareChain;
 import config.AppConfig;
 import config.RouteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.route.IndexRouteHandler;
-import routehandler.route.RegistrationPageHandler;
-import routehandler.utils.Route;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);

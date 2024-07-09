@@ -5,15 +5,13 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import routehandler.core.IRouteHandler;
-import routehandler.route.IndexRouteHandler;
-
-import static org.junit.jupiter.api.Assertions.*;
+import routehandler.route.IndexPageHandler;
 
 class RouteTrieTest {
     @Test
     @DisplayName("존재하는 경로 요청 시 정상 동작")
     void itWorksIfRouteExist() {
-        IndexRouteHandler handler = new IndexRouteHandler();
+        IndexPageHandler handler = new IndexPageHandler();
         RouteTrie trie = new RouteTrie();
         trie.insert("/hello/world", HttpMethodType.GET , handler);
         trie.insert("/hello/{id}/world", HttpMethodType.GET , handler);

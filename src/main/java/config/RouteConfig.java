@@ -1,8 +1,10 @@
 package config;
 
 import chain.RouteHandleChain;
-import routehandler.route.IndexRouteHandler;
+import routehandler.route.IndexPageHandler;
 import routehandler.route.RegistrationPageHandler;
+import routehandler.route.auth.LoginPageHandler;
+import routehandler.route.auth.SignInHandler;
 import routehandler.route.auth.SignUpHandler;
 import routehandler.utils.Route;
 
@@ -11,11 +13,15 @@ public class RouteConfig {
         return new RouteHandleChain(
             Route.at("/registration")
                 .GET(new RegistrationPageHandler()),
-            Route.at("/signup")
-                .POST(new SignUpHandler()),
+            Route.at("/auth")
+                .routes(Route.at("/signup").POST(new SignUpHandler()),
+                    Route.at("/signin").POST(new SignInHandler())
+                ),
+            Route.at("/login")
+                .GET(new LoginPageHandler()),
             Route.at("/")
-                .GET(new IndexRouteHandler())
-                .POST(new IndexRouteHandler())
+                .GET(new IndexPageHandler())
+                .POST(new IndexPageHandler())
         );
     }
 }

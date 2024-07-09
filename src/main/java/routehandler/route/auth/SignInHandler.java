@@ -14,7 +14,7 @@ import utils.FileReadUtil;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class SignUpHandler implements IRouteHandler {
+public class SignInHandler implements IRouteHandler {
     private final static Logger logger = LoggerFactory.getLogger(SignUpHandler.class);
 
     @Override
@@ -24,27 +24,20 @@ public class SignUpHandler implements IRouteHandler {
 
         var userId = formParams.get("userId");
         var password = formParams.get("password");
-        var name = formParams.get("name");
-        var email = formParams.get("email");
 
-        if(!validateUser(userId, password, name, email)) {
-            res.setStatusInfo(HttpStatusType.BAD_REQUEST);
-            res.setBody("user info is not valid");
+        User user = Database.findUserById(userId);
+        // 유저가 없거나, 비밀번호가 일치하지 않는 경우
+        if(user == null || !password.equals(user.getPassword())) {
+            res.setStatusInfo(HttpStatusType.UNAUTHORIZED);
+            try {
+                byte[] html = FileReadUtil.read("/login/index.html");
+                res.setBody(html);
+            } catch(Exception e) {
+                res.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
+            }
             return;
-        };
-
-        User user = new User(userId, password, name, email);
-        Database.addUser(user);
-        logger.debug("success to create user {}", user);
+        }
 
         res.redirect("/");
     }
-
-    private boolean validateUser(String userid, String password, String name, String email) {
-        return userid != null
-                && password != null
-                && name != null
-                && email != null;
-    }
-
 }
