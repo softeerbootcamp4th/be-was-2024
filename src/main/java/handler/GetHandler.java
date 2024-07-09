@@ -1,6 +1,5 @@
 package handler;
 
-import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
 import org.slf4j.Logger;
@@ -16,7 +15,7 @@ import static util.Utils.*;
 
 public class GetHandler {
     private static final Logger log = LoggerFactory.getLogger(GetHandler.class);
-    private static String staticPath = getStaticPath();
+    private static final String staticPath = getStaticPath();
 
     public static void sendResponse(String requestUrl, OutputStream out) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
@@ -34,7 +33,6 @@ public class GetHandler {
         headers.put("Content-Length", String.valueOf(body.length));
 
         HttpResponse response = new HttpResponse(httpStatus, headers, body);
-        System.out.println("response = " + response.toString());
         dos.writeBytes(response.toString());
         dos.write(body, 0, body.length);
         dos.flush();

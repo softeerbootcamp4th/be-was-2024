@@ -44,9 +44,9 @@ public class HttpRequest {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(httpMethod + " " + requestUrl + " " + version + "\n");
+        sb.append(httpMethod).append(" ").append(requestUrl).append(" ").append(version).append("\n");
         for (String s : headers.keySet()) {
-            sb.append(s + ": " + headers.get(s) + "\n");
+            sb.append(s).append(": ").append(headers.get(s)).append("\n");
         }
         if (body != null) {
             sb.append("body : ");

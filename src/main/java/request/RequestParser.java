@@ -46,7 +46,7 @@ public class RequestParser {
 
     private void setHeaders(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
-        String headerLine = "";
+        String headerLine;
 
         while (!(headerLine = bufferedReader.readLine()).isEmpty()) {
             log.append(headerLine).append("\n");
