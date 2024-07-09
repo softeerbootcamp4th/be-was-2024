@@ -13,21 +13,6 @@ public class RegistrationPageHandler implements IRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(RegistrationPageHandler.class);
 
     public void handle(MyHttpRequest req, MyHttpResponse res) {
-        var url = req.getUrl();
-
-        var userId = url.getParameter("userId");
-        var password = url.getParameter("password");
-        var name = url.getParameter("name");
-        var email = url.getParameter("email");
-
-        logger.debug("id: {}, password: {}", userId, password);
-
-        if (userId != null && password != null && name != null && email != null) {
-            var user = new User(userId, password, name, email);
-            logger.debug("user: {}", user);
-            res.redirect("/");
-            return;
-        }
         try {
             byte[] body = FileReadUtil.read("/registration/index.html");
             res.setBody(body);
