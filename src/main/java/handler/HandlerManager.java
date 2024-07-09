@@ -6,6 +6,7 @@ import constant.HttpStatus;
 import constant.MimeType;
 import db.Database;
 import dto.HttpRequest;
+import dto.HttpResponse;
 import exception.InvalidHttpRequestException;
 import model.User;
 import org.slf4j.Logger;
@@ -23,10 +24,13 @@ public class HandlerManager {
 
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String HTTP_VERSION = "HTTP/1.1";
-    private static final String CRLF = "\r\n";
     private static final String CHARSET_UTF8 = "UTF-8";
     private static final String LOCATION = "Location";
+    private static final String ERROR_MESSAGE_404 =
+            "<html>" +
+            "<head><title>404 Not Found</title></head>" +
+            "<body><h1>404 Not Found</h1></body>" +
+            "</html>";
 
     private final List<Map<String, Handler>> handlers;
 
@@ -39,27 +43,17 @@ public class HandlerManager {
 
         // 각 HttpRequest를 처리하는 Handler 등록
 
-        handlers.get(HttpMethod.POST.getHandlerMapIdx()).put("/user/create", (dos, httpRequest) -> {
+        handlers.get(HttpMethod.POST.getHandlerMapIdx()).put("/user/create", (httpRequest, httpResponse) -> {
 
-            List<String> valueList = httpRequest.getHeader(CONTENT_TYPE).orElseThrow(
-                    () -> new InvalidHttpRequestException("content type is empty")
-            );
+            Map<String, String> bodyParams = getBodyParams(httpRequest);
 
-            MimeType contentType = null;
-            for(String value : valueList){
-                contentType = MimeType.findByTypeName(value);
-                if(contentType != null)
-                    break;
-            }
-            if(contentType == null)
-                throw new InvalidHttpRequestException("content type is empty");
-
-            Map<String, String> bodyParams = HttpRequestParser.parseRequestBody(httpRequest.getBody().orElseThrow(
-                    () -> new InvalidHttpRequestException("request body is empty")),contentType);
+            // User를 DB에 저장
             User user = new User(bodyParams);
             Database.addUser(user);
 
-            response302Header(dos,"/login/index.html");
+            // 302 응답 생성
+            httpResponse.setHttpStatus(HttpStatus.FOUND);
+            httpResponse.addHeader(LOCATION, "login/index.html");
         });
     }
 
@@ -76,11 +70,7 @@ public class HandlerManager {
 
         // 정적 파일 요청인 경우
         if(httpRequest.getExtensionType().isPresent()){
-            return (dos, _httpRequest) -> {
-                handleStaticResource(dos, _httpRequest.getPath().orElseThrow(
-                        () -> new InvalidHttpRequestException("uri path is empty"))
-                        , _httpRequest.getExtensionType().get());
-            };
+            return this::handleStaticResource;
         }
         // API 요청인 경우
         else{
@@ -97,18 +87,47 @@ public class HandlerManager {
         }
     }
 
+    // HttpRequest의 content type에 따른 HttpRequest body 파싱 및 반환
+    private Map<String, String> getBodyParams(HttpRequest httpRequest){
+
+        List<String> valueList = httpRequest.getHeader(CONTENT_TYPE).orElseThrow(
+                () -> new InvalidHttpRequestException("content type is empty")
+        );
+
+        MimeType contentType = null;
+        for(String value : valueList){
+            contentType = MimeType.findByTypeName(value);
+            if(contentType != null)
+                break;
+        }
+        if(contentType == null)
+            throw new InvalidHttpRequestException("content type is empty");
+
+        return HttpRequestParser.parseRequestBody(httpRequest.getBody().orElseThrow(
+                () -> new InvalidHttpRequestException("request body is empty")),contentType);
+
+    }
+
     // 정적 파일 응답 메서드
-    public void handleStaticResource(DataOutputStream dos, String filePath, String extensionType) throws IOException, IllegalArgumentException {
-        logger.info("filePath: {}", filePath);
-        byte[] body = readFile(filePath);
+    public void handleStaticResource(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, IllegalArgumentException {
+
+        byte[] body = readFile(httpRequest.getPath().orElseThrow(
+                () -> new InvalidHttpRequestException("invalid path")));
 
         if(body != null) {
-            response200Header(dos, body.length, extensionType);
-            responseBody(dos, body);
+            // 정적 파일 응답 생성
+            httpResponse.setHttpStatus(HttpStatus.OK);
+            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(CONTENT_TYPE, CHARSET_UTF8);
+            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(body.length));
+            httpResponse.setBody(body);
         }
         else{
             // url에 해당하는 파일이 없으면 404 error 응답
-            response404Error(dos);
+            httpResponse.setHttpStatus(HttpStatus.NOT_FOUND);
+            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
+            httpResponse.setBody(ERROR_MESSAGE_404.getBytes(CHARSET_UTF8));
         }
     }
 
@@ -118,6 +137,7 @@ public class HandlerManager {
             filePath = filePath.substring(1);
         }
 
+        logger.debug("filePath: {}", filePath);
         // 등록된 정적 파일 클래스패스를 통해 파일 읽기 (src/main/resources/static 디렉토리 안에 있는 파일)
         try (InputStream inputStream = HandlerManager.class.getClassLoader().getResourceAsStream(filePath)) {
             if (inputStream == null) {
@@ -130,47 +150,7 @@ public class HandlerManager {
         }
     }
 
-    // Http Status 200 응답 메서드
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extensionType){
-        try {
-            FileExtensionType fileExtensionType = FileExtensionType.valueOf(extensionType.toUpperCase());
 
-            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.OK.getStatusCode() + " " + HttpStatus.OK.getMessage() + CRLF);
-            dos.writeBytes(CONTENT_TYPE + ": " + fileExtensionType.getContentType() + ";"
-                    + CHARSET_UTF8 + CRLF);
-            dos.writeBytes(CONTENT_LENGTH + ": " + lengthOfBodyContent + CRLF+CRLF);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    // Http Status 302 응답 메서드
-    private static void response302Header(DataOutputStream dos, String redirectUrl){
-        try {
-            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.FOUND.getStatusCode() + " "
-                    + HttpStatus.FOUND.getMessage() + CRLF);
-            dos.writeBytes(LOCATION + ": " + redirectUrl + CRLF + CRLF);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    // Http Status 404 응답 메서드
-    public void response404Error(DataOutputStream dos) throws IOException {
-        try {
-            String errorMessage = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>";
-            dos.writeBytes(HTTP_VERSION + " " + HttpStatus.NOT_FOUND.getStatusCode() + " "
-                            + HttpStatus.NOT_FOUND.getMessage() + CRLF);
-            dos.writeBytes(CONTENT_TYPE + ": " + FileExtensionType.HTML.getContentType() + CRLF);
-            dos.writeBytes(CONTENT_LENGTH + ": " + errorMessage.length() + CRLF + CRLF);
-            dos.writeBytes(errorMessage);
-            dos.flush();
-        }
-        catch (IOException e){
-            logger.error(e.getMessage());
-        }
-    }
 
 
 

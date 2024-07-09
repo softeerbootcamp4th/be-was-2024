@@ -49,11 +49,11 @@ public class HttpResponse {
 
     }
 
-    void setHttpStatus(HttpStatus status) {
+    public void setHttpStatus(HttpStatus status) {
         this.status = status;
     }
 
-    void addHeader(String headerName, String headerValue) {
+    public void addHeader(String headerName, String headerValue) {
         List<String> headerValueList = headers.get(headerName);
         if (headerValueList == null) {
             headerValueList = new ArrayList<>();
@@ -61,7 +61,7 @@ public class HttpResponse {
         headerValueList.add(headerValue);
     }
 
-    void setBody(byte[] body) {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
