@@ -2,7 +2,6 @@ package webserver.api;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.RequestHandler;
 import webserver.http.enums.Extension;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -16,8 +15,8 @@ import java.nio.file.Files;
 /*
 * readfile function
 * */
-public class ReadFile implements ApiFunction {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+public class ReadFile implements RequestHandler {
+    private static final Logger logger = LoggerFactory.getLogger(webserver.api.ReadFile.class);
     private static final String root = "./src/main/resources/static";
 
     @Override

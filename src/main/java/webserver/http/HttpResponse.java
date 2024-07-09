@@ -31,6 +31,9 @@ public class HttpResponse{
         return body;
     }
 
+    public Map<String, String> getHeadersMap() {
+        return headers;
+    }
 
     private HttpResponse(ResponseBuilder responseBuilder) {
         this.statusCode = responseBuilder.statusCode;

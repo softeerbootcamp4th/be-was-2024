@@ -2,7 +2,7 @@ package webserver.api.registration;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.api.ApiFunction;
+import webserver.api.RequestHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
@@ -17,7 +17,7 @@ class RegistrationTest {
     @Test
     void register() throws IOException {
         //given
-        ApiFunction register = new Registration();
+        RequestHandler register = new Registration();
         HttpRequest request = new HttpRequest.ReqeustBuilder("POST /registration HTTP/1.1")
                 .addHeader("Content-Length", "34")
                 .setBody("id=2&username=1&email=3&password=4".getBytes())

@@ -1,6 +1,8 @@
 package webserver.http;
 
-import webserver.api.ApiFunction;
+import webserver.api.Logout;
+import webserver.api.RequestHandler;
+import webserver.api.Login;
 import webserver.api.ReadFile;
 import webserver.api.registration.Registration;
 import webserver.http.enums.Methods;
@@ -10,14 +12,14 @@ import java.util.Map;
 
 public class PathMap {
     private static Map<String, PathNode> pathMap;
-    private static ApiFunction readfile = new ReadFile();
+    private static RequestHandler readfile = new ReadFile();
 
     static{
         buildPathMap();
     }
 
     private static class PathNode {
-        Map<Methods, ApiFunction> methods;
+        Map<Methods, RequestHandler> methods;
         String path;
 
 
@@ -27,26 +29,26 @@ public class PathMap {
             methods.put(Methods.GET , new ReadFile());
         }
 
-        public ApiFunction getMethod(Methods method) {
+        public RequestHandler getMethod(Methods method) {
             return methods.get(method);
         }
         public String getPath() { return path; }
 
-        public void addGetMethod(ApiFunction getMethod) {
+        public void addGetMethod(RequestHandler getMethod) {
             methods.put(Methods.GET, getMethod);
         }
-        public void addPostMethod(ApiFunction postMethod) {
+        public void addPostMethod(RequestHandler postMethod) {
             methods.put(Methods.POST, postMethod);
         }
-        public void addPutMethod(ApiFunction putMethod) {
+        public void addPutMethod(RequestHandler putMethod) {
             methods.put(Methods.PUT, putMethod);
         }
-        public void addDeleteMethod(ApiFunction deleteMethod) {
+        public void addDeleteMethod(RequestHandler deleteMethod) {
             methods.put(Methods.DELETE, deleteMethod);
         }
     }
 
-    public static ApiFunction getPathMethod(Methods method, String path) {
+    public static RequestHandler getPathMethod(Methods method, String path) {
         PathNode current = pathMap.get(path);
         if (current == null) {
             return readfile;
@@ -66,5 +68,15 @@ public class PathMap {
         PathNode create = new PathNode("/create");
         create.addPostMethod(new Registration());
         pathMap.put("/create", create);
+
+        //login
+        PathNode login = new PathNode("/login");
+        login.addPostMethod(new Login());
+        pathMap.put("/login", login);
+
+        //logout
+        PathNode logout = new PathNode("/logout");
+        logout.addGetMethod(new Logout());
+        pathMap.put("/logout", logout);
     }
 }

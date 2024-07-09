@@ -2,10 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.api.ApiFunction;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.PathMap;
@@ -57,7 +57,7 @@ public class RequestHandler implements Runnable {
 
             logger.info(request.printRequest());
 
-            ApiFunction api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            webserver.api.RequestHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
                     (api == null)
                             ? new HttpResponse.ResponseBuilder(404).build()
@@ -68,7 +68,8 @@ public class RequestHandler implements Runnable {
             dos.write(response.getBody());
             dos.flush();
         } catch (IOException | NumberFormatException e) {
-            logger.error(e.getMessage());
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 }

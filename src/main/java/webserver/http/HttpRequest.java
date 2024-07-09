@@ -23,6 +23,7 @@ public class HttpRequest {
     private byte[] body;
     private String protocol;
     private Map<String, String> headers;
+    private Map<String, String> cookies;
 
     public Methods getMethod() {
         return method;
@@ -44,6 +45,8 @@ public class HttpRequest {
         return headers;
     }
 
+    public Map<String, String> getCookie(String key) {return cookies;}
+
     public String printRequest(){
         return "method: " + method.getMethod() + "\n" +
                 "url: " + url.getPath() + "\n" +
@@ -59,6 +62,7 @@ public class HttpRequest {
         this.protocol = builder.protocol;
         this.body = builder.body;
         this.headers = builder.headers;
+        this.cookies = builder.cookies;
     }
 
     public static class ReqeustBuilder{
@@ -67,6 +71,7 @@ public class HttpRequest {
         private byte[] body;
         private String protocol;
         private Map<String, String> headers= new HashMap<>();
+        private Map<String, String> cookies= new HashMap<>();
 
         public ReqeustBuilder(String startline) throws IOException {
             String[] split = startline.split(" ");
@@ -88,7 +93,19 @@ public class HttpRequest {
             this.body = body;
             return this;
         }
+
+        private void setCookies (){
+            if(headers.containsKey("Cookie")){
+                String[] split = headers.get("Cookie").trim().split(";");
+                for(String cookie : split){
+                    String[] keyValue = cookie.split("=");
+                    cookies.put(keyValue[0], keyValue[1]);
+                }
+            }
+        }
+
         public HttpRequest build(){
+            setCookies();
             return new HttpRequest(this);
         }
     }

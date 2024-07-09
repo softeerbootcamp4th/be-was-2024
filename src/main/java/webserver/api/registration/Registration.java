@@ -2,30 +2,25 @@ package webserver.api.registration;
 
 import db.Database;
 import model.User;
-import webserver.api.ApiFunction;
-import webserver.api.ReadFile;
+import webserver.api.RequestHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.util.ParamsParser;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 
 /*
 * Registration function
 * */
-public class Registration implements ApiFunction {
+public class Registration implements RequestHandler {
     @Override
     public HttpResponse function(HttpRequest request) {
 
-        Map<String, String> params = new HashMap<>();
-
         String body = new String(request.getBody(), StandardCharsets.UTF_8);
-        for(String line : body.split("&")){
-            String[] param = line.split("=");
-            params.put(param[0], param[1]);
-        }
+
+        Map<String, String> params = ParamsParser.parseParams(body);
 
         String id =params.get("id");
         String username = params.get("username");
