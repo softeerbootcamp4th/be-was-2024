@@ -23,13 +23,15 @@
       </header>
       <div class="page">
         <h2 class="page-title">로그인</h2>
-        <form class="form">
+        <form class="form" method="post">
           <div class="textfield textfield_size_s">
             <p class="title_textfield">아이디</p>
             <input
               class="input_textfield"
+              name = "id"
               placeholder="아이디를 입력해주세요"
               autocomplete="username"
+              required
             />
           </div>
           <div class="textfield textfield_size_s">
@@ -37,8 +39,10 @@
             <input
               class="input_textfield"
               type="password"
+              name = "username"
               placeholder="비밀번호를 입력해주세요"
               autocomplete="current-password"
+              required
             />
           </div>
           <button
