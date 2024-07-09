@@ -9,39 +9,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PathMap {
-    private static PathNode root;
+    private static Map<String, PathNode> pathMap;
+    private static ApiFunction readfile = new ReadFile();
 
     static{
         buildPathMap();
     }
 
-        private static class PathNode {
-            String nodename;
+    private static class PathNode {
+        Map<Methods, ApiFunction> methods;
+        String path;
 
-            Map<Methods, ApiFunction> methods;
 
-            Map<String, PathNode> childnode;
-
-        public PathNode(String nodename) {
-            this.nodename = nodename;
+        public PathNode(String path) {
             this.methods = new HashMap<>();
-            this.childnode = new HashMap<>();
+            this.path = path;
             methods.put(Methods.GET , new ReadFile());
         }
 
         public ApiFunction getMethod(Methods method) {
             return methods.get(method);
         }
-
-        public PathNode getChild(String nodename) {
-            return childnode.get(nodename);
-        }
-
-        public PathNode addChild(String nodename) {
-            PathNode child = new PathNode(nodename);
-            childnode.put(nodename, child);
-            return child;
-        }
+        public String getPath() { return path; }
 
         public void addGetMethod(ApiFunction getMethod) {
             methods.put(Methods.GET, getMethod);
@@ -57,29 +46,25 @@ public class PathMap {
         }
     }
 
-    public static PathNode getRoot() {
-        return root;
-    }
-
     public static ApiFunction getPathMethod(Methods method, String path) {
-        String[] routes = path.split("/");
-        PathNode current = root;
-        if(routes.length == 1){
-            return current.getMethod(method);
-        }
-        for(int i = 1; i < routes.length; i++){
-            PathNode next = current.getChild(routes[i]);
-            if(next == null) break;
-            current = next;
+        PathNode current = pathMap.get(path);
+        if (current == null) {
+            return readfile;
         }
         return current.getMethod(method);
     }
 
 
     private static void buildPathMap(){
-        root = new PathNode("root");
+        pathMap = new HashMap<>();
 
-        //  /registration/~
-        root.addChild("create").addPostMethod(new Registration());
+        //root
+        PathNode root = new PathNode("/");
+        pathMap.put("/", root);
+
+        //register
+        PathNode create = new PathNode("/create");
+        create.addPostMethod(new Registration());
+        pathMap.put("/create", create);
     }
 }
