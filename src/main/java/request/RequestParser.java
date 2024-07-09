@@ -35,7 +35,7 @@ public class RequestParser {
         if(startLine == null) return;
         log.append(startLine).append("\n");
 
-        String[] splitStartLine = startLine.split(" ");
+        String[] splitStartLine = startLine.split(" ", 3);
 
         HttpMethod method = HttpMethod.getMethod(splitStartLine[0]);
         String requestUrl = splitStartLine[1];
@@ -51,16 +51,13 @@ public class RequestParser {
         while (!(headerLine = bufferedReader.readLine()).isEmpty()) {
             log.append(headerLine).append("\n");
 
-            String[] headerParts = headerLine.split(":");
+            String[] headerParts = headerLine.split(":", 2);
 
             String key = headerParts[0].strip();
             String value = headerParts[1].strip();
 
-            // 문제 발생 가능 -> 정규표현식 이용해서 다시 작성하기
-
             headers.put(key, value);
         }
-
         log.append("\n");
         request.setHeaders(headers);
     }
@@ -73,8 +70,12 @@ public class RequestParser {
         byte[] body = new byte[contentLength];
 
         for (int i = 0; i < contentLength; i++) {
-            body[i] = (byte) bufferedReader.read();
+            byte read = (byte) bufferedReader.read();
+            body[i] = read;
+            log.append((char) read);
         }
+
+        log.append("\n");
         request.setBody(body);
     }
 }
