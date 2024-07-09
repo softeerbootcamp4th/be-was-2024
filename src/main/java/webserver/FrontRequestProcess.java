@@ -34,7 +34,7 @@ public class FrontRequestProcess {
         return switch (HttpRequestMapper.of(path, method)) {
             case USER_SIGNUP -> {
                 userHandler.create(request.getRequestBody());
-                yield new HttpResponseObject(StringUtil.DYNAMIC, "/index.html", HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
+                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
             }
             case REGISTER -> new HttpResponseObject(StringUtil.DYNAMIC, "/registration", HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
             case MESSAGE_NOT_ALLOWED -> new HttpResponseObject(StringUtil.FAULT, "/405.html", HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion(), null);
@@ -77,8 +77,8 @@ public class FrontRequestProcess {
     }
 
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
-        byte[] body = IOUtil.readBytesFromFile(IOUtil.STATIC_PATH + path);
-        boolean isDir = IOUtil.isDirectory(IOUtil.STATIC_PATH + path);
+        byte[] body = IOUtil.readBytesFromFile(true, path);
+        boolean isDir = IOUtil.isDirectory(true, path);
         String extension = isDir ? ContentType.HTML.getExtension() : path.split(StringUtil.DOT)[1];
         try {
             dos.writeBytes("HTTP/1.1 200 OK " + StringUtil.CRLF);

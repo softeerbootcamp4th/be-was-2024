@@ -18,4 +18,9 @@ public class StringUtil {
     public static final String DYNAMIC = "dynamic";
     public static final String FAULT = "fault";
     public static final String STATIC = "static";
+
+    public static final String STATIC_DIR = "static.dir";
+    public static final String TEMPLATES_DIR = "templates.dir";
+    public static final String INDEX_HTML = "/index.html";
+    public static final String PROPERTIES = "project.properties";
 }
