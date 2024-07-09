@@ -9,6 +9,15 @@ repositories {
     mavenCentral()
 }
 
+// 정적 파일 클래스패스 등록
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources/static']
+        }
+    }
+}
+
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
