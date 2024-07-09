@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 
 import exception.InvalidHttpRequestException;
+import exception.UnsupportedHttpVersionException;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import http.HttpResponse;
@@ -38,7 +39,12 @@ public class RequestHandler implements Runnable {
             try {
                 response(connection.getOutputStream(), HttpResponse.error(HttpStatus.SC_BAD_REQUEST, ie.getMessage()));
             } catch (IOException e) {logger.error(e.getMessage());}
-        } catch (Exception e) {
+        } catch (UnsupportedHttpVersionException ue) {
+            try {
+                response(connection.getOutputStream(), HttpResponse.error(HttpStatus.SC_HTTP_VERSION_NOT_SUPPORTED, ue.getMessage()));
+            } catch (IOException e) {logger.error(e.getMessage());}
+        }
+        catch (Exception e) {
             logger.error(e.getMessage());
         }
 
