@@ -8,16 +8,15 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.*;
+import java.util.Map;
 
 public class HttpRequest {
     private String httpMethod;
     private String path;
     private String protocolVersion;
-    private List<String> headers;
+    private Map<String, String> headers;
 
-    // 생성자로 사용해도 되는가, 컨버컨버터로 사용해여  하눈거
-    public HttpRequest(String httpMethod, String path, String protocolVersion, List<String> headers) {
-
+    private HttpRequest(String httpMethod, String path, String protocolVersion, Map<String, String> headers) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.protocolVersion = protocolVersion;
@@ -53,6 +52,7 @@ public class HttpRequest {
 
     /**
      * HttpRequest를 통해 HttpResponse를 생성하는 로직
+     *
      * @return 생성된 HttpRequest
      * @throws IOException
      */
@@ -95,4 +95,8 @@ public class HttpRequest {
         return new HttpResponse("HTTP/1.1", HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
 
+    public static HttpRequest from(String httpMethod, String path, String protocolVersion, Map<String, String> headers) {
+        return new HttpRequest(httpMethod, path, protocolVersion, headers);
+
+    }
 }

@@ -7,7 +7,7 @@ import model.HttpRequest;
 import model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.InputStreamParser;
+import util.HttpRequestConverter;
 
 /**
  * 클라이언트가 연결(http 요청)을
@@ -27,13 +27,15 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // inputStream -> HttpRequest 객체로 변환
-            HttpRequest httpRequest = InputStreamParser.convertInputStreamToHttpRequest(in);
+            HttpRequestConverter httpRequestConverter = new HttpRequestConverter();
+            HttpRequest httpRequest = httpRequestConverter.with(in);
 
             // HttpRequest -> HttpResponse 객체로 변환
             HttpResponse httpResponse = httpRequest.createHttpResponse();
 
             //HttpResponse 객체를 기반으로 outputStream으로 HttpResponse 발송
             httpResponse.sendHttpResponse(out);
+
 
         } catch (IOException e) {
             logger.error(e.getMessage());
