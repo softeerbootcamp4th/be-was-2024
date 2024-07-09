@@ -12,6 +12,9 @@ public class HttpMessage {
         this.representationHeader = new RepresentationHeader(contentType,body.length);
         this.body = body;
     }
+    public HttpMessage(String httpVersion) {
+        this.httpVersion = httpVersion;
+    }
     public String getHttpVersion() {
         return httpVersion;
     }
@@ -25,12 +28,11 @@ public class HttpMessage {
 }
 class RepresentationHeader{
     private final Map<String,String> data;
-    public RepresentationHeader(String contentType, int contentLength) {
+    public RepresentationHeader(String contentType, int contentLength){
         this.data = new HashMap<>();
         this.data.put("Content-Type", contentType+"; charset=utf-8");
         this.data.put("Content-Length", String.valueOf(contentLength));
     }
-
     public Map<String, String> getData() {
         return data;
     }

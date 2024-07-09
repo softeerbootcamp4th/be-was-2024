@@ -1,13 +1,14 @@
 package webserver.back.byteReader;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-public class StaticFileReader implements ByteReader {
+public class ResponseStaticFileBody implements Body {
     private FileInputStream fileInputStream;
     private String contentType;
-    public StaticFileReader(String fileUrl,String contentType) throws FileNotFoundException {
+    public ResponseStaticFileBody(String fileUrl, String contentType) throws FileNotFoundException {
         this.fileInputStream = new FileInputStream(fileUrl);
         this.contentType = contentType;
     }
@@ -18,13 +19,12 @@ public class StaticFileReader implements ByteReader {
     }
 
     @Override
-    public byte[] readBytes()  {
+    public byte[] makeBytes()  {
         try{
             return fileInputStream.readAllBytes();
         }
         catch(IOException e){
             return new byte[0];
         }
-
     }
 }

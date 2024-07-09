@@ -4,10 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-public class JsonReader implements ByteReader{
+public class ResponseJsonBody implements Body {
     private Object object;
     private String contentType = "application/json";
-    public JsonReader(Object object){
+    public ResponseJsonBody(Object object){
         this.object = object;
     }
 
@@ -17,7 +17,7 @@ public class JsonReader implements ByteReader{
     }
 
     @Override
-    public byte[] readBytes()  {
+    public byte[] makeBytes()  {
         try{
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);

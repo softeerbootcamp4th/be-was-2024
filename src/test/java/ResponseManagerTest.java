@@ -18,7 +18,7 @@ public class ResponseManagerTest {
         FileInputStream fileInputStream = new FileInputStream(FILE_BASE_URL+"/index.html");
         String realFile = new String(fileInputStream.readAllBytes());
         System.out.println(realFile);
-        byte[] body = responseManager.getResponse("/index.html").body;
+        byte[] body = responseManager.getResponse("/index.html").getBody();
         String foundFile = new String(body);
         Assertions.assertTrue(realFile.equals(foundFile));
     }
@@ -34,10 +34,10 @@ public class ResponseManagerTest {
         }
         SignInForm signInForm = new SignInForm(map);
         byte[] bytes = responseManager.getResponse("/create?" +
-                "userId="+value[0] +
-                "&password="+value[1] +
-                "&name=" +value[2]+
-                "\n").body;
+                "userId=" + value[0] +
+                "&password=" + value[1] +
+                "&name=" + value[2] +
+                "\n").getBody();
         System.out.println(new String(bytes));
 
     }

@@ -13,7 +13,6 @@ public class HttpResponse extends HttpMessage{
         this.statusText = statusText;
         makeFirstLine();
     }
-
     private void makeFirstLine() {
         this.firstLine = this.getHttpVersion()+" " +statusCode+" "+ statusText;
     }
@@ -23,7 +22,6 @@ public class HttpResponse extends HttpMessage{
     public HashMap<String, String> getAdditionalHeader() {
         return additionalHeader;
     }
-
     public String getFirstLine() {
         return firstLine;
     }

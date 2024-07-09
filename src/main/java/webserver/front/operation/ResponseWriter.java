@@ -18,7 +18,7 @@ public class ResponseWriter {
         dos = new DataOutputStream(out);
         byte[] data = httpResponse.getBody();
 //        System.out.println(new String(data,"UTF-8"));
-//        printHeader(httpResponse);
+        printHeader(httpResponse);
         responseHeader(httpResponse);
         responseBody(data);
     }
