@@ -94,6 +94,7 @@ public class FileHandlerTest {
         assertEquals("application/octet-stream", determineContentType("unknown.xyz"));
     }
 
+    // 테스트를 위한 메서드 작성
     private void writeFileContent(File file, String content) throws IOException {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(content.getBytes());
