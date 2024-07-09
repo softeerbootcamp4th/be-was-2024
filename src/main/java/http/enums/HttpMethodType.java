@@ -1,4 +1,4 @@
-package http;
+package http.enums;
 
 public enum HttpMethodType {
     GET,
@@ -6,4 +6,9 @@ public enum HttpMethodType {
     PUT,
     DELETE,
     PATCH,
+
+    HEAD,
+    CONNECT,
+    OPTIONS,
+    TRACE;
 }

@@ -26,6 +26,10 @@ public class MyHttpHeaders {
         headers.put(parts[0].trim(), parts[1].trim());
     }
 
+    public void putHeader(String key, String value) {
+        headers.put(key, value);
+    }
+
     public String getHeader(String name) {
         return headers.get(name);
     }
