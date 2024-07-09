@@ -42,23 +42,6 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
             RequestResponse requestResponse = new RequestResponse(httpRequest, dos);
             MappingHandler.mapRequest(httpRequest, requestResponse);
-
-//            DataOutputStream dos = new DataOutputStream(out);
-//            String filePath = MappingHandler.mapRequest(httpRequest, dos);
-//
-//            if(filePath != null){
-//                File file = new File(filePath);
-//                if (!file.exists()) {
-//                    response404Header(dos);
-//                    return;
-//                }
-//
-//                byte[] fileBody = FileHandler.readFileToByteArray(file);
-//                String contentType = FileHandler.determineContentType(file.getName());
-//
-//                response200Header(dos, fileBody.length, contentType);
-//                responseBody(dos, fileBody);
-//            }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
