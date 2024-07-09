@@ -7,7 +7,8 @@ public enum MimeType {
     ICO("image/vnd.microsoft.icon"),
     PNG("image/png"),
     JPG("image/jpeg"),
-    SVG("image/svg+xml");
+    SVG("image/svg+xml"),
+    FORM("application/x-www-form-urlencoded");
 
     private final String mimeType;
 
