@@ -1,5 +1,6 @@
 package webserver;
 
+import enums.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +12,28 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Request{
-    private String method;
+    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private HttpMethod method;
     private String path;
     private String httpVersion;
     private Map<String, String> httpHeaders;
     private Map<String, String> parameters;
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private String body;
 
-    public Request() {}
+    public Request(HttpMethod method,
+                   String path,
+                   String httpVersion,
+                   Map<String, String> httpHeaders,
+                   Map<String, String> parameters,
+                   String body
+                   ) {
+       this.method = method;
+       this.path = path;
+       this.httpVersion = httpVersion;
+       this.httpHeaders = httpHeaders;
+       this.parameters = parameters;
+       this.body = body;
+    }
 
     public String getHeader(String HeaderKey) {
         return httpHeaders.get(HeaderKey);
@@ -28,7 +43,7 @@ public class Request{
         return parameters.get(parameterKey);
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 
@@ -38,29 +53,5 @@ public class Request{
 
     public String getHttpVersion() {
         return httpVersion;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public void setHttpVersion(String httpVersion) {
-        this.httpVersion = httpVersion;
-    }
-
-    public Map<String, String> getHttpHeaders() {
-        return httpHeaders;
-    }
-
-    public void setHttpHeaders(Map<String, String> httpHeaders) {
-        this.httpHeaders = httpHeaders;
-    }
-
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
     }
 }

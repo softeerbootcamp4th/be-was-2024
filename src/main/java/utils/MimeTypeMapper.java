@@ -1,4 +1,6 @@
-package webserver;
+package utils;
+
+import enums.MimeType;
 
 import java.util.HashMap;
 import java.util.Map;

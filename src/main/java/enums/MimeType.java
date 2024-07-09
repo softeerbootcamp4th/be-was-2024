@@ -1,4 +1,4 @@
-package webserver;
+package enums;
 
 public enum MimeType {
     HTML("text/html"),
@@ -7,9 +7,10 @@ public enum MimeType {
     ICO("image/vnd.microsoft.icon"),
     PNG("image/png"),
     JPG("image/jpeg"),
-    SVG("image/svg+xml");
+    SVG("image/svg+xml"),
+    FORM("application/x-www-form-urlencoded");
 
-    private String mimeType;
+    private final String mimeType;
 
     MimeType(String mimeType) {
        this.mimeType = mimeType;
@@ -18,7 +19,6 @@ public enum MimeType {
     public String getMimeType() {
         return mimeType;
     }
-
 
     @Override
     public String toString() {
