@@ -31,11 +31,11 @@ public class PostHandler
         }
     }
 
-    public void responseAlert(DataOutputStream dos, String content) {
+    /*public void responseAlert(DataOutputStream dos, String content) {
         try {
             String body = "<html><head><script type='text/javascript'>alert('" + content + "');window.location='/login/index.html';</script></head></html>";
             byte[] bodyBytes = body.getBytes("UTF-8");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
             dos.writeBytes("\r\n");
@@ -44,5 +44,5 @@ public class PostHandler
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }
+    }*/
 }
