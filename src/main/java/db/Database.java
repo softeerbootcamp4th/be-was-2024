@@ -1,8 +1,6 @@
 package db;
 
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +15,21 @@ public class Database {
     }
 
     public static User findUserById(String userId) {
+        if(!users.containsKey(userId)){
+            return null;
+        }
         return users.get(userId);
+    }
+
+    public static User login(String userId, String password) {
+        if(!users.containsKey(userId)){
+            return null;
+        }
+        User user = users.get(userId);
+        if(!user.getPassword().equals(password)){
+            return null;
+        }
+        return user;
     }
 
     public static Collection<User> findAll() {

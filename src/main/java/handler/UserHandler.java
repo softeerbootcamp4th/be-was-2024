@@ -4,8 +4,9 @@ import db.Database;
 import model.User;
 
 import java.util.Map;
+import java.util.Optional;
 
-public class UserHandler implements ModelHandler<User> {
+public class UserHandler {
 
     private UserHandler() {}
 
@@ -17,7 +18,10 @@ public class UserHandler implements ModelHandler<User> {
         private static final UserHandler INSTANCE = new UserHandler();
     }
 
-    @Override
+    public Optional<User> login(Map<String, String> fields) {
+        return Optional.ofNullable(Database.login(fields.get("userId"), fields.get("password")));
+    }
+
     public User create(Map<String, String> fields) {
         User user = User.from(fields);
         Database.addUser(user);
