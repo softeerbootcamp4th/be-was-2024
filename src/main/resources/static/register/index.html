@@ -15,7 +15,7 @@
             <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
           </li>
           <li class="header__menu__item">
-            <a class="btn btn_ghost btn_size_s" href="/registration">
+            <a class="btn btn_ghost btn_size_s" href="/register">
               회원 가입
             </a>
           </li>
@@ -23,37 +23,50 @@
       </header>
       <div class="page">
         <h2 class="page-title">회원가입</h2>
-        <form class="form">
+        <form class="form" action="/user/create" method="get">
           <div class="textfield textfield_size_s">
             <p class="title_textfield">아이디</p>
             <input
               class="input_textfield"
+              name="userId"
               placeholder="아이디를 입력해주세요"
-              autocomplete="username"
-            />
-          </div>
-          <div class="textfield textfield_size_s">
-            <p class="title_textfield">닉네임</p>
-            <input
-              class="input_textfield"
-              placeholder="닉네임을 입력해주세요"
               autocomplete="username"
             />
           </div>
           <div class="textfield textfield_size_s">
             <p class="title_textfield">비밀번호</p>
             <input
-              class="input_textfield"
-              type="password"
-              placeholder="비밀번호를 입력해주세요"
-              autocomplete="current-password"
+                    class="input_textfield"
+                    name="password"
+                    type="password"
+                    placeholder="비밀번호를 입력해주세요"
+                    autocomplete="current-password"
             />
           </div>
+          <div class="textfield textfield_size_s">
+            <p class="title_textfield">이름</p>
+            <input
+              class="input_textfield"
+              name="name"
+              placeholder="이름을 입력해주세요"
+              autocomplete="username"
+            />
+          </div>
+          <div class="textfield textfield_size_s">
+            <p class="title_textfield">이메일</p>
+            <input
+                    class="input_textfield"
+                    name="email"
+                    placeholder="이메일을 입력해주세요"
+                    autocomplete="email"
+            />
+          </div>
+
           <button
             id="registration-btn"
             class="btn btn_contained btn_size_m"
             style="margin-top: 24px"
-            type="button"
+            type="submit"
           >
             회원가입
           </button>

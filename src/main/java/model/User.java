@@ -1,5 +1,7 @@
 package model;
 
+import java.util.Map;
+
 public class User {
     private String userId;
     private String password;
@@ -11,6 +13,17 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public User(Map<String, String> map) {
+        if (map.get("userId") == null || map.get("password") == null || map.get("name") == null || map.get("email") == null) {
+            throw new IllegalArgumentException("User information cannot be null");
+        }
+
+        this.userId = map.get("userId");
+        this.password = map.get("password");
+        this.name = map.get("name");
+        this.email = map.get("email");
     }
 
     public String getUserId() {

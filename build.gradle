@@ -16,6 +16,12 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
 
+    // Mockito
+    testImplementation 'org.mockito:mockito-core:3.9.0'
+
+    // Rest Assured
+    testImplementation 'io.rest-assured:rest-assured:4.4.0'
+
 
 }
 
