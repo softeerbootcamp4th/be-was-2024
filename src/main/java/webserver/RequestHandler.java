@@ -128,32 +128,22 @@ public class RequestHandler implements Runnable {
 
         try(FileInputStream fis = new FileInputStream(file)) {
             fis.read(body);
-            responseHeader(ResponseCode.OK, dos, body.length, contentType);
-            responseBody(dos, body);
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.OK)
+                    .contentType(contentType)
+                    .contentLength(body.length)
+                    .body(body)
+                    .build();
+            response.writeInBytes(dos);
         } catch (Exception e) {
-            responseHeader(ResponseCode.INTERNAL_SERVER_ERROR, dos, body.length, contentType);
-            responseBody(dos, body);
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.INTERNAL_SERVER_ERROR)
+                    .contentType(contentType)
+                    .contentLength(body.length)
+                    .body(body)
+                    .build();
+            response.writeInBytes(dos);
             e.printStackTrace();
-        }
-    }
-
-    private void responseHeader(ResponseCode code, DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 "+code.getCode()+" OK \r\n");
-            dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
         }
     }
 }
