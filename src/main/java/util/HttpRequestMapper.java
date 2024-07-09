@@ -6,14 +6,21 @@ package util;
 public enum HttpRequestMapper {
 
     // 200
-    STATIC("/index.html", "GET"),
+    ROOT("/", "GET"),
+    INDEX_HTML("/index.html", "GET"),
+    USER_LOGIN_FAIL("/user/login_failed.html", "GET"),
+    USER_LOGIN("/login", "GET"),
 
     // 302
-    USER_SIGNUP("/user/create", "POST"),
-    REGISTER("/register.html", "GET"),
+    SIGNUP_REQUEST("/user/create", "POST"),
+    LOGIN_REQUEST("/user/login", "POST"),
+    REGISTER("/registration", "GET"),
 
     // 400
-    MESSAGE_NOT_ALLOWED("/notallow", "GET");
+    MESSAGE_NOT_ALLOWED("/notallow", "GET"),
+
+    // 500
+    ERROR("/error", "GET");
 
     private final String path;
     private final String method;
@@ -32,6 +39,6 @@ public enum HttpRequestMapper {
                 return MESSAGE_NOT_ALLOWED; // 요청 경로는 찾았으나 메서드가 없는 경우
             }
         }
-        return STATIC;
+        return ERROR;
     }
 }
