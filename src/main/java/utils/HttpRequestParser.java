@@ -1,9 +1,8 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import enums.Method;
+
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -15,58 +14,99 @@ public class HttpRequestParser {
     private final String startLine;
     private final String url;
     private final String path;
+    private final byte[] body;
+    private Method method;
     private final Map<String, String> requestHeadersMap = new HashMap<>();
     private final Map<String, String> queryParametersMap = new HashMap<>();
     public HttpRequestParser(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
+        int c;
+        int prev1 = -1, prev2 = -1, prev3 = -1;
 
-        startLine = br.readLine();
+        // Read headers
+        while ((c = inputStream.read()) != -1) {
+            headerBuffer.write(c);
+            if (prev3 == '\r' && prev2 == '\n' && prev1 == '\r' && c == '\n') {
+                break;
+            }
+            prev3 = prev2;
+            prev2 = prev1;
+            prev1 = c;
+        }
 
-        String readLine;
-        while ((readLine = br.readLine()) != null && !readLine.isEmpty()) {
-            int colonIndex = readLine.indexOf(":");
+        String headersString = headerBuffer.toString(StandardCharsets.ISO_8859_1);
+        String[] headerLines = headersString.split("\r\n");
 
+        startLine = headerLines[0];
+
+        for (int i = 1; i < headerLines.length; i++) {
+            String line = headerLines[i];
+            int colonIndex = line.indexOf(":");
             if (colonIndex != -1) {
-                String key = readLine.substring(0, colonIndex).trim();
-                String value = readLine.substring(colonIndex + 1).trim();
-
+                String key = line.substring(0, colonIndex).trim();
+                String value = line.substring(colonIndex + 1).trim();
                 requestHeadersMap.put(key, value);
             }
         }
 
+        String contentLengthHeader = requestHeadersMap.get("Content-Length");
+        int contentLength = contentLengthHeader == null ? 0 : Integer.parseInt(contentLengthHeader);
+
+        // body 파싱
+        if (contentLength > 0) {
+            body = new byte[contentLength];
+            int bytesRead = inputStream.read(body, 0, contentLength);
+            if (bytesRead != contentLength) {
+                throw new IOException("Failed to read full request body");
+            }
+        } else {
+            body = null;
+        }
+
+        method = Method.fromString(startLine.split(" ")[0]);
         url = startLine.split(" ")[1];
         String[] tokens = url.split("\\?");
 
         path = tokens[0];
         if (tokens.length > 1) {
             String queryParameters = tokens[1];
-            for (String queryParameter : queryParameters.split("&")) {
-                String[] keyValue = queryParameter.split("=");
-                String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-                String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
-                queryParametersMap.put(key, value);
+            for (String keyValue : queryParameters.split("&")) {
+                int equalsIndex = keyValue.indexOf("=");
+                if (equalsIndex != -1) {
+                    String key = URLDecoder.decode(keyValue.substring(0, equalsIndex), StandardCharsets.UTF_8);
+                    String value = URLDecoder.decode(keyValue.substring(equalsIndex + 1), StandardCharsets.UTF_8);
+                    queryParametersMap.put(key, value);
+                }
             }
         }
     }
 
     public String getStartLine() {
-        return this.startLine;
+        return startLine;
     }
 
     public String getUrl() {
-        return this.url;
+        return url;
     }
 
     public String getPath() {
-        return this.path;
+        return path;
     }
 
-    public Map<String, String> getQueryParametersMap() {
-        return this.queryParametersMap;
+    public byte[] getBody() {
+        return body;
     }
 
     public Map<String, String> getRequestHeadersMap() {
-        return this.requestHeadersMap;
+        return requestHeadersMap;
+    }
+
+    public Map<String, String> getQueryParametersMap() {
+        return queryParametersMap;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 
     public String headersToString() {
