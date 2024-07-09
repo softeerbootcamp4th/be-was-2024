@@ -1,6 +1,7 @@
 package webserver;
 
 import common.WebUtils;
+import exception.SizeNotMatchException;
 import file.ViewFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,9 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final String dirPath = "./src/main/resources/static";
+    private final String STATIC_DIR_PATH = "./src/main/resources/static";
+    private final String DYNAMIC_DIR_PATH = "./src/main/resources/template";
+    private final int BUFFER_SIZE = 4096;
 
     private Socket connection;
 
@@ -38,17 +41,14 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            StringBuilder requestString = readHttpRequest(in);
-            logger.debug("{}", requestString);
-
             // 요청 헤더를 파싱하여 Request객체 생성
-            HttpRequest httpRequest = WebAdapter.parseRequest(requestString.toString());
+            HttpRequest httpRequest = parseHttpRequest(in);
             // Request객체의 정보를 바탕으로 적절한 응답 뷰 파일 탐색
             ViewFile viewFile = ViewResolver.getProperFileFromRequest(httpRequest, out);
             // 뷰 파일에 맞게 적절한 Response객체 생성
             HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.OK, WebUtils.getProperContentType(viewFile.getExtension()));
             // Stream을 이용하여 HTTP 응답
-            readAndResponseFromPath(out, dirPath+viewFile.getPath(), httpResponse.getContentType());
+            readAndResponseFromPath(out, STATIC_DIR_PATH +viewFile.getPath(), httpResponse.getContentType());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,29 +63,59 @@ public class RequestHandler implements Runnable {
     }
 
     /**
-     * InputStream에서 Request를 String형태로 읽어온다.
+     * InputStream에서 Request를 String형태로 읽어온 후, HttpRequest를 만들어 반환한다.
+     * body는 byte[]형태로 받아온다.
      */
-    private StringBuilder readHttpRequest(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String str;
+    private HttpRequest parseHttpRequest(InputStream in) throws IOException {
+        int ch;
         StringBuilder sb = new StringBuilder();
         int contentLength = 0;
+        byte[] body = null;
 
-        while((str = br.readLine())!=null && !str.isEmpty()) {
-            if(str.startsWith("Content-Length")) {
-                contentLength = Integer.parseInt(str.split(":")[1].trim());
+        // Request Line부터 Body 전까지 읽는다
+        // Request Line과 Body 사이에는 '\r\n'이 두번 오게 된다.
+        boolean lastWasCR = false;
+        boolean lastWasLF = false;
+        while((ch = in.read())!=-1) {
+            sb.append((char) ch);
+
+            if(ch=='\r') {
+                lastWasCR = true;
+            } else if (ch=='\n') {
+                if(lastWasCR && lastWasLF) {
+                    break;
+                }
+                lastWasLF = true;
+            } else {
+                lastWasCR = false;
+                lastWasLF = false;
             }
-            sb.append(str).append("\n");
         }
 
-        // body가 존재한다면 읽는다.
+        // Content-Length 헤더 찾기
+        String header = sb.toString();
+        String[] headerLines = header.split("\r\n");
+        for (String line : headerLines) {
+            if (line.startsWith("Content-Length")) {
+                contentLength = Integer.parseInt(line.split(":")[1].trim());
+                break;
+            }
+        }
+
+        // Content-Length가 0보다 크다면 body를 읽는다.
         if(contentLength>0) {
-            char[] body = new char[contentLength];
-            br.read(body, 0, contentLength);
-            sb.append(body);
+            body = new byte[contentLength];
+            int readSize = in.read(body, 0, contentLength);
+            if(readSize!=contentLength) {
+                throw new SizeNotMatchException("Content-Length 크기와 읽은 body 사이즈가 다릅니다");
+            }
+            sb.append(new String(body));
+            sb.append("\n");
         }
 
-        return sb;
+        logger.debug("{}", sb);
+
+        return WebAdapter.parseRequest(sb.toString(), body);
     }
 
     /**

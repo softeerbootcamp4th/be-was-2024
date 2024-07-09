@@ -1,5 +1,8 @@
 package web;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 public class HttpResponse {
 
     private String httpVersion;
@@ -7,7 +10,10 @@ public class HttpResponse {
     private String contentType;
     private int contentLength;
     private String location;
-    private String body;
+    private HttpSession session;
+    private byte[] body;
+
+    public HttpResponse() {}
 
     private HttpResponse(
             String httpVersion,
@@ -15,17 +21,17 @@ public class HttpResponse {
             String contentType,
             int contentLength,
             String location,
-            String body
+            HttpSession session,
+            byte[] body
     ) {
         this.httpVersion = httpVersion;
         this.statusCode = statusCode;
         this.contentType = contentType;
         this.contentLength = contentLength;
         this.location = location;
+        this.session = session;
         this.body = body;
     }
-
-    public HttpResponse() {}
 
     public static class HttpResponseBuilder {
         private String httpVersion = "HTTP/1.1";
@@ -33,7 +39,8 @@ public class HttpResponse {
         private String contentType = "*/*";
         private int contentLength = 0;
         private String location = "/";
-        private String body = "";
+        private HttpSession session;
+        private byte[] body = null;
 
         public HttpResponseBuilder httpVersion(String httpVersion) {
             this.httpVersion = httpVersion;
@@ -60,14 +67,19 @@ public class HttpResponse {
             return this;
         }
 
-        public HttpResponseBuilder body(String body) {
+        public HttpResponseBuilder session(HttpSession session) {
+            this.session = session;
+            return this;
+        }
+
+        public HttpResponseBuilder body(byte[] body) {
             this.body = body;
             return this;
         }
 
         public HttpResponse build() {
             return new HttpResponse(
-                    httpVersion, code, contentType, contentLength, location, body
+                    httpVersion, code, contentType, contentLength, location, session, body
             );
         }
 
@@ -85,31 +97,31 @@ public class HttpResponse {
         return contentLength;
     }
 
-    public byte[] getBytes() {
+    public void writeInBytes(OutputStream out) throws IOException {
         StringBuilder response = new StringBuilder();
         response
                 .append(httpVersion).append(" ")
                 .append(statusCode.getCode()).append(" ")
                 .append(statusCode.getMessage()).append("\n");
 
-        if (!location.isEmpty()) {
+        if(!location.isEmpty()) {
             response.append("Location: ").append(location).append("\r\n");
         }
 
-        if (contentLength > 0) {
+        if(contentLength > 0) {
             response.append("Content-Length: ").append(contentLength).append("\r\n");
         }
 
-        if (!contentType.isEmpty()) {
+        if(!contentType.isEmpty()) {
             response.append("Content-Type: ").append(contentType).append("\r\n");
+        }
+        if(session!=null) {
+            response.append("Set-cookie: ").append(session.getString()).append("\r\n");
         }
 
         response.append("\r\n");
 
-        if (!body.isEmpty()) {
-            response.append(body);
-        }
-
-        return response.toString().getBytes();
+        out.write(response.toString().getBytes());
+        if(body!=null) out.write(body);
     }
 }

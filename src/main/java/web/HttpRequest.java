@@ -9,51 +9,77 @@ public class HttpRequest {
     private LinkedList<String> accept;
     private int contentLength;
     private String contentType;
-    private String body;
+    private HttpSession session;
+    private byte[] body;
 
     public HttpRequest() {}
 
-    private HttpRequest(HttpMethod method, String path, LinkedList<String> accept, int contentLength, String contentType, String body) {
+    private HttpRequest(
+            HttpMethod method,
+            String path,
+            LinkedList<String> accept,
+            int contentLength,
+            String contentType,
+            byte[] body
+    ) {
         this.method = method;
         this.path = path;
         this.accept = accept;
         this.contentLength = contentLength;
         this.contentType = contentType;
+        this.session = session;
         this.body = body;
     }
 
-    public HttpRequest method(HttpMethod method) {
-        this.method = method;
-        return this;
-    }
+    public static class HttpRequestBuilder {
+        private HttpMethod method;
+        private String path;
+        private LinkedList<String> accept;
+        private int contentLength;
+        private String contentType;
+        private HttpSession session;
+        private byte[] body;
 
-    public HttpRequest path(String path) {
-        this.path = path;
-        return this;
-    }
+        public HttpRequestBuilder method(HttpMethod method) {
+            this.method = method;
+            return this;
+        }
 
-    public HttpRequest accept(LinkedList<String> accept) {
-        this.accept = accept;
-        return this;
-    }
+        public HttpRequestBuilder path(String path) {
+            this.path = path;
+            return this;
+        }
 
-    public HttpRequest contentLength(int contentLength) {
-        this.contentLength = contentLength;
-        return this;
-    }
+        public HttpRequestBuilder accept(LinkedList<String> accept) {
+            this.accept = accept;
+            return this;
+        }
 
-    public HttpRequest contentType(String contentType) {
-        this.contentType = contentType;
-        return this;
-    }
+        public HttpRequestBuilder contentLength(int contentLength) {
+            this.contentLength = contentLength;
+            return this;
+        }
 
-    public HttpRequest body(String body) {
-        this.body = body;
-        return this;
-    }
+        public HttpRequestBuilder contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
 
-    public HttpRequest build() {
-        return new HttpRequest(method, path, accept, contentLength, contentType, body);
+        public HttpRequestBuilder session(HttpSession session) {
+            this.session = session;
+            return this;
+        }
+
+        public HttpRequestBuilder body(byte[] body) {
+            this.body = body;
+            return this;
+        }
+
+        public HttpRequest build() {
+            return new HttpRequest(
+                    method, path, accept, contentLength, contentType, body
+            );
+        }
     }
 
     public HttpMethod getMethod() {
@@ -76,7 +102,7 @@ public class HttpRequest {
         return contentType;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 

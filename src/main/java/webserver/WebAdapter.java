@@ -3,6 +3,7 @@ package webserver;
 import common.JsonBuilder;
 import db.Database;
 import exception.CannotResolveRequestException;
+import facade.UserFacade;
 import model.User;
 import web.*;
 
@@ -22,47 +23,47 @@ public class WebAdapter {
     /**
      * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
      * @param request 요청 전문
-     * @return HttpRequest 객체
+     * @return HttpRequest
      */
-    public static HttpRequest parseRequest(String request) {
+    public static HttpRequest parseRequest(String request, byte[] body) {
         HttpMethod method;
         String path, contentType = MIME.UNKNOWN.getType();
         LinkedList<String> accept = new LinkedList<>();
         int contentLength = 0;
-        StringBuilder body = new StringBuilder();
 
         String[] requestLine = request.split("\n");
 
-        // 첫줄에 HTTP Method 포함
+        // Request Line
         String[] line_1 = requestLine[0].split(" ");
         method = HttpMethod.valueOf(line_1[0]);
         path = line_1[1];
 
         for(int i=1; i<requestLine.length; i++) {
+            if(requestLine[i].split(":").length==1) continue;
             String[] line_N = requestLine[i].split(":");
-            // body
-            if(line_N.length==1) {
-                body.append(line_N[0]).append("\n");
-            }
-            // header
-            else {
-                String key = line_N[0].trim();
-                String value = line_N[1].trim();
+            String key = line_N[0].trim();
+            String value = line_N[1].trim();
 
-                // Accept헤더 MimeType 설정
-                switch (key) {
-                    case ACCEPT -> {
-                        String[] acceptLine = value.split(";");
-                        String[] mimeType = acceptLine[0].split(",");
-                        accept.addAll(Arrays.asList(mimeType));
-                    }
-                    case CONTENT_LENGTH -> contentLength = Integer.parseInt(value);
-                    case CONTENT_TYPE -> contentType = value;
+            // Accept헤더 MimeType 설정
+            switch (key) {
+                case ACCEPT -> {
+                    String[] acceptLine = value.split(";");
+                    String[] mimeType = acceptLine[0].split(",");
+                    accept.addAll(Arrays.asList(mimeType));
                 }
+                case CONTENT_LENGTH -> contentLength = Integer.parseInt(value);
+                case CONTENT_TYPE -> contentType = value;
             }
         }
 
-        return new HttpRequest().method(method).path(path).accept(accept).contentLength(contentLength).contentType(contentType).body(body.toString()).build();
+        return new HttpRequest.HttpRequestBuilder()
+                .method(method)
+                .path(path)
+                .accept(accept)
+                .contentLength(contentLength)
+                .contentType(contentType)
+                .body(body)
+                .build();
     }
 
     public static HttpResponse createResponse(ResponseCode code, String contentType) {
@@ -82,9 +83,9 @@ public class WebAdapter {
     /**
      * POST 요청을 처리
      */
-    private static String resolvePostRequestUri(String restUri, String body, OutputStream out) throws IOException {
+    private static String resolvePostRequestUri(String restUri, byte[] body, OutputStream out) throws IOException {
         // POST registration
-        if(restUri.split("\\?")[0].equals("/signUp")) {
+        if(restUri.equals("/signUp")) {
             Map<String, String> map = parseBodyInForm(body);
             Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
@@ -92,15 +93,34 @@ public class WebAdapter {
                     .code(ResponseCode.FOUND)
                     .build();
 
-            out.write(response.getBytes());
+            response.writeInBytes(out);
+
+        } else if(restUri.equals("/signIn")) {
+            Map<String, String> map = parseBodyInForm(body);
+
+            HttpResponse response;
+            if(UserFacade.isUserExist(map)) {
+                response = new HttpResponse.HttpResponseBuilder()
+                        .code(ResponseCode.FOUND)
+                        .session(new HttpSession.HttpSessionBuilder().build())
+                        .build();
+            } else {
+                response = new HttpResponse.HttpResponseBuilder()
+                        .code(ResponseCode.FOUND)
+                        .location("/user/login_failed.html")
+                        .build();
+            }
+
+            response.writeInBytes(out);
         }
 
-        return "/index.html";
+        return "/login/index.html";
     }
 
-    private static Map<String, String> parseBodyInForm(String body) {
+    private static Map<String, String> parseBodyInForm(byte[] body) {
         HashMap<String, String> map = new HashMap<>();
-        String[] chunks = body.split("&");
+        String bodyStr = new String(body);
+        String[] chunks = bodyStr.split("&");
         for (String chunk : chunks) {
             String key = chunk.split("=")[0];
             String value = chunk.split("=")[1];
@@ -120,7 +140,7 @@ public class WebAdapter {
                     .code(ResponseCode.BAD_REQUEST)
                     .build();
 
-            out.write(response.getBytes());
+            response.writeInBytes(out);
         }
         // 유저 리스트 찾아서 json으로 반환
         if(restUri.split("\\?")[0].equals("/user/list")) {
@@ -132,10 +152,10 @@ public class WebAdapter {
                     .code(ResponseCode.OK)
                     .contentType(MIME.JSON.getType())
                     .contentLength(jsonUser.length())
-                    .body(jsonUser)
+                    .body(jsonUser.getBytes())
                     .build();
 
-            out.write(response.getBytes());
+            response.writeInBytes(out);
         }
         // 데이터베이스 초기화
         else if(restUri.split("\\?")[0].equals("/database/init")) {
@@ -145,7 +165,7 @@ public class WebAdapter {
                     .code(ResponseCode.OK)
                     .build();
 
-            out.write(response.getBytes());
+            response.writeInBytes(out);
         }
 
         // 최종적으로 뷰를 찾아 반환
