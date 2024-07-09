@@ -3,21 +3,17 @@ package http;
 import exception.InvalidHttpRequestException;
 import exception.QueryParameterNotFoundException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static util.StringUtil.*;
+
 public class HttpRequest {
     private final Map<String, String> queryParameters = new TreeMap<>();
     private final Map<String, String> headers = new TreeMap<>();
-
-    private final String defaultViewPath = "/index.html";
+    private byte[] body;
 
     private String method;
     private String url;
@@ -37,7 +33,7 @@ public class HttpRequest {
     public void setPath(String url) {
         if(hasQueryParameters(url)) {
             setQueryParameters(url);
-            this.path = url.substring(0, url.indexOf('?'));
+            this.path = url.substring(0, url.indexOf(QUESTION_MARK));
         }
         else {
             this.path = url;
@@ -54,14 +50,14 @@ public class HttpRequest {
     }
 
     private boolean hasQueryParameters(String url){
-        return url != null && url.contains("?");
+        return url != null && url.contains(QUESTION_MARK);
     }
 
     private void setQueryParameters(String url){
-        String query = url.substring(url.indexOf("?") + 1);
-        String[] params = query.split("&");
+        String query = url.substring(url.indexOf(QUESTION_MARK) + 1);
+        String[] params = query.split(AMPERSAND);
         for(String param : params){
-            int index = param.indexOf('=');
+            int index = param.indexOf(EQUALS);
             if(index == -1){
                 throw new InvalidHttpRequestException("Invalid query parameter: " + query);
             }
@@ -73,14 +69,14 @@ public class HttpRequest {
     }
 
     private boolean isRootPath(String path){
-        return path.equals("/");
+        return path.equals(ROOT_PATH);
     }
 
     public String getViewPath() {
-        int index = path.lastIndexOf('.');
+        int index = path.lastIndexOf(DOT);
         if(index == -1){
-            if(isRootPath(path)) return defaultViewPath;
-            else return path + defaultViewPath;
+            if(isRootPath(path)) return DEFAULT_VIEW;
+            else return path + DEFAULT_VIEW;
         }
         return path;
     }
@@ -103,7 +99,7 @@ public class HttpRequest {
 
     public String getContentType(){
         String pathURL = getViewPath();
-        int index = pathURL.lastIndexOf('.');
+        int index = pathURL.lastIndexOf(DOT);
 
         String extension = pathURL.substring(index+1);
         return switch(extension){
@@ -120,13 +116,14 @@ public class HttpRequest {
 
     @Override
     public String toString(){
-        StringBuilder sb = new StringBuilder("\n")
-                .append(method).append(" ")
-                .append(url).append(" ")
-                .append(httpVersion).append("\n");
+        StringBuilder sb = new StringBuilder(LF)
+                .append(method).append(BLANK)
+                .append(url).append(BLANK)
+                .append(httpVersion).append(LF);
 
-        for(Map.Entry<String, String> entry : headers.entrySet()){
-            sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        for (String key : headers.keySet()) {
+            sb.append(key).append(COLON + BLANK)
+                    .append(headers.get(key)).append(LF);
         }
 
         return sb.toString();

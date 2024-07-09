@@ -8,10 +8,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import static util.StringUtil.*;
+import static util.StringUtil.Method.*;
+
 public class HttpRequestParser {
 
     public static HttpRequest parse(InputStream in)
             throws InvalidHttpRequestException, UnsupportedHttpVersionException, IOException {
+
         HttpRequest request = new HttpRequest();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
 
@@ -20,15 +24,13 @@ public class HttpRequestParser {
             throw new InvalidHttpRequestException("Empty request line.");
         }
 
-        String[] startLine = line.split("\\s+");
-        throwIfInvalid(startLine);
+        String[] startLine = line.split(SPACES);
 
-        request.setMethod(startLine[0]);
-        request.setUrl(startLine[1]);
-        request.setHttpVersion(startLine[2]);
+        throwIfInvalid(startLine);
+        setStartLine(request, startLine);
 
         while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다..?
-            int colonIndex = line.indexOf(':');
+            int colonIndex = line.indexOf(COLON);
             if (colonIndex == -1) {
                 throw new InvalidHttpRequestException("Invalid HTTP header: " + line);
             }
@@ -38,6 +40,12 @@ public class HttpRequestParser {
         }
 
         return request;
+    }
+
+    private static void setStartLine(HttpRequest request, String[] startLine) {
+        request.setMethod(startLine[0]);
+        request.setUrl(startLine[1]);
+        request.setHttpVersion(startLine[2]);
     }
 
     private static void throwIfInvalid(String[] startLine) throws InvalidHttpRequestException {
@@ -59,7 +67,7 @@ public class HttpRequestParser {
 
     private static boolean isValidMethod(String method) {
         return switch (method) {
-            case "GET", "POST", "PUT", "PATCH", "DELETE" -> true;
+            case GET, POST, PUT, PATCH, DELETE -> true;
             default -> false;
         };
     }
@@ -69,6 +77,6 @@ public class HttpRequestParser {
     }
 
     private static boolean isSupportedHttpVersion(String httpVersion) {
-        return httpVersion.equals("HTTP/1.1");
+        return httpVersion.equals(SUPPORTED_HTTP_VERSION);
     }
 }

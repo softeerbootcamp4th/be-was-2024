@@ -8,10 +8,11 @@ import exception.UnsupportedHttpVersionException;
 import http.HttpRequest;
 import http.HttpRequestParser;
 import http.HttpResponse;
-import http.HttpStatus;
 import logic.Logic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static util.HttpStatus.*;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -37,11 +38,11 @@ public class RequestHandler implements Runnable {
 
         } catch (InvalidHttpRequestException ie) {
             try {
-                response(connection.getOutputStream(), HttpResponse.error(HttpStatus.SC_BAD_REQUEST, ie.getMessage()));
+                response(connection.getOutputStream(), HttpResponse.error(SC_BAD_REQUEST, ie.getMessage()));
             } catch (IOException e) {logger.error(e.getMessage());}
         } catch (UnsupportedHttpVersionException ue) {
             try {
-                response(connection.getOutputStream(), HttpResponse.error(HttpStatus.SC_HTTP_VERSION_NOT_SUPPORTED, ue.getMessage()));
+                response(connection.getOutputStream(), HttpResponse.error(SC_HTTP_VERSION_NOT_SUPPORTED, ue.getMessage()));
             } catch (IOException e) {logger.error(e.getMessage());}
         }
         catch (Exception e) {
@@ -54,8 +55,10 @@ public class RequestHandler implements Runnable {
         DataOutputStream dos = new DataOutputStream(out);
         dos.writeBytes(httpResponse.headersToString());
         byte[] body = httpResponse.getBody();
-        dos.write(body, 0, body.length);
-        dos.flush();
+        if(body != null) {
+            dos.write(body, 0, body.length);
+            dos.flush();
+        }
     }
 
 }
