@@ -144,4 +144,13 @@ public class Request {
         }
         return data;
     }
+
+    // Test를 위한 메소드
+    public Map<String, String> getHeaders() {
+        return this.headers;
+    }
+
+    public int getContentLength() {
+        return Integer.parseInt(headers.get("Content-Length"));
+    }
 }
