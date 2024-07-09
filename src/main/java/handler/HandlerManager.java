@@ -100,7 +100,7 @@ public class HandlerManager {
     // 정적 파일 응답 메서드
     public void handleStaticResource(DataOutputStream dos, String filePath, String extensionType) throws IOException, IllegalArgumentException {
         logger.info("filePath: {}", filePath);
-        byte[] body = readFile("src/main/resources/static"+filePath);
+        byte[] body = readFile(filePath);
 
         if(body != null) {
             response200Header(dos, body.length, extensionType);
@@ -113,19 +113,17 @@ public class HandlerManager {
     }
 
     // File Path에 해당하는 파일을 byte 배열로 반환
-    private byte[] readFile(String filePath) {
-        File file = new File(filePath);
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    public static byte[] readFile(String filePath) {
+        if(filePath.startsWith("/")) {
+            filePath = filePath.substring(1);
+        }
 
-        try (FileInputStream fis = new FileInputStream(file)) {
-            byte[] temp = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = fis.read(temp)) != -1) {
-                buffer.write(temp, 0, bytesRead);
+        // 등록된 정적 파일 클래스패스를 통해 파일 읽기 (src/main/resources/static 디렉토리 안에 있는 파일)
+        try (InputStream inputStream = HandlerManager.class.getClassLoader().getResourceAsStream(filePath)) {
+            if (inputStream == null) {
+                throw new IOException("Resource not found: " + filePath);
             }
-
-            return buffer.toByteArray();
+            return inputStream.readAllBytes();
         } catch (IOException e) {
             logger.error(e.getMessage());
             return null;
