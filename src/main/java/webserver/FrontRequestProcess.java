@@ -1,5 +1,6 @@
 package webserver;
 
+import handler.AuthHandler;
 import handler.ModelHandler;
 import handler.UserHandler;
 import model.User;
@@ -10,14 +11,17 @@ import util.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
     private final ModelHandler<User> userHandler;
+    private final AuthHandler authHandler;
 
     private FrontRequestProcess() {
         this.userHandler = UserHandler.getInstance();
+        this.authHandler = AuthHandler.getInstance();
     }
 
     public static FrontRequestProcess getInstance() {
@@ -40,7 +44,8 @@ public class FrontRequestProcess {
             }
         }
 
-        logger.debug("path: " + path + ", method: " + method);
+        // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
+        logger.info("Request Path: {}, Method: {}", path, method);
         return switch (HttpRequestMapper.of(path, method)) {
             case ROOT ->
                     new HttpResponseObject(StringUtil.STATIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
@@ -49,15 +54,46 @@ public class FrontRequestProcess {
                 yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
             }
             case LOGIN_REQUEST -> {
-                UserHandler specificUserHandler = (UserHandler) userHandler;
-                yield specificUserHandler.login(request.getBodyMap())
-                            .map(user -> new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion()))
-                            .orElse(new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion()));
+                Optional<User> user = authHandler.login(request.getBodyMap());
+                if (user.isEmpty()) {
+                    yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
+                }
+
+                HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
+                CookieManager.setUserCookie(response, user.get());
+                yield response;
+            }
+            case LOGOUT_REQUEST -> {
+                // 클라이언트의 쿠키 중 sid를 무력화시키고 static index.html로 리다이렉트
+                if(request.getRequestHeaders().get("Cookie") != null) {
+                    String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get("Cookie"));
+                    authHandler.logout(sessionId);
+
+                    HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
+                    CookieManager.deleteUserCookie(response, sessionId);
+                    yield response;
+                }
+
+                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
             }
             case USER_LOGIN_FAIL -> {
+                // 로그인 실패 시 로그인 실패 페이지 반환
                 HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.OK.getStatus(), request.getHttpVersion());
                 response.putBody(new String(IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML)));
                 yield response;
+            }
+            case INDEX_HTML -> {
+                // 세션ID로 유저를 찾았다 -> templates/index.html 반환
+                if(request.getRequestHeaders().get("Cookie") != null){
+                    String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get("Cookie"));
+                    if(authHandler.findUserBySessionId(sessionId).isPresent()){
+                        HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
+                        response.putBody(new String(IOUtil.readBytesFromFile(false, StringUtil.INDEX_HTML)));
+                        yield response;
+                    }
+                }
+
+                yield new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
             }
             case MESSAGE_NOT_ALLOWED ->
                     new HttpResponseObject(StringUtil.FAULT, null, HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
@@ -99,6 +135,7 @@ public class FrontRequestProcess {
             default:
                 break;
         }
+        logger.info(response.getTotalHeaders());
         dos.writeBytes(response.getTotalHeaders());
     }
 

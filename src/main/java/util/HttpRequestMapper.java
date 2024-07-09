@@ -14,6 +14,7 @@ public enum HttpRequestMapper {
     // 302
     SIGNUP_REQUEST("/user/create", "POST"),
     LOGIN_REQUEST("/user/login", "POST"),
+    LOGOUT_REQUEST("/user/logout", "POST"),
     REGISTER("/registration", "GET"),
 
     // 400
