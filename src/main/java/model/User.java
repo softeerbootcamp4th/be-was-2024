@@ -1,5 +1,7 @@
 package model;
 
+import java.util.HashMap;
+
 public class User {
     private String userId;
     private String password;
@@ -12,6 +14,7 @@ public class User {
         this.name = name;
         this.email = email;
     }
+
 
     public String getUserId() {
         return userId;
@@ -28,6 +31,8 @@ public class User {
     public String getEmail() {
         return email;
     }
+
+
 
     @Override
     public String toString() {
