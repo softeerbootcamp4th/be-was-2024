@@ -21,7 +21,7 @@ public class POSTCreateUserMapper implements HttpMapper {
         Map<String, String> body = new HashMap<>();
         httpRequestParser.parseQuery(body, new String(httpRequest.getBody()));
 
-        User newUser = new User(body.get("userId"), body.get("password"), body.get("username"), body.get("email"));
+        User newUser = new User(body.get("userId"), body.get("password"), body.get("name"), body.get("email"));
         Database.addUser(newUser);
         logger.debug("User created: {}", Database.findUserById(body.get("userId")));
 
