@@ -29,15 +29,16 @@ public class UserRequestProcessor extends RequestProcessor {
         String password = param.get("password");
         String email = param.get("email");
 
-        insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
         if (userId == null || name == null || password == null || email == null ||
                 userId.isEmpty() || name.isEmpty() || password.isEmpty() || email.isEmpty()) {
 
+            insert2ResponseHeader("Content-Type", MIMEType.HTML.getContentType());
             setResult(StatusCodeType.BAD_REQUEST, getResponseHeader(), "" +
                     "<script>" +
                     "alert('Fill all the required fields');" +
                     "location.href='/registration'" +
                     "</script>");
+
             return;
         }
 

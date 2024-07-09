@@ -1,5 +1,7 @@
 package webserver;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import type.StatusCodeType;
 
 import java.io.DataOutputStream;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class ResponseHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
+
     private DataOutputStream dos;
     private RequestResult requestResult;
 
@@ -25,33 +29,18 @@ public class ResponseHandler {
 
     public void writeHeader(StatusCodeType statusCode, HashMap<String, String> responseHeader) throws IOException {
         dos.writeBytes("HTTP/1.1 " + statusCode.getCode() + " " + statusCode.getText() + CRLF);
-        switch (statusCode) {
-            // 2XX
-            case OK -> write200Header(responseHeader);
-            // 3XX
-            case FOUND -> write302Header(responseHeader);
-            // 4XX
-            case BAD_REQUEST -> write400Header(responseHeader);
-            case NOT_FOUND -> write404Header(responseHeader);
-        }
+        writeWithResponseHeader(responseHeader);
         dos.writeBytes(CRLF);
     }
 
-    private void write200Header(HashMap<String, String> responseHeader) throws IOException {
-        dos.writeBytes("Content-Type: " + responseHeader.get("Content-Type") + ";charset=utf-8\r\n");
-        dos.writeBytes("Content-Length: " + responseHeader.get("Content-Length") + CRLF);
-    }
-
-    private void write302Header(HashMap<String, String> responseHeader) throws IOException {
-        dos.writeBytes("Location: " + responseHeader.get("Location") + CRLF);
-    }
-
-    private void write400Header(HashMap<String, String> responseHeader) throws IOException {
-        dos.writeBytes("Content-Type: " + responseHeader.get("Content-Type") + ";charset=utf-8" + CRLF);
-    }
-
-    private void write404Header(HashMap<String, String> responseHeader) throws IOException {
-        dos.writeBytes("Content-Length: " + responseHeader.get("Content-Length") + CRLF);
+    private void writeWithResponseHeader(HashMap<String, String> responseHeader) throws IOException {
+        responseHeader.forEach((key, value) -> {
+            try {
+                dos.writeBytes(key + ": " + value + CRLF);
+            } catch (IOException e) {
+                logger.debug(e.getMessage());
+            }
+        });
     }
 
     public void writeBody(byte[] body) throws IOException {

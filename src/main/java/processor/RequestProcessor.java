@@ -8,7 +8,9 @@ import java.util.HashMap;
 
 public class RequestProcessor {
     public final static String STATIC_PATH = "./src/main/resources/static";
-    public final static String CONTENT_CHARSET = ";charset=utf-8\r\n";
+
+    public final static String CONTENT_CHARSET = ";charset=utf-8";
+
     private RequestInfo requestInfo;
     private HashMap<String, String> responseHeader = new HashMap<>();
 
@@ -47,7 +49,7 @@ public class RequestProcessor {
     }
 
     public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] bodyContent)  {
-        responseHeader.put("Content-Length", Integer.toString(bodyContent.length));
+        if (bodyContent.length > 0) responseHeader.put("Content-Length", Integer.toString(bodyContent.length));
         this.requestResult = new RequestResult(statusCode, responseHeader, bodyContent);
     }
 
