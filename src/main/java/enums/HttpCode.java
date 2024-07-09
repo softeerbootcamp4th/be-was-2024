@@ -1,14 +1,18 @@
 package enums;
 
 public enum HttpCode {
-    OK(200, "OK"),
-    Found(302, "Found");
+    OK(200, HttpResult.SUCCESS, "OK"),
+    Found(302, HttpResult.REDIRECT, "Found"),
+    UNPROCESSABLE_CONTENT(422, HttpResult.CLIENT_ERROR, "Unprocessable Content"),
+    BAD_REQUEST(400, HttpResult.CLIENT_ERROR, "Bad Request");
 
     private int code;
+    private HttpResult httpResult;
     private String message;
 
-    HttpCode(int code, String message) {
+    HttpCode(int code, HttpResult httpResult, String message) {
         this.code = code;
+        this.httpResult = httpResult;
         this.message = message;
     }
 
@@ -28,5 +32,8 @@ public enum HttpCode {
 
     public String getMessage() {
         return message;
+    }
+    public HttpResult getHttpResult() {
+        return httpResult;
     }
 }
