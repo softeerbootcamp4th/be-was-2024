@@ -42,4 +42,20 @@ public class UserProcessor {
         logger.debug(user.toString());
         Database.addUser(user);
     }
+
+    public boolean findUser(RequestObject requestObject)
+    {
+        String paramLine = new String(requestObject.getBody());
+        String[] pairs = paramLine.split("&");
+        String[] keyValue = pairs[0].split("=");
+        User user = Database.findUserById(keyValue[1]);
+        if(user==null)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 }

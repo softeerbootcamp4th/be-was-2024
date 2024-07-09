@@ -47,7 +47,6 @@ public class RequestObject {
         this.path=headerLines[0].split(" ")[1];
         this.version=headerLines[0].split(" ")[2];
 
-
         for(int i=1;i<headerLines.length;i++)
         {
             if(headerLines[i].startsWith("Content-Length"))

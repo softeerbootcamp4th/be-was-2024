@@ -30,18 +30,23 @@ public class PostHandler
 
     public void handlePostRequest(DataOutputStream dos, RequestObject requestObject) {
 
-
         if(requestObject.getPath().equals("/user/create"))
         {
             userProcessor.userCreate(requestObject);
         }
         else if(requestObject.getPath().equals("/user/login"))
         {
+            if(!userProcessor.findUser(requestObject))//해당하는 사용자가 없다면
+            {
+                logger.debug("False, 해당 Id는 존재하지 않는 Id입니다");
+            }
+            else
+            {
+                logger.debug("True, 해당하는 사용자가 있습니다");
+            }
 
         }
-        response302Header(dos, "/index.html");
     }
-
 
     private void response302Header(DataOutputStream dos, String loc)
     {
@@ -54,9 +59,9 @@ public class PostHandler
         }
     }
 
-    /*public void responseAlert(DataOutputStream dos, String content) {
+    public void responseAlert(DataOutputStream dos, String content) {
         try {
-            String body = "<html><head><script type='text/javascript'>alert('" + ontent + "');window.location='/login/index.html';</script></head></html>";
+            String body = "<html><head><script type='text/javascript'>alert('" + content + "');window.location='/login/index.html';</script></head></html>";
             byte[] bodyBytes = body.getBytes("UTF-8");
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
@@ -67,5 +72,5 @@ public class PostHandler
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
-    }*/
+    }
 }
