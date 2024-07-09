@@ -2,7 +2,6 @@ package model;
 
 import db.Database;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class UserCreate {
