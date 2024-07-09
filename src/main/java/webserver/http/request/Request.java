@@ -1,26 +1,35 @@
 package webserver.http.request;
 
 import exception.NotExistException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Request {
 
+    private static final String CRLF = "\r\n";
+    private static final char SPACE = ' ';
+    public static final Logger logger = LoggerFactory.getLogger(Request.class);
     private final Method method;
     private final String path;
     private final String version = "HTTP/1.1";
     private final Map<String, String> parameter;
     private final Map<String, String> header;
+    private final byte[] body;
 
     private Request(Builder builder){
         this.method = builder.method;
         this.path = builder.path;
         this.parameter = builder.parameter;
         this.header = builder.header;
+        this.body = builder.body;
     }
 
     public static class Builder {
@@ -28,12 +37,14 @@ public class Request {
         private String path;
         private Map<String, String> parameter;
         private Map<String, String> header;
+        private byte[] body;
 
         public Builder(Method method, String path){
             this.method = method;
             this.path = path;
-            parameter = new HashMap<>();
-            header = new HashMap<>();
+            this.body = new byte[0];
+            parameter = new LinkedHashMap<>();
+            header = new LinkedHashMap<>();
         }
 
         public Builder parameter(Map<String, String> parameter){
@@ -43,6 +54,11 @@ public class Request {
 
         public Builder header(Map<String, String> header){
             this.header = header;
+            return this;
+        }
+
+        public Builder body(byte[] body){
+            this.body = body;
             return this;
         }
 
@@ -66,8 +82,20 @@ public class Request {
         return this.method;
     }
 
+    public Map<String, String> getParameter(){
+        return this.parameter;
+    }
+
+    public byte[] getBody(){
+        return this.body;
+    }
+
     public String getPath(){
         return this.path;
+    }
+
+    public Map<String, String> getHeader(){
+        return this.header;
     }
 
     public String getExtension(){
@@ -78,7 +106,11 @@ public class Request {
         return this.parameter.get(key);
     }
 
-    public static Request parseRequest(String request) throws IOException {
+    public String getHeadValue(String key){
+        return this.header.get(key);
+    }
+
+    public static Request parseRequestWithoutBody(String request) throws IOException {
 
         String[] inputLines = request.split("\n");
         String[] startLine = inputLines[0].split(" ");
@@ -99,7 +131,7 @@ public class Request {
         return "";
     }
 
-    private static Map<String, String> parseParameterMap(String pathWithOutParameters){
+    public static Map<String, String> parseParameterMap(String pathWithOutParameters){
 
         Map<String, String> parameterMap = new HashMap<>();
         String[] split = pathWithOutParameters.split("&");
@@ -109,7 +141,7 @@ public class Request {
             if(param.length<2) continue;
             parameterMap.put(param[0], param[1]);
         }
-
+        logger.debug("parameterMap:"+parameterMap);
         return parameterMap;
 
     }
@@ -134,7 +166,6 @@ public class Request {
             if(inputLine!=null){
                 if(inputLine.isEmpty()) break;
             }else break;
-            System.out.println(inputLine);
             headers.put(
                     parseHeaderName(inputLine),
                     parseHeaderValue(inputLine)
@@ -155,6 +186,38 @@ public class Request {
     }
 
     @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(method.getMethodName()).append(SPACE).append(path);
+
+        //parameter
+        if(!parameter.isEmpty()) sb.append("?");
+
+        for(Map.Entry<String, String> entry:parameter.entrySet()){
+            sb.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+        sb.setLength(sb.length()-1);
+
+        sb.append(SPACE);
+        sb.append(version).append(CRLF);
+
+        //header
+        for(Map.Entry<String, String> entry:header.entrySet()){
+            sb.append(entry.getKey()).append(": ").append(entry.getValue()).append(CRLF);
+        }
+
+        sb.append(CRLF);
+
+        //body
+        if(body.length!=0){
+            sb.append(new String(body)).append(CRLF);
+        }
+
+        return sb.toString();
+
+    }
+
+    @Override
     public boolean equals(Object o){
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -163,6 +226,7 @@ public class Request {
         if(!this.path.equals(request.path)) return false;
         if(!this.parameter.equals(request.parameter)) return false;
         if(!this.header.equals(request.header)) return false;
+        if(!Arrays.equals(this.body, request.body)) return false;
         return true;
     }
 
