@@ -30,7 +30,13 @@ public class Router {
             return this::staticResourceHandler;
         }
 
-        Handler handler = getHandlersMap.get(httpRequestParser.getPath());
+        Handler handler = null;
+
+        switch (httpRequestParser.getMethod()) {
+            case GET -> handler = getHandlersMap.get(httpRequestParser.getPath());
+            case POST -> handler = postHandlersMap.get(httpRequestParser.getPath());
+        }
+
         if (handler != null) {
             return handler;
         }
@@ -39,28 +45,36 @@ public class Router {
     }
 
     private void initGetHandlers() {
-        getHandlersMap.put("/create", this::createUserHandler);
         getHandlersMap.put("/registration", this::mainHandler);
         getHandlersMap.put("/", this::mainHandler);
         getHandlersMap.put("/login", this::mainHandler);
-
     }
 
-    private void initPostHandlers() {}
+    private void initPostHandlers() {
+        postHandlersMap.put("/user/create", this::createUserHandler);
+    }
 
     private void createUserHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
-        Map<String, String> queryParametersMap = httpRequestParser.getQueryParametersMap();
-        String userId = queryParametersMap.get("userId");
-        String password = queryParametersMap.get("password");
-        String name = queryParametersMap.get("name");
-        String email = queryParametersMap.get("email");
+        String body = new String(httpRequestParser.getBody(), StandardCharsets.UTF_8);
+        Map<String, String> parameterMap = new HashMap<>();
+        for (String keyValue : body.split("&")) {
+            int equalsIndex = keyValue.indexOf("=");
+            if (equalsIndex != -1) {
+                parameterMap.put(keyValue.substring(0, equalsIndex), keyValue.substring(equalsIndex + 1));
+            }
+        }
+
+        String userId = parameterMap.get("userId");
+        String password = parameterMap.get("password");
+        String name = parameterMap.get("name");
+        String email = parameterMap.get("email");
 
         User user = new User(userId, password, name, email);
         Database.addUser(user);
 
         httpResponseHandler
                 .setStatus(Status.FOUND)
-                .addHeader("Location", "http://localhost:8080/login")
+                .addHeader("Location", "http://localhost:8080")
                 .respond(null);
     }
 
