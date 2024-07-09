@@ -57,7 +57,7 @@ public class RequestHandler implements Runnable {
 
             logger.info(request.printRequest());
 
-            ApiFunction api = PathMap.getPathMethod(request.getMethod(), request.getUri().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            ApiFunction api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
                     (api == null)
                             ? new HttpResponse.ResponseBuilder(404).build()

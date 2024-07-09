@@ -1,38 +1,89 @@
 package webserver;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.http.HttpRequest;
 import webserver.http.enums.Methods;
 
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class HttpRequestHandlerTest {
 
+    @DisplayName("get method test")
     @Test
-    void getMethod() {
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET / HTTP/1.1").build();
-        assertEquals(requestHandler.getMethod(), Methods.GET);
+    void getMethod() throws IOException {
+        //given
+        Methods method = Methods.GET;
+
+        //when
+        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder(method.getMethod()+" / HTTP/1.1").build();
+
+        //then
+        assertEquals(requestHandler.getMethod(), method);
     }
 
-
+    @DisplayName("get url test")
     @Test
-    void getUri() {
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET / HTTP/1.1").build();
-        assertEquals(requestHandler.getMethod(), Methods.GET);
+    void getUrl() throws IOException {
+        //given
+        String path = "/test/url";
+
+        //when
+        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET " + path +" HTTP/1.1").build();
+
+        //then
+        assertEquals(requestHandler.getUrl().getPath(),path );
     }
 
+    @DisplayName("get parameter of url test")
     @Test
-    void getParam(){
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET /registration?id=1&username=3&password=5 HTTP/1.1").build();
-        System.out.println(requestHandler.getUri().getParamsMap().toString());
-        assertFalse(requestHandler.getUri().getParamsMap().isEmpty());
+    void getParam() throws IOException {
+        //given
+        Map<String, String> params = new HashMap<>();
+        params.put("a", "1");
+        params.put("b", "2");
+        params.put("c", "3");
+
+        StringBuilder url = new StringBuilder();
+        url.append("/registration?");
+        for(Map.Entry<String, String> entry : params.entrySet()) {
+            url.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
+        }
+
+
+        //when
+        HttpRequest request = new HttpRequest.ReqeustBuilder("GET " + url.toString() + " HTTP/1.1").build();
+
+        //then
+        for(Map.Entry<String, String> entry : params.entrySet()) {
+            assertEquals(request.getUrl().getParamsMap().get(entry.getKey()), entry.getValue());
+        }
     }
 
+    @DisplayName("check if parameter is empty test")
     @Test
-    void getemptyParam(){
+    void getemptyParam() throws IOException {
+        //given
+
+        //when
         HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET /registration HTTP/1.1").build();
-        System.out.println(requestHandler.getUri().getParamsMap().toString());
-        assertTrue(requestHandler.getUri().getParamsMap().isEmpty());
+
+        //then
+        assertTrue(requestHandler.getUrl().getParamsMap().isEmpty());
+    }
+
+    @DisplayName("check if ioexception throws for wrong request")
+    @Test
+    void testIOException()  {
+        //given
+
+        //when & then
+        assertThrows(IOException.class, () ->
+        { HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("wrong request").build(); });
     }
 }

@@ -24,7 +24,7 @@ public class ReadFile implements ApiFunction {
     public HttpResponse function(HttpRequest request) {
         try{
             Extension extension;
-            String pathname = root + request.getUri().getPath();
+            String pathname = root + request.getUrl().getPath();
             String file = pathname.substring(pathname.lastIndexOf("/"));// 마지막 부분의 확장자 확인
             if(!file.contains(".")) { // 확장자가 있다면
                 pathname = pathname + "/index.html";

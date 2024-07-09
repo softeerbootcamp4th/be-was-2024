@@ -28,7 +28,7 @@ public class HttpRequest {
         return method;
     }
 
-    public Url getUri() {
+    public Url getUrl() {
         return url;
     }
 
@@ -74,6 +74,7 @@ public class HttpRequest {
                 throw new IOException("Invalid request line: " + startline);
             }
             method =  Methods.valueOfMethod(split[0]);
+            if(method == null){ throw new IOException("Invalid request line: " + startline); }
             url = new Url(split[1]);
             protocol = split[2];
         }
