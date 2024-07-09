@@ -22,7 +22,7 @@ public class RequestDispatcher {
         try {
             if (path.startsWith("/registration")) {
                 rr = new RegistrationRequestProcessor(requestInfo).getResult();
-            } else if (path.startsWith("/create")) {
+            } else if (path.startsWith("/user")) {
                 rr = new UserRequestProcessor(requestInfo).getResult();
             } else rr = new RootRequestProcessor(requestInfo).getResult(); // startsWith("/")
         } catch(StatusCodeException e) {
