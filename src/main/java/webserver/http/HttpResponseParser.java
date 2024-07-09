@@ -32,25 +32,17 @@ public class HttpResponseParser {
             httpResponse = mappingHandler.mapping(httpRequest);
         }
 
-        responseHeader(dos, httpResponse);
-        responseBody(dos, httpResponse.getBody());
+        sendResponse(dos, httpResponse);
     }
 
-    public void responseHeader(DataOutputStream dos, MyHttpResponse httpResponse) {
+    public void sendResponse(DataOutputStream dos, MyHttpResponse httpResponse) {
         try {
             dos.writeBytes(httpResponse.getVersion() + " " + httpResponse.getStatusCode() + " " + httpResponse.getStatusMessage() + " \r\n");
             for (String key : httpResponse.getHeaders().keySet()) {
                 dos.writeBytes(key + ": " + httpResponse.getHeaders().get(key) + "\r\n");
             }
             dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+            dos.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
