@@ -2,35 +2,48 @@ package webserver;
 
 import data.HttpRequestMessage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequestParser {
-    public static String getRequestString(InputStream in) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        String tempStr;
+    public static HttpRequestMessage getHttpRequestMessage(InputStream in) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        while ((tempStr = bufferedReader.readLine()) != null && !tempStr.isEmpty()) {
-            stringBuilder.append(tempStr);
+        BufferedInputStream bis = new BufferedInputStream(in);
+        String tempString;
+        while (!(tempString = readLine(bis)).isEmpty()) {
+            stringBuilder.append(tempString);
             stringBuilder.append("\n");
         }
-        return stringBuilder.toString();
+
+        HttpRequestMessage httpRequestMessage = getHttpRequestMessage(stringBuilder.toString());
+        Map<String, String> headers = httpRequestMessage.getHeaders();
+        String length = headers.get("Content-Length");
+        if (length != null) {
+            byte[] bytes = new byte[Integer.parseInt(length)];
+            bis.read(bytes,0,bytes.length);
+            httpRequestMessage.setBody(bytes);
+        }
+        return httpRequestMessage;
     }
 
-    public static HttpRequestMessage getHttpRequestMessage(String requestMessage){
-        String[] messageSplit = requestMessage.split("\n\n",2);
-        String headerPart = messageSplit[0];
-        String bodyPart = messageSplit.length > 1 ? messageSplit[1] : "";
-        return parseAndCreateHttpRequestMessage(headerPart, bodyPart);
+    private static String readLine(BufferedInputStream bis) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int ch;
+        while ((ch = bis.read()) != -1) {
+            if (ch == '\r'){
+                bis.read();
+                break;
+            }
+            byteArrayOutputStream.write(ch);
+        }
+        return byteArrayOutputStream.toString();
     }
 
-    private static HttpRequestMessage parseAndCreateHttpRequestMessage(String headerPart, String bodyPart) {
+    private static HttpRequestMessage getHttpRequestMessage(String requestMessage){
         Map<String, String> queryParams = new HashMap<>();
-        String[] headerSplit = headerPart.split("\n",2);
+        String[] headerSplit = requestMessage.split("\n",2);
         String startLine = headerSplit[0];
 
         String[] startLineSplit = startLine.split(" ");
@@ -42,7 +55,7 @@ public class HttpRequestParser {
         }
         String[] headerArray =  headerSplit[1].split("\n");
         Map<String, String> headers = getHeaderMap(headerArray);
-        return new HttpRequestMessage(method,uri,version,queryParams,headers, bodyPart);
+        return new HttpRequestMessage(method,uri,version,queryParams,headers, null);
     }
 
     private static Map<String, String> getHeaderMap(String[] headerArray) {
