@@ -1,5 +1,6 @@
 package webserver.http.request;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -10,28 +11,54 @@ import static org.junit.jupiter.api.Assertions.*;
 class RequestReaderTest {
 
     @Test
+    @DisplayName("Body 가 존재하는 요청을 정상적으로 읽을 수 있어야 한다.")
+    void readRequestWithBody() throws IOException {
+
+        //given
+        ByteArrayInputStream inputStream = new ByteArrayInputStream((
+                "POST /create HTTP/1.1\r\n" +
+                        "Host: localhost:8080\r\n" +
+                        "Content-Length: 93\r\n" +
+                        "\r\n" +
+                        "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net\r\n").getBytes()
+        );
+
+        Request expected = new Request.Builder(Method.POST, "/create")
+                .addHeader("Host", "localhost:8080")
+                .addHeader("Content-Length", "93")
+                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
+                .build();
+
+        //when
+        Request actual = RequestReader.readRequest(inputStream);
+
+        //then
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Body 가 없는 요청을 정상적으로 읽을 수 있어야 한다.")
     void readRequest() throws IOException {
 
         //given
-        String expected = "POST /api/resource HTTP/1.1\n" +
-                "Host: www.example.com\n" +
-                "Content-Type: application/json\n" +
-                "Content-Length: 58\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Accept-Language: en-US,en;q=0.9\n" +
-                "Accept-Encoding: gzip, deflate, br\n" +
-                "Connection: keep-alive\n" +
-                "\n" +
-                "{\n" +
-                "    \"name\": \"John Doe\",\n" +
-                "    \"email\": \"john.doe@example.com\"\n" +
-                "}\r\n\r\n";
+        ByteArrayInputStream inputStream = new ByteArrayInputStream((
+                "GET /create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\r\n" +
+                        "Host: localhost:8080\r\n" +
+                        "Content-Length: 0\r\n" +
+                        "\r\n").getBytes()
+        );
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(expected.getBytes());
+        Request expected = new Request.Builder(Method.GET, "/create")
+                .addParameter("userId", "javajigi")
+                .addParameter("password", "password")
+                .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
+                .addParameter("email", "javajigi%40slipp.net")
+                .addHeader("Host", "localhost:8080")
+                .addHeader("Content-Length", "0")
+                .build();
 
         //when
-        String actual = RequestReader.readRequest(inputStream);
+        Request actual = RequestReader.readRequest(inputStream);
 
         //then
         assertEquals(expected, actual);

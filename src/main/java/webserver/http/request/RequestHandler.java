@@ -25,9 +25,7 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             out.write(
                     ResponseHandler.response(
-                            Request.parseRequest(
-                                    readRequest(in)
-                            )
+                            readRequest(in)
                     ).toByte()
             );
         } catch (IOException e) {
