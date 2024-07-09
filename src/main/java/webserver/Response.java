@@ -31,8 +31,12 @@ public class Response {
     public void redirect(String url, DataOutputStream dos, int redirectionCode)  throws IOException {
         if (redirectionCode == 301) {
             response301Header(dos, url);
-        } else {
+        } else if (redirectionCode == 302) {
             response302Header(dos, url);
+        } else {
+            byte[] body = resourceHandler.getByteArray(url);
+            response404Header(dos, body.length);
+            responseBody(dos, body);
         }
     }
 
@@ -63,6 +67,17 @@ public class Response {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: " + newLocation + "\r\n");
             dos.writeBytes("Content-Length: 0\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void response404Header(DataOutputStream dos, int lengthOfBodyContent) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html\r\n");
+            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());
