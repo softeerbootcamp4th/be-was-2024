@@ -125,22 +125,23 @@ public class Request {
     }
 
     public HashMap<String, String> parseQueryString() {
-        String[] splitedQeuryString = queryString.split("&");
-        HashMap<String, String> userData = new HashMap<>();
-        for (String s : splitedQeuryString) {
-            String[] fieldData = s.split("=");
-            userData.put(fieldData[0], fieldData[1]);
-        }
-        return userData;
+        return createHashMap(splitString(queryString));
     }
 
     public HashMap<String, String> parseBody() {
-        String[] splitedQeuryString = stringBody.split("&");
-        HashMap<String, String> userData = new HashMap<>();
-        for (String s : splitedQeuryString) {
+        return createHashMap(splitString(stringBody));
+    }
+
+    private String[] splitString(String dataString) {
+        return dataString.split("&");
+    }
+
+    private HashMap<String, String> createHashMap(String[] dataString) {
+        HashMap<String, String> data = new HashMap<>();
+        for (String s : dataString) {
             String[] fieldData = s.split("=");
-            userData.put(fieldData[0], fieldData[1]);
+            data.put(fieldData[0], fieldData[1]);
         }
-        return userData;
+        return data;
     }
 }
