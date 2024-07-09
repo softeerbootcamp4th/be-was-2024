@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="../reset.css" rel="stylesheet"/>
     <link href="../global.css" rel="stylesheet"/>
+    <style>
+        .error-box {
+            display: none;
+            color: red;
+            border: 1px solid red;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -23,6 +32,7 @@
     </header>
     <div class="page">
         <h2 class="page-title">로그인</h2>
+
         <form class="form" id="login-form" action="/user/login" method="POST">
             <div class="textfield textfield_size_s">
                 <p class="title_textfield">아이디</p>
@@ -52,6 +62,29 @@
                 로그인
             </button>
         </form>
+        <br>
+        <div id="errorBox" class="error-box">
+            Unauthorized access. Please try again.
+        </div>
+
+        <script>
+            function getQueryParams() {
+                const params = {};
+                window.location.search.substring(1).split("&").forEach(pair => {
+                    const [key, value] = pair.split("=");
+                    params[decodeURIComponent(key)] = decodeURIComponent(value);
+                });
+                return params;
+            }
+
+            // Show error box if 'error' query parameter is present
+            document.addEventListener("DOMContentLoaded", () => {
+                const params = getQueryParams();
+                if (params.error === "unauthorized") {
+                    document.getElementById("errorBox").style.display = "block";
+                }
+            });
+        </script>
     </div>
 </div>
 </body>

@@ -25,15 +25,15 @@ public class POSTLoginUserMapper implements HttpMapper {
         String userId = body.get("userId");
         User user = Database.findUserById(userId);
 
-        // UserId not found
-        if (user == null) {
-            MyHttpResponse response = new MyHttpResponse(401, "Unauthorized", null, null);
-            return response;
-        }
-
-        // Password mismatch
-        if (!user.getPassword().equals(body.get("password"))) {
-            MyHttpResponse response = new MyHttpResponse(401, "Unauthorized", null, null);
+        // UserId not found or password does not match
+        if (user == null || !user.getPassword().equals(body.get("password"))) {
+            String redirectUrl = "/login?error=unauthorized";
+            MyHttpResponse response = new MyHttpResponse(302, "Found", Map.of(
+                    "Content-Type", "text/plain",
+                    "Content-Length", "0",
+                    "Location", redirectUrl
+            ), new byte[0]);
+            logger.debug("User not found: {}", userId);
             return response;
         }
 
