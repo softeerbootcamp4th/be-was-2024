@@ -1,6 +1,7 @@
 package handler;
 
 import http.HttpRequest;
+import http.HttpResponse;
 import http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +10,8 @@ import util.Utils.ResponseWithStatus;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
 
-import static util.ResponseFactory.*;
-import static util.ResponseFactory.addHeader;
 import static util.Utils.*;
 
 public class GetHandler {
@@ -26,12 +26,17 @@ public class GetHandler {
 
         ResponseWithStatus responseWithStatus = getFileContent(staticPath + requestUrl);
 
-        HttpStatus status = responseWithStatus.status;
+        HttpStatus httpStatus = responseWithStatus.status;
         byte[] body = responseWithStatus.body;
 
-        addHeader(dos, status);
-        addContentType(dos, getContentType(type));
-        addContentLength(dos, body.length);
-        responseBody(dos, body);
+        HashMap<String, String> headers = new HashMap<>();
+        headers.put("Content-Type", getContentType(type));
+        headers.put("Content-Length", String.valueOf(body.length));
+
+        HttpResponse response = new HttpResponse(httpStatus, headers, body);
+        System.out.println("response = " + response.toString());
+        dos.writeBytes(response.toString());
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 }

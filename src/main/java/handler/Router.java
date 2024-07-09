@@ -6,9 +6,8 @@ import http.HttpRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import static handler.GetHandler.getRouter;
 import static handler.GetHandler.sendResponse;
-import static handler.PostHandler.postRouter;
+import static handler.PostHandler.createUser;
 
 public class Router {
     public static void requestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
@@ -16,7 +15,7 @@ public class Router {
 
         switch (method){
             case GET -> getRequestMapping(httpRequest, out);
-            case POST -> postRouter(httpRequest, out);
+            case POST -> postRequestMapping(httpRequest, out);
         }
     }
 
@@ -29,6 +28,14 @@ public class Router {
         switch (requestTarget) {
             case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html", out);
             default -> sendResponse(requestTarget, out);
+        }
+    }
+
+    private static void postRequestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
+        String requestUrl = httpRequest.getRequestUrl();
+
+        switch(requestUrl){
+            case "/user/create" -> createUser(httpRequest, out);
         }
     }
 }

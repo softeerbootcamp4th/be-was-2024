@@ -38,6 +38,10 @@ public class HttpRequest {
         return Optional.ofNullable(headers.get(key));
     }
 
+    public byte[] getBody() {
+        return body;
+    }
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(httpMethod + " " + requestUrl + " " + version + "\n");
