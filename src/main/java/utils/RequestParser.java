@@ -8,10 +8,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class RequestParser {
 
@@ -28,29 +26,49 @@ public class RequestParser {
     private RequestParser() {}
 
     public Request getRequest(InputStream rawHttpRequest) throws IOException {
-        Request request = new Request();
         BufferedReader br = new BufferedReader(new InputStreamReader(rawHttpRequest));
-        requestLineParse(request, br.readLine());
-        requestHeaderParse(request, br);
-        requestBodyParse(request, br);
-        return request;
+
+        // request line parse
+        String[] requestLines = requestLineParse(br.readLine());
+        String method = requestLines[0];
+        Map<String, String> queryParameters = pathParse(requestLines[1]);
+        String path = queryParameters.get("path");
+        queryParameters.remove("path");
+        String httpVersion = requestLines[2];
+
+        // request header parse
+        Map<String, String> headers = requestHeaderParse(br);
+
+        // request body parse
+        String body = requestBodyParse(headers.get("Content-Length"), br);
+        String contentType = headers.get("Content-Type");
+        if(contentType != null && contentType.equals("application/x-www-form-urlencoded")) {
+            Map<String, String> bodyQuerys = queryParse(body);
+            queryParameters.putAll(bodyQuerys);
+        }
+        return new Request(method, path, httpVersion, headers, queryParameters, body);
     }
 
-    private void requestBodyParse(Request request, BufferedReader br) throws IOException {
-        String _contentLength = request.getHeader("Content-Length");
+    private String[] requestLineParse(String requestLine) {
+        return requestLine.split("\\s");
+    }
+
+    private String requestBodyParse(String _contentLength, BufferedReader br) throws IOException {
+        Map<String, String> tmpStore = new HashMap<>();
         if(_contentLength == null) {
-            request.setBody(null);
-            return;
+            return null;
         }
         int contentLength = Integer.parseInt(_contentLength);
         char[] body = new char[contentLength];
         br.read(body, 0, contentLength);
-        request.setBody(String.valueOf(body));
+        String s = String.valueOf(body);
+        return s;
+
     }
 
-    private void requestHeaderParse(Request request, BufferedReader br) throws IOException {
+    private Map<String, String> requestHeaderParse(BufferedReader br) throws IOException {
         String tmp;
-        Map<String, String> headers = new ConcurrentHashMap<>();
+        Map<String, String> headers = new HashMap<>();
         while((tmp = br.readLine()) != null && !tmp.isEmpty()) {
             int delimeterLoc = tmp.indexOf(":");
             if(delimeterLoc < 0) {
@@ -60,32 +78,34 @@ public class RequestParser {
             String value = tmp.substring(delimeterLoc + 1).trim();
             headers.put(key, value);
         }
-        request.setHttpHeaders(headers);
+        return headers;
     }
 
-    private void requestLineParse(Request request, String requestLine) {
-        String[] requestLineSplit = requestLine.split("\\s");
-        request.setMethod(requestLineSplit[0]);
-        pathParse(request, requestLineSplit[1]);
-        request.setHttpVersion(requestLineSplit[2]);
+    private Map<String, String> queryParse(String queryString) {
+        Map<String, String> tmpStore = new HashMap<>();
+        String[] rawKeyValues= queryString.split("\\&");
+        for(String rawKeyValue: rawKeyValues) {
+            String[] keyValue = rawKeyValue.split("\\=");
+            tmpStore.put(keyValue[0], keyValue[1]);
+        }
+        return tmpStore;
     }
 
-    private void pathParse(Request request, String path) {
+    private Map<String, String> pathParse(String path) {
         // api path 파싱
         String[] pathSplit = path.split("\\?");
         String apiPath = pathSplit[0];
-        request.setPath(apiPath);
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("path", apiPath);
 
-        if(pathSplit.length == 1) return;
+        if(pathSplit.length == 1) return queryParameters;
 
-        Map<String, String> queryParameters = new ConcurrentHashMap<>();
         String rawQueryParameter = pathSplit[1];
         String[] rawQueryParameters = rawQueryParameter.split("\\&");
         for(String queryParameter: rawQueryParameters) {
             String[] queryKeyValue = queryParameter.split("\\=");
             queryParameters.put(queryKeyValue[0], queryKeyValue[1]);
         }
-        request.setParameters(queryParameters);
+        return queryParameters;
     }
-
 }
