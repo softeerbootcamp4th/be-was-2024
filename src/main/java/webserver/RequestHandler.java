@@ -3,10 +3,9 @@ package webserver;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 
 import dto.HttpRequest;
-import exception.HttpRequestParsingException;
+import exception.InvalidHttpRequestException;
 import handler.Handler;
 import handler.HandlerManager;
 import org.slf4j.Logger;
@@ -38,14 +37,13 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
 
             // HttpRequest 파싱 및 결과 반환
-            HttpRequest parseResult = HttpRequestParser.parseHeader(br);
+            HttpRequest parseResult = HttpRequestParser.parseHttpRequest(br);
 
             // HandlerManager를 통해 request를 처리할 수 있는 handler 반환
             Handler handler = handlerManager.getHandler(parseResult);
-            handler.handle(dos, parseResult.getQueryParams().orElse(new HashMap<>()));
+            handler.handle(dos, parseResult);
 
-
-        } catch (IOException | IllegalArgumentException | HttpRequestParsingException e) {
+        } catch (IOException | IllegalArgumentException | InvalidHttpRequestException e) {
             logger.error(e.getMessage());
 
             // FileExtensionType에서 관리하지 않는 타입일 경우 404 error 응답
