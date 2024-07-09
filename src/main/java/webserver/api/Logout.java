@@ -14,6 +14,7 @@ public class Logout implements RequestHandler {
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
 
+        //check session id
         String cookies = request.getHeaders().get("Cookie");
         if(cookies != null) {
             String[] line = cookies.split(";");
@@ -21,12 +22,13 @@ public class Logout implements RequestHandler {
                 String[] keyValue = cookie.split("=");
                 if(keyValue.length == 2) {
                     if(keyValue[0].equals("sid")) {
-                        Session.deleteSession(keyValue[1]);
+                        Session.deleteSession(keyValue[1]); //delete session
                     }
                 }
             }
         }
 
+        //go to main page
         byte[] responseBody = Files.readAllBytes(new File(HtmlFiles.main_page).toPath());
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())

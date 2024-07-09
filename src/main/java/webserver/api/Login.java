@@ -26,6 +26,8 @@ public class Login implements RequestHandler {
         String id =params.get("id");
         String password = params.get("password");
         User user = Database.findUserById(id);
+
+        // if user information is not valid
         if(id == null || id.isEmpty()
                 || password == null || password.isEmpty()
                 || user == null || !Objects.equals(user.getPassword(), password)){
@@ -39,14 +41,15 @@ public class Login implements RequestHandler {
 
         }
 
-
+        // if user information is valid
         String sessionString = Session.createSession(user);
         byte[] responseBody = Files.readAllBytes(new File(HtmlFiles.login_success).toPath());
 
+        //go to logined main page
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
                 .addheader("Content-Length", String.valueOf(responseBody.length))
-                .addheader("Set-Cookie","sid="+sessionString +"; Path=/")
+                .addheader("Set-Cookie","sid="+sessionString +"; Path=/") //set cookie
                 .setBody(responseBody)
                 .build();
     }
