@@ -51,7 +51,7 @@ class RequestTest {
         Request request = Request.from(new ByteArrayInputStream(query.getBytes()));
 
         // then
-        HashMap<String, String> headers = (HashMap<String, String>) request.getHeaders();
+        HashMap<String, String> headers = (HashMap<String, String>) request.getHeadersForTest();
         // Connection 필드에 예상치 못한 공백이 있지만 제대로 파싱 되는지 테스트
         assertThat(headers.get("Connection")).isEqualTo("keep-alive");
     }
@@ -71,7 +71,7 @@ class RequestTest {
         Request request = Request.from(new ByteArrayInputStream(query.getBytes()));
 
         //then
-        int contentLength = request.getContentLength();
+        int contentLength = request.getContentLengthForTest();
         assertThat(contentLength).isEqualTo(48);
     }
 }
