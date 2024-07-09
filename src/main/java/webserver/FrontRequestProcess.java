@@ -36,34 +36,35 @@ public class FrontRequestProcess {
         if (path.contains(StringUtil.DOT)) {
             String extension = path.split(StringUtil.REGDOT)[1];
             if (!extension.equals(ContentType.HTML.getExtension())) {
-                return new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion(), null);
+                return new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
             }
         }
 
         logger.debug("path: " + path + ", method: " + method);
         return switch (HttpRequestMapper.of(path, method)) {
             case ROOT ->
-                    new HttpResponseObject(StringUtil.STATIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
+                    new HttpResponseObject(StringUtil.STATIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
             case SIGNUP_REQUEST -> {
                 User user = userHandler.create(request.getBodyMap());
-                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null);
+                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
             }
             case LOGIN_REQUEST -> {
                 UserHandler specificUserHandler = (UserHandler) userHandler;
                 yield specificUserHandler.login(request.getBodyMap())
-                            .map(user -> new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null))
-                            .orElse(new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion(), null));
+                            .map(user -> new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion()))
+                            .orElse(new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion()));
             }
             case USER_LOGIN_FAIL -> {
-                byte[] body = IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML);
-                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.OK.getStatus(), request.getHttpVersion(), body);
+                HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.OK.getStatus(), request.getHttpVersion());
+                response.putBody(new String(IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML)));
+                yield response;
             }
             case MESSAGE_NOT_ALLOWED ->
-                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion(), null);
+                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
             case ERROR ->
-                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion(), null);
+                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
             default ->
-                    new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion(), null);
+                    new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
         };
     }
 
@@ -85,11 +86,11 @@ public class FrontRequestProcess {
         String path = response.getPath();
         switch (HttpCode.of(response.getStatusCode())) {
             case OK:
-                response.addHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
-                response.addHeader("Content-Length", response.getBody().length + "");
+                response.putHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
+                response.putHeader("Content-Length", response.getBody().length + "");
                 break;
             case FOUND:
-                response.addHeader("Location", path);
+                response.putHeader("Location", path);
                 break;
             case METHOD_NOT_ALLOWED:
                 break;

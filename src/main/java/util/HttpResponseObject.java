@@ -12,13 +12,12 @@ public class HttpResponseObject {
     private Map<String, String> header;
     private byte[] body;
 
-    public HttpResponseObject(String type, String path, String statusCode, String httpVersion, byte[] responseBody) {
+    public HttpResponseObject(String type, String path, String statusCode, String httpVersion) {
         this.type = type;
         this.path = path;
         this.statusCode = statusCode;
         this.httpVersion = httpVersion;
         this.header = new HashMap<>();
-        this.body = responseBody;
     }
 
     public String getType() {
@@ -37,10 +36,6 @@ public class HttpResponseObject {
         return body;
     }
 
-    public void addHeader(String key, String value){
-        header.put(key, value);
-    }
-
     public String getTotalHeaders(){
         StringBuilder sb = new StringBuilder();
         sb.append(httpVersion).append(StringUtil.SPACE).append(statusCode).append(StringUtil.SPACE).append(HttpCode.getMessage(statusCode)).append(StringUtil.CRLF);
@@ -49,5 +44,13 @@ public class HttpResponseObject {
         }
         sb.append(StringUtil.CRLF);
         return sb.toString();
+    }
+
+    public void putHeader(String key, String value){
+        header.put(key, value);
+    }
+
+    public void putBody(String body){
+        this.body = body.getBytes();
     }
 }
