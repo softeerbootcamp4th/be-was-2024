@@ -3,8 +3,6 @@ package utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -12,9 +10,11 @@ public class ResourcesLoader {
 
   private static final Logger logger = LoggerFactory.getLogger(ResourcesLoader.class);
 
-  public static byte[] getFile(String filePath) throws IOException {
+  public static byte[] getFile(String filePath) {
     byte[] body;
-    logger.debug("filePath = {}", filePath);
+    if(filePath.startsWith("/")) {
+      filePath = filePath.substring(1);
+    }
     try (
             InputStream inputStream = ResourcesLoader.class.getClassLoader().getResourceAsStream(filePath)
     ) {
