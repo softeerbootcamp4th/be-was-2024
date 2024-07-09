@@ -72,7 +72,7 @@ public class HttpRequestParser {
         ByteArrayOutputStream requestLineBuffer = new ByteArrayOutputStream();
         int nextByte;
 
-// 읽어들일 버퍼 크기
+        // 읽어들일 버퍼 크기
         int bufferSize = 1024;
         byte[] buffer = new byte[bufferSize];
 
@@ -143,10 +143,8 @@ public class HttpRequestParser {
             return new MyHttpRequest(method, path, queries, version, requestHeaders, requestBody);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalArgumentException("Invalid HTTP request : " + e.getMessage());
         }
-
-        return null;
     }
 
 
