@@ -20,7 +20,7 @@ public enum HttpStatusType {
 
     //Redirection messages
     MOVED_PERMANENTLY(301, "Moved Permanently"),
-    FOUND(302, "Found"),
+    FOUND(302, "Found"), // 일반적인 Redirect
     SEE_OTHER(303, "See Other"),
     NOT_MODIFIED(304, "Not Modified"),
     USE_PROXY(305, "Use Proxy"),

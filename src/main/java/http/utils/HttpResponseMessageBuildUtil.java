@@ -3,6 +3,7 @@ package http.utils;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
 
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class HttpResponseMessageBuildUtil {
@@ -10,12 +11,17 @@ public class HttpResponseMessageBuildUtil {
         StringBuilder builder = new StringBuilder();
 
         // startLine
+        String version = response.getVersion();
         HttpStatusType statusType = response.getStatusType();
+        // 둘 중 하나만 없어도 라인 작성 불가
+        if(version == null || statusType == null) throw new RuntimeException("required argument not exist");
+
         int code = statusType.getStatusCode();
         String message = statusType.getMessage();
         String startLine = response.getVersion() + " " + code + " " + message + "\r\n";
 
         builder.append(startLine);
+
         // header
         for(var entries: response.getHeaders().getHeaders().entrySet()) {
             String header = entries.getKey();
@@ -24,12 +30,20 @@ public class HttpResponseMessageBuildUtil {
             String headerLine = header + ": " + value + "\r\n";
             builder.append(headerLine);
         }
+
         // 빈 라인
         builder.append("\r\n");
 
-        // body
-        if(response.getBody() != null)
-            builder.append(new String(response.getBody(), StandardCharsets.UTF_8));
-        return builder.toString().getBytes();
+        // 헤더 바이트 획득
+        byte[] startLineAndHeaderBytes = builder.toString().getBytes(StandardCharsets.UTF_8);
+
+        // 헤더 + 바디를 모두 포함할 수 있는 바이트 배열 생성, 반환
+
+        byte[] httpResMessageBytes = new byte[startLineAndHeaderBytes.length + response.getBody().length];
+
+        System.arraycopy(startLineAndHeaderBytes, 0, httpResMessageBytes, 0, startLineAndHeaderBytes.length);
+        System.arraycopy(response.getBody(), 0, httpResMessageBytes, startLineAndHeaderBytes.length, response.getBody().length);
+
+        return httpResMessageBytes;
     }
 }

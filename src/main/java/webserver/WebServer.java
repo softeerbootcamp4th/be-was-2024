@@ -5,10 +5,14 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import chain.RouteHandleChain;
+import chain.StaticResourceChain;
+import chain.core.ChainManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routehandler.RouteHandlerMatcher;
-import routehandler.StaticResourceHandler;
+import routehandler.route.NotFoundRouteHandler;
+import routehandler.route.IndexRouteHandler;
+import routehandler.route.RegistrationRouteHandler;
 
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
@@ -23,9 +27,13 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
-        // RouteHandlerMatcher을 등록, 요청을 만들 때 같이 보내주자.
-        RouteHandlerMatcher matcher = new RouteHandlerMatcher(
-                new StaticResourceHandler("./src/main/resources/static")
+        ChainManager chainManager = new ChainManager(
+                new StaticResourceChain(),
+                new RouteHandleChain(
+                    new RegistrationRouteHandler("/registration"),
+                    new IndexRouteHandler("/"),
+                    new NotFoundRouteHandler()
+                )
         );
 
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -38,7 +46,7 @@ public class WebServer {
             // new socket이 실행되므로, 각 요청마다 다른 처리가 가능.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                executor.submit(new RequestHandler(connection, matcher));
+                executor.submit(new RequestHandler(connection, chainManager));
             }
         }
     }
