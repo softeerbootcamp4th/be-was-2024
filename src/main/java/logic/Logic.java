@@ -4,7 +4,6 @@ import db.Database;
 import exception.QueryParameterNotFoundException;
 import http.HttpRequest;
 import http.HttpResponse;
-import http.HttpStatus;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,9 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
+import static util.StringUtil.Header.*;
+import static util.HttpStatus.*;
 
 public class Logic {
     private static final Logger logger = LoggerFactory.getLogger(Logic.class);
@@ -28,25 +30,24 @@ public class Logic {
     }
 
     private static HttpResponse serveStaticResource(HttpRequest request) {
-        HttpResponse response = new HttpResponse();
         File file = new File(staticResourcePath + request.getViewPath());
 
         if (!file.exists()) {
-            return HttpResponse.error(HttpStatus.SC_NOT_FOUND, "Page Not Found!");
+            return HttpResponse.error(SC_NOT_FOUND, "Page Not Found!");
         }
 
         try (FileInputStream fis = new FileInputStream(file)) {
+            HttpResponse response = new HttpResponse();
             byte[] body = fis.readAllBytes();
             response.setBody(body);
-            response.setStatusCode(HttpStatus.SC_OK);
-            response.addHeader("Content-Type", request.getContentType());
-            response.addHeader("Content-Length", String.valueOf(body.length));
+            response.setStatusCode(SC_OK);
+            response.addHeader(CONTENT_TYPE, request.getContentType());
+            response.addHeader(CONTENT_LENGTH, String.valueOf(body.length));
+            return response;
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return HttpResponse.error(HttpStatus.SC_INTERNAL_SERVER_ERROR, "Server Error!");
+            return HttpResponse.error(SC_INTERNAL_SERVER_ERROR, "Server Error!");
         }
-
-        return response;
     }
 
     private static HttpResponse registration(HttpRequest httpRequest){
@@ -63,7 +64,7 @@ public class Logic {
         } catch (QueryParameterNotFoundException qe){
             // /registration/index.html form의 내용은 전부 required 이므로 파라미터를 찾지 못하는건 유저가 임의로 url을 변경하여 접근했을때이다.
             logger.debug(qe.getMessage());
-            return HttpResponse.error(HttpStatus.SC_BAD_REQUEST, "Invalid Access");
+            return HttpResponse.error(SC_BAD_REQUEST, "Invalid Access");
         }
     }
 }
