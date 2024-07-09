@@ -72,10 +72,6 @@ public class HttpRequestParser {
         ByteArrayOutputStream requestLineBuffer = new ByteArrayOutputStream();
         int nextByte;
 
-        // 읽어들일 버퍼 크기
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
         try {
             // Read the request line
             while ((nextByte = in.read()) != -1) {
@@ -130,16 +126,15 @@ public class HttpRequestParser {
                 requestBody = new byte[contentLength];
                 int bytesRead = 0;
                 while (bytesRead < contentLength) {
-                    int read = in.read();
+                    int read = in.read(requestBody, bytesRead, contentLength - bytesRead);
                     if (read == -1) {
                         break;
                     }
-                    requestBody[bytesRead++] = (byte) read;
+                    bytesRead += read;
                 }
             }
+            
 
-            // Now you have all the components of the HTTP request
-            // Handle the request as needed...
             return new MyHttpRequest(method, path, queries, version, requestHeaders, requestBody);
 
         } catch (IOException e) {
