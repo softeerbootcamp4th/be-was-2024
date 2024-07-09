@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import webserver.http.MyHttpResponse;
 
 import java.io.IOException;
@@ -15,27 +14,27 @@ public class FileContentReaderTest {
 
     @ParameterizedTest
     @CsvSource({"/favicon.ico", "/index.html"})
-    @DisplayName("파일 읽기 성공")
-    void FileReaderTestSuccess(String uri) throws IOException {
+    @DisplayName("Static Resource 파일 읽기, 성공")
+    void readStaticResourceFile(String uri) throws IOException {
         // When
+        boolean isStaticResource = fileContentReader.isStaticResource(uri);
         MyHttpResponse response = fileContentReader.readStaticResource(uri);
 
         // Then
+        Assertions.assertTrue(isStaticResource);
         Assertions.assertNotEquals(response.getBody(), null);
-        //temp 변경
     }
 
     @ParameterizedTest
-    @ValueSource(strings = "/hello")
-    @DisplayName("파일 읽기 실패")
-    void FileReaderTestNotFound(String uri) throws IOException {
+    @CsvSource({"/registration", "/abc"})
+    @DisplayName("Static Resource 파일 여부 확인, Not File")
+    void isStaticResourceTestNotFile(String uri) throws IOException {
         // Given
 
         // When
-        MyHttpResponse response = fileContentReader.readStaticResource(uri);
+        boolean isStaticResource = fileContentReader.isStaticResource(uri);
 
         // Then
-        Assertions.assertNull(response);
+        Assertions.assertFalse(isStaticResource);
     }
-    
 }
