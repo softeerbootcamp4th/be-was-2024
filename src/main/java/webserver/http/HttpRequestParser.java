@@ -91,10 +91,11 @@ public class HttpRequestParser {
             String path = url[0];
             Map<String, String> queries = new HashMap<>();
             if (url.length > 1) {
-                queries = parseQuery(queries, url[1]);
+                queries = parseQuery(url[1]);
             }
 
             String version = requestLineParts[2];
+            requestLineBuffer.reset();
 
             // Read the request headers
             Map<String, String> requestHeaders = new HashMap<>();
@@ -114,6 +115,8 @@ public class HttpRequestParser {
                             String headerName = headerLine.substring(0, index).trim();
                             String headerValue = headerLine.substring(index + 1).trim();
                             requestHeaders.put(headerName, headerValue);
+                        } else {
+                            throw new IllegalArgumentException("Invalid HTTP header: " + headerLine);
                         }
                     }
                 }
@@ -133,7 +136,7 @@ public class HttpRequestParser {
                     bytesRead += read;
                 }
             }
-            
+
 
             return new MyHttpRequest(method, path, queries, version, requestHeaders, requestBody);
 
@@ -148,19 +151,31 @@ public class HttpRequestParser {
         String[] firstLines = requestLine.split("\\s+");
 
         // The request URI (path) is the second element in the tokens array
-        if (firstLines.length >= 2) {
+        if (firstLines.length == 3) {
             return firstLines;
         } else {
             throw new IllegalArgumentException("Invalid HTTP request line: " + requestLine);
         }
     }
 
-    public Map<String, String> parseQuery(Map<String, String> queries, String query) {
+    public Map<String, String> parseQuery(String query) {
+        Map<String, String> queries = new HashMap<>();
+
         String[] keyValues = query.split("&");
         for (String keyValue : keyValues) {
             String[] keyAndValue = keyValue.split("=");
+
+            if (keyAndValue.length != 2) {
+                throw new IllegalArgumentException("Invalid query: " + query);
+            }
+            
             String key = URLDecoder.decode(keyAndValue[0], StandardCharsets.UTF_8);
             String value = URLDecoder.decode(keyAndValue[1], StandardCharsets.UTF_8);
+
+            if (key == null || value == null) {
+                throw new IllegalArgumentException("Invalid query: " + query);
+            }
+
             queries.put(key, value);
         }
 

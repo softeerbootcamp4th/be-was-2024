@@ -20,8 +20,7 @@ public class POSTLoginUserMapper implements HttpMapper {
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
-        Map<String, String> body = new HashMap<>();
-        httpRequestParser.parseQuery(body, new String(httpRequest.getBody()));
+        Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));
 
         String userId = body.get("userId");
         User user = Database.findUserById(userId);

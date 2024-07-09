@@ -9,7 +9,6 @@ import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 public class POSTCreateUserMapper implements HttpMapper {
@@ -18,8 +17,7 @@ public class POSTCreateUserMapper implements HttpMapper {
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
-        Map<String, String> body = new HashMap<>();
-        httpRequestParser.parseQuery(body, new String(httpRequest.getBody()));
+        Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));
 
         User newUser = new User(body.get("userId"), body.get("password"), body.get("name"), body.get("email"));
         Database.addUser(newUser);

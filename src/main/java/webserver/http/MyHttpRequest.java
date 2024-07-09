@@ -66,7 +66,7 @@ public class MyHttpRequest {
                 ", query=" + query +
                 ", version='" + version + '\'' +
                 ", headers=" + headers +
-                ", body=" + (body != null ? new String(body) : "null") +
-                " }";
+                ", body= { " + (body != null ? new String(body) : "null") +
+                " }, }";
     }
 }
