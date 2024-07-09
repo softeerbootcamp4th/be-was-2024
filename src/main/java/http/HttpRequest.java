@@ -1,11 +1,15 @@
 package http;
 
+import exception.InvalidHttpRequestException;
 import exception.QueryParameterNotFoundException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -57,8 +61,14 @@ public class HttpRequest {
         String query = url.substring(url.indexOf("?") + 1);
         String[] params = query.split("&");
         for(String param : params){
-            String[] keyValue = param.split("=");
-            queryParameters.put(keyValue[0], keyValue[1]);
+            int index = param.indexOf('=');
+            if(index == -1){
+                throw new InvalidHttpRequestException("Invalid query parameter: " + query);
+            }
+            String key = URLDecoder.decode(param.substring(0, index), StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(param.substring(index + 1), StandardCharsets.UTF_8);
+
+            queryParameters.put(key, value);
         }
     }
 
