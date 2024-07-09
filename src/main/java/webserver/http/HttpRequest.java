@@ -2,6 +2,7 @@ package webserver.http;
 
 import webserver.http.enums.Methods;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ import java.util.Map;
 public class HttpRequest {
     private Methods method;
     private Url url; //하나의 클래스로 분리를 하면
-    private String body;
+    private byte[] body;
     private String protocol;
     private Map<String, String> headers;
 
@@ -31,7 +32,7 @@ public class HttpRequest {
         return url;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 
@@ -41,6 +42,15 @@ public class HttpRequest {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public String printRequest(){
+        return "method: " + method.getMethod() + "\n" +
+                "url: " + url.getPath() + "\n" +
+                "url params: " + url.getParamsMap().toString() + "\n" +
+                "protocol: " + protocol + "\n" +
+                "headers: " + headers.toString() + "\n" +
+                "body: " + body + "\n";
     }
 
     private HttpRequest(ReqeustBuilder builder) {
@@ -54,12 +64,15 @@ public class HttpRequest {
     public static class ReqeustBuilder{
         private Methods method;
         private Url url;
-        private String body;
+        private byte[] body;
         private String protocol;
         private Map<String, String> headers= new HashMap<>();
 
-        public ReqeustBuilder(String startline) {
+        public ReqeustBuilder(String startline) throws IOException {
             String[] split = startline.split(" ");
+            if(split.length != 3){
+                throw new IOException("Invalid request line: " + startline);
+            }
             method =  Methods.valueOfMethod(split[0]);
             url = new Url(split[1]);
             protocol = split[2];
@@ -70,7 +83,7 @@ public class HttpRequest {
             return this;
         }
 
-        public ReqeustBuilder setBody(String body) {
+        public ReqeustBuilder setBody(byte[] body) {
             this.body = body;
             return this;
         }

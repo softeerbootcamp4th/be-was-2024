@@ -19,7 +19,7 @@ public enum Methods {
     Methods(String method) {
         this.method = method;
     }
-    private String getMethod() {
+    public String getMethod() {
         return this.method;
     }
 

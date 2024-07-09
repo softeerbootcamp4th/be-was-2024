@@ -9,6 +9,7 @@ import webserver.api.ApiFunction;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.PathMap;
+import webserver.util.StreamByteReader;
 
 
 /*
@@ -29,16 +30,15 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             DataOutputStream dos = new DataOutputStream(out);
-            InputStreamReader dis = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(dis);
+            BufferedInputStream bif = new BufferedInputStream(in);
 
-            String startline = br.readLine(); // http request의 첫번째줄
+            String startline = StreamByteReader.readLine(bif); // http request의 첫번째줄
             HttpRequest.ReqeustBuilder reqeustBuilder = new HttpRequest.ReqeustBuilder(startline);
 
             String headers = startline;
             int contentLength = 0;
             while(!headers.isEmpty()){ //header들을 한줄씩 순회하면서 request에 header를 하나씩 추가함
-                headers = br.readLine();
+                headers = StreamByteReader.readLine(bif);
                 logger.info(headers);
                 String[] parsedline = headers.split(":");
                 if((parsedline.length) ==2) {
@@ -47,12 +47,15 @@ public class RequestHandler implements Runnable {
                 }
             }
             if(contentLength != 0) {
-                char[] body = new char[contentLength];
-                br.read(body, 0, contentLength);
-                reqeustBuilder.setBody(new String(body));
+                byte[] body = new byte[contentLength];
+
+                if(bif.read(body, 0, contentLength) == contentLength) {
+                    reqeustBuilder.setBody(body);
+                }
             }
             HttpRequest request = reqeustBuilder.build();
 
+            logger.info(request.printRequest());
 
             ApiFunction api = PathMap.getPathMethod(request.getMethod(), request.getUri().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =

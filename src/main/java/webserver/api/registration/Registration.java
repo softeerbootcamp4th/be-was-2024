@@ -7,6 +7,7 @@ import webserver.api.ReadFile;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class Registration implements ApiFunction {
 
         Map<String, String> params = new HashMap<>();
 
-        String body = request.getBody();
+        String body = new String(request.getBody(), StandardCharsets.UTF_8);
         for(String line : body.split("&")){
             String[] param = line.split("=");
             params.put(param[0], param[1]);
