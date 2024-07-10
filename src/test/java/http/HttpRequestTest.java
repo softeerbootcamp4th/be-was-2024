@@ -1,5 +1,6 @@
 package http;
 
+import exception.HeaderNotFoundException;
 import exception.InvalidHttpRequestException;
 import exception.QueryParameterNotFoundException;
 import exception.UnsupportedHttpVersionException;
@@ -12,7 +13,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
+import static util.StringUtil.*;
 
 class HttpRequestTest {
 
@@ -20,17 +22,19 @@ class HttpRequestTest {
     @CsvSource({
             "GET / HTTP/1.1",
             "GET        /           HTTP/1.1",
+            "GET / HTTP/1.1\r\nContent-Length: 17",
     })
     void testValidRequest(String requestString) throws IOException {
         HttpRequest httpRequest =
                 HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes()));
 
-        assertEquals(httpRequest.getMethod(), "GET");
-        assertEquals(httpRequest.getUrl(), "/");
-        assertEquals(httpRequest.getPath(), "/");
-        assertEquals(httpRequest.getViewPath(), "/index.html");
-        assertEquals(httpRequest.getHttpVersion(), "HTTP/1.1");
+        assertThat(httpRequest.getMethod()).isEqualTo("GET");
+        assertThat(httpRequest.getUrl()).isEqualTo("/");
+        assertThat(httpRequest.getPath()).isEqualTo("/");
+        assertThat(httpRequest.getViewPath()).isEqualTo("/index.html");
+        assertThat(httpRequest.getHttpVersion()).isEqualTo("HTTP/1.1");
     }
+
 
     @ParameterizedTest
     @CsvSource({
@@ -44,9 +48,11 @@ class HttpRequestTest {
             "GET /showData MyVersion/2.2" //wrong http version
     })
     void testInvalidRequest(String requestString) {
-        assertThrows(InvalidHttpRequestException.class,
-                () -> HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes())));
+        assertThatExceptionOfType(InvalidHttpRequestException.class)
+                .isThrownBy(() -> HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes())));
     }
+
+
 
     @ParameterizedTest
     @CsvSource({
@@ -56,8 +62,8 @@ class HttpRequestTest {
             "PATCH /showAll HTTP/3"
     })
     void testUnsupportedRequest(String requestString) {
-        assertThrows(UnsupportedHttpVersionException.class,
-                () -> HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes())));
+        assertThatExceptionOfType(UnsupportedHttpVersionException.class)
+                .isThrownBy(() -> HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes())));
     }
 
 
@@ -68,29 +74,28 @@ class HttpRequestTest {
         HttpRequest httpRequest =
                 HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes()));
 
-        assertThrows(QueryParameterNotFoundException.class,
-                () -> httpRequest.getQueryParameterValue("namee"));
-        assertThrows(QueryParameterNotFoundException.class,
-                () -> httpRequest.getQueryParameterValue("name "));
-        assertThrows(QueryParameterNotFoundException.class,
-                () -> httpRequest.getQueryParameterValue(" name"));
-        assertThrows(QueryParameterNotFoundException.class,
-                () -> httpRequest.getQueryParameterValue("AGE"));
-        assertThrows(QueryParameterNotFoundException.class,
-                () -> httpRequest.getQueryParameterValue("se x"));
+        assertThatExceptionOfType(QueryParameterNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getQueryParameterValue("namee"));
+        assertThatExceptionOfType(QueryParameterNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getQueryParameterValue("name "));
+        assertThatExceptionOfType(QueryParameterNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getQueryParameterValue(" name"));
+        assertThatExceptionOfType(QueryParameterNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getQueryParameterValue("AGE"));
+        assertThatExceptionOfType(QueryParameterNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getQueryParameterValue("se x"));
 
-        try{
+        assertThatCode(() -> {
             String name = httpRequest.getQueryParameterValue("name");
             String age = httpRequest.getQueryParameterValue("age");
             String sex = httpRequest.getQueryParameterValue("sex");
 
-            assertEquals(name, "junha");
-            assertEquals(age, "27");
-            assertEquals(sex, "male");
-        } catch(QueryParameterNotFoundException qe){
-            fail();
-        }
+            assertThat(name).isEqualTo("junha");
+            assertThat(age).isEqualTo("27");
+            assertThat(sex).isEqualTo("male");
+        }).doesNotThrowAnyException();
     }
+
 
     @ParameterizedTest
     @CsvSource({
@@ -115,9 +120,10 @@ class HttpRequestTest {
         //then
         //조회한 값은 realValue
         String findValue = httpRequest.getQueryParameterValue("key");
-        assertNotEquals(findValue, encodedValue);
-        assertEquals(findValue, realValue);
+        assertThat(findValue).isNotEqualTo(encodedValue);
+        assertThat(findValue).isEqualTo(realValue);
     }
+
 
     @Test
     void testParsingParameters() throws IOException {
@@ -129,11 +135,65 @@ class HttpRequestTest {
                 HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes()));
 
         //then
-        assertEquals(httpRequest.getQueryParameterValue("map"), "key=value");
-        assertEquals(httpRequest.getQueryParameterValue("proposition"), "a==b");
-        assertEquals(httpRequest.getQueryParameterValue("name"), "jun ha");
-
+        assertThat(httpRequest.getQueryParameterValue("map")).isEqualTo("key=value");
+        assertThat(httpRequest.getQueryParameterValue("proposition")).isEqualTo("a==b");
+        assertThat(httpRequest.getQueryParameterValue("name")).isEqualTo("jun ha");
     }
+
+
+    @ParameterizedTest
+    @CsvSource({
+            "Content-Length:17",
+            "Content-Length: 17", //OWS - blank
+            "Content-Length:    17" //OWS - tab
+    })
+    void testHeader(String headerString) throws IOException {
+        //given
+        String startLine = "POST /create HTTP/1.1\r\n";
+        String bodyString = "hello from client";
+        String requestString = startLine + headerString + CRLF + CRLF + bodyString;
+
+        //when
+        HttpRequest httpRequest =
+                HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes()));
+
+        //then
+        assertThat(httpRequest.getHeaders().size()).isEqualTo(1);
+        assertThat(httpRequest.getHeaderValue("Content-Length")).isEqualTo("17");
+
+        assertThatExceptionOfType(HeaderNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getHeaderValue("Content-Length "));
+        assertThatExceptionOfType(HeaderNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getHeaderValue(" Content-Length"));
+        assertThatExceptionOfType(HeaderNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getHeaderValue("CONTENT-LENGTH"));
+        assertThatExceptionOfType(HeaderNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getHeaderValue("Content-Type"));
+   }
+
+    @Test
+    void testRequestWithBody() throws IOException {
+        //given
+        String requestString = "POST /create HTTP/1.1\r\n" +
+                                "Content-Length: 17\r\n\r\n" +
+                                "hello from client";
+
+        //when
+        HttpRequest httpRequest =
+                HttpRequestParser.parse(new ByteArrayInputStream(requestString.getBytes()));
+
+        //then
+        assertThat(httpRequest.getHeaderValue("Content-Length")).isEqualTo("17");
+        assertThatExceptionOfType(HeaderNotFoundException.class)
+                .isThrownBy(() -> httpRequest.getHeaderValue("hello"));
+
+        byte[] body = httpRequest.getBody();
+
+        assertThat(body.length).isEqualTo(17);
+        assertThat(body).isEqualTo("hello from client".getBytes());
+        assertThat(new String(body, StandardCharsets.UTF_8)).isEqualTo("hello from client");
+    }
+
 
 
 }
