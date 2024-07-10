@@ -54,13 +54,18 @@ public class UserProcessor {
         String[] pairs = paramLine.split("&");
         String[] keyValue = pairs[0].split("=");
         User user = Database.findUserById(keyValue[1]);
-        if(user==null)
+        if(user==null)//User가 존재하지 않는다면
         {
             return false;
         }
         else
         {
-            return true;
+            String[] password = pairs[1].split("=");
+            if(user.getPassword().equals(password[1]))//패스워드가 일치한다면
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
