@@ -1,26 +1,26 @@
 package webserver;
 
-import type.MIMEType;
-import type.StatusCodeType;
+import type.HTTPStatusCode;
 
 import java.util.HashMap;
 
 public class RequestResult {
-    private StatusCodeType statusCode;
+    private HTTPStatusCode statusCode;
     private HashMap<String, String> responseHeader;
+    private HashMap<String, String> bodyParams;
     private byte[] bodyContent;
 
-    public RequestResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] content) {
+    public RequestResult(HTTPStatusCode statusCode, HashMap<String, String> responseHeader,
+                         byte[] content, HashMap<String, String> bodyParams) {
         this.statusCode = statusCode;
-        responseHeader.computeIfAbsent("Content-Type", k -> MIMEType.DEFAULT.getContentType());
         this.responseHeader = responseHeader;
         this.bodyContent = content;
+        this.bodyParams = bodyParams;
     }
 
-    public RequestResult(StatusCodeType statusCode, String content) {
+    public RequestResult(HTTPStatusCode statusCode, String content) {
         this.statusCode = statusCode;
         this.responseHeader = new HashMap<>();
-        setResponseHeader("Content-Type", MIMEType.DEFAULT.getContentType());
         this.bodyContent = content.getBytes();
     }
 
@@ -28,7 +28,9 @@ public class RequestResult {
 
     public HashMap<String, String> getResponseHeader() { return responseHeader; }
 
-    public StatusCodeType getStatusCode() { return statusCode; }
+    public HTTPStatusCode getStatusCode() { return statusCode; }
 
     public byte[] getBodyContent() { return bodyContent; }
+
+    public HashMap<String, String> getBodyParams() { return bodyParams; }
 }
