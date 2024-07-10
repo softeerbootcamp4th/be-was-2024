@@ -49,7 +49,7 @@ public class UserProcessor {
         Database.addUser(user);
     }
 
-    public void findUser(RequestObject requestObject) throws Exception {
+    public User findUser(RequestObject requestObject) throws Exception {
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
         String[] idLine = pairs[0].split("=");
@@ -67,5 +67,7 @@ public class UserProcessor {
         if (!user.getPassword().equals(passwordLine[1])) {
             throw new Exception("비밀번호가 일치하지 않습니다");
         }
+
+        return user;
     }
 }
