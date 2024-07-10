@@ -1,7 +1,6 @@
 package logic;
 
 import db.Database;
-import exception.QueryParameterNotFoundException;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.User;
@@ -11,9 +10,15 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
-import static util.StringUtil.Header.*;
 import static util.HttpStatus.*;
+import static util.StringUtil.*;
+import static util.StringUtil.Header.*;
+import static util.StringUtil.Method.*;
 
 public class Logic {
     private static final Logger logger = LoggerFactory.getLogger(Logic.class);
@@ -46,25 +51,48 @@ public class Logic {
             return response;
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return HttpResponse.error(SC_INTERNAL_SERVER_ERROR, "Server Error!");
+            return HttpResponse.error(SC_INTERNAL_SERVER_ERROR, "Server Error");
         }
     }
 
     private static HttpResponse registration(HttpRequest httpRequest){
-        HttpResponse response = new HttpResponse();
-        try{
-            String userId = httpRequest.getQueryParameterValue("userId");
-            String password = httpRequest.getQueryParameterValue("password");
-            String name = httpRequest.getQueryParameterValue("name");
-            String email = httpRequest.getQueryParameterValue("email");
-
-            Database.addUser(new User(userId, password, name, email));
-
-            return HttpResponse.redirect("/index.html");
-        } catch (QueryParameterNotFoundException qe){
-            // /registration/index.html form의 내용은 전부 required 이므로 파라미터를 찾지 못하는건 유저가 임의로 url을 변경하여 접근했을때이다.
-            logger.debug(qe.getMessage());
-            return HttpResponse.error(SC_BAD_REQUEST, "Invalid Access");
+        if(!httpRequest.getMethod().equals(POST)){
+            return HttpResponse.error(SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
         }
+        //TODO body to string and parsing
+        byte[] body = httpRequest.getBody();
+        if(body==null){
+            return HttpResponse.error(SC_BAD_REQUEST, "Request body is empty");
+        }
+
+        String bodyString = new String(body, StandardCharsets.UTF_8);
+        Map<String, String> params = new HashMap<>();
+
+        String[] queries = bodyString.split(AMPERSAND);
+        if(queries.length!=4) {
+            return HttpResponse.error(SC_BAD_REQUEST, "Request body must contain 4 parameters.");
+        }
+
+        for(String query : queries){
+            int index = query.indexOf(EQUALS);
+            if(index==-1){
+                return HttpResponse.error(SC_BAD_REQUEST, "Request body parameter must be formatted like (key=value)");
+            }
+            String key = URLDecoder.decode(query.substring(0, index), StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(query.substring(index + 1), StandardCharsets.UTF_8);
+            params.put(key, value);
+        }
+
+        String userId = params.get("userId");
+        String password = params.get("password");
+        String name = params.get("name");
+        String email = params.get("email");
+        if(userId==null || password==null || name==null || email==null){
+            return HttpResponse.error(SC_BAD_REQUEST, "Missing required parameters");
+        }
+
+        Database.addUser(new User(userId, password, name, email));
+
+        return HttpResponse.redirect(ROOT_PATH);
     }
 }

@@ -3,12 +3,10 @@ package http;
 import exception.InvalidHttpRequestException;
 import exception.UnsupportedHttpVersionException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 import static util.StringUtil.*;
+import static util.StringUtil.Header.CONTENT_LENGTH;
 import static util.StringUtil.Method.*;
 
 public class HttpRequestParser {
@@ -29,6 +27,22 @@ public class HttpRequestParser {
         throwIfInvalid(startLine);
         setStartLine(request, startLine);
 
+        readHeaders(bufferedReader, request);
+        readBody(bufferedReader, request);
+
+        return request;
+    }
+
+    private static void readBody(BufferedReader bufferedReader, HttpRequest request) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        while (bufferedReader.ready()) {
+            buffer.write(bufferedReader.read());
+        }
+        request.setBody(buffer.toByteArray());
+    }
+
+    private static void readHeaders(BufferedReader bufferedReader, HttpRequest request) throws IOException {
+        String line;
         while ((line = bufferedReader.readLine()) != null && !line.isEmpty()) { //null check only는 broken pipe 에러를 발생시킨다..?
             int colonIndex = line.indexOf(COLON);
             if (colonIndex == -1) {
@@ -38,8 +52,6 @@ public class HttpRequestParser {
             String value = line.substring(colonIndex + 1).trim();
             request.addHeader(key, value);
         }
-
-        return request;
     }
 
     private static void setStartLine(HttpRequest request, String[] startLine) {
@@ -79,4 +91,7 @@ public class HttpRequestParser {
     private static boolean isSupportedHttpVersion(String httpVersion) {
         return httpVersion.equals(SUPPORTED_HTTP_VERSION);
     }
+
+
+
 }
