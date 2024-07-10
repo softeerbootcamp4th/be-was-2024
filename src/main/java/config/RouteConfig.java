@@ -2,6 +2,7 @@ package config;
 
 import chain.RouteHandleChain;
 import routehandler.route.IndexPageHandler;
+import routehandler.route.auth.SignOutHandler;
 import routehandler.route.registration.RegistrationPageHandler;
 import routehandler.route.auth.LoginPageHandler;
 import routehandler.route.auth.SignInHandler;
@@ -15,8 +16,9 @@ public class RouteConfig {
             Route.at("/auth")
             .routes(
                 Route.at("/signup").POST(new SignUpHandler()),
-                Route.at("/signin").POST(new SignInHandler())
-                ),
+                Route.at("/signin").POST(new SignInHandler()),
+                Route.at("/signout").POST(new SignOutHandler())
+            ),
             Route.at("/login")
                 .GET(new LoginPageHandler()),
             Route.at("/")
