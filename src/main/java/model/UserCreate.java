@@ -6,7 +6,7 @@ import java.util.Map;
 
 public class UserCreate {
 
-    public static void createUser(String urlPath) {
+    public static synchronized void createUser(String urlPath) {
         Map<String, String> userInfo = UserInfoExtract.extractUserInfoFromBody(urlPath);
         String userId = userInfo.get("userId");
         String password = userInfo.get("password");

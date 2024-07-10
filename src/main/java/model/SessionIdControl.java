@@ -9,7 +9,7 @@ public class SessionIdControl {
 
     private static SecureRandom random = new SecureRandom();
 
-    public static String sessionIdCreate(User user) {
+    public static  synchronized String createSessionId(User user) {
         String sessionId = new BigInteger(130, random).toString(32);
         User existUser = Session.findUserBySessionId(sessionId);
         while(existUser != null){
@@ -20,7 +20,7 @@ public class SessionIdControl {
         return sessionId;
     }
 
-    public static void sessionIdDelete(String sessionId){
+    public static synchronized void deleteSessionId(String sessionId){
         Session.deleteSessionId(sessionId);
     }
 }

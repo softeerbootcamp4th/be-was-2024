@@ -31,12 +31,12 @@ public class PostHandler {
                     break;
                 }
                 redirectUrl = "/main/index.html";
-                sessionId = SessionIdControl.sessionIdCreate(user);
+                sessionId = SessionIdControl.createSessionId(user);
                 requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
                 break;
             case "/logout":
                 sessionId = headers.get("Cookie").split(";")[1].substring(5);
-                SessionIdControl.sessionIdDelete(sessionId);
+                SessionIdControl.deleteSessionId(sessionId);
                 requestResponse.redirectPath("/index.html");
                 break;
             default:
