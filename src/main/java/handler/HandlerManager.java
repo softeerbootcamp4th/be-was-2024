@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestParser;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HandlerManager {
     private static final Logger logger = LoggerFactory.getLogger(HandlerManager.class);
@@ -32,18 +29,18 @@ public class HandlerManager {
             "<body><h1>404 Not Found</h1></body>" +
             "</html>";
 
-    private final List<Map<String, Handler>> handlers;
+    private final EnumMap<HttpMethod, Map<String, Handler>> handlers;
 
     private HandlerManager(){
-        // Http Method 종류별로 Handler를 저장하는 Map 생성
-        handlers = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            handlers.add(new HashMap<>());
+        // Http Method 종류별로 Handler를 저장하는 EnumMap 생성
+        handlers = new EnumMap<>(HttpMethod.class);
+        for (HttpMethod method : HttpMethod.values()) {
+            handlers.put(method, new HashMap<>());
         }
 
         // 각 HttpRequest를 처리하는 Handler 등록
 
-        handlers.get(HttpMethod.POST.getHandlerMapIdx()).put("/user/create", (httpRequest, httpResponse) -> {
+        handlers.get(HttpMethod.POST).put("/user/create", (httpRequest, httpResponse) -> {
 
             Map<String, String> bodyParams = getBodyParams(httpRequest);
 
@@ -77,7 +74,7 @@ public class HandlerManager {
             HttpMethod httpMethod = httpRequest.getHttpMethod();
             String path = httpRequest.getPath().orElseThrow(
                     () -> new InvalidHttpRequestException("uri path is empty"));
-            Handler handler = handlers.get(httpMethod.getHandlerMapIdx()).get(path);
+            Handler handler = handlers.get(httpMethod).get(path);
 
             // HttpRequest를 처리할 handler가 없을 경우, 예외 발생
             if(handler == null)
