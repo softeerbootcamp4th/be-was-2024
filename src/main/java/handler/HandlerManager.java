@@ -8,6 +8,7 @@ import db.Database;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import exception.InvalidHttpRequestException;
+import exception.ResourceNotFoundException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,7 @@ public class HandlerManager {
     // 정적 파일 응답 메서드
     public void handleStaticResource(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException, IllegalArgumentException {
 
-        byte[] body = readFile(httpRequest.getPath().orElseThrow(
+        byte[] body = readStaticFile(httpRequest.getPath().orElseThrow(
                 () -> new InvalidHttpRequestException("invalid path")));
 
         String extensionType = httpRequest.getExtensionType().get().toUpperCase();
@@ -129,7 +130,7 @@ public class HandlerManager {
     }
 
     // File Path에 해당하는 파일을 byte 배열로 반환
-    public static byte[] readFile(String filePath) {
+    public static byte[] readStaticFile(String filePath) {
         if(filePath.startsWith("/")) {
             filePath = filePath.substring(1);
         }
@@ -138,7 +139,7 @@ public class HandlerManager {
         // 등록된 정적 파일 클래스패스를 통해 파일 읽기 (src/main/resources/static 디렉토리 안에 있는 파일)
         try (InputStream inputStream = HandlerManager.class.getClassLoader().getResourceAsStream(filePath)) {
             if (inputStream == null) {
-                throw new IOException("Resource not found: " + filePath);
+                throw new ResourceNotFoundException("Resource not found: " + filePath);
             }
             return inputStream.readAllBytes();
         } catch (IOException e) {
@@ -146,6 +147,8 @@ public class HandlerManager {
             return null;
         }
     }
+
+
 
 
 
