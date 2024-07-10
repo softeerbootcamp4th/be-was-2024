@@ -27,6 +27,9 @@ public class PostDistributor extends Distributor {
         if (path.equals("/user/create")) {
             userProcessor.createUser(request);
             response.redirect("/index.html", dos, 302);
+        } else if (path.equals("/user/login")) {
+            userProcessor.login(request);
+            response.redirect("/index.html", dos, 302);
         }
     }
 }
