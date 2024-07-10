@@ -108,6 +108,7 @@ public class GetHandler
     }
 
 
+    //세션을 얻어낸다
     private void handleUserInfoRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
         String sessionId = requestObject.getCookies().get("SID");
         if (sessionId != null) // 쿠기 값을 받아 왔다면

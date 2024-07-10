@@ -102,6 +102,8 @@ public class RequestObject {
         this.body = body;
     }
 
+
+    //헤더에서 쿠키를 파싱한다
     public Map<String, String> getCookies() {
         Map<String, String> cookies = new HashMap<>();
         if (headers.containsKey("Cookie")) {
