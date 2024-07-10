@@ -15,7 +15,6 @@ public class HttpResponseHandler {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final DataOutputStream dos;
     private final Map<String, String> responseHeadersMap = new HashMap<>();
-
     private Status status;
 
     public HttpResponseHandler(OutputStream outputStream) {
@@ -66,5 +65,9 @@ public class HttpResponseHandler {
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    public Status getStatus() {
+        return status;
     }
 }
