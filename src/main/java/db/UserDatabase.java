@@ -3,14 +3,15 @@ package db;
 import model.User;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class Database {
-    private static Map<String, User> users = new HashMap<>();
+public class UserDatabase {
+    private static Map<String, User> users = new ConcurrentHashMap<>();
 
-    public static void addUser(User user) {
+    public static User addUser(User user) {
         users.put(user.getUserId(), user);
+        return users.get(user.getUserId());
     }
 
     public static User findUserById(String userId) {
@@ -22,6 +23,6 @@ public class Database {
     }
 
     public static void initialize() {
-        users = new HashMap<>();
+        users = new ConcurrentHashMap<>();
     }
 }
