@@ -19,7 +19,7 @@ public class RequestInfo {
 
     private HTTPMethod method;
     private String path;
-    private HashMap<String, String> query;
+    private HashMap<String, String> queryParam;
     private HashMap<String, String> header;
     private HashMap<String, String> cookie;
     private String body;
@@ -52,7 +52,7 @@ public class RequestInfo {
         this.method = findMethod(requestLine);
         String[] seperatedPath = requestLine.split("\\s+")[1].split("\\?");
         this.path = seperatedPath[0];
-        if (seperatedPath.length > 1) this.query = StringUtils.paramToMap(seperatedPath[1], "&");
+        if (seperatedPath.length > 1) this.queryParam = StringUtils.paramToMap(seperatedPath[1], "&");
     }
 
     private static HTTPMethod findMethod(String requestLine) {
@@ -68,7 +68,7 @@ public class RequestInfo {
 
     public String getPath() { return path; }
 
-    public HashMap<String, String> getQuery() { return query; }
+    public HashMap<String, String> getQuery() { return queryParam; }
 
     public HashMap<String, String> getHeader() { return header; }
 
