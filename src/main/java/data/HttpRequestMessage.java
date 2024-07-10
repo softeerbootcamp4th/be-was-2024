@@ -10,15 +10,17 @@ public class HttpRequestMessage {
     String version;
     Map<String, String> queryParam;
     Map<String,String> headers;
+    Map<String,String> cookies;
     byte[] body;
 
-    public HttpRequestMessage(String method, String uri, String version, Map<String,String> queryParam, Map<String, String> headers, byte[] body) {
+    public HttpRequestMessage(String method, String uri, String version, Map<String,String> queryParam, Map<String, String> headers, byte[] body, Map<String,String> cookies) {
         this.method = method;
         this.uri = uri;
         this.version = version;
         this.queryParam = queryParam;
         this.headers = headers;
         this.body = body;
+        this.cookies = cookies;
     }
 
     public void setBody(byte[] body) {
@@ -49,6 +51,10 @@ public class HttpRequestMessage {
         return body;
     }
 
+    public Map<String, String> getCookies() {
+        return cookies;
+    }
+
     @Override
     public String toString() {
         return "HttpRequestMessage{" +
@@ -57,7 +63,8 @@ public class HttpRequestMessage {
                 ", version='" + version + '\'' +
                 ", queryParam=" + queryParam +
                 ", headers=" + headers +
-                ", body=" +  Arrays.toString(body) +
+                ", cookies=" + cookies +
+                ", body=" + Arrays.toString(body) +
                 '}';
     }
 }

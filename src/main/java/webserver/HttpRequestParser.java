@@ -55,7 +55,8 @@ public class HttpRequestParser {
         }
         String[] headerArray =  headerSplit[1].split("\n");
         Map<String, String> headers = getHeaderMap(headerArray);
-        return new HttpRequestMessage(method,uri,version,queryParams,headers, null);
+        Map<String, String> cookies = getCookie(headers.get("Cookie"));
+        return new HttpRequestMessage(method,uri,version,queryParams,headers, null,cookies);
     }
 
     private static Map<String, String> getHeaderMap(String[] headerArray) {
@@ -65,6 +66,17 @@ public class HttpRequestParser {
             headers.put(headerParts[0].strip(), headerParts[1].strip());
         }
         return headers;
+    }
+
+    private static Map<String,String> getCookie(String cookieString){
+        HashMap<String, String> cookies = new HashMap<>();
+        if (cookieString == null) return cookies;
+        String[] cookieArray = cookieString.split(";");
+        for (String cookie : cookieArray) {
+            String[] cookieEntry = cookie.split("=");
+            cookies.put(cookieEntry[0].strip(), cookieEntry[1].strip());
+        }
+        return cookies;
     }
 
     private static String processQuery(String uri, Map<String, String> queryParams) {

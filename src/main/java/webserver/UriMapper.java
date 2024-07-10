@@ -13,7 +13,7 @@ public class UriMapper {
         //Exact Matching
         if (httpRequestMessage.getMethod().equals("GET")){
             return switch (httpRequestMessage.getUri()){
-                case "/", "/index.html" -> staticRequestProcess("src/main/resources/static/index.html");
+                case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
                 case "/registration.html" -> staticRequestProcess("src/main/resources/static/registration/index.html");
                 case "/login" -> staticRequestProcess("src/main/resources/static/login/index.html");
                 default -> staticRequestProcess("src/main/resources/static" + httpRequestMessage.getUri());
@@ -29,7 +29,7 @@ public class UriMapper {
         throw new RuntimeException();
     }
 
-    private static HttpResponseMessage staticRequestProcess(String path) throws IOException {
+    public static HttpResponseMessage staticRequestProcess(String path) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", findContentType(path.substring(path.lastIndexOf('.') + 1)));
         byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
