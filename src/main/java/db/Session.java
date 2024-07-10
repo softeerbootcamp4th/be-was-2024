@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- *
+ * 세션 관리
  */
 public class Session {
     private static Map<String, User> sessionMap = new ConcurrentHashMap<>();
