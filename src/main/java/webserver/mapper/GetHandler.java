@@ -1,17 +1,25 @@
 package webserver.mapper;
 
+import webserver.RequestResponse;
+
+import java.io.IOException;
+
 public class GetHandler {
 
     private static final String staticResourceDir = System.getProperty("staticResourceDir");
 
-    public static String handle(String url) {
+    public static void handle(String url, RequestResponse requestResponse) throws IOException {
         switch (url) {
             case "/registration":
-                return staticResourceDir + "/registration/index.html";
+                url = staticResourceDir + "/registration/index.html";
+                break;
             case "/login":
-                return staticResourceDir + "/login/index.html";
+                url = staticResourceDir + "/login/index.html";
+                break;
             default:
-                return staticResourceDir + url;
+                url = staticResourceDir + "/registration/index.html";
+                break;
         }
+        requestResponse.openPath(url);
     }
 }

@@ -13,12 +13,10 @@ public class MappingHandler {
 
         switch (method) {
             case "GET":
-                url = GetHandler.handle(url);
-                requestResponse.openPath(url);
+                GetHandler.handle(url, requestResponse);
                 break;
             case "POST":
-                url = PostHandler.handle(url, body);
-                requestResponse.redirectPath(url);
+                PostHandler.handle(url, body, requestResponse);
                 break;
             default:
                 break;
