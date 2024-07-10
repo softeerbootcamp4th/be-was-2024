@@ -6,29 +6,32 @@ package util;
 public enum HttpRequestMapper {
 
     // 200
-    ROOT("/", "GET"),
-    INDEX_HTML("/index.html", "GET"),
-    USER_LOGIN_FAIL("/user/login_failed.html", "GET"),
-    USER_LOGIN("/login", "GET"),
+    INDEX_HTML("/index.html", "GET", "200"),
+    USER_LOGIN_FAIL("/user/login_failed.html", "GET", "200"),
 
     // 302
-    SIGNUP_REQUEST("/user/create", "POST"),
-    LOGIN_REQUEST("/user/login", "POST"),
-    LOGOUT_REQUEST("/user/logout", "POST"),
-    REGISTER("/registration", "GET"),
+    ROOT("/", "GET", "302"),
+    REGISTER("/registration", "GET", "302"),
+    LOGIN("/login", "GET", "302"),
+    SIGNUP_REQUEST("/user/create", "POST", "302"),
+    LOGIN_REQUEST("/user/login", "POST", "302"),
+    LOGOUT_REQUEST("/user/logout", "POST", "302"),
 
     // 400
-    MESSAGE_NOT_ALLOWED("/notallow", "GET"),
+    MESSAGE_NOT_ALLOWED("/notallow", "GET", "405"),
 
     // 500
-    ERROR("/error", "GET");
+    ERROR("/error", "GET", "500");
 
     private final String path;
     private final String method;
+    private final String code;
 
-    HttpRequestMapper(String path, String method) {
+
+    HttpRequestMapper(String path, String method, String code) {
         this.path = path;
         this.method = method;
+        this.code = code;
     }
 
     public static HttpRequestMapper of(String path, String method) {
@@ -41,5 +44,21 @@ public enum HttpRequestMapper {
             }
         }
         return ERROR;
+    }
+
+    public static boolean isAuthRequest(String path, String method) {
+        return LOGIN_REQUEST.equals(of(path, method)) || LOGOUT_REQUEST.equals(of(path, method));
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public String getCode() {
+        return code;
     }
 }

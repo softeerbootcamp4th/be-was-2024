@@ -40,68 +40,69 @@ public class FrontRequestProcess {
         if (path.contains(StringUtil.DOT)) {
             String extension = path.split(StringUtil.REGDOT)[1];
             if (!extension.equals(ContentType.HTML.getExtension())) {
-                return new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
+                return HttpResponseObject.okStatic(path, HttpCode.OK.getStatus(), request.getHttpVersion());
             }
         }
 
+        // 로그인 및 로그아웃 요청은 별도로 처리
+        if(HttpRequestMapper.isAuthRequest(path, method)){
+            return handleAuthRequest(request);
+        }
+
         // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
+        // TODO: Status Code enum 클래스에 편입시켜서 중복 코드 줄여보기, 그리고 Response 객체 팩토리메서드 추가하기
         logger.info("Request Path: {}, Method: {}", path, method);
-        return switch (HttpRequestMapper.of(path, method)) {
-            case ROOT ->
-                    new HttpResponseObject(StringUtil.STATIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
+        HttpRequestMapper mapper = HttpRequestMapper.of(path, method);
+        return switch (mapper) {
+            case ROOT -> HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             case SIGNUP_REQUEST -> {
-                User user = userHandler.create(request.getBodyMap());
-                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
-            }
-            case LOGIN_REQUEST -> {
-                Optional<User> user = authHandler.login(request.getBodyMap());
-                if (user.isEmpty()) {
-                    yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
-                }
-
-                HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
-                CookieManager.setUserCookie(response, user.get());
-                yield response;
-            }
-            case LOGOUT_REQUEST -> {
-                // 클라이언트의 쿠키 중 sid를 무력화시키고 static index.html로 리다이렉트
-                if(request.getRequestHeaders().get("Cookie") != null) {
-                    String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get("Cookie"));
-                    authHandler.logout(sessionId);
-
-                    HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
-                    CookieManager.deleteUserCookie(response, sessionId);
-                    yield response;
-                }
-
-                yield new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.INDEX_HTML, HttpCode.FOUND.getStatus(), request.getHttpVersion());
+                userHandler.create(request.getBodyMap());
+                yield HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             }
             case USER_LOGIN_FAIL -> {
-                // 로그인 실패 시 로그인 실패 페이지 반환
-                HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, StringUtil.LOGIN_FAIL_HTML, HttpCode.OK.getStatus(), request.getHttpVersion());
-                response.putBody(new String(IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML)));
-                yield response;
+                String body = new String(IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML));
+                yield HttpResponseObject.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
             }
             case INDEX_HTML -> {
                 // 세션ID로 유저를 찾았다 -> templates/index.html 반환
-                if(request.getRequestHeaders().get("Cookie") != null){
-                    String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get("Cookie"));
+                if(request.getRequestHeaders().get(StringUtil.COOKIE) != null){
+                    String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get(StringUtil.COOKIE));
                     if(authHandler.findUserBySessionId(sessionId).isPresent()){
-                        HttpResponseObject response = new HttpResponseObject(StringUtil.DYNAMIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
-                        response.putBody(new String(IOUtil.readBytesFromFile(false, StringUtil.INDEX_HTML)));
-                        yield response;
+                        String body = new String(IOUtil.readBytesFromFile(false, StringUtil.INDEX_HTML));
+                        yield HttpResponseObject.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
                     }
                 }
 
-                yield new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
+                yield HttpResponseObject.okStatic(path, mapper.getCode(), request.getHttpVersion());
             }
-            case MESSAGE_NOT_ALLOWED ->
-                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
-            case ERROR ->
-                    new HttpResponseObject(StringUtil.FAULT, null, HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
+            case MESSAGE_NOT_ALLOWED, ERROR ->
+                    HttpResponseObject.error(mapper.getCode(), request.getHttpVersion());
             default ->
-                    new HttpResponseObject(StringUtil.STATIC, path, HttpCode.OK.getStatus(), request.getHttpVersion());
+                    HttpResponseObject.okStatic(path, mapper.getCode(), request.getHttpVersion());
         };
+    }
+
+    public HttpResponseObject handleAuthRequest(HttpRequestObject request){
+        HttpRequestMapper mapper = HttpRequestMapper.of(request.getRequestPath(), request.getRequestMethod());
+        if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // Login
+            Optional<User> user = authHandler.login(request.getBodyMap());
+            if (user.isEmpty()) {
+                return HttpResponseObject.redirect(StringUtil.LOGIN_FAIL_HTML, mapper.getCode(), request.getHttpVersion());
+            }
+
+            HttpResponseObject response = HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            CookieManager.setUserCookie(response, user.get());
+            return response;
+        } else { // Logout: 클라이언트의 쿠키 중 sid를 무력화시키고 static/index.html로 리다이렉트
+            if(request.getRequestHeaders().get(StringUtil.COOKIE) == null)
+                return HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+
+            String sessionId = CookieManager.parseUserCookie(request.getRequestHeaders().get(StringUtil.COOKIE));
+            authHandler.logout(sessionId);
+            HttpResponseObject response = HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            CookieManager.deleteUserCookie(response, sessionId);
+            return HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+        }
     }
 
     public void handleResponse(OutputStream out, HttpResponseObject response) throws IOException {
@@ -113,35 +114,12 @@ public class FrontRequestProcess {
             return;
         }
 
-        sendHeader(dos, response);
-        if(response.getBody() != null)
-            sendBody(dos, response.getBody());
-    }
-
-    private void sendHeader(DataOutputStream dos, HttpResponseObject response) throws IOException {
-        String path = response.getPath();
-        switch (HttpCode.of(response.getStatusCode())) {
-            case OK:
-                response.putHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
-                response.putHeader("Content-Length", response.getBody().length + "");
-                break;
-            case FOUND:
-                response.putHeader("Location", path);
-                break;
-            case METHOD_NOT_ALLOWED:
-                break;
-            case NOT_FOUND:
-                break;
-            default:
-                break;
-        }
-        logger.info(response.getTotalHeaders());
         dos.writeBytes(response.getTotalHeaders());
-    }
-
-    private void sendBody(DataOutputStream dos, byte[] body) throws IOException {
-        dos.write(body, 0, body.length);
-        dos.flush();
+        byte[] body = response.getBody();
+        if(body != null) {
+            dos.write(body, 0, body.length);
+            dos.flush();
+        }
     }
 
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
