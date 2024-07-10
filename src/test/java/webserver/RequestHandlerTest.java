@@ -3,13 +3,13 @@ package webserver;
 import constant.HttpMethod;
 import db.Database;
 import dto.HttpRequest;
+import dto.HttpResponse;
 import exception.InvalidHttpRequestException;
 import handler.Handler;
 import handler.HandlerManager;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import java.io.*;
 
@@ -39,10 +39,9 @@ public class RequestHandlerTest {
         httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
         Handler handler = handlerManager.getHandler(httpRequest);
-        DataOutputStream dataOutputStream = Mockito.mock(DataOutputStream.class);
 
         // when
-        handler.handle(new DataOutputStream(dataOutputStream), httpRequest);
+        handler.handle(httpRequest, new HttpResponse());
 
         // then
         User user = Database.findUserById("javajigi");
@@ -68,10 +67,9 @@ public class RequestHandlerTest {
         httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
         Handler handler = handlerManager.getHandler(httpRequest);
-        DataOutputStream dataOutputStream = Mockito.mock(DataOutputStream.class);
 
         // when & then
-        assertThatThrownBy(() -> handler.handle(new DataOutputStream(dataOutputStream), httpRequest))
+        assertThatThrownBy(() -> handler.handle(httpRequest, new HttpResponse()))
                 .isInstanceOf(InvalidHttpRequestException.class)
                 .hasMessage("User information cannot be null");
     }
