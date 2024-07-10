@@ -52,13 +52,6 @@ public class HandlerManager {
             // 302 응답 생성
             httpResponse.setRedirect("/index.html");
         });
-
-        handlers.get(HttpMethod.GET).put("/user/login", (httpRequest, httpResponse) -> {
-
-            // 로그인 페이지 응답
-            DynamicFileResolver.setHttpResponse(httpResponse, "/user/login");
-
-        });
     }
 
     private static class LazyHolder {

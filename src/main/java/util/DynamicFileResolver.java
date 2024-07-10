@@ -15,7 +15,7 @@ import java.io.UnsupportedEncodingException;
 public class DynamicFileResolver {
     private static final Logger logger = LoggerFactory.getLogger(DynamicFileResolver.class);
 
-    private final static String prefix = "/src/main/resources/templates";
+    private final static String prefix = "src/main/resources/templates";
     private final static String suffix = ".html";
 
     private static final String CONTENT_TYPE = "Content-Type";
