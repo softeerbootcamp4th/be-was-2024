@@ -29,4 +29,6 @@ public class StringUtil {
     public static final String PROPERTIES = "project.properties";
 
     public static final String INVALID_LOGIN = "Invalid Login";
+    public static final String INVALID_PATH = "Invalid Path: ";
+    public static final String INVALID_HEADER = "Invalid Header: ";
 }

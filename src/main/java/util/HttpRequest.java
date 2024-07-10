@@ -1,5 +1,7 @@
 package util;
 
+import exception.RequestException;
+
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -86,7 +88,7 @@ public class HttpRequest {
         headerLine = headerLine.replaceAll(StringUtil.SPACES, StringUtil.SPACE); // remove multiple spaces
         int idx = headerLine.indexOf(StringUtil.COLON);
         if(idx == -1) {
-            throw new IllegalArgumentException("Header is invalid");
+            throw new RequestException(StringUtil.INVALID_HEADER + headerLine);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
         requestHeaders.put(header[0].trim(), header[1].trim());

@@ -1,5 +1,6 @@
 package webserver;
 
+import exception.RequestException;
 import handler.SessionHandler;
 import handler.ModelHandler;
 import handler.UserHandler;
@@ -39,7 +40,7 @@ public class FrontRequestProcess {
         // css, img 등 html이 아닌 정적 자원인 경우 즉시 반환
         if (path.contains(StringUtil.DOT)) {
             int idx = path.lastIndexOf(StringUtil.DOT);
-            if(idx == -1) throw new IllegalArgumentException("Invalid Path: " + path);
+            if(idx == -1) throw new RequestException(StringUtil.INVALID_PATH + path);
             String extension = path.substring(idx + 1);
             if (!extension.equals(ContentType.HTML.getExtension())) {
                 return HttpResponse.okStatic(path, request.getHttpVersion());
