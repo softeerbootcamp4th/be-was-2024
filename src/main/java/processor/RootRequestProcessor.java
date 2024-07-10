@@ -2,6 +2,7 @@ package processor;
 
 import db.Database;
 import exception.StatusCodeException;
+import model.User;
 import type.HTTPStatusCode;
 import utils.FileUtils;
 import webserver.RequestInfo;
@@ -30,8 +31,15 @@ public class RootRequestProcessor extends RequestProcessor {
 
         String sid = cookie.get("sid");
         if (sid != null) {
-            bodyParams.put("hasSID", "true");
-            bodyParams.put("userId", Database.findUserIdBySessionId(sid));
+            if (Database.findUserIdBySessionId(sid) == null) {
+                insertToResponseHeader("Set-Cookie", "sid=; Path=/; Max-Age=0");
+            } else {
+                bodyParams.put("hasSID", "true");
+                String userId = Database.findUserIdBySessionId(sid);
+                bodyParams.put("userId", userId);
+                User user = Database.findUserById(userId);
+                bodyParams.put("userName", user.getName());
+            }
         }
 
         insertHTMLTypeToHeader();

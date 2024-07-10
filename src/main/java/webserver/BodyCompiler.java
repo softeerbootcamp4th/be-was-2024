@@ -19,21 +19,33 @@ public class BodyCompiler {
     }
 
     // s1: boolean
-    public static String replace(HashMap<String, String> param, MatchResult matchResult) {
+    private static String replace(HashMap<String, String> param, MatchResult matchResult) {
         String content = matchResult.group(1);
 
         // s1 ? s2 : s3
         Pattern TernaryOpPattern = Pattern.compile(STATEMENT + TRIM + "\\?" + TRIM + STATEMENT + TRIM + ":" + TRIM + LAST_STATEMENT, Pattern.DOTALL);
         Matcher matcher = TernaryOpPattern.matcher(content);
-        if (matcher.find()) return isStatementTrue(param, matcher.group(1)) ? matcher.group(2) : matcher.group(3);
+        if (matcher.find()) return isStatementTrue(param, matcher.group(1)) ? replaceVarToValue(param, matcher.group(2))
+                                                                            : replaceVarToValue(param, matcher.group(3));
 
         // s1 && s2
         Pattern AndOpPattern = Pattern.compile(STATEMENT + TRIM + "&&" + TRIM + LAST_STATEMENT, Pattern.DOTALL);
         matcher = AndOpPattern.matcher(content);
-        if (matcher.find()) return isStatementTrue(param, matcher.group(1)) ? matcher.group(2) : "";
+        if (matcher.find()) return isStatementTrue(param, matcher.group(1)) ? replaceVarToValue(param, matcher.group(2)) : "";
 
         // var
         String getVar = param.get(content);
+        return getVar != null ? getVar : "";
+    }
+
+    private static String replaceVarToValue(HashMap<String, String> param, String content) {
+        Pattern varPattern = Pattern.compile("\\{\\{" + TRIM + STATEMENT + TRIM + "}}", Pattern.DOTALL);
+        Matcher matcher = varPattern.matcher(content);
+        return matcher.replaceAll(matchResult -> getValueByHashMap(param, matchResult));
+    }
+
+    private static String getValueByHashMap(HashMap<String, String> param, MatchResult matchResult) {
+        String getVar = param.get(matchResult.group(1));
         return getVar != null ? getVar : "";
     }
 

@@ -9,6 +9,11 @@ import utils.StringUtils;
 import webserver.RequestInfo;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.util.HashMap;
 
 public class UserRequestProcessor extends RequestProcessor {
@@ -19,6 +24,7 @@ public class UserRequestProcessor extends RequestProcessor {
         switch (methodPath()) {
             case "GET /user/login.html" -> loginPage();
             case "GET /user/login_failed.html" -> loginFailedPage();
+            case "GET /user/list" -> userListPage();
 
             case "POST /user/create" -> createUser();
             case "POST /user/login" -> loginUser();
@@ -43,8 +49,36 @@ public class UserRequestProcessor extends RequestProcessor {
         setResult(HTTPStatusCode.OK, getResponseHeader(), body);
     }
 
+    private void userListPage() throws IOException {
+        HashMap<String, String> cookie = getCookie();
+        String sid = cookie.get("sid");
+
+        if (sid == null || Database.findUserIdBySessionId(sid) == null) {
+            insertToResponseHeader("Location", "/user/login.html");
+            setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
+            return;
+        }
+
+        String path = STATIC_PATH + "/user/list.html";
+        byte[] body = FileUtils.readFileToBytes(path);
+
+        insertHTMLTypeToHeader();
+        HashMap<String, String> bodyParams = new HashMap<>();
+        StringBuilder userListContent = new StringBuilder();
+        String listContent = "<div class=\"user-list-content\">\n" +
+                "                <div>ID: {0}</div>\n" +
+                "                <div>NAME: {1}</div>\n" +
+                "                <div>EMAIL: {2}</div>\n" +
+                "            </div>";
+        for (User user : Database.findAll()) {
+            userListContent.append(MessageFormat.format(listContent, user.getUserId(), user.getName(), user.getEmail()));
+        }
+        bodyParams.put("userList", userListContent.toString());
+        setResult(HTTPStatusCode.OK, getResponseHeader(), body, bodyParams);
+    }
+
     // POST "/user/create"
-    private void createUser() {
+    private void createUser() throws UnsupportedEncodingException {
         HashMap<String, String> param = StringUtils.paramToMap(getBody(), "&");
         String userId = param.get("userId");
         String name = param.get("name");
@@ -64,7 +98,7 @@ public class UserRequestProcessor extends RequestProcessor {
             return;
         }
 
-        User user = new User(userId, name, password, email);
+        User user = new User(userId, password, URLDecoder.decode(name, "UTF-8"), URLDecoder.decode(email, "UTF-8"));
         Database.addUser(user);
         insertToResponseHeader("Location", "/user/login.html");
         setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
