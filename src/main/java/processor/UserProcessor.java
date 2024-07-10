@@ -1,6 +1,7 @@
 package processor;
 
 import db.Database;
+import jdk.jfr.DataAmount;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,19 +52,19 @@ public class UserProcessor {
     public void findUser(RequestObject requestObject) throws Exception {
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
-        String[] keyValue = pairs[0].split("=");
-        User user = Database.findUserById(keyValue[1]);
-        if(user==null)//User가 존재하지 않는다면
+        String[] idLine = pairs[0].split("=");
+        String[] passwordLine = pairs[1].split("=");
+        if(idLine.length==1||passwordLine.length==1)
+        {
+            throw new Exception("아이디와 비밀번호를 모두 입력해야 합니다");
+        }
+        User user = Database.findUserById(idLine[1]);
+
+        if(user==null)
         {
             throw new Exception("해당하는 Id가 존재하지 않습니다");
         }
-        else
-        {
-            String[] password = pairs[1].split("=");
-            if(user.getPassword().equals(password[1]))//패스워드가 일치한다면
-            {
-                return;
-            }
+        if (!user.getPassword().equals(passwordLine[1])) {
             throw new Exception("비밀번호가 일치하지 않습니다");
         }
     }
