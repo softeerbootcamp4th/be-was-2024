@@ -8,11 +8,9 @@ import java.io.IOException;
 
 public class GetDistributor extends Distributor {
     Request request;
-    Response response;
 
-    protected GetDistributor(Request request, Response response) {
+    protected GetDistributor(Request request) {
         this.request = request;
-        this.response = response;
     }
 
     @Override
@@ -20,14 +18,26 @@ public class GetDistributor extends Distributor {
         if (request.isQueryString()) {
             processQuery(dos);
         } else {
-            response.response(request.getPath(), dos);
+            Response response = new Response.Builder()
+                    .url(request.getPath())
+                    .statusCode(200)
+                    .dataOutputStream(dos)
+                    .build();
+
+            response.sendResponse();
         }
     }
 
     private void processQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            response.redirect("/not_found.html", dos, 404);
+            Response response = new Response.Builder()
+                    .url("/not_found.html")
+                    .dataOutputStream(dos)
+                    .redirectCode(404)
+                    .build();
+
+            response.sendResponse();
         }
     }
 }

@@ -9,12 +9,10 @@ import java.io.IOException;
 
 public class PostDistributor extends Distributor {
     Request request;
-    Response response;
     UserProcessor userProcessor = new UserProcessor();
 
-    PostDistributor(Request request, Response response) {
+    PostDistributor(Request request) {
         this.request = request;
-        this.response = response;
     }
 
     @Override
@@ -33,14 +31,32 @@ public class PostDistributor extends Distributor {
 
     private void processUserCreate(DataOutputStream dos) throws IOException {
         userProcessor.createUser(request);
-        response.redirect("/index.html", dos, 302);
+        Response response = new Response.Builder()
+                .url("/index.html")
+                .dataOutputStream(dos)
+                .redirectCode(302)
+                .build();
+
+        response.sendResponse();
     }
 
     private void processUserLogin(DataOutputStream dos) throws IOException {
         if (userProcessor.login(request)) {
-            response.redirect("/index.html", dos, 302);
+            Response response = new Response.Builder()
+                    .url("/index.html")
+                    .dataOutputStream(dos)
+                    .redirectCode(302)
+                    .build();
+
+            response.sendResponse();
         } else {
-            response.redirect("/login/login_failed.html", dos, 404);
+            Response response = new Response.Builder()
+                    .url("/login/login_failed.html")
+                    .dataOutputStream(dos)
+                    .redirectCode(404)
+                    .build();
+
+            response.sendResponse();
         }
     }
 }
