@@ -9,6 +9,7 @@ public class StringUtil {
     public static final String SPACES = "\\s+";
     public static final String COLON = ":";
     public static final String COLON_WITH_SPACE = ": ";
+    public static final String SEMICOLON_WITH_SPACES = ";\\s+";
     public static final String CRLF = "\r\n";
     public static final String AND = "&";
     public static final String EQUAL = "=";
@@ -26,4 +27,6 @@ public class StringUtil {
     public static final String INDEX_HTML = "/index.html";
     public static final String LOGIN_FAIL_HTML = "/user/login_failed.html";
     public static final String PROPERTIES = "project.properties";
+
+    public static final String INVALID_LOGIN = "Invalid Login";
 }
