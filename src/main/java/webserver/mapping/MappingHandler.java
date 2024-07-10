@@ -25,7 +25,7 @@ public class MappingHandler {
         getHandlers.put("/", new GETHomeMapper());
         getHandlers.put("/registration", new GETRegistrationFormMapper());
         getHandlers.put("/login", new GETLoginFormMapper());
-//        getHandlers.put("/user/create", new GETCreateUserMapper());
+        getHandlers.put("/user/list", new GETUserListMapper());
 
         postHandlers.put("/user/create", new POSTCreateUserMapper());
         postHandlers.put("/user/login", new POSTLoginUserMapper());

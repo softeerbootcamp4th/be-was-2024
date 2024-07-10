@@ -13,13 +13,10 @@ public class GETHomeMapper implements HttpMapper {
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
-        if (isLogin(httpRequest)) {
+        if (httpRequestParser.isLogin(httpRequest)) {
             return fileContentReader.readStaticResource("/main/index.html");
         }
         return fileContentReader.readStaticResource("/index.html");
     }
 
-    private boolean isLogin(MyHttpRequest httpRequest) {
-        return httpRequestParser.parseCookie(httpRequest.getHeaders().get("Cookie")).containsKey("sId");
-    }
 }
