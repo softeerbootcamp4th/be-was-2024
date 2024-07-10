@@ -59,9 +59,9 @@ public class Logic {
         if(!httpRequest.getMethod().equals(POST)){
             return HttpResponse.error(SC_METHOD_NOT_ALLOWED, "Method Not Allowed");
         }
-        //TODO body to string and parsing
+
         byte[] body = httpRequest.getBody();
-        if(body==null){
+        if(body==null || body.length==0){
             return HttpResponse.error(SC_BAD_REQUEST, "Request body is empty");
         }
 
