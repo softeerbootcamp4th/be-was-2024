@@ -22,7 +22,6 @@ public class HandlerManager {
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String CONTENT_LENGTH = "Content-Length";
     private static final String CHARSET_UTF8 = "utf-8";
-    private static final String LOCATION = "Location";
     private static final String ERROR_MESSAGE_404 =
             "<html>" +
             "<head><title>404 Not Found</title></head>" +
@@ -49,8 +48,7 @@ public class HandlerManager {
             Database.addUser(user);
 
             // 302 응답 생성
-            httpResponse.setHttpStatus(HttpStatus.FOUND);
-            httpResponse.addHeader(LOCATION, "/login/index.html");
+            httpResponse.setRedirect("/index.html");
         });
     }
 

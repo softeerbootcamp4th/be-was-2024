@@ -18,6 +18,7 @@ public class HttpResponse {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
+    private static final String LOCATION = "Location";
 
     private HttpStatus status;
     private Map<String, List<String>> headers;
@@ -34,6 +35,10 @@ public class HttpResponse {
         dos.flush();
     }
 
+    public void setRedirect(String url){
+        setHttpStatus(HttpStatus.FOUND);
+        addHeader(LOCATION, url);
+    }
     // HttpResponse header 생성
     private void makeHttpResponse(DataOutputStream dos) throws IOException {
 
@@ -77,5 +82,7 @@ public class HttpResponse {
     public void setBody(byte[] body) {
         this.body = body;
     }
+
+
 
 }
