@@ -9,11 +9,8 @@ import model.User;
 
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class DynamicRequestProcess {
     public static HttpResponseMessage registration(HttpRequestMessage httpRequestMessage){
@@ -62,8 +59,27 @@ public class DynamicRequestProcess {
         if (user == null) return UriMapper.staticRequestProcess("src/main/resources/static/index.html");
         Map<String,String> param = new HashMap<>();
         param.put("userName", user.getName());
-        String loginedHomeView = ViewHandler.viewProcess("src/main/resources/static/main/index.html",param);
-        System.out.println(loginedHomeView);
+        String loginedHomeView = ViewHandler.viewParamProcess("src/main/resources/static/main/index.html",param);
         return new HttpResponseMessage("200",headers,loginedHomeView.getBytes());
+    }
+
+    public static HttpResponseMessage userList(HttpRequestMessage httpRequestMessage) throws IOException {
+        Map<String, String> cookies = httpRequestMessage.getCookies();
+        Map<String,String> headers = new HashMap<>();
+        List<String> list = Database.findAll();
+        String sid = cookies.get("SID");
+        if (sid == null) return new HttpResponseMessage("303",headers,null);
+        User user = Session.getUser(sid);
+        if (user == null) return new HttpResponseMessage("303",headers,null);
+        String html = ViewHandler.viewListProcess("src/main/resources/static/user/list.html", list);
+        return new HttpResponseMessage("200",headers,html.getBytes());
+    }
+
+    public static HttpResponseMessage logout(HttpRequestMessage httpRequestMessage) throws IOException {
+        Map<String,String> headers = new HashMap<>();
+        headers.put("Location","/index.html");
+        headers.put("Set-Cookie","SID=null;MAX-AGE=0");
+        Session.removeSession(httpRequestMessage.getCookies().get("SID"));
+        return new HttpResponseMessage("303",headers,null);
     }
 }

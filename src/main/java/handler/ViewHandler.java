@@ -4,6 +4,7 @@ import util.FileUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
  *
  */
 public class ViewHandler {
-    public static String viewProcess(String path,Map<String,String> params) throws IOException {
+    public static String viewParamProcess(String path, Map<String,String> params) throws IOException {
         Pattern pattern = Pattern.compile("\\$\\{(\\w+)}");
         byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
         String templateHtml = new String(bytes);
@@ -25,5 +26,17 @@ public class ViewHandler {
         }
         matcher.appendTail(buffer);
         return buffer.toString();
+    }
+
+    public static String viewListProcess(String path, List<String> list) throws IOException {
+        byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
+        String templateHtml = new String(bytes);
+        StringBuilder buffer = new StringBuilder();
+        for (String x : list) {
+            buffer.append("<p class=\"btn btn_contained btn_size_m\">");
+            buffer.append(x);
+            buffer.append("</p>\r\n");
+        }
+        return templateHtml.replace("$list", buffer.toString());
     }
 }

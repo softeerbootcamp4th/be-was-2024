@@ -4,6 +4,7 @@ import model.User;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,7 +19,7 @@ public class Database {
         return users.get(userId);
     }
 
-    public static Collection<User> findAll() {
-        return users.values();
+    public static List<String> findAll() {
+        return users.values().stream().map(User::getName).toList();
     }
 }

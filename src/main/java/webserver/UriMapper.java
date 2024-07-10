@@ -14,6 +14,7 @@ public class UriMapper {
         if (httpRequestMessage.getMethod().equals("GET")){
             return switch (httpRequestMessage.getUri()){
                 case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
+                case "/user/list" -> DynamicRequestProcess.userList(httpRequestMessage);
                 case "/registration.html" -> staticRequestProcess("src/main/resources/static/registration/index.html");
                 case "/login" -> staticRequestProcess("src/main/resources/static/login/index.html");
                 default -> staticRequestProcess("src/main/resources/static" + httpRequestMessage.getUri());
@@ -21,6 +22,7 @@ public class UriMapper {
         }
         else if (httpRequestMessage.getMethod().equals("POST")){
             return switch (httpRequestMessage.getUri()){
+                case "/logout" -> DynamicRequestProcess.logout(httpRequestMessage);
                 case "/create" -> DynamicRequestProcess.registration(httpRequestMessage);
                 case "/user/login" -> DynamicRequestProcess.login(httpRequestMessage);
                 default -> throw new RuntimeException();
