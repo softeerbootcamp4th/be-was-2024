@@ -1,5 +1,6 @@
 package handler;
 
+import db.Session;
 import processer.UserProcessor;
 import util.exception.CustomException;
 import http.HttpRequest;
@@ -69,9 +70,11 @@ public class PostHandler {
             String password = bodyTokens[1].split("=")[1];
 
             UserProcessor.loginUser(userId, password);
+            String sid = Session.createSession(userId);
 
             httpStatus = HttpStatus.FOUND;
             headers.put("Location", "/");
+            headers.put("Set-Cookie", "sid=" + sid + "; Path=/");
         } catch (CustomException e) {
             httpStatus = e.getHttpStatus();
             responseBody = showAlert(e.getMessage(), "http://localhost:8080/login");

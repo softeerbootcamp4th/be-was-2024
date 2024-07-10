@@ -1,7 +1,5 @@
 package db;
 
-import model.User;
-
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
