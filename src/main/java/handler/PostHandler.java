@@ -40,4 +40,10 @@ public class PostHandler {
         dos.writeBytes(response.toString());
         dos.flush();
     }
+
+    static void loginUser(HttpRequest httpRequest, OutputStream out) {
+        DataOutputStream dos = new DataOutputStream(out);
+        String body = new String(httpRequest.getBody());
+        log.debug(body);
+    }
 }

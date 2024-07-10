@@ -8,6 +8,7 @@ import java.io.OutputStream;
 
 import static handler.GetHandler.sendResponse;
 import static handler.PostHandler.createUser;
+import static handler.PostHandler.loginUser;
 
 public class Router {
     public static void requestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
@@ -36,6 +37,7 @@ public class Router {
 
         switch(requestUrl){
             case "/user/create" -> createUser(httpRequest, out);
+            case "/user/login" -> loginUser(httpRequest, out);
         }
     }
 }
