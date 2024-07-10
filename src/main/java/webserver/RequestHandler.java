@@ -2,6 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +38,12 @@ public class RequestHandler implements Runnable {
             }
 
             // Request Body
-            StringBuilder body = new StringBuilder();
+            List<Byte> body = new ArrayList<>();
             while(br.ready()) {
-                body.append((char) br.read());
+                body.add((byte) br.read());
             }
             if(!body.isEmpty()) {
-                httpRequestObject.putBody(body.toString());
+                httpRequestObject.putBody(body);
             }
 
             HttpResponseObject responseInfo = frontRequestProcess.handleRequest(httpRequestObject);

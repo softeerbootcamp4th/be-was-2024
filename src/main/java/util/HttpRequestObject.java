@@ -1,7 +1,10 @@
 package util;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HttpRequestObject {
@@ -31,7 +34,7 @@ public class HttpRequestObject {
             String[] params = requestURIElements[1].split(StringUtil.AND);
             for (String param : params) {
                 String[] keyValue = param.split(StringUtil.EQUAL);
-                requestParams.put(keyValue[0], keyValue[1]);
+                requestParams.put(keyValue[0], URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8));
             }
         }
         String requestVersion = requestLineElements[2];
@@ -63,15 +66,18 @@ public class HttpRequestObject {
     }
 
     public String getBodyString() {
-        return new String(requestBody);
+        return new String(requestBody, StandardCharsets.UTF_8);
     }
 
     public Map<String, String> getBodyMap() {
         Map<String, String> bodyMap = new HashMap<>();
-        String[] bodyElements = new String(requestBody).split(StringUtil.AND);
-        for (String bodyElement : bodyElements) {
-            String[] keyValue = bodyElement.split(StringUtil.EQUAL);
-            bodyMap.put(keyValue[0], keyValue[1]);
+
+        // byte[] to String, "&"으로 split
+        String restoredString = new String(requestBody, StandardCharsets.UTF_8);
+        String[] pairs = restoredString.split(StringUtil.AND);
+        for (String pair : pairs) {
+            String[] keyValue = pair.split(StringUtil.EQUAL);
+            bodyMap.put(keyValue[0].trim(), keyValue[1].trim());
         }
         return bodyMap;
     }
@@ -87,7 +93,13 @@ public class HttpRequestObject {
         requestHeaders.put(header[0].trim(), header[1].trim());
     }
 
-    public void putBody(String body){
-        this.requestBody = body.getBytes();
+    public void putBody(List<Byte> body){
+        // List<Byte> to byte[]
+        byte[] byteArray = new byte[body.size()];
+        for (int i = 0; i < body.size(); i++) {
+            byteArray[i] = body.get(i);
+        }
+        // byte[] to String 후 디코딩하여 다시 byte[]로 변환
+        this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8);
     }
 }
