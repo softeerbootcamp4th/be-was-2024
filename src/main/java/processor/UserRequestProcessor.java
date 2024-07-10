@@ -98,6 +98,17 @@ public class UserRequestProcessor extends RequestProcessor {
             return;
         }
 
+        if (Database.findUserById(userId) != null) {
+            insertHTMLTypeToHeader();
+            setResult(HTTPStatusCode.BAD_REQUEST, getResponseHeader(), "" +
+                    "<script>" +
+                    "alert('이미 등록된 아이디입니다.');" +
+                    "location.href='/registration'" +
+                    "</script>");
+
+            return;
+        }
+
         User user = new User(userId, password, URLDecoder.decode(name, "UTF-8"), URLDecoder.decode(email, "UTF-8"));
         Database.addUser(user);
         insertToResponseHeader("Location", "/user/login.html");
