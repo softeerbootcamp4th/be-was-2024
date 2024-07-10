@@ -81,11 +81,19 @@ public class HttpResponseObject {
         return sb.toString();
     }
 
-    public void putHeader(String key, String value){
+    private void putHeader(String key, String value){
         header.put(key, value);
     }
 
-    public void putBody(String body){
+    private void putBody(String body){
         this.body = body.getBytes();
+    }
+
+    public void setSessionId(String sessionId){
+        putHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
+    }
+
+    public void deleteSessionId(String sessionId){
+        putHeader("Set-Cookie", "sid=" + sessionId + "; Path=/; Max-Age=0");
     }
 }

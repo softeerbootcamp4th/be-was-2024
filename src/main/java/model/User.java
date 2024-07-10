@@ -7,7 +7,6 @@ public class User {
     private String password;
     private String name;
     private String email;
-    private String sessionId;
 
     protected User(String userId, String password, String name, String email) {
         this.userId = userId;
@@ -34,14 +33,6 @@ public class User {
 
     public String getEmail() {
         return email;
-    }
-
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
     }
 
     @Override
