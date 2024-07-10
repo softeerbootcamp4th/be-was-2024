@@ -1,10 +1,11 @@
 package webserver.mapper;
 
+import model.SessionIdCreate;
+import model.User;
 import model.UserCreate;
 import model.UserLogin;
 import webserver.RequestResponse;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class PostHandler {
@@ -16,13 +17,17 @@ public class PostHandler {
             case "/user/create":
                 UserCreate.createUser(new String(body, "UTF-8"));
                 requestResponse.redirectPath(redirectUrl);
+                break;
             case "/login":
-                boolean userExists = UserLogin.login(new String(body, "UTF-8"));
-                if(!userExists){
+                User user = UserLogin.login(new String(body, "UTF-8"));
+                if(user == null){
                     requestResponse.redirectPath(redirectUrl);
+                    break;
                 }
                 redirectUrl = "/main/index.html";
-                requestResponse.setCookieAndRedirectPath(redirectUrl,);
+                String sessionId = SessionIdCreate.nextSessionId(user);
+                requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
+                break;
             default:
                 break;
         }

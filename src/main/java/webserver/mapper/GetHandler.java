@@ -17,7 +17,7 @@ public class GetHandler {
                 url = staticResourceDir + "/login/index.html";
                 break;
             default:
-                url = staticResourceDir + "/registration/index.html";
+                url = staticResourceDir + url;
                 break;
         }
         requestResponse.openPath(url);
