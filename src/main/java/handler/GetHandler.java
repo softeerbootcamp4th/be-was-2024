@@ -61,4 +61,27 @@ public class GetHandler {
         dos.write(body, 0, body.length);
         dos.flush();
     }
+
+    public static void logout(HttpRequest httpRequest, OutputStream out) throws IOException {
+        DataOutputStream dos = new DataOutputStream(out);
+
+        String cookie = httpRequest.getHeaders("Cookie");
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get("sid");
+
+        Session.deleteSession(sid);
+
+        HttpStatus httpStatus = HttpStatus.FOUND;
+        HashMap<String, String> headers = new HashMap<>();
+        byte[] body = new byte[0];
+
+        headers.put("Content-Type", "text/html");
+        headers.put("Content-Length", "0");
+        headers.put("Location", "/");
+        HttpResponse response = new HttpResponse(httpStatus, headers, body);
+        dos.writeBytes(response.toString());
+        dos.write(body, 0, body.length);
+        dos.flush();
+
+    }
 }
