@@ -33,7 +33,10 @@ public class MyCookies {
      */
     public void expire(String key) {
         MyCookie cookie = this.cookies.get(key);
-        if(cookie == null) return;
+        if (cookie == null) {
+            cookie = new MyCookie(key, "");
+            this.cookies.put(key, cookie);
+        }
 
         // Max-Age=0 -> 쿠키의 남은 수명을 제거
         // Path=/ -> 모든 경로에 적용
@@ -42,6 +45,25 @@ public class MyCookies {
 
     public boolean has(String key) {
         return this.cookies.containsKey(key);
+    }
+
+    /**
+     * 대응되는 쿠키가 있다면 쿠키 객체를 반환
+     * @param key 쿠키의 키 값
+     */
+    public MyCookie get(String key) {
+        return this.cookies.get(key);
+    }
+
+    /**
+     * 대응되는 쿠키가 있다면 쿠키 객체의 값을 반환
+     * @param key 쿠키의 값
+     */
+    public String getValue(String key) {
+        MyCookie cookie = this.cookies.get(key);
+
+        if(cookie == null) return null;
+        return cookie.getValue();
     }
 
     public List<MyCookie> getCookies() {
