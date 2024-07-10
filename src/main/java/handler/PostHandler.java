@@ -37,16 +37,15 @@ public class PostHandler
         }
         else if(requestObject.getPath().equals("/user/login"))
         {
-            if(!userProcessor.findUser(requestObject))//해당하는 사용자가 없다면
+            try
             {
-                logger.debug("False, 해당 Id는 존재하지 않는 Id입니다");
-                responseAlert(dos,"해당 Id는 존재하지 않는 Id입니다");
+                userProcessor.findUser(requestObject);
+                logger.debug("True, 로그인 성공!!");
             }
-            else
+            catch(Exception e)
             {
-                logger.debug("True, 해당하는 사용자가 있습니다");
+                responseAlert(dos,e.getMessage());
             }
-
         }
     }
 
