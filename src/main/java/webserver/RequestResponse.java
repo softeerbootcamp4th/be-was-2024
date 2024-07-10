@@ -2,7 +2,6 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +20,14 @@ public class RequestResponse {
     public void redirectPath(String redirectPath) throws IOException {
         dos.writeBytes("HTTP/1.1 302 Found\r\n");
         dos.writeBytes("Location: " + redirectPath + "\r\n");
+        dos.writeBytes("\r\n");
+        dos.flush();
+    }
+
+    public void setCookieAndRedirectPath(String sessionId, String redirectPath) throws IOException {
+        dos.writeBytes("HTTP/1.1 302 Found\r\n");
+        dos.writeBytes("Location: " + redirectPath + "\r\n");
+        dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/\r\n");
         dos.writeBytes("\r\n");
         dos.flush();
     }
