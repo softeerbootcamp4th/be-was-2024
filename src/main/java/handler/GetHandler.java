@@ -26,7 +26,16 @@ public class GetHandler
         String path = requestObject.getPath();
         if(path.equals("/user/info"))//세션값 요청이 들어왔다면
         {
-            logger.debug("user/info");
+            try
+            {
+                handleUserInfoRequest(dos,requestObject);
+            }
+            catch (IOException e)
+            {
+                logger.debug("이게 왜 안되는건데");
+            }
+
+
             return;
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
@@ -108,11 +117,12 @@ public class GetHandler
             {
                 String body = "{ \"username\" : \"" + user.getUserId() +"\" }";
                 //JSON은 key 랑 value가 쌍 따옴표 " 로 둘러 싸져있어야한다.
+                byte[] bodyBytes = body.getBytes("UTF-8");
                 dos.writeBytes("HTTP/1.1 200 OK \r\n");
                 dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n"); //json파일로 보낸다
                 dos.writeBytes("Content-Length: " + body.length() + "\r\n");
                 dos.writeBytes("\r\n");
-                return;
+                responseBody(dos,bodyBytes);
             }
         }
     }
