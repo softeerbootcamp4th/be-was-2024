@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,22 +51,16 @@ public class Router {
 
     private void initPostHandlers() {
         postHandlersMap.put("/user/create", this::createUserHandler);
+        postHandlersMap.put("/login", this::loginHandler);
     }
 
     private void createUserHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
-        String body = new String(httpRequestParser.getBody(), StandardCharsets.UTF_8);
-        Map<String, String> parameterMap = new HashMap<>();
-        for (String keyValue : body.split("&")) {
-            int equalsIndex = keyValue.indexOf("=");
-            if (equalsIndex != -1) {
-                parameterMap.put(keyValue.substring(0, equalsIndex), keyValue.substring(equalsIndex + 1));
-            }
-        }
+        Map<String, String> formData = getFormData(httpRequestParser);
 
-        String userId = parameterMap.get("userId");
-        String password = parameterMap.get("password");
-        String name = parameterMap.get("name");
-        String email = parameterMap.get("email");
+        String userId = formData.get("userId");
+        String password = formData.get("password");
+        String name = formData.get("name");
+        String email = formData.get("email");
 
         User user = new User(userId, password, name, email);
         Database.addUser(user);
@@ -90,6 +83,34 @@ public class Router {
 
     }
 
+    private void loginHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) throws IOException {
+        Map<String, String> formData = getFormData(httpRequestParser);
+
+        String userId = formData.get("userId");
+        String password = formData.get("password");
+
+        User user = Database.findUserById(userId);
+
+        // 로그인 성공
+        if (user != null && user.getPassword().equals(password)) {
+            String sessionId = SessionManager.createSession(user);
+            httpResponseHandler
+                    .setStatus(Status.FOUND)
+                    .addHeader("Set-Cookie", "sid=" + sessionId + "; Path=/")
+                    .addHeader("Location", "http://localhost:8080")
+                    .respond(null);
+        } else {
+            // 로그인 실패
+            String filePath = "/Users/jungwoo/Desktop/study/be-was-2024/src/main/resources/static/login/login_failed.html";
+            byte[] body = readFileToByteArray(filePath);
+            httpResponseHandler
+                    .setStatus(Status.UNAUTHORIZED)
+                    .addHeader("Content-Type", FileType.getContentTypeByExtension("html"))
+                    .addHeader("Content-Length", String.valueOf(body.length))
+                    .respond(body);
+        }
+    }
+
     private void staticResourceHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) throws IOException {
         // 정적 리소스 반환
         String path = httpRequestParser.getPath();
@@ -105,7 +126,7 @@ public class Router {
 
     private void invalidRequestHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
         String responseBody = "<html><body><h1>404 Not Found</h1></body></html>";
-        byte[] body = responseBody.getBytes(StandardCharsets.UTF_8);
+        byte[] body = responseBody.getBytes();
         httpResponseHandler
                 .setStatus(Status.NOT_FOUND)
                 .addHeader("Content-Type", "text/html")
@@ -126,5 +147,18 @@ public class Router {
             }
             return bos.toByteArray();
         }
+    }
+
+    private Map<String, String> getFormData(HttpRequestParser httpRequestParser) {
+        String body = new String(httpRequestParser.getBody());
+        Map<String, String> formData = new HashMap<>();
+        for (String keyValue : body.split("&")) {
+            int equalsIndex = keyValue.indexOf("=");
+            if (equalsIndex != -1) {
+                formData.put(keyValue.substring(0, equalsIndex), keyValue.substring(equalsIndex + 1));
+            }
+        }
+
+        return formData;
     }
 }
