@@ -14,4 +14,8 @@ public class SessionTable {
     public static String findUserIdBySessionId(UUID sessionId) {
         return sessions.get(sessionId);
     }
+
+    public static void removeSession(UUID sessionId) {
+        sessions.remove(sessionId);
+    }
 }

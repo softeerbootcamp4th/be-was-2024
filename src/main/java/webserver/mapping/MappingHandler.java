@@ -29,6 +29,7 @@ public class MappingHandler {
 
         postHandlers.put("/user/create", new POSTCreateUserMapper());
         postHandlers.put("/user/login", new POSTLoginUserMapper());
+        postHandlers.put("/user/logout", new POSTLogoutUserMapper());
     }
 
     public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {

@@ -181,4 +181,28 @@ public class HttpRequestParser {
 
         return queries;
     }
+
+    public Map<String, String> parseCookie(String cookie) {
+        Map<String, String> cookies = new HashMap<>();
+
+        String[] keyValues = cookie.split("; ");
+        for (String keyValue : keyValues) {
+            String[] keyAndValue = keyValue.split("=");
+
+            if (keyAndValue.length != 2) {
+                throw new IllegalArgumentException("Invalid cookie: " + cookie);
+            }
+
+            String key = keyAndValue[0];
+            String value = keyAndValue[1];
+
+            if (key == null || value == null) {
+                throw new IllegalArgumentException("Invalid cookie: " + cookie);
+            }
+
+            cookies.put(key, value);
+        }
+
+        return cookies;
+    }
 }
