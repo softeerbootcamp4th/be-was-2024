@@ -1,5 +1,6 @@
 package routehandler.route.auth;
 
+import config.AppConfig;
 import db.Database;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
@@ -8,6 +9,7 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
+import session.MySession;
 import url.MyURL;
 import utils.FileReadUtil;
 
@@ -29,12 +31,14 @@ public class SignInHandler implements IRouteHandler {
         // 유저가 없거나, 비밀번호가 일치하지 않는 경우
         if(user == null || !user.getPassword().equals(password)) {
             res.setStatusInfo(HttpStatusType.UNAUTHORIZED);
-            res.send("/user/login_failed.html");
+            res.send("/login/login_failed.html");
 
             return;
         }
 
-        res.getCookies().put("test", "login success");
+        // 로그인 성공. 세션 생성하고 쿠키에 SID 넣기
+        String sessionId = MySession.createSession(user.getUserId());
+        res.getCookies().put(AppConfig.SESSION_NAME, sessionId);
 
         res.redirect("/");
     }
