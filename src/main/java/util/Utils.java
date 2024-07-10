@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class Utils {
@@ -65,5 +66,21 @@ public class Utils {
             case "svg" -> "image/svg+xml";
             default -> "*/*"; // 이건 작동 안함 -> 406 에러 반환
         };
+    }
+
+    public static HashMap<String, String> cookieParsing(String cookies) {
+        HashMap<String, String> parsedCookies = new HashMap<>();
+        String[] splitCookies = cookies.split(";");
+        for (String cookie : splitCookies) {
+            cookie = cookie.strip();
+            String[] nameAndValue = cookie.split("=");
+
+            String name = nameAndValue[0];
+            String value = nameAndValue[1];
+
+            parsedCookies.put(name, value);
+        }
+
+        return parsedCookies;
     }
 }
