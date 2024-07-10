@@ -1,5 +1,6 @@
 package http;
 
+import exception.HeaderNotFoundException;
 import exception.InvalidHttpRequestException;
 import exception.QueryParameterNotFoundException;
 
@@ -43,6 +44,16 @@ public class HttpRequest {
         this.httpVersion = httpVersion;
     }
 
+    public String getHeaderValue(String headerName) {
+        if(headers.containsKey(headerName)) {
+            return headers.get(headerName);
+        } else throw new HeaderNotFoundException("Cannot find Header names :  " + headerName);
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
     public String getQueryParameterValue(String key) throws QueryParameterNotFoundException {
         if(queryParameters.containsKey(key)) {
             return queryParameters.get(key);
@@ -54,6 +65,7 @@ public class HttpRequest {
     }
 
     private void setQueryParameters(String url){
+        //TODO '?' 는 존재하나 이후에 아무런 값이 없을 경우 IndexOutOfBounds Exception이 발생하는지 확인하고 발생한다면 에러처리 로직 추가.
         String query = url.substring(url.indexOf(QUESTION_MARK) + 1);
         String[] params = query.split(AMPERSAND);
         for(String param : params){
@@ -112,6 +124,13 @@ public class HttpRequest {
             case "svg" -> "image/svg+xml";
             default -> throw new IllegalStateException("Unexpected value: " + extension);
         };
+    }
+
+    public byte[] getBody() {
+        return body;
+    }
+    public void setBody(byte[] body) {
+        this.body = body;
     }
 
     @Override
