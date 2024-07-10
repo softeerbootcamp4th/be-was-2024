@@ -1,6 +1,7 @@
 package processor;
 
 import db.Database;
+import handler.SessionHandler;
 import model.User;
 import webserver.Request;
 
@@ -23,6 +24,7 @@ public class UserProcessor {
         if (user != null) {
             if (password.equals(user.getPassword())) {
                 // 로그인 성공
+                SessionHandler.makeNewSessionId(user);
                 return true;
             } else {
                 // 로그인 실패. 패스워드 불일치
