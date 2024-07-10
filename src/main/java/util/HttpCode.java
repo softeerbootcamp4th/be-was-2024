@@ -5,7 +5,8 @@ public enum HttpCode {
     OK("200", "OK"),
     FOUND("302", "Found"),
     NOT_FOUND("404", "Not Found"),
-    METHOD_NOT_ALLOWED("405", "Method Not Allowed");
+    METHOD_NOT_ALLOWED("405", "Method Not Allowed"),
+    INTERNAL_SERVER_ERROR("500", "Internal Server Error");
 
     final String status;
     final String message;
@@ -22,15 +23,6 @@ public enum HttpCode {
             }
         }
         return statusCode;
-    }
-
-    public static HttpCode of(String statusCode) {
-        for (HttpCode httpCode : values()) {
-            if (httpCode.status.equals(statusCode)) {
-                return httpCode;
-            }
-        }
-        return HttpCode.NOT_FOUND;
     }
 
     public String getStatus() {

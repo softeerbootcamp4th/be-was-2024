@@ -15,11 +15,11 @@ public class HttpResponse {
     protected HttpResponse() {
     }
 
-    public static HttpResponse ok(String type, String path, String statusCode, String httpVersion, String body) {
+    public static HttpResponse ok(String type, String path, String httpVersion, String body) {
         HttpResponse response = new HttpResponse();
         response.type = type;
         response.path = path;
-        response.statusCode = statusCode;
+        response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
         response.putBody(body);
         response.putHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
@@ -28,11 +28,11 @@ public class HttpResponse {
     }
 
     // staticResponse에서 담당하기에 Header/Body를 설정하지 않음
-    public static HttpResponse okStatic(String path, String statusCode, String httpVersion) {
+    public static HttpResponse okStatic(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = StringUtil.STATIC;
         response.path = path;
-        response.statusCode = statusCode;
+        response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
         return response;
     }
@@ -45,11 +45,11 @@ public class HttpResponse {
         return response;
     }
 
-    public static HttpResponse redirect(String path, String statusCode, String httpVersion) {
+    public static HttpResponse redirect(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = StringUtil.DYNAMIC;
         response.path = path;
-        response.statusCode = statusCode;
+        response.statusCode = HttpCode.FOUND.getStatus();
         response.httpVersion = httpVersion;
         response.putHeader("Location", path);
         return response;

@@ -5,33 +5,28 @@ package util;
  */
 public enum HttpRequestMapper {
 
-    // 200
-    INDEX_HTML("/index.html", "GET", "200"),
-    USER_LOGIN_FAIL("/user/login_failed.html", "GET", "200"),
+    // OK
+    INDEX_HTML("/index.html", "GET"),
+    USER_LOGIN_FAIL("/user/login_failed.html", "GET"),
 
-    // 302
-    ROOT("/", "GET", "302"),
-    REGISTER("/registration", "GET", "302"),
-    LOGIN("/login", "GET", "302"),
-    SIGNUP_REQUEST("/user/create", "POST", "302"),
-    LOGIN_REQUEST("/user/login", "POST", "302"),
-    LOGOUT_REQUEST("/user/logout", "POST", "302"),
+    // Redirect
+    ROOT("/", "GET"),
+    REGISTER("/registration", "GET"),
+    LOGIN("/login", "GET"),
+    SIGNUP_REQUEST("/user/create", "POST"),
+    LOGIN_REQUEST("/user/login", "POST"),
+    LOGOUT_REQUEST("/user/logout", "POST"),
 
-    // 400
-    MESSAGE_NOT_ALLOWED("/notallow", "GET", "405"),
-
-    // 500
-    ERROR("/error", "GET", "500");
+    // Error
+    MESSAGE_NOT_ALLOWED("/notallow", "GET"),
+    NOT_FOUND("/error", "GET");
 
     private final String path;
     private final String method;
-    private final String code;
 
-
-    HttpRequestMapper(String path, String method, String code) {
+    HttpRequestMapper(String path, String method) {
         this.path = path;
         this.method = method;
-        this.code = code;
     }
 
     public static HttpRequestMapper of(String path, String method) {
@@ -43,22 +38,14 @@ public enum HttpRequestMapper {
                 return MESSAGE_NOT_ALLOWED; // 요청 경로는 찾았으나 메서드가 없는 경우
             }
         }
-        return ERROR;
+        return NOT_FOUND;
     }
 
     public static boolean isAuthRequest(String path, String method) {
         return LOGIN_REQUEST.equals(of(path, method)) || LOGOUT_REQUEST.equals(of(path, method));
     }
 
-    public String getPath() {
-        return path;
-    }
-
     public String getMethod() {
         return method;
-    }
-
-    public String getCode() {
-        return code;
     }
 }
