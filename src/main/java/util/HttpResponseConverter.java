@@ -31,20 +31,14 @@ public class HttpResponseConverter {
         return !path.contains(".");
     }
 
-    private HttpResponse createDynamicHttpResponse(HttpRequest httpRequest) throws UnsupportedEncodingException {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Location", "/index.html");
-        String userId = URLDecoder.decode(httpRequest.getQueryParams().get("userId"),"UTF-8");
-        String password = URLDecoder.decode(httpRequest.getQueryParams().get("password"),"UTF-8");
-        String username = URLDecoder.decode(httpRequest.getQueryParams().get("name"),"UTF-8");
-        String email = URLDecoder.decode(httpRequest.getQueryParams().get("email"),"UTF-8");
+    private HttpResponse createDynamicHttpResponse(HttpRequest httpRequest) throws IOException {
+        HttpPathMapper httpPathMapper = new HttpPathMapper();
+        return httpPathMapper.map(httpRequest);
 
-        User user = new User(userId, username, password, email);
-        Database.addUser(user);
-        return  HttpResponse.of("HTTP/1.1", HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
 
     private HttpResponse createStaticHttpResponse(HttpRequest httpRequest) throws IOException {
+
         String contentType = ExtensionMapper.getContentTypeFromRequestPath(httpRequest.getPath());
         byte[] body = FileMapper.getByteConvertedFile(httpRequest.getPath());
 
