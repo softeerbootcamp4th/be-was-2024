@@ -1,6 +1,6 @@
 package util;
 
-public class StringUtil {
+public final class StringUtil {
     public static final String SPACES = "\\s+";
     public static final String COLON = ":";
     public static final String BLANK = " ";
