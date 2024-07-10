@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -146,6 +148,35 @@ class RequestTest {
 
         //then
         assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("Request 를 파싱하면 쿠키가 제대로 설정된다.")
+    void testParseRequestCookie() throws IOException {
+
+        //given
+        String requestString = "GET /create HTTP/1.1\r\n" +
+                "Cookie: Idea-69015724=5706a651-e233-42d1-908e-6339dc52f13f; sid=19ad748c-e842-4e8b-949d-da446429e94c\r\n" +
+                "\r\n";
+
+        Map<String, String> cookie = new HashMap<>();
+        cookie.put("Idea-69015724", "5706a651-e233-42d1-908e-6339dc52f13f");
+        cookie.put("sid", "19ad748c-e842-4e8b-949d-da446429e94c");
+
+        Request expected = new Request.Builder(Method.GET, "/create")
+                .addHeader("Cookie", "Idea-69015724=5706a651-e233-42d1-908e-6339dc52f13f; sid=19ad748c-e842-4e8b-949d-da446429e94c")
+                .cookie(cookie)
+                .build();
+
+        //when
+        Request request = Request.parseRequestWithoutBody(requestString);
+
+        //then
+        assertEquals(expected, request);
+        assertEquals("5706a651-e233-42d1-908e-6339dc52f13f", request.getCookieValue("Idea-69015724"));
+        assertEquals("19ad748c-e842-4e8b-949d-da446429e94c", request.getCookieValue("sid"));
+
+
     }
 
 }

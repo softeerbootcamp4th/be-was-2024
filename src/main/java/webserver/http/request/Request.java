@@ -22,6 +22,7 @@ public class Request {
     private final String version = "HTTP/1.1";
     private final Map<String, String> parameter;
     private final Map<String, String> header;
+    private final Map<String, String> cookie;
     private final byte[] body;
 
     private Request(Builder builder){
@@ -30,6 +31,7 @@ public class Request {
         this.parameter = builder.parameter;
         this.header = builder.header;
         this.body = builder.body;
+        this.cookie = builder.cookie;
     }
 
     public static class Builder {
@@ -37,6 +39,7 @@ public class Request {
         private String path;
         private Map<String, String> parameter;
         private Map<String, String> header;
+        private Map<String, String> cookie;
         private byte[] body;
 
         public Builder(Method method, String path){
@@ -45,10 +48,16 @@ public class Request {
             this.body = new byte[0];
             parameter = new LinkedHashMap<>();
             header = new LinkedHashMap<>();
+            cookie = new HashMap<>();
         }
 
         public Builder parameter(Map<String, String> parameter){
             this.parameter = parameter;
+            return this;
+        }
+
+        public Builder cookie(Map<String, String> cookie){
+            this.cookie = cookie;
             return this;
         }
 
@@ -78,9 +87,16 @@ public class Request {
         }
 
         public Request build(){
+            if(header.isEmpty()) return new Request(this);
+            if(!header.containsKey("Cookie")) return new Request(this);
+            this.cookie = parseCookie(header.get("Cookie"));
             return new Request(this);
         }
 
+    }
+
+    public String getCookieValue(String key){
+        return this.cookie.get(key);
     }
 
     public Method getMethod(){
@@ -147,7 +163,29 @@ public class Request {
             parameterMap.put(param[0], param[1]);
         }
         return parameterMap;
+    }
 
+    private static Map<String, String> parseCookie(String parameterCookieValue){
+        Map<String, String> cookie = new HashMap<>();
+        String[] cookieStrings = parameterCookieValue.split(";");
+
+        for(int i=0; i<cookieStrings.length; i++){
+            String cookieString = cookieStrings[i];
+            String[] cookieStringSplit = cookieString.split("=");
+            logger.debug(Arrays.toString(cookieStringSplit));
+            cookie.put(removeSpace(cookieStringSplit[0]), removeSpace(cookieStringSplit[1]));
+        }
+
+        return cookie;
+    }
+
+    private static String removeSpace(String str){
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<str.length(); i++){
+            char c = str.charAt(i);
+            if(c!=' ') sb.append(c);
+        }
+        return sb.toString();
     }
 
     private static String parseExtension(String path){
@@ -180,13 +218,29 @@ public class Request {
     }
 
     private static String parseHeaderName(String header){
-        StringBuilder sb = new StringBuilder(header.split(" ")[0]);
-        sb.setLength(sb.length()-1);
+
+        StringBuilder sb = new StringBuilder();
+        for(int i=0; i<header.length(); i++){
+            char c = header.charAt(i);
+            if(c==':') break;
+            sb.append(c);
+        }
+
         return sb.toString();
     }
 
     private static String parseHeaderValue(String header){
-        return header.split(" ")[1];
+
+        StringBuilder sb = new StringBuilder();
+
+        int i;
+        for(i=0; header.charAt(i)!=':'; i++){}
+        for(i++;i<header.length()&&header.charAt(i)==' '; i++){}
+        for(; i<header.length(); i++){
+            sb.append(header.charAt(i));
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -231,6 +285,7 @@ public class Request {
         if(!this.parameter.equals(request.parameter)) return false;
         if(!this.header.equals(request.header)) return false;
         if(!Arrays.equals(this.body, request.body)) return false;
+        if(!this.cookie.equals(request.cookie)) return false;
         return true;
     }
 
