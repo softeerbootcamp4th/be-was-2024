@@ -20,4 +20,8 @@ public class Database {
     public static Collection<User> findAll() {
         return users.values();
     }
+
+    public static void deleteAll(){
+        users.clear();
+    }
 }

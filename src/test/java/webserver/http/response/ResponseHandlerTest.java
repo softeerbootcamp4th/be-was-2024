@@ -1,170 +1,136 @@
 package webserver.http.response;
 
-import db.Database;
-import model.User;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import webserver.PluginLoader;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
 import static util.Utils.getFile;
 
 import java.io.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseHandlerTest {
 
-    @Test
-    void testResponseIndexHtmlSuccess() throws IOException {
-        //given
-        Request request = new Request.Builder(Method.GET, "/index.html")
-                .addHeader("Host", "localhost:8080")
-                .build();
+    @Nested
+    @DisplayName("정적 요청에 대한 응답")
+    class StaticResponseTest {
 
-        Response expected = new Response.Builder(Status.OK)
-                .addHeader("Content-Type", "text/html;charset=utf-8")
-                .body(getFile("index.html"))
-                .build();
+        ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
 
-        //when
-        Response actual = ResponseHandler.response(request);
+        @Test
+        @DisplayName("HTML")
+        void testResponseIndexHtmlSuccess() throws IOException {
+            //given
+            Request request = new Request.Builder(Method.GET, "/index.html")
+                    .addHeader("Host", "localhost:8080")
+                    .build();
 
-        //then
-        assertEquals(expected,actual);
+            Response expected = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", "text/html;charset=utf-8")
+                    .body(getFile("index.html"))
+                    .build();
 
-    }
+            //when
+            Response actual = responseHandler.response(request);
 
-    @Test
-    void testAccessStaticResourcePngSuccess() throws IOException {
-        //given
-        Request request = new Request.Builder(Method.GET, "/img/signiture.png")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
+            //then
+            assertEquals(expected,actual);
 
-        Response expected = new Response.Builder(Status.OK)
-                .addHeader("Content-Type", "image/png;charset=utf-8")
-                .body(getFile("/img/signiture.png"))
-                .build();
+        }
 
-        //when
-        Response actual = ResponseHandler.response(request);
+        @Test
+        @DisplayName("PNG")
+        void testAccessStaticResourcePngSuccess() throws IOException {
+            //given
+            Request request = new Request.Builder(Method.GET, "/img/signiture.png")
+                    .addHeader("Host", "localhost:8080")
+                    .addHeader("Connection", "keep-alive")
+                    .build();
 
-        //then
-        assertEquals(expected,actual);
+            Response expected = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", "image/png;charset=utf-8")
+                    .body(getFile("/img/signiture.png"))
+                    .build();
 
-    }
+            //when
+            Response actual = responseHandler.response(request);
 
-    @Test
-    void testAccessStaticResourceSvgSuccess() throws IOException {
+            //then
+            assertEquals(expected,actual);
 
-        //given
-        Request request = new Request.Builder(Method.GET, "/img/signiture.svg")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
+        }
 
-        Response expected = new Response.Builder(Status.OK)
-                .addHeader("Content-Type", "image/svg+xml;charset=utf-8")
-                .body(getFile("/img/signiture.svg"))
-                .build();
+        @Test
+        @DisplayName("SVG")
+        void testAccessStaticResourceSvgSuccess() throws IOException {
 
-        //when
-        Response actual = ResponseHandler.response(request);
+            //given
+            Request request = new Request.Builder(Method.GET, "/img/signiture.svg")
+                    .addHeader("Host", "localhost:8080")
+                    .addHeader("Connection", "keep-alive")
+                    .build();
 
-        //then
-        assertEquals(expected,actual);
-    }
+            Response expected = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", "image/svg+xml;charset=utf-8")
+                    .body(getFile("/img/signiture.svg"))
+                    .build();
+
+            //when
+            Response actual = responseHandler.response(request);
+
+            //then
+            assertEquals(expected,actual);
+        }
 
 
-    @Test
-    void testAccessStaticResourceCssSuccess() throws IOException {
+        @Test
+        @DisplayName("CSS")
+        void testAccessStaticResourceCssSuccess() throws IOException {
 
-        //given
-        Request request = new Request.Builder(Method.GET, "/main.css")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
+            //given
+            Request request = new Request.Builder(Method.GET, "/main.css")
+                    .addHeader("Host", "localhost:8080")
+                    .addHeader("Connection", "keep-alive")
+                    .build();
 
-        Response expected = new Response.Builder(Status.OK)
-                .addHeader("Content-Type", "text/css;charset=utf-8")
-                .body(getFile("main.css"))
-                .build();
+            Response expected = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", "text/css;charset=utf-8")
+                    .body(getFile("main.css"))
+                    .build();
 
-        //when
-        Response actual = ResponseHandler.response(request);
+            //when
+            Response actual = responseHandler.response(request);
 
-        //then
-        assertEquals(expected,actual);
+            //then
+            assertEquals(expected,actual);
 
-    }
+        }
 
-    @Test
-    void testAccessStaticResourceIcoSuccess() throws IOException {
+        @Test
+        @DisplayName("ICO")
+        void testAccessStaticResourceIcoSuccess() throws IOException {
 
-        //given
-        Request request = new Request.Builder(Method.GET, "/favicon.ico")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
+            //given
+            Request request = new Request.Builder(Method.GET, "/favicon.ico")
+                    .addHeader("Host", "localhost:8080")
+                    .addHeader("Connection", "keep-alive")
+                    .build();
 
-        Response expected = new Response.Builder(Status.OK)
-                .addHeader("Content-Type", "image/png;charset=utf-8")
-                .body(getFile("favicon.ico"))
-                .build();
+            Response expected = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", "image/png;charset=utf-8")
+                    .body(getFile("favicon.ico"))
+                    .build();
 
-        //when
-        Response actual = ResponseHandler.response(request);
+            //when
+            Response actual = responseHandler.response(request);
 
-        //then
-        assertEquals(expected,actual);
+            //then
+            assertEquals(expected,actual);
 
-    }
-
-    @Test
-    void testAccessRegistrationSuccess() throws IOException {
-
-        //given
-        Request request = new Request.Builder(Method.GET, "/registration")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
-
-        Response expected = new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/registration/index.html")
-                .build();
-
-        //when
-        Response actual = ResponseHandler.response(request);
-
-        //then
-        assertEquals(expected,actual);
+        }
 
     }
-
-    @Test
-    void testRegistrationSuccess() throws IOException {
-
-        Request request = new Request.Builder(Method.GET, "/create")
-                .addParameter("userId", "javajigi")
-                .addParameter("password", "password")
-                .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
-                .addParameter("email", "javajigi%40slipp.net")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .addHeader("Accept", "*/*")
-                .build();
-
-        User expected = new User("javajigi", "password", "%EB%B0%95%EC%9E%AC%EC%84%B1", "javajigi%40slipp.net");
-
-        //when
-        ResponseHandler.response(request);
-        User actual = Database.findUserById("javajigi");
-
-        //then
-        assertEquals(expected, actual);
-
-    }
-
-
 
 }
