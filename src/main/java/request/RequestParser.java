@@ -65,10 +65,10 @@ public class RequestParser {
     }
 
     private void setBody(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
-        Optional<String> optionalContentLength = request.getHeaders("Content-Length");
-        if (optionalContentLength.isEmpty()) return;
+        String contentLengthValue = request.getHeaders("Content-Length");
+        if (contentLengthValue == null) return;
 
-        int contentLength = Integer.parseInt(optionalContentLength.get());
+        int contentLength = Integer.parseInt(contentLengthValue);
         byte[] body = new byte[contentLength];
 
         for (int i = 0; i < contentLength; i++) {

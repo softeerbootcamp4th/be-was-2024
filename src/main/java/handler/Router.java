@@ -6,6 +6,7 @@ import http.HttpRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import static handler.GetHandler.loginCheck;
 import static handler.GetHandler.sendResponse;
 import static handler.PostHandler.createUser;
 import static handler.PostHandler.loginUser;
@@ -28,6 +29,7 @@ public class Router {
 
         switch (requestTarget) {
             case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html", out);
+            case "/loginCheck" -> loginCheck(httpRequest, out);
             default -> sendResponse(requestTarget, out);
         }
     }

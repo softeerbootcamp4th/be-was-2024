@@ -34,8 +34,8 @@ public class HttpRequest {
         return this.requestUrl;
     }
 
-    public Optional<String> getHeaders(String key) {
-        return Optional.ofNullable(headers.get(key));
+    public String getHeaders(String key) {
+        return headers.get(key);
     }
 
     public byte[] getBody() {
