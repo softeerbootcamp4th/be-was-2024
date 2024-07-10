@@ -1,4 +1,4 @@
-package routehandler.route.auth;
+package routehandler.route.registration;
 
 import http.MyHttpRequest;
 import http.MyHttpResponse;
@@ -6,13 +6,12 @@ import http.enums.HttpStatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
-import utils.FileReadUtil;
 
-public class LoginPageHandler implements IRouteHandler {
-    private final static Logger logger = LoggerFactory.getLogger(LoginPageHandler.class);
-    @Override
+public class RegistrationPageHandler implements IRouteHandler {
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationPageHandler.class);
+
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         res.setStatusInfo(HttpStatusType.OK);
-        res.send("/login/index.html");
+        res.send("/registration/index.html");
     }
 }
