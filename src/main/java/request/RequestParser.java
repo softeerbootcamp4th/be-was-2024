@@ -21,7 +21,11 @@ public class RequestParser {
 
         HttpRequest request = new HttpRequest();
 
-        setStartLine(bufferedReader, request, log);
+        String startLine = bufferedReader.readLine();
+        if (startLine == null || startLine.isEmpty()) {
+            return;
+        }
+        setStartLine(startLine, request, log);
         setHeaders(bufferedReader, request, log);
         setBody(bufferedReader, request, log);
 
@@ -30,11 +34,9 @@ public class RequestParser {
         requestMapping(request, out);
     }
 
-    private void setStartLine(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
-        String startLine = bufferedReader.readLine();
-        if(startLine == null) return;
-        log.append(startLine).append("\n");
+    private void setStartLine(String startLine, HttpRequest request, StringBuilder log) throws IOException {
 
+        log.append(startLine).append("\n");
         String[] splitStartLine = startLine.split(" ", 3);
 
         HttpMethod method = HttpMethod.getMethod(splitStartLine[0]);
