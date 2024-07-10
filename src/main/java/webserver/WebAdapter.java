@@ -1,15 +1,19 @@
 package webserver;
 
 import common.JsonBuilder;
-import db.Database;
+import db.SessionDatabase;
+import db.SessionIdMapper;
+import db.UserDatabase;
 import exception.CannotResolveRequestException;
 import facade.UserFacade;
+import model.Session;
 import model.User;
 import web.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 요청 헤더에서 필요한 정보를 추출하는 클래스
@@ -19,6 +23,8 @@ public class WebAdapter {
     static final String ACCEPT = "Accept";
     static final String CONTENT_TYPE = "Content-Type";
     static final String CONTENT_LENGTH = "Content-Length";
+    static final String COOKIE = "cookie";
+    static final String SESSION_ID = "SID";
 
     /**
      * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
@@ -30,6 +36,7 @@ public class WebAdapter {
         String path, contentType = MIME.UNKNOWN.getType();
         LinkedList<String> accept = new LinkedList<>();
         int contentLength = 0;
+        Map<String, String> cookie = new HashMap<>();
 
         String[] requestLine = request.split("\n");
 
@@ -53,6 +60,14 @@ public class WebAdapter {
                 }
                 case CONTENT_LENGTH -> contentLength = Integer.parseInt(value);
                 case CONTENT_TYPE -> contentType = value;
+                case COOKIE -> {
+                    String[] cookies = value.split(";");
+                    for(String c: cookies) {
+                        String cookieName = c.split(":")[0].trim();
+                        String cookieId = c.split(":")[1].trim();
+                        cookie.put(cookieName, cookieId);
+                    }
+                }
             }
         }
 
@@ -62,6 +77,7 @@ public class WebAdapter {
                 .accept(accept)
                 .contentLength(contentLength)
                 .contentType(contentType)
+                .cookie(cookie)
                 .body(body)
                 .build();
     }
@@ -72,9 +88,9 @@ public class WebAdapter {
 
     public static String resolveRequestUri(HttpRequest request, OutputStream out) throws IOException {
         if(request.isGetRequest()) {
-            return resolveGetRequestUri(request.getPath(), out);
+            return resolveGetRequestUri(request, out);
         } else if(request.isPostRequest()) {
-            return resolvePostRequestUri(request.getPath(), request.getBody(), out);
+            return resolvePostRequestUri(request, out);
         }
 
         throw new CannotResolveRequestException("Cannot Resolve Request Method");
@@ -83,11 +99,11 @@ public class WebAdapter {
     /**
      * POST 요청을 처리
      */
-    private static String resolvePostRequestUri(String restUri, byte[] body, OutputStream out) throws IOException {
+    private static String resolvePostRequestUri(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
-        if(restUri.equals("/signUp")) {
-            Map<String, String> map = parseBodyInForm(body);
-            Database.addUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
+        if(request.getPath().equals("/signUp")) {
+            Map<String, String> map = parseBodyInForm(request.getBody()); // userId, password, name
+            UserFacade.createUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
             HttpResponse response = new HttpResponse.HttpResponseBuilder()
                     .code(ResponseCode.FOUND)
@@ -95,26 +111,56 @@ public class WebAdapter {
 
             response.writeInBytes(out);
 
-        } else if(restUri.equals("/signIn")) {
-            Map<String, String> map = parseBodyInForm(body);
+        } else if(request.getPath().equals("/signIn")) {
+            Map<String, String> map = parseBodyInForm(request.getBody()); // userId, password
 
             HttpResponse response;
-            if(UserFacade.isUserExist(map)) {
-                response = new HttpResponse.HttpResponseBuilder()
-                        .code(ResponseCode.FOUND)
-                        .session(new HttpSession.HttpSessionBuilder().build())
-                        .build();
-            } else {
-                response = new HttpResponse.HttpResponseBuilder()
-                        .code(ResponseCode.FOUND)
-                        .location("/user/login_failed.html")
-                        .build();
+            // 헤더에 세션이 존재하지 않을 경우 -> 새로 로그인하는 경우
+            if(request.getCookie().isEmpty() || request.getCookie().get(SESSION_ID)==null) {
+                if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
+                    // 세션 생성
+                    Session session = SessionDatabase.createDefaultSession();
+                    // 생성된 세션을 세션 저장소에 저장
+                    SessionIdMapper.addSessionId(session.getId(), map.get("userId"));
+                    Map<String, String> hashMap = new ConcurrentHashMap<>();
+                    hashMap.put(SESSION_ID, session.getId());
+
+                    response = new HttpResponse.HttpResponseBuilder()
+                            .code(ResponseCode.FOUND)
+                            .cookie(hashMap)
+                            .build();
+
+                } else { // id, pwd 불일치
+                    response = new HttpResponse.HttpResponseBuilder()
+                            .code(ResponseCode.FOUND)
+                            .location("/login/index.html")
+                            .build();
+                }
             }
+            // 세션이 존재하는 경우 -> 세션 유효성 확인
+            else {
+                SessionDatabase.removeExpiredSessions();
+                String userId = SessionIdMapper.findUserIdBySessionId(request.getCookie().get(SESSION_ID));
+
+                // 세션이 만료되었거나 세션 저장소에서 찾을 수 없음
+                if(userId==null) {
+                    response = new HttpResponse.HttpResponseBuilder()
+                            .code(ResponseCode.FOUND)
+                            .location("/login/index.html")
+                            .build();
+                } else {
+                    response = new HttpResponse.HttpResponseBuilder()
+                            .code(ResponseCode.FOUND)
+                            .location("/login/index.html")
+                            .build();
+                }
+            }
+
 
             response.writeInBytes(out);
         }
 
-        return "/login/index.html";
+        return "/index.html";
     }
 
     private static Map<String, String> parseBodyInForm(byte[] body) {
@@ -132,9 +178,9 @@ public class WebAdapter {
     /**
      * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답
      */
-    private static String resolveGetRequestUri(String restUri, OutputStream out) throws IOException {
+    private static String resolveGetRequestUri(HttpRequest request, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
-        if(restUri.split("\\?")[0].equals("/signUp")) {
+        if(request.getPath().split("\\?")[0].equals("/signUp")) {
 
             HttpResponse response = new HttpResponse.HttpResponseBuilder()
                     .code(ResponseCode.BAD_REQUEST)
@@ -143,9 +189,9 @@ public class WebAdapter {
             response.writeInBytes(out);
         }
         // 유저 리스트 찾아서 json으로 반환
-        if(restUri.split("\\?")[0].equals("/user/list")) {
+        if(request.getPath().split("\\?")[0].equals("/user/list")) {
 
-            Collection<User> users = Database.findAll();
+            Collection<User> users = UserDatabase.findAll();
             String jsonUser = JsonBuilder.buildJsonResponse(users);
 
             HttpResponse response = new HttpResponse.HttpResponseBuilder()
@@ -158,8 +204,8 @@ public class WebAdapter {
             response.writeInBytes(out);
         }
         // 데이터베이스 초기화
-        else if(restUri.split("\\?")[0].equals("/database/init")) {
-            Database.initialize();
+        else if(request.getPath().split("\\?")[0].equals("/database/init")) {
+            UserDatabase.initialize();
 
             HttpResponse response = new HttpResponse.HttpResponseBuilder()
                     .code(ResponseCode.OK)
@@ -169,7 +215,7 @@ public class WebAdapter {
         }
 
         // 최종적으로 뷰를 찾아 반환
-        return resolveGetRequestUri(restUri);
+        return resolveGetRequestUri(request.getPath());
     }
 
     /**

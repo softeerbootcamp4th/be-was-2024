@@ -1,6 +1,7 @@
 package web;
 
 import java.util.LinkedList;
+import java.util.Map;
 
 public class HttpRequest {
 
@@ -9,7 +10,7 @@ public class HttpRequest {
     private LinkedList<String> accept;
     private int contentLength;
     private String contentType;
-    private HttpSession session;
+    private Map<String, String> cookie;
     private byte[] body;
 
     public HttpRequest() {}
@@ -20,6 +21,7 @@ public class HttpRequest {
             LinkedList<String> accept,
             int contentLength,
             String contentType,
+            Map<String, String> cookie,
             byte[] body
     ) {
         this.method = method;
@@ -27,7 +29,7 @@ public class HttpRequest {
         this.accept = accept;
         this.contentLength = contentLength;
         this.contentType = contentType;
-        this.session = session;
+        this.cookie = cookie;
         this.body = body;
     }
 
@@ -37,7 +39,7 @@ public class HttpRequest {
         private LinkedList<String> accept;
         private int contentLength;
         private String contentType;
-        private HttpSession session;
+        private Map<String, String> cookie;
         private byte[] body;
 
         public HttpRequestBuilder method(HttpMethod method) {
@@ -65,8 +67,8 @@ public class HttpRequest {
             return this;
         }
 
-        public HttpRequestBuilder session(HttpSession session) {
-            this.session = session;
+        public HttpRequestBuilder cookie(Map<String, String> cookie) {
+            this.cookie = cookie;
             return this;
         }
 
@@ -77,7 +79,7 @@ public class HttpRequest {
 
         public HttpRequest build() {
             return new HttpRequest(
-                    method, path, accept, contentLength, contentType, body
+                    method, path, accept, contentLength, contentType, cookie, body
             );
         }
     }
@@ -100,6 +102,10 @@ public class HttpRequest {
 
     public String getContentType() {
         return contentType;
+    }
+
+    public Map<String, String> getCookie() {
+        return cookie;
     }
 
     public byte[] getBody() {

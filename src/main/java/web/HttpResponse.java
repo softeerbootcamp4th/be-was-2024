@@ -2,6 +2,8 @@ package web;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HttpResponse {
 
@@ -10,7 +12,7 @@ public class HttpResponse {
     private String contentType;
     private int contentLength;
     private String location;
-    private HttpSession session;
+    private Map<String, String> cookie;
     private byte[] body;
 
     public HttpResponse() {}
@@ -21,7 +23,7 @@ public class HttpResponse {
             String contentType,
             int contentLength,
             String location,
-            HttpSession session,
+            Map<String, String> cookie,
             byte[] body
     ) {
         this.httpVersion = httpVersion;
@@ -29,7 +31,7 @@ public class HttpResponse {
         this.contentType = contentType;
         this.contentLength = contentLength;
         this.location = location;
-        this.session = session;
+        this.cookie = cookie;
         this.body = body;
     }
 
@@ -39,7 +41,7 @@ public class HttpResponse {
         private String contentType = "*/*";
         private int contentLength = 0;
         private String location = "/";
-        private HttpSession session;
+        private Map<String, String> cookie = new ConcurrentHashMap<>();
         private byte[] body = null;
 
         public HttpResponseBuilder httpVersion(String httpVersion) {
@@ -67,8 +69,8 @@ public class HttpResponse {
             return this;
         }
 
-        public HttpResponseBuilder session(HttpSession session) {
-            this.session = session;
+        public HttpResponseBuilder cookie(Map<String, String> cookie) {
+            this.cookie = cookie;
             return this;
         }
 
@@ -79,7 +81,7 @@ public class HttpResponse {
 
         public HttpResponse build() {
             return new HttpResponse(
-                    httpVersion, code, contentType, contentLength, location, session, body
+                    httpVersion, code, contentType, contentLength, location, cookie, body
             );
         }
 
@@ -107,18 +109,20 @@ public class HttpResponse {
         if(!location.isEmpty()) {
             response.append("Location: ").append(location).append("\r\n");
         }
-
         if(contentLength > 0) {
             response.append("Content-Length: ").append(contentLength).append("\r\n");
         }
-
         if(!contentType.isEmpty()) {
             response.append("Content-Type: ").append(contentType).append("\r\n");
         }
-        if(session!=null) {
-            response.append("Set-cookie: ").append(session.getString()).append("\r\n");
+        if(!cookie.isEmpty()) {
+            response.append("Set-cookie: ");
+            for(String name : cookie.keySet()) {
+                String value = cookie.get(name);
+                response.append(name).append("=").append(value).append(";");
+            }
+            response.deleteCharAt(response.length()-1);
         }
-
         response.append("\r\n");
 
         out.write(response.toString().getBytes());
