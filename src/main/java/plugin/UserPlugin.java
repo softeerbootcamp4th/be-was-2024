@@ -39,4 +39,10 @@ public class UserPlugin{
                 .build();
     }
 
+    @Get(path = "/login")
+    public Response redirect(Request request) {
+        return new Response.Builder(Status.SEE_OTHER)
+                .addHeader("Location", "/login/index.html")
+                .build();
+    }
 }

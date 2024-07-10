@@ -99,4 +99,39 @@ class UserPluginTest {
 
     }
 
+    @Test
+    @DisplayName("가입한 회원 정보로 로그인")
+    public void testLoginSuccess(){
+
+    }
+
+    @Test
+    @DisplayName("로그인 메뉴를 클릭하면 로그인 화면으로 이동")
+    public void testAccessLoginPage(){
+
+        //given
+        Request request = new Request.Builder(Method.GET, "/login")
+                .build();
+
+        //when
+        Response response = userPlugin.redirect(request);
+
+        //then
+        assertEquals(Status.SEE_OTHER, response.getStatus());
+        assertEquals(response.getHeaderValue("Location"), "/login/index.html");
+
+    }
+
+    @Test
+    @DisplayName("로그인이 성공하면 index.html 로 이동")
+    public void testLoginSuccessRedirection(){
+
+    }
+
+    @Test
+    @DisplayName("로그인이 실패하면 /user/login_failed.html로 이동")
+    public void testLoginFailure(){
+
+    }
+
 }
