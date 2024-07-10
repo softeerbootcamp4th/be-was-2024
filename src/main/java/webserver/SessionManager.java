@@ -18,6 +18,15 @@ public class SessionManager {
     public static User getUser(String sessionId) {
         return sessionMap.get(sessionId);
     }
+    public static String getSession(User user) {
+        for (String sessionId : sessionMap.keySet()) {
+            if (sessionMap.get(sessionId).equals(user)) {
+                return sessionId;
+            }
+        }
+
+        return null;
+    }
 
     public static boolean isValidSession(String sessionId) {
         return sessionMap.containsKey(sessionId);
