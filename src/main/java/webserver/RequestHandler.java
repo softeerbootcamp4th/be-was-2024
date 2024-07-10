@@ -5,9 +5,11 @@ import java.net.Socket;
 
 import model.HttpRequest;
 import model.HttpResponse;
+import model.HttpSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestConverter;
+import util.HttpResponseConverter;
 
 /**
  * 클라이언트가 연결(http 요청)을
@@ -31,10 +33,13 @@ public class RequestHandler implements Runnable {
             HttpRequest httpRequest = httpRequestConverter.with(in);
 
             // HttpRequest -> HttpResponse 객체로 변환
-            HttpResponse httpResponse = httpRequest.createHttpResponse();
+            HttpResponseConverter httpResponseConverter = new HttpResponseConverter();
+            HttpResponse httpResponse = httpResponseConverter.with(httpRequest);
 
             //HttpResponse 객체를 기반으로 outputStream으로 HttpResponse 발송
-            httpResponse.sendHttpResponse(out);
+//            httpResponse.sendHttpResponse(out,httpResponse);
+            HttpSender httpSender = new HttpSender();
+            httpSender.sendHttpResponse(out,httpResponse);
 
 
         } catch (IOException e) {
