@@ -41,7 +41,7 @@ public class PostHandler
             try
             {
                 User user = userProcessor.findUser(requestObject);
-                loginSuccess(dos,user);//로그인 실패 시
+                loginSuccess(dos,user);//로그인 성공 시
             }
             catch(Exception e)//해당하는 예외 메세지를 출력한다
             {
@@ -84,7 +84,7 @@ public class PostHandler
             logger.error(session);
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: /index.html \r\n");
-            dos.writeBytes("Set-Cookie: SID=" + session + "; Path=/; HttpOnly\r\n");
+            dos.writeBytes("Set-Cookie: SID=" + session + "; Path=/; \r\n");
             dos.writeBytes("\r\n");
         }
         catch(IOException e)

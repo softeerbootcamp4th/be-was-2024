@@ -1,5 +1,6 @@
 package handler;
 
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileDetection;
@@ -23,6 +24,11 @@ public class GetHandler
     public void handleGetRequest(DataOutputStream dos, RequestObject requestObject)
     {
         String path = requestObject.getPath();
+        if(path.equals("/user/info"))//세션값 요청이 들어왔다면
+        {
+            logger.debug("user/info");
+            return;
+        }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
         staticFileHandler(dos,path);
     }
@@ -92,6 +98,24 @@ public class GetHandler
         }
     }
 
+
+    private void handleUserInfoRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
+        String sessionId = requestObject.getCookies().get("SID");
+        if (sessionId != null) // 쿠기 값을 받아 왔다면
+        {
+            User user = SessionHandler.getUserBySessionId(sessionId);
+            if (user != null)//해당 쿠키 값의 세션 Id랑 일치하는 회원이 존재한다면
+            {
+                String body = "{ \"username\" : \"" + user.getUserId() +"\" }";
+                //JSON은 key 랑 value가 쌍 따옴표 " 로 둘러 싸져있어야한다.
+                dos.writeBytes("HTTP/1.1 200 OK \r\n");
+                dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n"); //json파일로 보낸다
+                dos.writeBytes("Content-Length: " + body.length() + "\r\n");
+                dos.writeBytes("\r\n");
+                return;
+            }
+        }
+    }
 
     private String match(String extensions)
     {
