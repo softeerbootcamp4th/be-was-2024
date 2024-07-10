@@ -83,4 +83,23 @@ public class UserPlugin{
                 .build();
 
     }
+
+    @Get(path = "/user/list")
+    public Response userList(Request request){
+
+        if(!request.isLogin()) return new Response.Builder(Status.SEE_OTHER)
+                .addHeader("Location", "/login/index.html")
+                .build();
+
+        StringBuilder sb = new StringBuilder();
+
+        for(User user: Database.findAll()){
+            sb.append(user.toString()).append("\n");
+        }
+
+        return new Response.Builder(Status.OK)
+                .body(sb.toString())
+                .build();
+    }
+
 }

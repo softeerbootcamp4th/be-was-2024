@@ -3,6 +3,7 @@ package webserver.http.request;
 import exception.NotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.Session;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -177,6 +178,17 @@ public class Request {
         }
 
         return cookie;
+    }
+
+    public boolean isLogin(){
+        String sessionValue = getCookieValue("sid");
+        if(sessionValue==null) return false;
+        if(!Session.isExist(sessionValue)) return false;
+        return true;
+    }
+
+    public String getSessionId(){
+        return getCookieValue("sid");
     }
 
     private static String removeSpace(String str){

@@ -24,5 +24,12 @@ public class Session {
         return storage.get(sessionId);
     }
 
+    public static void deleteAll(){
+        storage.clear();
+    }
+
+    public static boolean isExist(String sessionId){
+        return storage.containsKey(sessionId);
+    }
 
 }
