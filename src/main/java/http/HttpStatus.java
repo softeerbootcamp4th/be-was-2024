@@ -2,29 +2,26 @@ package http;
 
 public enum HttpStatus {
 
-    OK(200, "C001", "success"),
-    FOUND(302, "C002", "redirect"),
-    NOT_FOUND(404, "C003", "not found");
+    OK(200, "Ok"),
+    FOUND(302, "Found"),
+    BAD_REQUEST(400, "Bad request"),
+    NOT_FOUND(404, "Not found"),
+    UNAUTHORIZED(401, "Unauthorized"),
+    CONFLICT(409, "Conflict");
 
     private int status;
-    private String code;
     private String message;
 
-    HttpStatus(int status, String code, String message) {
+    HttpStatus(int status, String message) {
         this.status = status;
-        this.code = code;
         this.message = message;
     }
 
-    public int getStatus(){
+    public int getStatus() {
         return status;
     }
 
-    public String getCode(){
-        return code;
-    }
-
-    public String getMessage(){
+    public String getMessage() {
         return message;
     }
 }

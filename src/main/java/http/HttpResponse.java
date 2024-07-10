@@ -8,11 +8,6 @@ public class HttpResponse {
     HashMap<String, String> headers;
     byte[] body;
 
-    public HttpResponse(HttpStatus httpStatus, HashMap<String, String> headers) {
-        this.httpStatus = httpStatus;
-        this.headers = headers;
-    }
-
     public HttpResponse(HttpStatus httpStatus, HashMap<String, String> headers, byte[] body) {
         this.httpStatus = httpStatus;
         this.headers = headers;
