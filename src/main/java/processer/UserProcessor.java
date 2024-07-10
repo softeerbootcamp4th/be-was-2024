@@ -8,7 +8,7 @@ import util.exception.CustomException;
 import java.io.IOException;
 
 public class UserProcessor {
-    public static void createUser(String userId, String name, String password, String email) throws IOException {
+    public static void createUser(String userId, String name, String password, String email)  {
 
         User user = Database.findUserById(userId);
         if (user != null) {

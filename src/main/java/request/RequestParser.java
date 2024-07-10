@@ -34,7 +34,7 @@ public class RequestParser {
         requestMapping(request, out);
     }
 
-    private void setStartLine(String startLine, HttpRequest request, StringBuilder log) throws IOException {
+    private void setStartLine(String startLine, HttpRequest request, StringBuilder log) {
 
         log.append(startLine).append("\n");
         String[] splitStartLine = startLine.split(" ", 3);
