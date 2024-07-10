@@ -5,11 +5,11 @@ import db.Session;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-public class SessionIdCreate {
+public class SessionIdControl {
 
     private static SecureRandom random = new SecureRandom();
 
-    public static String nextSessionId(User user) {
+    public static String sessionIdCreate(User user) {
         String sessionId = new BigInteger(130, random).toString(32);
         User existUser = Session.findUserBySessionId(sessionId);
         while(existUser != null){
@@ -18,5 +18,9 @@ public class SessionIdCreate {
         }
         Session.addSessionId(sessionId, user);
         return sessionId;
+    }
+
+    public static void sessionIdDelete(String sessionId){
+        Session.deleteSessionId(sessionId);
     }
 }

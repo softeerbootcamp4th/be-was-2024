@@ -13,4 +13,8 @@ public class Session {
     public static User findUserBySessionId(String sessionId) {
         return users.get(sessionId);
     }
+
+    public static void deleteSessionId(String sessionId){
+        users.remove(sessionId);
+    }
 }

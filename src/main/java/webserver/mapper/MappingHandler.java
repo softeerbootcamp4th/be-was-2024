@@ -13,10 +13,10 @@ public class MappingHandler {
 
         switch (method) {
             case "GET":
-                GetHandler.handle(url, requestResponse);
+                GetHandler.handle(httpRequest, requestResponse);
                 break;
             case "POST":
-                PostHandler.handle(url, body, requestResponse);
+                PostHandler.handle(httpRequest, requestResponse);
                 break;
             default:
                 break;
