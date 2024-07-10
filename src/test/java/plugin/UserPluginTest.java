@@ -2,8 +2,7 @@ package plugin;
 
 import db.Database;
 import model.User;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
 import webserver.http.response.Response;
@@ -11,14 +10,18 @@ import webserver.http.response.Status;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserPluginTest {
+public class UserPluginTest {
 
     private UserPlugin userPlugin = new UserPlugin();
+
+    @BeforeEach
+    void after(){
+        Database.deleteAll();
+    }
 
     @Test
     @DisplayName("POST 회원가입이 정상 동작")
     void testRegistrationSuccessful() {
-        Database.deleteAll();
 
         //given
         Request request = new Request.Builder(Method.POST, "/create")
@@ -61,7 +64,6 @@ class UserPluginTest {
     @Test
     @DisplayName("가입을 완료하면 /index.html 페이지로 이동")
     void testRegistrationRedirection() {
-        Database.deleteAll();
 
         //given
         Request request = new Request.Builder(Method.POST, "/create")
@@ -80,7 +82,6 @@ class UserPluginTest {
     @Test
     @DisplayName("GET 으로 회원가입 할 경우 실패")
     void testRegistrationGETFailure() {
-        Database.deleteAll();
 
         //given
         Request request = new Request.Builder(Method.GET, "/create")
@@ -96,12 +97,6 @@ class UserPluginTest {
 
         //then
         assertNull(actual);
-
-    }
-
-    @Test
-    @DisplayName("가입한 회원 정보로 로그인")
-    public void testLoginSuccess(){
 
     }
 
@@ -126,12 +121,67 @@ class UserPluginTest {
     @DisplayName("로그인이 성공하면 index.html 로 이동")
     public void testLoginSuccessRedirection(){
 
+        //given
+        Database.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
+
+        Request request = new Request.Builder(Method.POST, "/login")
+                .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
+                .body("userId=testUserId&password=testPassword")
+                .build();
+
+        //when
+        Response response = userPlugin.login(request);
+
+        //then
+        assertRedirection(response, "/index.html");
     }
 
     @Test
     @DisplayName("로그인이 실패하면 /user/login_failed.html로 이동")
     public void testLoginFailure(){
 
+        Request request = new Request.Builder(Method.POST, "/login")
+                .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
+                .body("userId=testUserId&password=testPassword")
+                .build();
+
+        //when
+        Response response = userPlugin.login(request);
+
+        //then
+        assertRedirection(response, "/user/login_failed.html");
+
+    }
+
+    @Test
+    @DisplayName("로그인이 성공할 경우 HTTP 헤더의 쿠키 값을 SID = 세션 ID 로 응답한다. ")
+    public void testLoginSuccessCookie(){
+
+        //given
+        Database.addUser(createTestUser());
+
+        Request request = new Request.Builder(Method.POST, "/login")
+                .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
+                .body("userId=testUserId&password=testPassword")
+                .build();
+
+        //when
+        Response response = userPlugin.login(request);
+
+        //then
+        String cookieValue = response.getHeaderValue("Set-Cookie");
+        assertNotNull(cookieValue);
+        assertTrue(cookieValue.contains("sid="));
+        assertTrue(cookieValue.contains("Path=\\/"));
+    }
+
+    private void assertRedirection(Response response, String dist){
+        assertEquals(Status.SEE_OTHER, response.getStatus());
+        assertEquals(dist, response.getHeaderValue("Location"));
+    }
+
+    public static User createTestUser(){
+        return new User("testUserId", "testPassword", "testName", "testEmail");
     }
 
 }

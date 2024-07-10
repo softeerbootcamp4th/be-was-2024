@@ -62,6 +62,11 @@ public class Request {
             return this;
         }
 
+        public Builder body(String body){
+            this.body = body.getBytes();
+            return this;
+        }
+
         public Builder addParameter(String key, String value){
             parameter.put(key, value);
             return this;
@@ -131,17 +136,16 @@ public class Request {
         return "";
     }
 
-    public static Map<String, String> parseParameterMap(String pathWithOutParameters){
+    public static Map<String, String> parseParameterMap(String parameterString){
 
         Map<String, String> parameterMap = new HashMap<>();
-        String[] split = pathWithOutParameters.split("&");
+        String[] split = parameterString.split("&");
 
         for (String s : split) {
             String[] param = s.split("=");
             if(param.length<2) continue;
             parameterMap.put(param[0], param[1]);
         }
-        logger.debug("parameterMap:"+parameterMap);
         return parameterMap;
 
     }
