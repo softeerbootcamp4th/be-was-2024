@@ -40,6 +40,7 @@
 }
 
 .btn {
+  width: 100%;
   border: none;
   border-radius: 8px;
   text-decoration: none;
@@ -80,6 +81,7 @@
 }
 
 .form {
+  align-items: center;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -140,4 +142,12 @@
   background: #4362d0;
   color: #ffffff;
   cursor: hover;
+}
+
+.alert-danger {
+  padding: 2rem;
+  margin: 1rem;
+  border: gray 2px solid;
+  border-radius: 10px;
+  background-color: #d68686;
 }
