@@ -7,6 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionHandler {
     private static final ConcurrentHashMap<String, User> sessionMap = new ConcurrentHashMap<>();
+    //멀티스레드 환경에서 Thread-safe 한 HashMap 이다
+
 
     public static String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();
