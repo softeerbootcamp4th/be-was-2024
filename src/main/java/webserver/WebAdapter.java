@@ -115,55 +115,33 @@ public class WebAdapter {
             Map<String, String> map = parseBodyInForm(request.getBody()); // userId, password
 
             HttpResponse response;
-            // 헤더에 세션이 존재하지 않을 경우 -> 새로 로그인하는 경우
-//            if(request.getCookie().isEmpty() || request.getCookie().get(SESSION_ID)==null) {
-                if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
-                    // 세션 생성
-                    Session session = SessionDatabase.createDefaultSession();
-                    // 생성된 세션을 세션 저장소에 저장
-                    SessionIdMapper.addSessionId(session.getId(), map.get("userId"));
-                    Map<String, String> hashMap = new ConcurrentHashMap<>();
-                    hashMap.put(SESSION_ID, session.getId());
+            // 로그인시 새로운 세션 쿠키 발급
+            if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
+                // 세션 생성
+                Session session = SessionDatabase.createDefaultSession();
+                // 생성된 세션을 세션 저장소에 저장
+                SessionIdMapper.addSessionId(session.getId(), map.get("userId"));
+                Map<String, String> hashMap = new ConcurrentHashMap<>();
+                hashMap.put(SESSION_ID, session.getId());
 
-                    response = new HttpResponse.HttpResponseBuilder()
-                            .code(ResponseCode.FOUND)
-                            .cookie(hashMap)
-                            .build();
+                response = new HttpResponse.HttpResponseBuilder()
+                        .code(ResponseCode.FOUND)
+                        .cookie(hashMap)
+                        .build();
 
-                } else { // id, pwd 불일치
-                    response = new HttpResponse.HttpResponseBuilder()
-                            .code(ResponseCode.FOUND)
-                            .location("/login/index.html")
-                            .build();
-                }
-//            }
-            // 세션이 존재하는 경우 -> 세션 유효성 확인
-//            else {
-//                SessionDatabase.removeExpiredSessions();
-//                String userId = SessionIdMapper.findUserIdBySessionId(request.getCookie().get(SESSION_ID));
-//
-//                // 세션이 만료되었거나 세션 저장소에서 찾을 수 없음 (재 로그인 필요)
-//                if(userId==null) {
-//                    SessionDatabase.invalidateSession(request.getCookie().get(SESSION_ID));
-//                    response = new HttpResponse.HttpResponseBuilder()
-//                            .code(ResponseCode.FOUND)
-//                            .location("/login/index.html")
-//                            .cookie(new ConcurrentHashMap<>())
-//                            .build();
-//                } else {
-//                    response = new HttpResponse.HttpResponseBuilder()
-//                            .code(ResponseCode.FOUND)
-//                            .location("/index.html")
-//                            .build();
-//                }
-//            }
+            } else { // id, pwd 불일치
+                response = new HttpResponse.HttpResponseBuilder()
+                        .code(ResponseCode.FOUND)
+                        .location("/login/index.html")
+                        .build();
+            }
 
             response.writeInBytes(out);
 
         } else if(request.getPath().equals("/logout")) {
             String sid = request.getCookie().get(SESSION_ID);
-            System.out.println("sid = " + sid);
             SessionDatabase.invalidateSession(sid);
+            SessionDatabase.removeExpiredSessions();
 
             HttpResponse response = new HttpResponse.HttpResponseBuilder()
                     .code(ResponseCode.FOUND)
