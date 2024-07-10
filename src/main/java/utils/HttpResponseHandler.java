@@ -70,4 +70,8 @@ public class HttpResponseHandler {
     public Status getStatus() {
         return status;
     }
+
+    public Map<String, String> getResponseHeadersMap() {
+        return responseHeadersMap;
+    }
 }
