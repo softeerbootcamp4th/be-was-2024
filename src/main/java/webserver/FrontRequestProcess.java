@@ -32,7 +32,7 @@ public class FrontRequestProcess {
         private static final FrontRequestProcess INSTANCE = new FrontRequestProcess();
     }
 
-    public HttpResponseObject handleRequest(HttpRequestObject request) throws IOException {
+    public HttpResponse handleRequest(HttpRequest request) throws IOException {
         String path = request.getRequestPath();
         String method = request.getRequestMethod();
 
@@ -42,7 +42,7 @@ public class FrontRequestProcess {
             if(idx == -1) throw new IllegalArgumentException("Invalid Path: " + path);
             String extension = path.substring(idx + 1);
             if (!extension.equals(ContentType.HTML.getExtension())) {
-                return HttpResponseObject.okStatic(path, HttpCode.OK.getStatus(), request.getHttpVersion());
+                return HttpResponse.okStatic(path, HttpCode.OK.getStatus(), request.getHttpVersion());
             }
         }
 
@@ -55,57 +55,57 @@ public class FrontRequestProcess {
         logger.info("Request Path: {}, Method: {}", path, method);
         HttpRequestMapper mapper = HttpRequestMapper.of(path, method);
         return switch (mapper) {
-            case ROOT -> HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            case ROOT -> HttpResponse.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             case SIGNUP_REQUEST -> {
                 userHandler.create(request.getBodyMap());
-                yield HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+                yield HttpResponse.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             }
             case USER_LOGIN_FAIL -> {
                 String body = new String(IOUtil.readBytesFromFile(false, StringUtil.LOGIN_FAIL_HTML));
-                yield HttpResponseObject.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
+                yield HttpResponse.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
             }
             case INDEX_HTML -> {
                 // 세션ID가 있는 경우 로그인 상태로 간주
                 String sessionId = sessionHandler.parseSessionId(request.getRequestHeaders().get(StringUtil.COOKIE)).orElse(null);
                 if(sessionId != null){
                     String body = new String(IOUtil.readBytesFromFile(false, StringUtil.INDEX_HTML));
-                    yield HttpResponseObject.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
+                    yield HttpResponse.ok(StringUtil.DYNAMIC, path, mapper.getCode(), request.getHttpVersion(), body);
                 }
 
-                yield HttpResponseObject.okStatic(path, mapper.getCode(), request.getHttpVersion());
+                yield HttpResponse.okStatic(path, mapper.getCode(), request.getHttpVersion());
             }
             case MESSAGE_NOT_ALLOWED, ERROR ->
-                    HttpResponseObject.error(mapper.getCode(), request.getHttpVersion());
+                    HttpResponse.error(mapper.getCode(), request.getHttpVersion());
             default ->
-                    HttpResponseObject.okStatic(path, mapper.getCode(), request.getHttpVersion());
+                    HttpResponse.okStatic(path, mapper.getCode(), request.getHttpVersion());
         };
     }
 
-    public HttpResponseObject handleAuthRequest(HttpRequestObject request){
+    public HttpResponse handleAuthRequest(HttpRequest request){
         HttpRequestMapper mapper = HttpRequestMapper.of(request.getRequestPath(), request.getRequestMethod());
         if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인
             Session session = sessionHandler.login(request.getBodyMap()).orElse(null);
             if (session == null) { // 로그인 실패 시 로그인 실패 페이지로 리다이렉트
-                return HttpResponseObject.redirect(StringUtil.LOGIN_FAIL_HTML, mapper.getCode(), request.getHttpVersion());
+                return HttpResponse.redirect(StringUtil.LOGIN_FAIL_HTML, mapper.getCode(), request.getHttpVersion());
             }
 
-            HttpResponseObject response = HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            HttpResponse response = HttpResponse.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             response.setSessionId(session.getSessionId());
             return response;
         } else { // 로그아웃
             String sessionId = sessionHandler.parseSessionId(request.getRequestHeaders().get(StringUtil.COOKIE)).orElse(null);
             if(sessionId == null){ // 로그아웃인데 세션ID가 없는 경우 올바르지 않은 요청이므로 리다이렉트
-                return HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+                return HttpResponse.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             }
 
             sessionHandler.logout(sessionId);
-            HttpResponseObject response = HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            HttpResponse response = HttpResponse.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
             response.deleteSessionId(sessionId);
-            return HttpResponseObject.redirect(StringUtil.INDEX_HTML, mapper.getCode(), request.getHttpVersion());
+            return response;
         }
     }
 
-    public void handleResponse(OutputStream out, HttpResponseObject response) throws IOException {
+    public void handleResponse(OutputStream out, HttpResponse response) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
 
         // 정적 자원인 경우 바로 반환

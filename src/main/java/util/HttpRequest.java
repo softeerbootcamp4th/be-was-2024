@@ -7,24 +7,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class HttpRequestObject {
+public class HttpRequest {
 
     private String requestMethod;
     private String requestPath;
     private Map<String, String> requestParams;
     private String httpVersion;
-    private Map<String, String> requestHeaders;
+    private Map<String, String> requestHeaders = new HashMap<>();
     private byte[] requestBody;
 
-    private HttpRequestObject(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
+    private HttpRequest(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
         this.requestMethod = requestMethod;
         this.requestPath = requestPath;
         this.requestParams = requestParams;
         this.httpVersion = httpVersion;
-        this.requestHeaders = new HashMap<>();
     }
 
-    public static HttpRequestObject from(String requestLine) {
+    public static HttpRequest from(String requestLine) {
         String[] requestLineElements = Arrays.stream(requestLine.split(StringUtil.SPACES)).map(String::trim).toArray(String[]::new);
         String requestMethod = requestLineElements[0];
         String[] requestURIElements = Arrays.stream(requestLineElements[1].split(StringUtil.QUESTION_MARK)).map(String::trim).toArray(String[]::new);
@@ -38,7 +37,7 @@ public class HttpRequestObject {
             }
         }
         String requestVersion = requestLineElements[2];
-        return new HttpRequestObject(requestMethod, requestPath, requestParams, requestVersion);
+        return new HttpRequest(requestMethod, requestPath, requestParams, requestVersion);
     }
 
     public String getRequestMethod() {

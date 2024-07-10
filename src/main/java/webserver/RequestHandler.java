@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.HttpRequestObject;
-import util.HttpResponseObject;
+import util.HttpRequest;
+import util.HttpResponse;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,11 +30,11 @@ public class RequestHandler implements Runnable {
             // 요청 Header 출력
             String line = br.readLine(); // Request Line (ex: "GET /index.html HTTP/1.1")
             //logger.debug("request line: {}", line);
-            HttpRequestObject httpRequestObject = HttpRequestObject.from(line);
+            HttpRequest httpRequest = HttpRequest.from(line);
             while(!line.isEmpty()) {
                 //logger.debug("header: {}", line);
                 line = br.readLine();
-                httpRequestObject.putHeaders(line);
+                httpRequest.putHeaders(line);
             }
 
             // Request Body
@@ -43,10 +43,10 @@ public class RequestHandler implements Runnable {
                 body.add((byte) br.read());
             }
             if(!body.isEmpty()) {
-                httpRequestObject.putBody(body);
+                httpRequest.putBody(body);
             }
 
-            HttpResponseObject responseInfo = frontRequestProcess.handleRequest(httpRequestObject);
+            HttpResponse responseInfo = frontRequestProcess.handleRequest(httpRequest);
             frontRequestProcess.handleResponse(out, responseInfo);
         }  catch (IOException e) {
             logger.error("error: {}", e.getStackTrace());

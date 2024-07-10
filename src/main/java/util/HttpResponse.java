@@ -3,7 +3,7 @@ package util;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpResponseObject {
+public class HttpResponse {
 
     private String type;
     private String httpVersion;
@@ -12,11 +12,11 @@ public class HttpResponseObject {
     private Map<String, String> header = new HashMap<>();
     private byte[] body;
 
-    protected HttpResponseObject() {
+    protected HttpResponse() {
     }
 
-    public static HttpResponseObject ok(String type, String path, String statusCode, String httpVersion, String body) {
-        HttpResponseObject response = new HttpResponseObject();
+    public static HttpResponse ok(String type, String path, String statusCode, String httpVersion, String body) {
+        HttpResponse response = new HttpResponse();
         response.type = type;
         response.path = path;
         response.statusCode = statusCode;
@@ -28,8 +28,8 @@ public class HttpResponseObject {
     }
 
     // staticResponse에서 담당하기에 Header/Body를 설정하지 않음
-    public static HttpResponseObject okStatic(String path, String statusCode, String httpVersion) {
-        HttpResponseObject response = new HttpResponseObject();
+    public static HttpResponse okStatic(String path, String statusCode, String httpVersion) {
+        HttpResponse response = new HttpResponse();
         response.type = StringUtil.STATIC;
         response.path = path;
         response.statusCode = statusCode;
@@ -37,16 +37,16 @@ public class HttpResponseObject {
         return response;
     }
 
-    public static HttpResponseObject error(String statusCode, String httpVersion) {
-        HttpResponseObject response = new HttpResponseObject();
+    public static HttpResponse error(String statusCode, String httpVersion) {
+        HttpResponse response = new HttpResponse();
         response.type = StringUtil.FAULT;
         response.statusCode = statusCode;
         response.httpVersion = httpVersion;
         return response;
     }
 
-    public static HttpResponseObject redirect(String path, String statusCode, String httpVersion) {
-        HttpResponseObject response = new HttpResponseObject();
+    public static HttpResponse redirect(String path, String statusCode, String httpVersion) {
+        HttpResponse response = new HttpResponse();
         response.type = StringUtil.DYNAMIC;
         response.path = path;
         response.statusCode = statusCode;
