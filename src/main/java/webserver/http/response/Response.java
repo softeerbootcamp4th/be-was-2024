@@ -21,7 +21,7 @@ public class Response {
         this.body = builder.body;
     }
 
-    static class Builder {
+    public static class Builder {
 
         private Status status;
         private Map<String, String> headers;

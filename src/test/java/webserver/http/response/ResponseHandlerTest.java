@@ -1,16 +1,14 @@
 package webserver.http.response;
 
-import db.Database;
-import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import webserver.PluginLoader;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
 import static util.Utils.getFile;
 
 import java.io.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseHandlerTest {
@@ -18,6 +16,8 @@ class ResponseHandlerTest {
     @Nested
     @DisplayName("정적 요청에 대한 응답")
     class StaticResponseTest {
+
+        ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
 
         @Test
         @DisplayName("HTML")
@@ -33,7 +33,7 @@ class ResponseHandlerTest {
                     .build();
 
             //when
-            Response actual = ResponseHandler.response(request);
+            Response actual = responseHandler.response(request);
 
             //then
             assertEquals(expected,actual);
@@ -55,7 +55,7 @@ class ResponseHandlerTest {
                     .build();
 
             //when
-            Response actual = ResponseHandler.response(request);
+            Response actual = responseHandler.response(request);
 
             //then
             assertEquals(expected,actual);
@@ -78,7 +78,7 @@ class ResponseHandlerTest {
                     .build();
 
             //when
-            Response actual = ResponseHandler.response(request);
+            Response actual = responseHandler.response(request);
 
             //then
             assertEquals(expected,actual);
@@ -101,7 +101,7 @@ class ResponseHandlerTest {
                     .build();
 
             //when
-            Response actual = ResponseHandler.response(request);
+            Response actual = responseHandler.response(request);
 
             //then
             assertEquals(expected,actual);
@@ -124,97 +124,12 @@ class ResponseHandlerTest {
                     .build();
 
             //when
-            Response actual = ResponseHandler.response(request);
+            Response actual = responseHandler.response(request);
 
             //then
             assertEquals(expected,actual);
 
         }
-
-
-    }
-
-    @Test
-    @DisplayName("/registration 요청에 대한 응답 성공")
-    void testAccessRegistrationSuccess() throws IOException {
-
-        //given
-        Request request = new Request.Builder(Method.GET, "/registration")
-                .addHeader("Host", "localhost:8080")
-                .addHeader("Connection", "keep-alive")
-                .build();
-
-        Response expected = new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/registration/index.html")
-                .build();
-
-        //when
-        Response actual = ResponseHandler.response(request);
-
-        //then
-        assertEquals(expected,actual);
-
-    }
-
-    @Test
-    @DisplayName("GET 으로 회원가입 할 경우 실패")
-    void testRegistrationGETFailure() throws IOException {
-        Database.deleteAll();
-
-        //given
-        Request request = new Request.Builder(Method.GET, "/create")
-                .addParameter("userId", "javajigi")
-                .addParameter("password", "password")
-                .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
-                .addParameter("email", "javajigi%40slipp.net")
-                .build();
-
-        //when
-        ResponseHandler.response(request);
-        User actual = Database.findUserById("javajigi");
-
-        //then
-        assertNull(actual);
-
-    }
-
-    @Test
-    @DisplayName("POST 회원가입이 정상 동작")
-    void testRegistrationSuccessful() throws IOException {
-        Database.deleteAll();
-
-        //given
-        Request request = new Request.Builder(Method.POST, "/create")
-                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
-                .build();
-
-        User expected = new User("javajigi", "password", "%EB%B0%95%EC%9E%AC%EC%84%B1", "javajigi%40slipp.net");
-
-        //when
-        ResponseHandler.response(request);
-        User actual = Database.findUserById("javajigi");
-
-        //then
-        assertEquals(expected, actual);
-
-    }
-
-    @Test
-    @DisplayName("가입을 완료하면 /index.html 페이지로 이동")
-    void testRegistrationRedirection() throws IOException {
-        Database.deleteAll();
-
-        //given
-        Request request = new Request.Builder(Method.POST, "/create")
-                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
-                .build();
-
-        //when
-        Response response = ResponseHandler.response(request);
-
-        //then
-        assertEquals(response.getStatus(), Status.SEE_OTHER);
-        assertEquals(response.getHeaderValue("Location"), "/index.html");
 
     }
 

@@ -13,9 +13,11 @@ public class RequestHandler implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
     private Socket connection;
+    private final ResponseHandler responseHandler;
 
-    public RequestHandler(Socket connectionSocket) {
+    public RequestHandler(Socket connectionSocket, ResponseHandler responseHandler) {
         this.connection = connectionSocket;
+        this.responseHandler = responseHandler;
     }
 
     public void run() {
@@ -24,7 +26,7 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             out.write(
-                    ResponseHandler.response(
+                    responseHandler.response(
                             readRequest(in)
                     ).toByte()
             );
