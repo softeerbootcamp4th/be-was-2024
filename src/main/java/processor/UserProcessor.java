@@ -11,7 +11,6 @@ public class UserProcessor {
     public void createUser(Request request) {
         HashMap<String, String> userData = request.parseBody();
         User user = User.from(userData);
-        System.out.println(user);
         Database.addUser(user);
     }
 
