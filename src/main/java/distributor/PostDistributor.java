@@ -25,11 +25,22 @@ public class PostDistributor extends Distributor {
     private void processQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            userProcessor.createUser(request);
-            response.redirect("/index.html", dos, 302);
+            processUserCreate(dos);
         } else if (path.equals("/user/login")) {
-            userProcessor.login(request);
+            processUserLogin(dos);
+        }
+    }
+
+    private void processUserCreate(DataOutputStream dos) throws IOException {
+        userProcessor.createUser(request);
+        response.redirect("/index.html", dos, 302);
+    }
+
+    private void processUserLogin(DataOutputStream dos) throws IOException {
+        if (userProcessor.login(request)) {
             response.redirect("/index.html", dos, 302);
+        } else {
+            response.redirect("/login/login_failed.html", dos, 404);
         }
     }
 }
