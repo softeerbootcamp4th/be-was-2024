@@ -1,5 +1,6 @@
 package distributor;
 
+import handler.SessionHandler;
 import processor.UserProcessor;
 import webserver.Request;
 import webserver.Response;
@@ -42,9 +43,11 @@ public class PostDistributor extends Distributor {
 
     private void processUserLogin(DataOutputStream dos) throws IOException {
         if (userProcessor.login(request)) {
+            String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
             Response response = new Response.Builder()
                     .url("/index.html")
                     .dataOutputStream(dos)
+                    .cookie(sessionId)
                     .redirectCode(302)
                     .build();
 
