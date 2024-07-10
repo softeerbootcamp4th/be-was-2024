@@ -21,21 +21,21 @@ public class HttpRequest {
     private final Map<String, String> queryParams;
     private final String protocolVersion;
     private final Map<String, String> headers;
-    private final List<Character> bodys;
+    private final byte[] body;
 
     private HttpRequest(HttpMethod httpMethod, String path, Map<String, String> queryParams, String protocolVersion,
-                        Map<String, String> headers, List<Character> bodys) {
+                        Map<String, String> headers, byte[] body) {
         this.httpMethod = httpMethod;
         this.path = path;
         this.queryParams = queryParams;
         this.protocolVersion = protocolVersion;
         this.headers = headers;
-        this.bodys = bodys;
+        this.body = body;
     }
 
     public static HttpRequest of(HttpMethod httpMethod, String path, Map<String, String> queryParams,
-                                 String protocolVersion, Map<String, String> headers, List<Character> bodys) {
-        return new HttpRequest(httpMethod, path, queryParams, protocolVersion, headers, bodys);
+                                 String protocolVersion, Map<String, String> headers, byte[] body) {
+        return new HttpRequest(httpMethod, path, queryParams, protocolVersion, headers, body);
     }
 
 //
@@ -106,7 +106,7 @@ public class HttpRequest {
         return headers;
     }
 
-    public List<Character> getBodys() {
-        return bodys;
+    public byte[] getBody() {
+        return body;
     }
 }

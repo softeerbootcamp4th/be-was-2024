@@ -1,4 +1,6 @@
-package model;
+package util;
+
+import model.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

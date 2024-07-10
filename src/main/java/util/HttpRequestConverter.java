@@ -53,15 +53,23 @@ public class HttpRequestConverter {
         }
 
         /* httpRequest bodys */
-        List<Character> bodys = new ArrayList<>();
+        List<Byte> body = new ArrayList<Byte>();
 
         //TODO  : 지우고 구현하기, 테스트코드로 확인하기 뭘?
         while (buffer.ready()) {
-            char readChar = (char) buffer.read();
-            bodys.add(readChar);
+            byte readByte = (byte) buffer.read(); //TODO : int -> byte 변환 문제 없는가?
+            body.add(readByte);
         }
 
-        return HttpRequest.of(httpMethod, path, queryParams, protocolVersion, headers, bodys);
+        // List<Byte>를 byte[]로 변환
+        byte[] bodyBytes = new byte[body.size()];
+        for (int i = 0; i < body.size(); i++) {
+            bodyBytes[i] = body.get(i);
+        }
+
+
+        return HttpRequest.of(httpMethod, path, queryParams, protocolVersion, headers, bodyBytes);
+
 
     }
 

@@ -5,7 +5,7 @@ import java.net.Socket;
 
 import model.HttpRequest;
 import model.HttpResponse;
-import model.HttpSender;
+import util.HttpSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestConverter;
