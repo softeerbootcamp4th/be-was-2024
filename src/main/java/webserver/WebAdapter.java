@@ -23,7 +23,7 @@ public class WebAdapter {
     static final String ACCEPT = "Accept";
     static final String CONTENT_TYPE = "Content-Type";
     static final String CONTENT_LENGTH = "Content-Length";
-    static final String COOKIE = "cookie";
+    static final String COOKIE = "Cookie";
     static final String SESSION_ID = "SID";
 
     /**
@@ -63,8 +63,8 @@ public class WebAdapter {
                 case COOKIE -> {
                     String[] cookies = value.split(";");
                     for(String c: cookies) {
-                        String cookieName = c.split(":")[0].trim();
-                        String cookieId = c.split(":")[1].trim();
+                        String cookieName = c.split("=")[0].trim();
+                        String cookieId = c.split("=")[1].trim();
                         cookie.put(cookieName, cookieId);
                     }
                 }
@@ -116,7 +116,7 @@ public class WebAdapter {
 
             HttpResponse response;
             // 헤더에 세션이 존재하지 않을 경우 -> 새로 로그인하는 경우
-            if(request.getCookie().isEmpty() || request.getCookie().get(SESSION_ID)==null) {
+//            if(request.getCookie().isEmpty() || request.getCookie().get(SESSION_ID)==null) {
                 if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
                     // 세션 생성
                     Session session = SessionDatabase.createDefaultSession();
@@ -136,28 +136,42 @@ public class WebAdapter {
                             .location("/login/index.html")
                             .build();
                 }
-            }
+//            }
             // 세션이 존재하는 경우 -> 세션 유효성 확인
-            else {
-                SessionDatabase.removeExpiredSessions();
-                String userId = SessionIdMapper.findUserIdBySessionId(request.getCookie().get(SESSION_ID));
-
-                // 세션이 만료되었거나 세션 저장소에서 찾을 수 없음
-                if(userId==null) {
-                    response = new HttpResponse.HttpResponseBuilder()
-                            .code(ResponseCode.FOUND)
-                            .location("/login/index.html")
-                            .build();
-                } else {
-                    response = new HttpResponse.HttpResponseBuilder()
-                            .code(ResponseCode.FOUND)
-                            .location("/login/index.html")
-                            .build();
-                }
-            }
-
+//            else {
+//                SessionDatabase.removeExpiredSessions();
+//                String userId = SessionIdMapper.findUserIdBySessionId(request.getCookie().get(SESSION_ID));
+//
+//                // 세션이 만료되었거나 세션 저장소에서 찾을 수 없음 (재 로그인 필요)
+//                if(userId==null) {
+//                    SessionDatabase.invalidateSession(request.getCookie().get(SESSION_ID));
+//                    response = new HttpResponse.HttpResponseBuilder()
+//                            .code(ResponseCode.FOUND)
+//                            .location("/login/index.html")
+//                            .cookie(new ConcurrentHashMap<>())
+//                            .build();
+//                } else {
+//                    response = new HttpResponse.HttpResponseBuilder()
+//                            .code(ResponseCode.FOUND)
+//                            .location("/index.html")
+//                            .build();
+//                }
+//            }
 
             response.writeInBytes(out);
+
+        } else if(request.getPath().equals("/logout")) {
+            String sid = request.getCookie().get(SESSION_ID);
+            System.out.println("sid = " + sid);
+            SessionDatabase.invalidateSession(sid);
+
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.FOUND)
+                    .location("/login/index.html")
+                    .build();
+
+            response.writeInBytes(out);
+
         }
 
         return "/index.html";

@@ -33,6 +33,7 @@ public class SessionDatabase {
 
     public static void invalidateSession(String SID) {
         Session session = sessions.get(SID);
-        session.invalidateSession();
+        if(session!=null)
+            session.invalidateSession();
     }
 }
