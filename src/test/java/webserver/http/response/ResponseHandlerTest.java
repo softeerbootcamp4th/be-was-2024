@@ -23,13 +23,13 @@ class ResponseHandlerTest {
         @DisplayName("HTML")
         void testResponseIndexHtmlSuccess() throws IOException {
             //given
-            Request request = new Request.Builder(Method.GET, "/index.html")
+            Request request = new Request.Builder(Method.GET, "/login/index.html")
                     .addHeader("Host", "localhost:8080")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
                     .addHeader("Content-Type", "text/html;charset=utf-8")
-                    .body(getFile("index.html"))
+                    .body(getFile("/login/index.html"))
                     .build();
 
             //when

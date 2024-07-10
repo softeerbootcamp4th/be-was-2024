@@ -4,6 +4,7 @@ import exception.NotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.PluginLoader;
+import webserver.http.Session;
 import webserver.http.request.Request;
 
 import java.io.IOException;
@@ -29,6 +30,28 @@ public class ResponseHandler {
                 if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
             }
         } catch (NotExistException e) {
+
+            if(request.getPath().equals("/index.html")){
+
+                String body = new String(getFile(request.getPath()));
+                String replacedBody;
+
+                if(request.isLogin()){
+                    replacedBody = body.replace("{USERNAME}", Session.get(request.getSessionId()).getName());
+                    replacedBody = replacedBody.replace("{LOGIN}", "로그아웃");
+                    replacedBody = replacedBody.replace("{LOGINPATH}", "/logout");
+                }else {
+                    replacedBody = body.replace("{USERNAME}", "");
+                    replacedBody = replacedBody.replace("{LOGIN}", "로그인");
+                    replacedBody = replacedBody.replace("{LOGINPATH}", "/login");
+                }
+                response = new Response.Builder(Status.OK)
+                        .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
+                        .body(replacedBody.getBytes())
+                        .build();
+                return response;
+            }
+
             response = new Response.Builder(Status.OK)
                     .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
                     .body(getFile(request.getPath()))
