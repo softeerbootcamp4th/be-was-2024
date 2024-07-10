@@ -2,17 +2,14 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import type.MIMEType;
-import type.MethodType;
-import type.StatusCodeType;
-import utils.FileUtils;
+import type.MIME;
+import type.HTTPMethod;
 import utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 
 public class RequestInfo {
@@ -20,10 +17,11 @@ public class RequestInfo {
 
     private final static String STATIC_PATH = "./src/main/resources/static";
 
-    private MethodType method;
+    private HTTPMethod method;
     private String path;
     private HashMap<String, String> query;
     private HashMap<String, String> header;
+    private HashMap<String, String> cookie;
     private String body;
 
     public RequestInfo(InputStream in) throws IOException {
@@ -49,19 +47,21 @@ public class RequestInfo {
             logger.debug("\n:: Response ::\n{}", this.body);
         }
 
+        if (headers.get("Cookie") != null) this.cookie = StringUtils.paramToMap(headers.get("Cookie"), ";");
+
         this.method = findMethod(requestLine);
         String[] seperatedPath = requestLine.split("\\s+")[1].split("\\?");
         this.path = seperatedPath[0];
-        if (seperatedPath.length > 1) this.query = StringUtils.param2Map(seperatedPath[1]);
+        if (seperatedPath.length > 1) this.query = StringUtils.paramToMap(seperatedPath[1], "&");
     }
 
-    private static MethodType findMethod(String requestLine) {
-        return MethodType.valueOf(requestLine.split("\\s+")[0]);
+    private static HTTPMethod findMethod(String requestLine) {
+        return HTTPMethod.valueOf(requestLine.split("\\s+")[0]);
     }
 
-    private static MIMEType findMIME(String path) {
+    private static MIME findMIME(String path) {
         String[] list = path.split("\\.");
-        return MIMEType.findByContentType(list.length > 1 ? list[list.length - 1] : "");
+        return MIME.findByContentType(list.length > 1 ? list[list.length - 1] : "");
     }
 
     public String getMethod() { return method.getValue(); }
@@ -71,6 +71,8 @@ public class RequestInfo {
     public HashMap<String, String> getQuery() { return query; }
 
     public HashMap<String, String> getHeader() { return header; }
+
+    public HashMap<String, String> getCookie() { return cookie; }
 
     public String getBody() { return body; }
 }

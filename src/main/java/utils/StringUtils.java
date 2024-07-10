@@ -6,12 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class StringUtils {
-    public static HashMap<String, String> param2Map(String str) {
+    public static HashMap<String, String> paramToMap(String str, String token) {
         HashMap<String, String> map = new HashMap<>();
-        Arrays.stream(str.split("&"))
+        Arrays.stream(str.split(token))
                 .forEach(val -> {
                     String[] keyValue = val.split("=");
-                    map.put(keyValue[0], keyValue.length > 1 ? keyValue[1] : "");
+                    map.put(keyValue[0].trim(), keyValue.length > 1 ? keyValue[1].trim() : "");
                 });
         return map;
     }

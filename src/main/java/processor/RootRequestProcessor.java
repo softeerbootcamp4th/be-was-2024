@@ -1,12 +1,13 @@
 package processor;
 
+import db.Database;
 import exception.StatusCodeException;
-import type.MIMEType;
-import type.StatusCodeType;
+import type.HTTPStatusCode;
 import utils.FileUtils;
 import webserver.RequestInfo;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class RootRequestProcessor extends RequestProcessor {
 
@@ -23,8 +24,18 @@ public class RootRequestProcessor extends RequestProcessor {
         String path = STATIC_PATH + getPath() + "index.html";
         byte[] body = FileUtils.readFileToBytes(path);
 
+        HashMap<String, String> cookie = getCookie();
+
+        HashMap<String, String> bodyParams = new HashMap<>();
+
+        String sid = cookie.get("sid");
+        if (sid != null) {
+            bodyParams.put("hasSID", "true");
+            bodyParams.put("userId", Database.findUserIdBySessionId(sid));
+        }
+
         insertHTMLTypeToHeader();
-        setResult(StatusCodeType.OK, getResponseHeader(), body);
+        setResult(HTTPStatusCode.OK, getResponseHeader(), body, bodyParams);
     }
 
     private void staticResource() throws StatusCodeException, IOException {
@@ -35,7 +46,7 @@ public class RootRequestProcessor extends RequestProcessor {
             insertContentTypeToHeader(FileUtils.findMIME(getPath()));
             insertToResponseHeader("Content-Length", String.valueOf(body.length));
 
-            setResult(StatusCodeType.OK, getResponseHeader(), body);
-        } else throw new StatusCodeException(StatusCodeType.NOT_FOUND);
+            setResult(HTTPStatusCode.OK, getResponseHeader(), body);
+        } else throw new StatusCodeException(HTTPStatusCode.NOT_FOUND);
     }
 }

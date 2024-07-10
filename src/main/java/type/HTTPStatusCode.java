@@ -1,6 +1,6 @@
 package type;
 
-public enum StatusCodeType {
+public enum HTTPStatusCode {
     // 2XX
     OK(200, "OK"),
     // 3XX
@@ -12,7 +12,7 @@ public enum StatusCodeType {
     private final int code;
     private final String text;
 
-    StatusCodeType(int code, String text) {
+    HTTPStatusCode(int code, String text) {
         this.code = code;
         this.text = text;
     }

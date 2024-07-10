@@ -2,7 +2,8 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import type.StatusCodeType;
+import type.MIME;
+import type.HTTPStatusCode;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,11 +24,19 @@ public class ResponseHandler {
 
     public void write() throws IOException {
         HashMap<String, String> responseHeader = requestResult.getResponseHeader();
+        String contentType = responseHeader.get("Content-Type");
+        byte[] bodyContent = requestResult.getBodyContent();
+        if (contentType != null && contentType.split(";")[0].equals(MIME.HTML.getContentType())) {
+            String compiledBody = BodyCompiler.compile(requestResult.getBodyParams(), new String(bodyContent));
+            byte[] compiledBodyBytes = compiledBody.getBytes();
+            requestResult.setResponseHeader("Content-Length", Integer.toString(compiledBodyBytes.length));
+            bodyContent = compiledBodyBytes;
+        }
         writeHeader(requestResult.getStatusCode(), responseHeader);
-        writeBody(requestResult.getBodyContent());
+        writeBody(bodyContent);
     }
 
-    public void writeHeader(StatusCodeType statusCode, HashMap<String, String> responseHeader) throws IOException {
+    public void writeHeader(HTTPStatusCode statusCode, HashMap<String, String> responseHeader) throws IOException {
         dos.writeBytes("HTTP/1.1 " + statusCode.getCode() + " " + statusCode.getText() + CRLF);
         writeWithResponseHeader(responseHeader);
         dos.writeBytes(CRLF);

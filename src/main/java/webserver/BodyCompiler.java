@@ -23,7 +23,7 @@ public class BodyCompiler {
         String content = matchResult.group(1);
 
         // s1 ? s2 : s3
-        Pattern TernaryOpPattern = Pattern.compile(STATEMENT + TRIM + "\\?" + TRIM + STATEMENT + TRIM + ":" + TRIM + STATEMENT, Pattern.DOTALL);
+        Pattern TernaryOpPattern = Pattern.compile(STATEMENT + TRIM + "\\?" + TRIM + STATEMENT + TRIM + ":" + TRIM + LAST_STATEMENT, Pattern.DOTALL);
         Matcher matcher = TernaryOpPattern.matcher(content);
         if (matcher.find()) return isStatementTrue(param, matcher.group(1)) ? matcher.group(2) : matcher.group(3);
 

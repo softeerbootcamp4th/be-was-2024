@@ -1,7 +1,7 @@
 package processor;
 
-import type.MIMEType;
-import type.StatusCodeType;
+import type.MIME;
+import type.HTTPStatusCode;
 import webserver.RequestInfo;
 import webserver.RequestResult;
 
@@ -29,6 +29,10 @@ public class RequestProcessor {
         return requestInfo.getMethod();
     }
 
+    public HashMap<String, String> getRequestHeaders() { return requestInfo.getHeader(); }
+
+    public HashMap<String, String> getCookie() { return requestInfo.getCookie(); }
+
     public String getPath() {
         return requestInfo.getPath();
     }
@@ -47,22 +51,27 @@ public class RequestProcessor {
 
     public void insertContentTypeToHeader(String value) { responseHeader.put("Content-Type", value + CONTENT_CHARSET); }
 
-    public void insertHTMLTypeToHeader() { insertContentTypeToHeader(MIMEType.HTML.getContentType()); }
+    public void insertHTMLTypeToHeader() { insertContentTypeToHeader(MIME.HTML.getContentType()); }
 
     public HashMap<String, String> getResponseHeader() {
         return responseHeader;
     }
 
-    public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, byte[] bodyContent)  {
+    public void setResult(HTTPStatusCode statusCode, HashMap<String, String> responseHeader, byte[] bodyContent)  {
         if (bodyContent.length > 0) responseHeader.put("Content-Length", Integer.toString(bodyContent.length));
-        this.requestResult = new RequestResult(statusCode, responseHeader, bodyContent);
+        this.requestResult = new RequestResult(statusCode, responseHeader, bodyContent, null);
     }
 
-    public void setResult(StatusCodeType statusCode, HashMap<String, String> responseHeader, String bodyContent)  {
+    public void setResult(HTTPStatusCode statusCode, HashMap<String, String> responseHeader,
+                          byte[] bodyContent, HashMap<String, String> bodyParams)  {
+        this.requestResult = new RequestResult(statusCode, responseHeader, bodyContent, bodyParams);
+    }
+
+    public void setResult(HTTPStatusCode statusCode, HashMap<String, String> responseHeader, String bodyContent)  {
         setResult(statusCode, responseHeader, bodyContent.getBytes());
     }
 
-    public void setResult(StatusCodeType statusCode, String bodyContent) {
+    public void setResult(HTTPStatusCode statusCode, String bodyContent) {
         setResult(statusCode, new HashMap<>(), bodyContent.getBytes());
     }
 

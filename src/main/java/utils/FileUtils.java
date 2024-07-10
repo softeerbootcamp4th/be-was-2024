@@ -1,6 +1,6 @@
 package utils;
 
-import type.MIMEType;
+import type.MIME;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,7 +19,7 @@ public class FileUtils {
 
     public static String findMIME(String fileName) {
         String[] list = fileName.split("\\.");
-        return MIMEType.findByContentType(list.length > 1 ? list[list.length - 1] : "").getContentType();
+        return MIME.findByContentType(list.length > 1 ? list[list.length - 1] : "").getContentType();
     }
 
     public static byte[] readFileToBytes(String filePath) throws IOException {

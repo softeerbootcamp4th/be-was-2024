@@ -3,8 +3,7 @@ package processor;
 import db.Database;
 import exception.StatusCodeException;
 import model.User;
-import type.MIMEType;
-import type.StatusCodeType;
+import type.HTTPStatusCode;
 import utils.FileUtils;
 import utils.StringUtils;
 import webserver.RequestInfo;
@@ -23,7 +22,8 @@ public class UserRequestProcessor extends RequestProcessor {
 
             case "POST /user/create" -> createUser();
             case "POST /user/login" -> loginUser();
-            default -> throw new StatusCodeException(StatusCodeType.NOT_FOUND);
+            case "POST /user/logout" -> logoutUser();
+            default -> throw new StatusCodeException(HTTPStatusCode.NOT_FOUND);
         }
     }
 
@@ -32,7 +32,7 @@ public class UserRequestProcessor extends RequestProcessor {
         byte[] body = FileUtils.readFileToBytes(path);
 
         insertHTMLTypeToHeader();
-        setResult(StatusCodeType.OK, getResponseHeader(), body);
+        setResult(HTTPStatusCode.OK, getResponseHeader(), body);
     }
 
     private void loginFailedPage() throws IOException {
@@ -40,12 +40,12 @@ public class UserRequestProcessor extends RequestProcessor {
         byte[] body = FileUtils.readFileToBytes(path);
 
         insertHTMLTypeToHeader();
-        setResult(StatusCodeType.OK, getResponseHeader(), body);
+        setResult(HTTPStatusCode.OK, getResponseHeader(), body);
     }
 
     // POST "/user/create"
     private void createUser() {
-        HashMap<String, String> param = StringUtils.param2Map(getBody());
+        HashMap<String, String> param = StringUtils.paramToMap(getBody(), "&");
         String userId = param.get("userId");
         String name = param.get("name");
         String password = param.get("password");
@@ -55,7 +55,7 @@ public class UserRequestProcessor extends RequestProcessor {
                 userId.isEmpty() || name.isEmpty() || password.isEmpty() || email.isEmpty()) {
 
             insertHTMLTypeToHeader();
-            setResult(StatusCodeType.BAD_REQUEST, getResponseHeader(), "" +
+            setResult(HTTPStatusCode.BAD_REQUEST, getResponseHeader(), "" +
                     "<script>" +
                     "alert('Fill all the required fields');" +
                     "location.href='/registration'" +
@@ -67,12 +67,12 @@ public class UserRequestProcessor extends RequestProcessor {
         User user = new User(userId, name, password, email);
         Database.addUser(user);
         insertToResponseHeader("Location", "/user/login.html");
-        setResult(StatusCodeType.FOUND, getResponseHeader(), "");
+        setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
     }
 
     // POST "/user/login"
     private void loginUser() {
-        HashMap<String, String> param = StringUtils.param2Map(getBody());
+        HashMap<String, String> param = StringUtils.paramToMap(getBody(), "&");
         String userId = param.get("userId");
         String password = param.get("password");
 
@@ -86,11 +86,23 @@ public class UserRequestProcessor extends RequestProcessor {
                 // 결과값 작성
                 insertToResponseHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
                 insertToResponseHeader("Location", "/");
-                setResult(StatusCodeType.FOUND, getResponseHeader(), "");
+                setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
             } else throw new Exception("login failed"); // null exception or 로그인 실패
         } catch (Exception e) {
             insertToResponseHeader("Location", "/user/login_failed.html");
-            setResult(StatusCodeType.FOUND, getResponseHeader(), "");
+            setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
         }
+    }
+
+    private void logoutUser() {
+        HashMap<String, String> cookie = getCookie();
+        String sid = cookie.get("sid");
+
+        insertToResponseHeader("Location", "/");
+        if (sid != null && !sid.isEmpty()) {
+            Database.removeSession(sid);
+            insertToResponseHeader("Set-Cookie", "sid=; Path=/; Max-Age=0");
+        }
+        setResult(HTTPStatusCode.FOUND, getResponseHeader(), "");
     }
 }

@@ -1,12 +1,12 @@
 package type;
 
-public enum MethodType {
+public enum HTTPMethod {
     GET("GET"),
     POST("POST");
 
     private final String value;
 
-    MethodType(String value) { this.value = value; }
+    HTTPMethod(String value) { this.value = value; }
 
     public String getValue() { return value; }
 }

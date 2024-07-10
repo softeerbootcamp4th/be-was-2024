@@ -1,8 +1,7 @@
 package processor;
 
 import exception.StatusCodeException;
-import type.MIMEType;
-import type.StatusCodeType;
+import type.HTTPStatusCode;
 import utils.FileUtils;
 import webserver.RequestInfo;
 
@@ -14,7 +13,7 @@ public class RegistrationRequestProcessor extends RequestProcessor {
 
         switch (methodPath()) {
             case "GET /registration" -> index();
-            default -> throw new StatusCodeException(StatusCodeType.NOT_FOUND);
+            default -> throw new StatusCodeException(HTTPStatusCode.NOT_FOUND);
         }
     }
 
@@ -25,6 +24,6 @@ public class RegistrationRequestProcessor extends RequestProcessor {
 
         insertHTMLTypeToHeader();
 
-        setResult(StatusCodeType.OK, getResponseHeader(), body);
+        setResult(HTTPStatusCode.OK, getResponseHeader(), body);
     }
 }

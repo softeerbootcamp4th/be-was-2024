@@ -1,12 +1,12 @@
 package exception;
 
-import type.StatusCodeType;
+import type.HTTPStatusCode;
 
 public class StatusCodeException extends Exception {
-    StatusCodeType statusCode;
-    public StatusCodeException(StatusCodeType sc) {
+    HTTPStatusCode statusCode;
+    public StatusCodeException(HTTPStatusCode sc) {
         this.statusCode = sc;
     }
 
-    public StatusCodeType getStatusCode() { return statusCode; }
+    public HTTPStatusCode getStatusCode() { return statusCode; }
 }
