@@ -28,24 +28,3 @@ public class FileReadUtil {
 
     }
 }
-
-
-//        if(filePath.startsWith("\\/")) filePath = filePath.substring(1);
-//
-////        File targetFile = new File(filePath);
-////
-////        byte[] buffer;
-////
-////        if(!targetFile.exists() || targetFile.isDirectory())
-////            throw new FileNotFoundException("파일을 찾을 수 없음");
-////
-////        int bodyLength = (int)targetFile.length();
-//
-//        try(InputStream is = FileReadUtil.class.getClassLoader().getResourceAsStream(filePath)) {
-//        if(is == null) throw new IOException("resource not found: " + filePath);
-//
-//            return is.readAllBytes();
-//        } catch (Exception e) {
-//        logger.error(e.getMessage());
-//        throw e;
-//        }
