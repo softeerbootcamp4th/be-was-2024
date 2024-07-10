@@ -57,14 +57,6 @@ public class Response {
 
     private static final ResourceHandler resourceHandler = new ResourceHandler();
 
-    public void runGetResponse() {
-
-    }
-
-    public void runPostResponse() {
-
-    }
-
     public void sendResponse() throws IOException {
         if (redirectCode != 0) {
             redirect(url, dos, redirectCode);
