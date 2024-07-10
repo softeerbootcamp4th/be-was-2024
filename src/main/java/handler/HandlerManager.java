@@ -12,7 +12,6 @@ import exception.ResourceNotFoundException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.DynamicFileResolver;
 import util.HttpRequestParser;
 
 import java.io.*;
@@ -51,6 +50,28 @@ public class HandlerManager {
 
             // 302 응답 생성
             httpResponse.setRedirect("/index.html");
+        });
+
+        handlers.get(HttpMethod.POST).put("/user/login", (httpRequest, httpResponse) -> {
+
+            Map<String, String> bodyParams = getBodyParams(httpRequest);
+
+            if(Database.userExists(bodyParams.get("userId"))){
+                String userId = bodyParams.get("userId");
+                String password = bodyParams.get("password");
+
+                User user = Database.findUserById(userId);
+
+                // 로그인 성공 시, /index.html로 redirect
+                if(user.getPassword().equals(password)){
+                    httpResponse.setRedirect("/index.html");
+                }
+                // 로그인 실패 시, /login/failed.html로 redirect
+                else{
+                    httpResponse.setRedirect("/login/failed.html");
+                }
+            }
+
         });
     }
 
