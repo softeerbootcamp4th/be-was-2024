@@ -1,5 +1,6 @@
 package distributor;
 
+import handler.SessionHandler;
 import webserver.Request;
 import webserver.Response;
 
@@ -38,7 +39,10 @@ public class GetDistributor extends Distributor {
     private void processNonQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/logout")) {
-            // 세션 삭제해줘야 함
+            // 세션 삭제
+            String userId = request.getSessionId();
+            SessionHandler.deleteSession(userId);
+
             Response response = new Response.Builder()
                     .url("/index.html")
                     .dataOutputStream(dos)
@@ -46,6 +50,28 @@ public class GetDistributor extends Distributor {
                     .build();
 
             response.sendResponse();
+        } else if (path.equals("/login/index.html")) {
+            String sessionId = request.getSessionId();
+
+            // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
+            if (SessionHandler.verifySessionId(sessionId)) {
+                Response response = new Response.Builder()
+                        .url("/main/index.html")
+                        .statusCode(200)
+                        .dataOutputStream(dos)
+                        .build();
+
+                response.sendResponse();
+            } else {
+                // 세션아이디가 존재하지 않는다면 그대로
+                Response response = new Response.Builder()
+                        .url(path)
+                        .statusCode(200)
+                        .dataOutputStream(dos)
+                        .build();
+
+                response.sendResponse();
+            }
         } else {
             Response response = new Response.Builder()
                     .url(path)
