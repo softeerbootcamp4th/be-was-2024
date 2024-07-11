@@ -17,6 +17,8 @@ import static util.HttpStatus.*;
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
 
+    private static final Logic logic = new Logic();
+
     private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -29,23 +31,26 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            HttpRequest httpRequest = HttpRequestParser.parse(in);
+            HttpRequest httpRequest;
+            try{
+                httpRequest = HttpRequestParser.parse(in);
+            } catch (InvalidHttpRequestException ie) {
+                logger.debug(ie.getMessage());
+                response(out, HttpResponse.error(SC_BAD_REQUEST, ie.getMessage()));
+                return;
+            } catch (UnsupportedHttpVersionException ue) {
+                logger.debug(ue.getMessage());
+                response(out, HttpResponse.error(SC_HTTP_VERSION_NOT_SUPPORTED, ue.getMessage()));
+                return;
+            }
+
             logger.debug(httpRequest.toString());
 
-            HttpResponse httpResponse = Logic.serve(httpRequest);
+            HttpResponse httpResponse = logic.serve(httpRequest);
 
             response(out, httpResponse);
 
-        } catch (InvalidHttpRequestException ie) {
-            try {
-                response(connection.getOutputStream(), HttpResponse.error(SC_BAD_REQUEST, ie.getMessage()));
-            } catch (IOException e) {logger.error(e.getMessage());}
-        } catch (UnsupportedHttpVersionException ue) {
-            try {
-                response(connection.getOutputStream(), HttpResponse.error(SC_HTTP_VERSION_NOT_SUPPORTED, ue.getMessage()));
-            } catch (IOException e) {logger.error(e.getMessage());}
-        }
-        catch (Exception e) {
+        } catch (IOException e) {
             logger.error(e.getMessage());
         }
 
