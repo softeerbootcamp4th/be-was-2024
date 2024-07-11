@@ -6,7 +6,6 @@ import model.UserCreate;
 import model.UserLogin;
 import webserver.HttpRequest;
 import webserver.RequestResponse;
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -37,14 +36,13 @@ public class PostHandler {
             case "/logout":
                 sessionId = headers.get("Cookie").split(";")[1].substring(5);
                 SessionIdControl.deleteSessionId(sessionId);
-                requestResponse.redirectPath("/index.html");
+                redirectUrl = "/index.html";
+                requestResponse.resetCookieAndRedirectPath(redirectUrl);
                 break;
             default:
                 break;
         }
 
-
     }
-
 
 }

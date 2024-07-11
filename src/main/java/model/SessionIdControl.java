@@ -9,7 +9,7 @@ public class SessionIdControl {
 
     private static SecureRandom random = new SecureRandom();
 
-    public static  synchronized String createSessionId(User user) {
+    public static synchronized String createSessionId(User user) {
         String sessionId = new BigInteger(130, random).toString(32);
         User existUser = Session.findUserBySessionId(sessionId);
         while(existUser != null){

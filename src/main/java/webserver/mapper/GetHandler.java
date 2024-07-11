@@ -11,7 +11,7 @@ public class GetHandler {
 
     private static final String staticResourceDir = System.getProperty("staticResourceDir");
 
-    public static void handle(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
+    public static synchronized void handle(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
         String url = httpRequest.getUrl();
         Map<String, String> headers = httpRequest.getHeaders();
         switch (url) {

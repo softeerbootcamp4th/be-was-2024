@@ -32,6 +32,15 @@ public class RequestResponse {
         dos.flush();
     }
 
+    // 로그아웃 할 때 빈 세션으로 반환하게 하기 dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; Max-Age=0\r\n");
+    public void resetCookieAndRedirectPath(String redirectPath) throws IOException {
+        dos.writeBytes("HTTP/1.1 302 Found\r\n");
+        dos.writeBytes("Location: " + redirectPath + "\r\n");
+        dos.writeBytes("Set-Cookie: sid=; Path=/; Max-Age=0\r\n");
+        dos.writeBytes("\r\n");
+        dos.flush();
+    }
+
     public void openPath(String url) throws IOException {
         if (url != null) {
             File file = new File(url);

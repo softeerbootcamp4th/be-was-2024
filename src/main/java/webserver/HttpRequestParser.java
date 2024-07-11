@@ -3,17 +3,16 @@ package webserver;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class HttpRequestParser {
     private String method;
     private String url;
-    private Map<String, String> headers;
+    private ConcurrentHashMap<String, String> headers;
     private byte[] body;
 
     public HttpRequestParser() {
-        headers = new HashMap<>();
+        headers = new ConcurrentHashMap<>();
     }
 
     public HttpRequest parse(InputStream inputStream) throws IOException {
