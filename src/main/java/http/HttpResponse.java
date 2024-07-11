@@ -14,6 +14,9 @@ public class HttpResponse {
         return HTTP_VERSION + httpStatus.getStatus() + " " + httpStatus.getMessage() + "\r\n";
     }
 
+    public String getHeader(String key){
+        return headers.get(key);
+    }
     public String getHeaders(){
         StringBuilder header = new StringBuilder();
         for (String key : headers.keySet()) {
