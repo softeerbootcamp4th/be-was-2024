@@ -43,6 +43,11 @@ public class Response {
             return this;
         }
 
+        public Builder body(String body){
+            this.body = body.getBytes();
+            return this;
+        }
+
         public Builder addHeader(String key, String value){
             this.headers.put(key, value);
             return this;
@@ -92,6 +97,10 @@ public class Response {
         if(!headers.equals(response.headers)) return false;
         if(!Arrays.equals(body, response.body)) return false;
         return true;
+    }
+
+    public String getBody(){
+        return new String(body);
     }
 
 }

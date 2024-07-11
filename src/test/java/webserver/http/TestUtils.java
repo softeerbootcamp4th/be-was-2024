@@ -1,5 +1,7 @@
 package webserver.http;
 
+import static org.junit.jupiter.api.Assertions.fail;
+
 public class TestUtils {
 
     public static int checkDif(String a, String b){
@@ -22,6 +24,10 @@ public class TestUtils {
         }
         System.out.println("no dif");
         return -1;
+    }
+
+    public static void notImplementedYet(){
+        fail("This test is not implemented yet.");
     }
 
 }

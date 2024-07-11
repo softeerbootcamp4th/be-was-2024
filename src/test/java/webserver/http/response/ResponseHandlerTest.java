@@ -3,8 +3,8 @@ package webserver.http.response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import webserver.PluginLoader;
-import webserver.http.request.Method;
+import webserver.PluginMapper;
+import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 import static util.Utils.getFile;
 
@@ -17,19 +17,18 @@ class ResponseHandlerTest {
     @DisplayName("정적 요청에 대한 응답")
     class StaticResponseTest {
 
-        ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
+        ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
         @Test
         @DisplayName("HTML")
         void testResponseIndexHtmlSuccess() throws IOException {
             //given
-            Request request = new Request.Builder(Method.GET, "/index.html")
-                    .addHeader("Host", "localhost:8080")
+            Request request = new Request.Builder(HttpMethod.GET, "/login/index.html")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
                     .addHeader("Content-Type", "text/html;charset=utf-8")
-                    .body(getFile("index.html"))
+                    .body(getFile("/login/index.html"))
                     .build();
 
             //when
@@ -44,9 +43,7 @@ class ResponseHandlerTest {
         @DisplayName("PNG")
         void testAccessStaticResourcePngSuccess() throws IOException {
             //given
-            Request request = new Request.Builder(Method.GET, "/img/signiture.png")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
+            Request request = new Request.Builder(HttpMethod.GET, "/img/signiture.png")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -67,9 +64,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceSvgSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/img/signiture.svg")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
+            Request request = new Request.Builder(HttpMethod.GET, "/img/signiture.svg")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -90,9 +85,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceCssSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/main.css")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
+            Request request = new Request.Builder(HttpMethod.GET, "/main.css")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -113,9 +106,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceIcoSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/favicon.ico")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
+            Request request = new Request.Builder(HttpMethod.GET, "/favicon.ico")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
