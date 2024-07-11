@@ -22,7 +22,6 @@ public class UserHandler implements ModelHandler<User>{
 
     @Override
     public User create(Map<String, String> fields) {
-        validateFields(fields);
         User user = User.from(fields);
         Database.addUser(user);
         return user;
@@ -36,11 +35,5 @@ public class UserHandler implements ModelHandler<User>{
     @Override
     public Collection<User> findAll() {
         return Database.findAll();
-    }
-
-    private void validateFields(Map<String, String> fields) {
-        if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
-            throw new ModelException(ConstantUtil.INVALID_LOGIN);
-        }
     }
 }

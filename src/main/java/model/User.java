@@ -1,5 +1,8 @@
 package model;
 
+import exception.ModelException;
+import util.ConstantUtil;
+
 import java.util.Map;
 
 public class User {
@@ -16,7 +19,18 @@ public class User {
     }
 
     public static User from(Map<String, String> params){
-        return new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+        if (params.size() != 4 || params.values().stream().anyMatch(String::isBlank)) {
+            throw new ModelException(ConstantUtil.INVALID_LOGIN);
+        }
+
+        String userId = params.get("userId");
+        String password = params.get("password");
+        String name = params.get("name");
+        String email = params.get("email");
+        if(userId == null || password == null || name == null || email == null){
+            throw new ModelException(ConstantUtil.INVALID_LOGIN);
+        }
+        return new User(userId, password, name, email);
     }
 
     public String getUserId() {
