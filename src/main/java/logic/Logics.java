@@ -30,9 +30,10 @@ public class Logics {
         Map<String, String> parsingBodyParams = new HashMap<>();
         for (String bodyParsedPair : bodyParsedPairList) {
             String queryKey = bodyParsedPair.substring(0, bodyParsedPair.indexOf(EQUAL));
-            String queryValue = bodyParsedPair.substring(bodyParsedPair.indexOf(EQUAL));
+            String queryValue = bodyParsedPair.substring(bodyParsedPair.indexOf(EQUAL)+1);
             parsingBodyParams.put(queryKey, queryValue);
         }
+
         String userId = URLDecoder.decode(parsingBodyParams.get("userId"), UTF_8);
         String password = URLDecoder.decode(parsingBodyParams.get("password"), UTF_8);
         String username = URLDecoder.decode(parsingBodyParams.get("name"), UTF_8);
