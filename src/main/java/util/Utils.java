@@ -8,6 +8,8 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Properties;
 
+import static util.TemplateEngine.getNotFoundPage;
+
 public class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final Properties properties = new Properties();
@@ -48,8 +50,7 @@ public class Utils {
             }
             return new ResponseWithStatus(HttpStatus.OK, content.toString().getBytes());
         } catch (FileNotFoundException e) {
-            String notFound = "<h1>Page Not Found</h1>";
-            return new ResponseWithStatus(HttpStatus.NOT_FOUND, notFound.getBytes());
+            return new ResponseWithStatus(HttpStatus.NOT_FOUND, getNotFoundPage());
         }
     }
 
