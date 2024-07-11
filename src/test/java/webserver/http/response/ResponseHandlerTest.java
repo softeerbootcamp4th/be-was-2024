@@ -3,7 +3,7 @@ package webserver.http.response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import webserver.PluginLoader;
+import webserver.PluginMapper;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
 import static util.Utils.getFile;
@@ -17,7 +17,7 @@ class ResponseHandlerTest {
     @DisplayName("정적 요청에 대한 응답")
     class StaticResponseTest {
 
-        ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
+        ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
         @Test
         @DisplayName("HTML")

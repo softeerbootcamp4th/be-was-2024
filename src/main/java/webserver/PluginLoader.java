@@ -3,7 +3,6 @@ package webserver;
 import annotations.Get;
 import annotations.Plugin;
 import annotations.Post;
-import exception.NotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,8 +17,11 @@ import java.util.*;
 public class PluginLoader {
     public static final Logger logger = LoggerFactory.getLogger(PluginLoader.class);
 
-    // 플러그인을 저장할 리스트
-    private Map<String, Method> pathMap = new HashMap<>();
+    private final PluginMapper pluginMapper;
+
+    public PluginLoader(PluginMapper pluginMapper){
+        this.pluginMapper = pluginMapper;
+    }
 
     // 특정 패키지에서 플러그인 클래스를 동적으로 로드하는 메소드
     public void loadPlugins() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, URISyntaxException {
@@ -31,11 +33,11 @@ public class PluginLoader {
                 for (Method method : cls.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Post.class)) {
                         Post post = method.getAnnotation(Post.class);
-                        pathMap.put("POST " + post.path(), method);
+                        pluginMapper.put(webserver.http.request.Method.POST, post.path(), method);
                     }
                     if (method.isAnnotationPresent(Get.class)) {
                         Get get = method.getAnnotation(Get.class);
-                        pathMap.put("GET " + get.path(), method);
+                        pluginMapper.put(webserver.http.request.Method.GET, get.path(), method);
                     }
                 }
             }
@@ -82,27 +84,5 @@ public class PluginLoader {
             }
         }
         return classes;
-    }
-
-    // 플러그인 실행 메소드
-    public Optional<Object> runPlugin(String path, Object... args) {
-        Method method = pathMap.get(path);
-        logger.debug(path);
-        if (method != null) {
-            try {
-                logger.debug(method.getName());
-                Class<?> declaringClass = method.getDeclaringClass();
-                Object instance = declaringClass.getConstructor().newInstance();
-                Object returnValue = method.invoke(instance, args);
-                if (method.getReturnType().equals(Void.TYPE)) {
-                    return Optional.empty();
-                }
-                return Optional.ofNullable(returnValue);
-            } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
-                     NoSuchMethodException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new NotExistException();
     }
 }

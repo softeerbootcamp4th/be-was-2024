@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,20 +16,21 @@ class RequestReaderTest {
     void readRequestWithBody() throws IOException {
 
         //given
-        ByteArrayInputStream inputStream = new ByteArrayInputStream((
+        InputStream inputStream = new ByteArrayInputStream((
                 "POST /create HTTP/1.1\r\n" +
                         "Content-Length: 93\r\n" +
                         "\r\n" +
                         "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net\r\n").getBytes()
         );
 
+        RequestReader requestReader = new RequestReader(inputStream);
         Request expected = new Request.Builder(Method.POST, "/create")
                 .addHeader("Content-Length", "93")
                 .body("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")
                 .build();
 
         //when
-        Request actual = RequestReader.readRequest(inputStream);
+        Request actual = requestReader.readRequest();
 
         //then
         assertEquals(expected, actual);
@@ -39,12 +41,13 @@ class RequestReaderTest {
     void readRequest() throws IOException {
 
         //given
-        ByteArrayInputStream inputStream = new ByteArrayInputStream((
+        InputStream inputStream = new ByteArrayInputStream((
                 "GET /create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\r\n" +
                         "Content-Length: 0\r\n" +
                         "\r\n").getBytes()
         );
 
+        RequestReader requestReader = new RequestReader(inputStream);
         Request expected = new Request.Builder(Method.GET, "/create")
                 .addParameter("userId", "javajigi")
                 .addParameter("password", "password")
@@ -54,7 +57,7 @@ class RequestReaderTest {
                 .build();
 
         //when
-        Request actual = RequestReader.readRequest(inputStream);
+        Request actual = requestReader.readRequest();
 
         //then
         assertEquals(expected, actual);

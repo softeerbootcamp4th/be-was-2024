@@ -3,7 +3,7 @@ package plugin;
 import db.Database;
 import model.User;
 import org.junit.jupiter.api.*;
-import webserver.PluginLoader;
+import webserver.PluginMapper;
 import webserver.http.Session;
 import webserver.http.request.Method;
 import webserver.http.request.Request;
@@ -204,7 +204,7 @@ public class UserPluginTest {
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
-            ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
+            ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
             //when
             Response response = responseHandler.response(request);
@@ -225,7 +225,7 @@ public class UserPluginTest {
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
-            ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
+            ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
             //when
             Response response = responseHandler.response(request);
@@ -243,7 +243,7 @@ public class UserPluginTest {
             Request request = new Request.Builder(Method.GET, "/index.html")
                     .build();
 
-            ResponseHandler responseHandler = new ResponseHandler(new PluginLoader());
+            ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
             //when
             Response response = responseHandler.response(request);
