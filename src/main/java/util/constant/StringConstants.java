@@ -24,5 +24,6 @@ public class StringConstants {
 
     //path
     public static final String PATH_CREATE = "/create";
+    public static final String PATH_LOGIN = "/login";
 
 }

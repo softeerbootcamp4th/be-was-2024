@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import static logic.Logics.create;
+import static logic.Logics.*;
 import static util.constant.StringConstants.*;
 
 public class HttpPathMapper {
@@ -28,6 +28,7 @@ public class HttpPathMapper {
 
         return switch (httpRequest.getPath()) {
             case PATH_CREATE -> create(httpRequest);
+            case PATH_LOGIN -> login(httpRequest);
             default -> throw new RuntimeException("Invalid path");
         };
 

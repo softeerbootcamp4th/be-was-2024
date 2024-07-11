@@ -4,6 +4,8 @@ import model.HttpRequest;
 import model.enums.HttpMethod;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,5 +71,19 @@ public class HttpRequestConverter {
 
     }
 
+    public static Map<String, String> bodyToMap(byte[] body) throws UnsupportedEncodingException {
+
+        String bodyToString = URLDecoder.decode(new String(body, StandardCharsets.UTF_8), UTF_8);
+
+        String[] bodyParsedPairList = bodyToString.split(AMPERSAND);
+
+        Map<String, String> parsingBodyParams = new HashMap<>();
+        for (String bodyParsedPair : bodyParsedPairList) {
+            String queryKey = bodyParsedPair.substring(0, bodyParsedPair.indexOf(EQUAL));
+            String queryValue = bodyParsedPair.substring(bodyParsedPair.indexOf(EQUAL) + 1);
+            parsingBodyParams.put(queryKey, queryValue);
+        }
+        return parsingBodyParams;
+    }
 
 }
