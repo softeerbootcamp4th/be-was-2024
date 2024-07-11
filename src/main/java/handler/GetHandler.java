@@ -37,6 +37,7 @@ public class GetHandler
             return;
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
+        logger.debug(path);
         staticFileHandler(dos,path);
     }
 
