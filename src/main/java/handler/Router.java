@@ -2,44 +2,46 @@ package handler;
 
 import http.HttpMethod;
 import http.HttpRequest;
+import http.HttpResponse;
 
 import java.io.IOException;
-import java.io.OutputStream;
 
 import static handler.GetHandler.*;
 import static handler.PostHandler.createUser;
 import static handler.PostHandler.loginUser;
 
 public class Router {
-    public static void requestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
+    public static HttpResponse requestMapping(HttpRequest httpRequest) throws IOException {
         HttpMethod method = httpRequest.getHttpMethod();
 
-        switch (method){
-            case GET -> getRequestMapping(httpRequest, out);
-            case POST -> postRequestMapping(httpRequest, out);
-        }
+        return switch (method) {
+            case GET -> getRequestMapping(httpRequest);
+            case POST -> postRequestMapping(httpRequest);
+            default -> throw new IllegalStateException("Unexpected value: " + method);
+        };
     }
 
-    private static void getRequestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
+    private static HttpResponse getRequestMapping(HttpRequest httpRequest) throws IOException {
         String requestUrl = httpRequest.getRequestUrl();
 
         String[] splitUrl = requestUrl.split("\\?");
         String requestTarget = splitUrl[0];
 
-        switch (requestTarget) {
-            case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html", out);
-            case "/loginCheck" -> loginCheck(httpRequest, out);
-            case "/logout" -> logout(httpRequest, out);
-            default -> sendResponse(requestTarget, out);
-        }
+        return switch (requestTarget) {
+            case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html");
+            case "/loginCheck" -> loginCheck(httpRequest);
+            case "/logout" -> logout(httpRequest);
+            default -> sendResponse(requestTarget);
+        };
     }
 
-    private static void postRequestMapping(HttpRequest httpRequest, OutputStream out) throws IOException {
+    private static HttpResponse postRequestMapping(HttpRequest httpRequest) {
         String requestUrl = httpRequest.getRequestUrl();
 
-        switch(requestUrl){
-            case "/user/create" -> createUser(httpRequest, out);
-            case "/user/login" -> loginUser(httpRequest, out);
-        }
+        return switch (requestUrl) {
+            case "/user/create" -> createUser(httpRequest);
+            case "/user/login" -> loginUser(httpRequest);
+            default -> throw new IllegalStateException("Unexpected value: " + requestUrl);
+        };
     }
 }

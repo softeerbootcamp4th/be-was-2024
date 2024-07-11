@@ -1,32 +1,21 @@
 package handler;
 
 import db.Session;
+import http.HttpResponse;
 import processer.UserProcessor;
 import util.exception.CustomException;
 import http.HttpRequest;
-import http.HttpResponse;
 import http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
 
 import static util.TemplateEngine.showAlert;
 
 public class PostHandler {
-    private static final Logger log = LoggerFactory.getLogger(GetHandler.class);
-
-    static void createUser(HttpRequest httpRequest, OutputStream out) throws IOException {
-        DataOutputStream dos = new DataOutputStream(out);
+    static HttpResponse createUser(HttpRequest httpRequest) {
         String body = new String(httpRequest.getBody());
 
         String[] bodyTokens = body.split("&");
 
         HttpStatus httpStatus;
-        HashMap<String, String> headers = new HashMap<>();
         byte[] responseBody = new byte[0];
         try {
             String userId = bodyTokens[0].split("=", 2)[1];
@@ -37,7 +26,6 @@ public class PostHandler {
             UserProcessor.createUser(userId, name, password, email);
 
             httpStatus = HttpStatus.FOUND;
-            headers.put("Location", "/");
         } catch (CustomException e) {
             httpStatus = e.getHttpStatus();
             responseBody = showAlert(e.getMessage(), "http://localhost:8080/registration");
@@ -46,23 +34,21 @@ public class PostHandler {
             responseBody = showAlert("모든 필드를 입력하세요.", "http://localhost:8080/registration");
         }
 
-        headers.put("Content-Length", String.valueOf(responseBody.length));
-        headers.put("Content-Type", "text/html;charset=UTF-8");
-
-        HttpResponse response = new HttpResponse(httpStatus, headers, responseBody);
-        dos.writeBytes(response.toString());
-        dos.write(responseBody, 0, responseBody.length);
-        dos.flush();
+        return new HttpResponse()
+                .addStatus(httpStatus)
+                .addHeader("Location", "/")
+                .addHeader("Content-Length", String.valueOf(responseBody.length))
+                .addHeader("Content-Type", "text/html;charset=UTF-8")
+                .addBody(responseBody);
     }
 
-    static void loginUser(HttpRequest httpRequest, OutputStream out) throws IOException {
-        DataOutputStream dos = new DataOutputStream(out);
+    static HttpResponse loginUser(HttpRequest httpRequest)  {
         String body = new String(httpRequest.getBody());
 
         String[] bodyTokens = body.split("&");
 
-        HttpStatus httpStatus;
-        HashMap<String, String> headers = new HashMap<>();
+
+        HttpResponse response = new HttpResponse();
         byte[] responseBody = new byte[0];
 
         try {
@@ -72,23 +58,21 @@ public class PostHandler {
             UserProcessor.loginUser(userId, password);
             String sid = Session.createSession(userId);
 
-            httpStatus = HttpStatus.FOUND;
-            headers.put("Location", "/");
-            headers.put("Set-Cookie", "sid=" + sid + "; Path=/");
+            response.addStatus(HttpStatus.FOUND)
+                    .addHeader("Location", "/")
+                    .addHeader("Set-Cookie", "sid=" + sid + "; Path=/");
         } catch (CustomException e) {
-            httpStatus = e.getHttpStatus();
             responseBody = showAlert(e.getMessage(), "http://localhost:8080/login");
+            response.addStatus(e.getHttpStatus())
+                    .addBody(responseBody);
         } catch (ArrayIndexOutOfBoundsException e) {
-            httpStatus = HttpStatus.BAD_REQUEST;
             responseBody = showAlert("모든 필드를 입력하세요.", "http://localhost:8080/login");
+            response.addStatus(HttpStatus.BAD_REQUEST)
+                    .addBody(responseBody);
         }
 
-        headers.put("Content-Length", String.valueOf(responseBody.length));
-        headers.put("Content-Type", "text/html;charset=UTF-8");
-
-        HttpResponse response = new HttpResponse(httpStatus, headers, responseBody);
-        dos.writeBytes(response.toString());
-        dos.write(responseBody, 0, responseBody.length);
-        dos.flush();
+        response.addHeader("Content-Length", String.valueOf(responseBody.length))
+                .addHeader("Content-Type", "text/html;charset=UTF-8");
+        return response;
     }
 }

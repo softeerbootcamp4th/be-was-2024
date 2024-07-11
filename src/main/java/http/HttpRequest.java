@@ -1,7 +1,6 @@
 package http;
 
 import java.util.HashMap;
-import java.util.Optional;
 
 public class HttpRequest {
 

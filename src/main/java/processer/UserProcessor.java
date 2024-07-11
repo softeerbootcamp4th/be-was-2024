@@ -5,7 +5,6 @@ import http.HttpStatus;
 import model.User;
 import util.exception.CustomException;
 
-import java.io.IOException;
 
 public class UserProcessor {
     public static void createUser(String userId, String name, String password, String email)  {

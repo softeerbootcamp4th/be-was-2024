@@ -2,19 +2,19 @@ package request;
 
 import http.HttpMethod;
 import http.HttpRequest;
+import http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.Optional;
 
 import static handler.Router.requestMapping;
 
 public class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
 
-    public void ParsingRequest(InputStream in, OutputStream out) throws IOException {
+    public HttpResponse ParsingRequest(InputStream in) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(in);
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder log = new StringBuilder().append("\n\n****** REQUEST ******\n");
@@ -22,16 +22,13 @@ public class RequestParser {
         HttpRequest request = new HttpRequest();
 
         String startLine = bufferedReader.readLine();
-        if (startLine == null || startLine.isEmpty()) {
-            return;
-        }
         setStartLine(startLine, request, log);
         setHeaders(bufferedReader, request, log);
         setBody(bufferedReader, request, log);
 
         logger.debug(log.toString());
 
-        requestMapping(request, out);
+        return requestMapping(request);
     }
 
     private void setStartLine(String startLine, HttpRequest request, StringBuilder log) {

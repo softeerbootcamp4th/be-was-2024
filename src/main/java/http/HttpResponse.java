@@ -5,22 +5,38 @@ import java.util.HashMap;
 public class HttpResponse {
 
     HttpStatus httpStatus;
-    HashMap<String, String> headers;
+    HashMap<String, String> headers = new HashMap<>();
     byte[] body;
 
-    public HttpResponse(HttpStatus httpStatus, HashMap<String, String> headers, byte[] body) {
-        this.httpStatus = httpStatus;
-        this.headers = headers;
-        this.body = body;
+    public String getStatusLine(){
+        return "HTTP/1.1 " + httpStatus.getStatus() + " " + httpStatus.getMessage() + "\r\n";
     }
 
-    public String toString() {
-        StringBuilder response = new StringBuilder();
-        response.append("HTTP/1.1 ").append(httpStatus.getStatus()).append(" ").append(httpStatus.getMessage()).append("\r\n");
+    public String getHeaders(){
+        StringBuilder header = new StringBuilder();
         for (String key : headers.keySet()) {
-            response.append(key).append(": ").append(headers.get(key)).append("\r\n");
+            header.append(key).append(": ").append(headers.get(key)).append("\r\n");
         }
-        response.append("\r\n");
-        return response.toString();
+        header.append("\r\n");
+        return header.toString();
+    }
+
+    public byte[] getBody(){
+        return body;
+    }
+
+    public HttpResponse addStatus(HttpStatus httpStatus) {
+        this.httpStatus = httpStatus;
+        return this;
+    }
+
+    public HttpResponse addHeader(String key, String value) {
+        headers.put(key, value);
+        return this;
+    }
+
+    public HttpResponse addBody(byte[] body) {
+        this.body = body;
+        return this;
     }
 }
