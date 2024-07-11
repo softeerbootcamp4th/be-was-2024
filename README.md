@@ -227,5 +227,44 @@ get 요청이 올 시에 path경로를 분석하여 회원가입 기능을 실�
 현재 사용자가 로그인 시, 서버는 사용자에 대한 세션을 생성하고 세션 id를 쿠키값으로 넘겨줌 <br>
 로그아웃시에는 해당 유저의 세션을 삭제시키고, 쿠키도 deleted로 변경해주게 됨
 
+### Task 6
+    동적인 html 구현
+    사용자가 로그인 상태일 경우 /index.html에서 사용자 이름을 표시해 준다.
+    사용자가 로그인 상태가 아닐 경우 /index.html에서 [로그인] 버튼을 표시해 준다.
+    사용자가 로그인 상태일 경우 http://localhost:8080/user/list 에서 사용자 목록을 출력한다.
+    http://localhost:8080/user/list  페이지 접근시 로그인하지 않은 상태일 경우 로그인 페이지(login.html)로 이동한다.
 
+#### 코드 수정사항
+- 문제상황
+  - **각 function hanlder가 여러가 생성될 가능성이 있음**
 
+    <br>
+    각 handler는 여러 thread가 공유하더라도 내부에서 공유하는 변화하는 요소가 없음<br>
+    -> singleton pattern을 적용시킴 <br>
+    이러면 해당 hanlder클래스가 여러개 생성되는 경우가 없음 <br><br>
+
+  - **페이지를 css파일과 같은 로직으로, readfile을 사용하기에 페이지별로 리디렉션을 따로 하고싶을때 번거러운 상황이 발생**
+    
+    <br>
+    -> 각 페이지별로 pagehandler를 생성 <br>
+    이러면 페이지별로 리디렉션 로직을 다르게 설정가능 <br><br>
+    
+  - **html에 있는 img나 css파일 요청들이 상대경로로 진행되기에, 만약 html을 get하는 요청의 path가 실제 서버의 파일 path와 동일하지 않다면 문제가 생김**
+    - ex) user/login에서 루트경로의 index.html을 받아올시에 css파일 경로가 ./main.css여서 user/main.css 요청이 오게됨
+      
+    <br>
+    네이버의 경우, 이러한 css파일을 받아오는 url과 path가 따로있음 <br>
+    -> 모든 파일 요청들에 대해서 절대경로를 설정 (resource/파일명) <br>
+    resource/로 오는 요청들만 파일 읽기 실행 (서버의 내부 구조를 어느정도 숨길 수 있음) <br><br>
+  
+hanlder들에 singleton pattern을 적용
+
+모든 페이지들에 대해서 pagehandler를 생성 <br>
+메인페이지는 하나의 링크로만 구성하고 세션값에 따라서 화면 구성아 바뀌게끔 수정 <br>
+세션이 유효한 상태에서 로그인, 회원가입 페이지 접근시에 메인 페이지로 redirect
+
+url을 파일경로와 관계없이 처리하기 위해서 모든 html의 리소스들을 절대경로로 바꾼 뒤, 해당 형태의 절대경로에 대해서만 file을 return하도록 수정
+
+path variable이 존재할 수 있기에, path를 tree구조로 다시 변경
+
+동적 html request를 처리하기 위해서 pagebuilder를 만들어서 html body를 이곳에서 처리

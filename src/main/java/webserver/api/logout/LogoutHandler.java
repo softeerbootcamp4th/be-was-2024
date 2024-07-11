@@ -35,7 +35,7 @@ public class LogoutHandler implements FunctionHandler {
         //go to main page
         return new HttpResponse.ResponseBuilder(302)
                 .addheader("Location", "http://localhost:8080/")
-                .addheader("Set-Cookie", "sid=deleted")
+                .addheader("Set-Cookie", "sid=deleted ; Max-Age=0")
                 .addheader("Content-Type", "text/html; charset=utf-8")
                 .build();
     }

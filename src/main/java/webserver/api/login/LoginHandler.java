@@ -59,7 +59,7 @@ public class LoginHandler implements FunctionHandler {
         //go to logined main page
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
-                .addheader("Set-Cookie","sid="+sessionString +"; Path=/") //set cookie
+                .addheader("Set-Cookie","sid="+sessionString +"; Max-Age=3600; Path=/") //set cookie
                 .setBody(responseBody)
                 .build();
     }
