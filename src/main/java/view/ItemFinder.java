@@ -27,7 +27,7 @@ public class ItemFinder {
 
         // 아이템 획특
         Object item = items.get(itemSegments[0]);
-        // 아이템이 존재하지 않음
+
         if(itemSegments.length == 2) item = getItem(item, itemSegments[1]);
 
         return item != null ? item.toString() : null;
