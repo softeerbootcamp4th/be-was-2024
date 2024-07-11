@@ -28,4 +28,14 @@ public class SessionHandler {
         // session id를 이용해 user 알아내기
         return sessionIdList.get(sessionId);
     }
+
+    public static void deleteSession(String sessionId) {
+        if (sessionId != null) {
+            sessionIdList.remove(sessionId);
+        }
+    }
+
+    public static boolean verifySessionId(String sessionId) {
+        return sessionIdList.get(sessionId) != null;
+    }
 }
