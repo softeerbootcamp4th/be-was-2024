@@ -10,6 +10,7 @@ import util.TemplateEngine;
 import util.Utils.ResponseWithStatus;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +59,7 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get("sid");
 
-        if(!isLogin(sid)) return serveStaticFile("/index.html");
+        if (!isLogin(sid)) return serveStaticFile("/index.html");
 
         String userId = getUser(sid);
         User user = Database.findUserById(userId);
@@ -100,12 +101,34 @@ public class GetHandler {
                 .addBody(body);
     }
 
-    public static HttpResponse getUserList(HttpRequest httpRequest) {
+    public static HttpResponse getUserList(HttpRequest httpRequest) throws IOException {
         String cookie = httpRequest.getHeaders("Cookie");
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get("sid");
 
-        return null;
-        /// 수정필요
+        if (!isLogin(sid)) {
+            return new HttpResponse()
+                    .addStatus(HttpStatus.FOUND)
+                    .addHeader("Location", "/")
+                    .addHeader("Content-Type", "text/html")
+                    .addBody(new byte[0]);
+        }
+        else{
+            Collection<User> users = Database.findAll();
+
+            StringBuilder userList = new StringBuilder();
+            for (User user : users) {
+                userList.append("<tr>");
+                userList.append("<td>").append(user.getUserId()).append("</td>");
+                userList.append("<td>").append(user.getName()).append("</td>");
+                userList.append("<td>").append(user.getEmail()).append("</td>");
+                userList.append("</tr>");
+            }
+
+            Map<String, String> data = new HashMap<>();
+            data.put("userList", userList.toString());
+            data.put("userName", Database.findUserById(Session.getUser(sid)).getName());
+            return serveDynamicFile("/user/userList.html", data);
+        }
     }
 }

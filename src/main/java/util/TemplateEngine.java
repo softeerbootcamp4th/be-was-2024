@@ -1,5 +1,6 @@
 package util;
 
+import java.io.*;
 import java.util.Map;
 
 public class TemplateEngine {
@@ -18,13 +19,22 @@ public class TemplateEngine {
         return alert.getBytes();
     }
 
+    public static byte[] getNotFoundPage() throws IOException {
+        StringBuilder content = new StringBuilder();
+        File file = new File("./src/main/resources/static/error/NOT_FOUND.html");
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        return content.toString().getBytes();
+    }
+
     public static byte[] renderTemplate(byte[] template, Map<String, String> data) {
         String rawTemplate = new String(template);
         for (String key : data.keySet()) {
             rawTemplate = rawTemplate.replace("{{" + key + "}}", data.get(key));
         }
-        System.out.println("rawTemplate = " + rawTemplate);
         return rawTemplate.getBytes();
     }
-
 }
