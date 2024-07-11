@@ -2,6 +2,7 @@ package dto;
 
 import constant.HttpMethod;
 import exception.InvalidHttpRequestException;
+import session.Session;
 
 import java.util.*;
 
@@ -71,5 +72,20 @@ public class HttpRequest {
 
     public void setBody(String body) {
         this.body = body;
+    }
+
+    public Optional<String> getSessionId(){
+        if(headers == null)
+            return Optional.empty();
+
+        List<String> cookies = headers.get("Cookie");
+        for(String cookie : cookies){
+            if(cookie.startsWith("sessionId=")){
+                String sessionId = cookie.substring("sessionId=".length());
+                return Optional.of(sessionId);
+            }
+        }
+
+        return Optional.empty();
     }
 }
