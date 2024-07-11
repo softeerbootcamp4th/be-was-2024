@@ -27,11 +27,11 @@ public class HttpRequest {
         this.method = method;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url) throws InvalidHttpRequestException {
         this.url = url;
         setPath(url);
     }
-    public void setPath(String url) {
+    public void setPath(String url) throws InvalidHttpRequestException {
         if(hasQueryParameters(url)) {
             setQueryParameters(url);
             this.path = url.substring(0, url.indexOf(QUESTION_MARK));
@@ -64,9 +64,10 @@ public class HttpRequest {
         return url != null && url.contains(QUESTION_MARK);
     }
 
-    private void setQueryParameters(String url){
-        //TODO '?' 는 존재하나 이후에 아무런 값이 없을 경우 IndexOutOfBounds Exception이 발생하는지 확인하고 발생한다면 에러처리 로직 추가.
+    private void setQueryParameters(String url) throws InvalidHttpRequestException{
         String query = url.substring(url.indexOf(QUESTION_MARK) + 1);
+        if(query.isEmpty()) return; //empty parameter is OK
+
         String[] params = query.split(AMPERSAND);
         for(String param : params){
             int index = param.indexOf(EQUALS);
@@ -143,6 +144,11 @@ public class HttpRequest {
         for (String key : headers.keySet()) {
             sb.append(key).append(COLON + BLANK)
                     .append(headers.get(key)).append(LF);
+        }
+
+        String bodyString = new String(body, StandardCharsets.UTF_8);
+        if(!bodyString.isEmpty()){
+            sb.append(LF).append(bodyString).append(LF);
         }
 
         return sb.toString();

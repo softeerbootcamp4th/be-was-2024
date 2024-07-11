@@ -6,7 +6,6 @@ import exception.UnsupportedHttpVersionException;
 import java.io.*;
 
 import static util.StringUtil.*;
-import static util.StringUtil.Header.CONTENT_LENGTH;
 import static util.StringUtil.Method.*;
 
 public class HttpRequestParser {
@@ -54,7 +53,7 @@ public class HttpRequestParser {
         }
     }
 
-    private static void setStartLine(HttpRequest request, String[] startLine) {
+    private static void setStartLine(HttpRequest request, String[] startLine) throws InvalidHttpRequestException {
         request.setMethod(startLine[0]);
         request.setUrl(startLine[1]);
         request.setHttpVersion(startLine[2]);
