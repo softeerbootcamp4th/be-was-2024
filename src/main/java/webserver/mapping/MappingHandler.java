@@ -1,5 +1,7 @@
 package webserver.mapping;
 
+import webserver.annotation.LoginCheck;
+import webserver.annotation.processor.LoginCheckProcessor;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
 import webserver.mapping.mapper.*;
@@ -36,10 +38,20 @@ public class MappingHandler {
         String method = httpRequest.getMethod();
         String path = httpRequest.getPath();
 
-        return switch (method) {
-            case "GET" -> getHandlers.get(path).handle(httpRequest);
-            case "POST" -> postHandlers.get(path).handle(httpRequest);
-            default -> null;
+        HttpMapper mapper = switch (method) {
+            case "GET" -> getHandlers.get(path);
+            case "POST" -> postHandlers.get(path);
+            default -> new NotFoundMapper();
         };
+
+        // 어노테이션 확인 및 처리
+        if (mapper.getClass().isAnnotationPresent(LoginCheck.class)) {
+            LoginCheckProcessor loginCheckProcessor = new LoginCheckProcessor();
+            if (!loginCheckProcessor.isUserLoggedIn(httpRequest)) {
+                return loginCheckProcessor.toLoginPage();
+            }
+        }
+
+        return mapper.handle(httpRequest);
     }
 }
