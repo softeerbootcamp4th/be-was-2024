@@ -14,4 +14,9 @@ public class UserInfoExtract {
         }
         return userInfo;
     }
+
+    public static String extractSessionIdFromHeader(String header){
+        String sessionId = header.split(";")[1].substring(5);
+        return sessionId;
+    }
 }
