@@ -5,6 +5,7 @@ import exception.ModelException;
 import model.User;
 import util.StringUtil;
 
+import java.util.Collection;
 import java.util.Map;
 
 public class UserHandler implements ModelHandler<User>{
@@ -27,7 +28,15 @@ public class UserHandler implements ModelHandler<User>{
         return user;
     }
 
-    // 추후 update, read, delete 추가 가능
+    @Override
+    public User findById(String userId) {
+        return Database.findUserById(userId).orElse(null);
+    }
+
+    @Override
+    public Collection<User> findAll() {
+        return Database.findAll();
+    }
 
     private void validateFields(Map<String, String> fields) {
         if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
