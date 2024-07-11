@@ -4,6 +4,7 @@ import db.Database;
 import enums.FileType;
 import enums.Status;
 import model.User;
+import utils.Cookie;
 import utils.Handler;
 import utils.HttpRequestParser;
 import utils.HttpResponseHandler;
@@ -47,11 +48,13 @@ public class Router {
         getHandlersMap.put("/registration", this::mainHandler);
         getHandlersMap.put("/", this::mainHandler);
         getHandlersMap.put("/login", this::mainHandler);
+        getHandlersMap.put("/main", this::mainHandler);
     }
 
     private void initPostHandlers() {
         postHandlersMap.put("/user/create", this::createUserHandler);
         postHandlersMap.put("/login", this::loginHandler);
+        postHandlersMap.put("/logout", this::logoutHandler);
     }
 
     private void createUserHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
@@ -68,7 +71,7 @@ public class Router {
         httpResponseHandler
                 .setStatus(Status.FOUND)
                 .addHeader("Location", "http://localhost:8080")
-                .respond(null);
+                .respond();
     }
 
     private void mainHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) throws IOException {
@@ -79,7 +82,8 @@ public class Router {
                 .setStatus(Status.OK)
                 .addHeader("Content-Type", "text/html")
                 .addHeader("Content-Length", String.valueOf(body.length))
-                .respond(body);
+                .setBody(body)
+                .respond();
 
     }
 
@@ -94,11 +98,15 @@ public class Router {
         // 로그인 성공
         if (user != null && user.getPassword().equals(password)) {
             String sessionId = SessionManager.createSession(user);
+            Cookie cookie = new Cookie.Builder("sid", sessionId)
+                    .path("/")
+                    .build();
+
             httpResponseHandler
                     .setStatus(Status.FOUND)
-                    .addHeader("Set-Cookie", "sid=" + sessionId + "; Path=/")
-                    .addHeader("Location", "http://localhost:8080")
-                    .respond(null);
+                    .addHeader("Location", "http://localhost:8080/main")
+                    .addCookie(cookie)
+                    .respond();
         } else {
             // 로그인 실패
             String filePath = "/Users/jungwoo/Desktop/study/be-was-2024/src/main/resources/static/login/login_failed.html";
@@ -107,7 +115,25 @@ public class Router {
                     .setStatus(Status.UNAUTHORIZED)
                     .addHeader("Content-Type", FileType.getContentTypeByExtension("html"))
                     .addHeader("Content-Length", String.valueOf(body.length))
-                    .respond(body);
+                    .setBody(body)
+                    .respond();
+        }
+    }
+
+    private void logoutHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
+        Map<String, String> cookiesMap = httpRequestParser.getCookiesMap();
+        String sessionId = cookiesMap.get("sid");
+        if (sessionId != null) {
+            Cookie cookie = new Cookie.Builder("sid", sessionId)
+                    .path("/")
+                    .maxAge(0)
+                    .build();
+
+            httpResponseHandler
+                    .setStatus(Status.FOUND)
+                    .addHeader("Location", "http://localhost:8080/")
+                    .addCookie(cookie)
+                    .respond();
         }
     }
 
@@ -121,7 +147,8 @@ public class Router {
                 .setStatus(Status.OK)
                 .addHeader("Content-Type", FileType.getContentTypeByExtension(extension))
                 .addHeader("Content-Length", String.valueOf(body.length))
-                .respond(body);
+                .setBody(body)
+                .respond();
     }
 
     private void invalidRequestHandler(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) {
@@ -131,7 +158,8 @@ public class Router {
                 .setStatus(Status.NOT_FOUND)
                 .addHeader("Content-Type", "text/html")
                 .addHeader("Content-Length", String.valueOf(body.length))
-                .respond(body);
+                .setBody(body)
+                .respond();
 
     }
 
