@@ -20,6 +20,11 @@
               회원 가입
             </a>
           </li>
+          <li class="header__menu__item">
+            <form id="logout-form" action="/logout" method="POST" style="display:inline;">
+              <button type="button" class="btn btn_ghost btn_size_s" onclick="document.getElementById('logout-form').submit();">로그아웃</button>
+            </form>
+          </li>
         </ul>
       </header>
       <div class="wrapper">
@@ -145,5 +150,11 @@
         </nav>
       </div>
     </div>
+    <script>
+      // 자바스크립트를 사용하여 폼을 제출
+      document.querySelector('.btn_ghost.btn_size_s').addEventListener('click', function() {
+        document.getElementById('logout-form').submit();
+      });
+    </script>
   </body>
 </html>
