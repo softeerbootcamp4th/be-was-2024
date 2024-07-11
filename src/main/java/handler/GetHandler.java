@@ -26,37 +26,33 @@ public class GetHandler
     public void handleGetRequest(DataOutputStream dos, RequestObject requestObject)
     {
         String path = requestObject.getPath();
-        if(path.equals("/user/info"))//세션값 요청이 들어왔다면
+        try
         {
-            try
-            {
+            if(path.equals("/user/info"))
+            {//세션값 요청이 들어왔다면
                 handleUserInfoRequest(dos,requestObject);
             }
-            catch (IOException e)
+            else if(path.equals("/user/list"))//사용자 목록 요청이 들어왔다면
             {
-                logger.debug("이게 왜 안되는건데");
-            }
-            return;
-        }
-        if(path.equals("/user/list"))//사용자 목록 요청이 들어왔을때
-        {
-            try
-            {
-                if(requestObject.getCookies().isEmpty())//쿠키 값이 비어 있다면, 즉 로그인 안해있으면
-                {
+                if(requestObject.getCookies().isEmpty())
+                {//쿠키 값이 비어있다면, 즉 로그인이 안 돼있으면
                     staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
-                    return ;
                 }
-                handleUserListRequest(dos,requestObject);
+                else
+                {
+                    handleUserListRequest(dos,requestObject);
+                }
             }
-            catch (IOException e)
+            else
             {
-                logger.debug("사용자 목록 예외");
+                path = FileDetection.getPath(FileDetection.fixedPath+path);
+                staticFileHandler(dos,path);
             }
-            return;
         }
-        path= FileDetection.getPath(FileDetection.fixedPath+path);
-        staticFileHandler(dos,path);
+        catch (IOException e)
+        {
+            logger.error("Request handling error : {}",e.getMessage());
+        }
     }
 
     //static html 파일은 여기서 다뤄준다
@@ -65,47 +61,37 @@ public class GetHandler
         byte[] body;
         File fi = new File(path);
 
-        if(!fi.exists())
-        {
+        if(!fi.exists()) {
             response404Header(dos);
             return;
         }
 
         try(FileInputStream fin = new FileInputStream(fi);
-            BufferedInputStream bi = new BufferedInputStream(fin);)
+            BufferedInputStream bi = new BufferedInputStream(fin))
         {
-            body = new byte[(int)fi.length()];
-            bi.read(body);
+            body = bi.readAllBytes();
             response200Header(dos,body,path);
-            responseBody(dos, body);
         }
         catch(IOException e)
         {
-            logger.error(e.getMessage());
+            logger.error("Static file handling error: {}" , e.getMessage());
         }
     }
 
-    private void response200Header(DataOutputStream dos,byte[] body,String url) {
-        try {
-            String[] temp = url.split("\\.");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: "+match(temp[1])+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + body.length + "\r\n");
-            dos.writeBytes("\r\n");
-            responseBody(dos,body);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void response200Header(DataOutputStream dos,byte[] body,String url) throws IOException
+    {
+        String contentType = getContentType(url);
+        dos.writeBytes("HTTP/1.1 200 OK \r\n");
+        dos.writeBytes("Content-Type: "+ contentType+";charset=utf-8\r\n");
+        dos.writeBytes("Content-Length: " + body.length + "\r\n");
+        dos.writeBytes("\r\n");
+        responseBody(dos,body);
     }
 
     //응답의 Body섹션
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    private void responseBody(DataOutputStream dos, byte[] body) throws IOException{
+        dos.write(body, 0, body.length);
+        dos.flush();
     }
 
 
@@ -121,7 +107,7 @@ public class GetHandler
             dos.writeBytes("\r\n");
             responseBody(dos,bodyBytes);
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("404 response error : {}",e.getMessage());
         }
     }
 
@@ -139,7 +125,7 @@ public class GetHandler
                 byte[] bodyBytes = body.getBytes("UTF-8");
                 dos.writeBytes("HTTP/1.1 200 OK \r\n");
                 dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n"); //json파일로 보낸다
-                dos.writeBytes("Content-Length: " + body.length() + "\r\n");
+                dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
                 dos.writeBytes("\r\n");
                 responseBody(dos,bodyBytes);
             }
@@ -152,7 +138,7 @@ public class GetHandler
         Collection<User> list = Database.findAll();
         for(User temp : list)//list에 담겨있는 모든 유저 정보를 StringBuilder에 담아준다
         {
-            sb.append(temp.toString()+"<br>");
+            sb.append(temp).append("<br>");
         }
         String body = "<html><head></head><body>" + sb + " </body></html>";
         byte[] bodyBytes = body.getBytes("UTF-8");
@@ -163,18 +149,14 @@ public class GetHandler
         responseBody(dos,bodyBytes);
     }
 
-    private String match(String extensions)
+    private String getContentType(String url)
     {
-        return switch (extensions) {
-            case "css" -> "text/css";
-            case "svg" -> "image/svg+xml";
-            case "jpg" -> "image/jpeg";
-            case "png" -> "image/png";
-            case "ico" -> "image/vnd.microsoft.icon";
-            case "js" -> "text/javascript";
-            default -> "text/html";
-        };
+        if (url.endsWith(".css")) return "text/css";
+        if (url.endsWith(".svg")) return "image/svg+xml";
+        if (url.endsWith(".jpg") || url.endsWith(".jpeg")) return "image/jpeg";
+        if (url.endsWith(".png")) return "image/png";
+        if (url.endsWith(".ico")) return "image/vnd.microsoft.icon";
+        if (url.endsWith(".js")) return "application/javascript";
+        return "text/html";
     }
-
-
 }

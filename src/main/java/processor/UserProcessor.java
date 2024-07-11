@@ -33,14 +33,7 @@ public class UserProcessor {
         for (String pair : pairs) {
             String[] keyValue = pair.split("=");
             String key = keyValue[0];
-            String value ="";
-            try{
-                 value = keyValue[1];
-            }
-            catch(IndexOutOfBoundsException e)
-            {
-                logger.debug(key +" 값이 비어 있습니다");
-            }
+            String value = keyValue.length>1 ? keyValue[1] : "";
             map.put(key, value);
         }
 
