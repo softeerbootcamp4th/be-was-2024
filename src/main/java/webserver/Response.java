@@ -1,5 +1,6 @@
 package webserver;
 
+import auth.Cookie;
 import enums.HttpCode;
 import enums.MimeType;
 import org.slf4j.Logger;
@@ -7,6 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Response {
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
@@ -14,16 +17,18 @@ public class Response {
     private MimeType contentType;
     private HttpCode httpCode;
     private Integer contentLength;
+    private String location;
+    private List<Cookie> cookies = new ArrayList<>();
 
-    public void sendRedirect(DataOutputStream dos, String location) {
-        HttpCode httpCode = this.httpCode == null ? HttpCode.OK : this.httpCode;
-        try {
-            dos.writeBytes("HTTP/1.1 " + httpCode.getCode() + " " + httpCode.getMessage() + "\r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
+    public String getLocation() {
+        return location;
+    }
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public void sendRedirect(DataOutputStream dos) {
+        responseHeader(dos);
     }
 
     public void send(DataOutputStream dos, byte[] body) {
@@ -32,12 +37,27 @@ public class Response {
        responseBody(dos, body);
     }
 
+    public void addCookie(Cookie cookie) {
+        cookies.add(cookie);
+    }
+
     private void responseHeader(DataOutputStream dos) {
         HttpCode httpCode = this.httpCode == null ? HttpCode.OK : this.httpCode;
         try {
             dos.writeBytes("HTTP/1.1 " + httpCode.getCode() + " " + httpCode.getMessage() + "\r\n");
-            dos.writeBytes("Content-Type: " + contentType + "\r\n");
-            dos.writeBytes("Content-Length: " + contentLength + "\r\n");
+            if(httpCode.isRedirect()) {
+                dos.writeBytes(Request.LOCATION + ": " + location + "\r\n");
+            } else {
+                dos.writeBytes(Request.CONTENT_TYPE + ": " + contentType + "\r\n");
+                dos.writeBytes(Request.CONTENT_LENGTH + ": " + contentLength + "\r\n");
+            }
+            for(Cookie cookie: cookies) {
+                dos.writeBytes(Cookie.SET_COOKIE + ": " +
+                        cookie.getKey() + "=" + cookie.getValue() + "; " +
+                        Cookie.MAX_AGE + "=" + cookie.getMaxAge() + "; " +
+                        Cookie.PATH + "=" + cookie.getPath() + "\r\n"
+                );
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             logger.error(e.getMessage());

@@ -26,6 +26,7 @@ public class RegisterApiProcess implements ApiProcess {
         logger.debug("name = {}, userId= {}, email = {}, password = {}", name, userId, email, password);
         User user = new User(userId, password, name, email);
         response.setHttpCode(HttpCode.Found);
+        response.setLocation("/");
         Database.addUser(user);
         return "/";
     }
