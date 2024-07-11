@@ -84,6 +84,19 @@ public class UserPlugin{
 
     }
 
+    @Post(path = "/logout")
+    public Response logout(Request request){
+
+        logger.debug("logout");
+        String sessionId = request.getSessionId();
+        Session.delete(sessionId);
+
+        return new Response.Builder(Status.SEE_OTHER)
+                .addHeader("Location", "/index.html")
+                .build();
+
+    }
+
     @Get(path = "/user/list")
     public Response userList(Request request){
 

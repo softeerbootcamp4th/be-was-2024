@@ -255,6 +255,25 @@ public class UserPluginTest {
         }
 
         @Test
+        @DisplayName("사용자가 정상적으로 로그아웃되는지 검증한다.")
+        public void testLogout(){
+            //given
+            User user = createTestUser();
+            String sessionId = Session.save(user);
+
+            Request request = new Request.Builder(Method.POST, "/logout")
+                    .addHeader("Cookie", "sid="+sessionId)
+                    .build();
+
+            //when
+            userPlugin.logout(request);
+
+            //then
+            assertFalse(Session.isExist(sessionId));
+
+        }
+
+        @Test
         @DisplayName("사용자가 로그인 상태일 경우 http://localhost:8080/user/list 에서 사용자 목록을 출력한다.")
         public void testListWithLogin(){
 

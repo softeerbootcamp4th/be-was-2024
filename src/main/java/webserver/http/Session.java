@@ -2,13 +2,13 @@ package webserver.http;
 
 import model.User;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Session {
 
-    private static Map<String, User> storage = new HashMap<>();
+    private static Map<String, User> storage = new ConcurrentHashMap<>();
 
     public static String save(User user){
         String key = keyGen();
@@ -30,6 +30,10 @@ public class Session {
 
     public static boolean isExist(String sessionId){
         return storage.containsKey(sessionId);
+    }
+
+    public static void delete(String sessionId){
+        storage.remove(sessionId);
     }
 
 }

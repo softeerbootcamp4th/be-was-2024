@@ -38,12 +38,10 @@ public class ResponseHandler {
 
                 if(request.isLogin()){
                     replacedBody = body.replace("{USERNAME}", Session.get(request.getSessionId()).getName());
-                    replacedBody = replacedBody.replace("{LOGIN}", "로그아웃");
-                    replacedBody = replacedBody.replace("{LOGINPATH}", "/logout");
+                    replacedBody = replacedBody.replace("{LOGINBTN}", "<form action=\"/logout\" method=\"post\"><button type=\"submit\" class=\"btn btn_contained btn_size_s\">로그아웃</button></form>");
                 }else {
                     replacedBody = body.replace("{USERNAME}", "");
-                    replacedBody = replacedBody.replace("{LOGIN}", "로그인");
-                    replacedBody = replacedBody.replace("{LOGINPATH}", "/login");
+                    replacedBody = replacedBody.replace("{LOGINBTN}", "<a class=\"btn btn_contained btn_size_s\" href=\"/login\">로그인</a>");
                 }
                 response = new Response.Builder(Status.OK)
                         .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
