@@ -1,9 +1,9 @@
 package distributor;
 
 import handler.SessionHandler;
+import processor.ResponseProcessor;
 import processor.UserProcessor;
 import webserver.Request;
-import webserver.Response;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,7 +13,7 @@ public class PostDistributor extends Distributor {
     DataOutputStream dos;
     UserProcessor userProcessor = new UserProcessor();
 
-    PostDistributor(Request request, DataOutputStream dos) {
+    protected PostDistributor(Request request, DataOutputStream dos) {
         this.request = request;
         this.dos = dos;
     }
@@ -34,34 +34,20 @@ public class PostDistributor extends Distributor {
 
     private void processUserCreate(DataOutputStream dos) throws IOException {
         userProcessor.createUser(request);
-        Response response = new Response.Builder()
-                .url("/index.html")
-                .dataOutputStream(dos)
-                .redirectCode(302)
-                .build();
 
-        response.sendResponse();
+        ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
+        responseProcessor.createUserResponse();
     }
 
     private void processUserLogin(DataOutputStream dos) throws IOException {
         if (userProcessor.login(request)) {
             String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
-            Response response = new Response.Builder()
-                    .url("/main/index.html")
-                    .dataOutputStream(dos)
-                    .cookie(sessionId)
-                    .redirectCode(302)
-                    .build();
 
-            response.sendResponse();
+            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
+            responseProcessor.loginSuccessResponse(sessionId);
         } else {
-            Response response = new Response.Builder()
-                    .url("/login/login_failed.html")
-                    .dataOutputStream(dos)
-                    .redirectCode(404)
-                    .build();
-
-            response.sendResponse();
+            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
+            responseProcessor.loginFailedResponse();
         }
     }
 }
