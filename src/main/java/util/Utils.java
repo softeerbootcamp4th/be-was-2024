@@ -68,6 +68,8 @@ public class Utils {
 
     public static HashMap<String, String> cookieParsing(String cookies) {
         HashMap<String, String> parsedCookies = new HashMap<>();
+
+        if(cookies == null) return parsedCookies;
         String[] splitCookies = cookies.split(";");
         for (String cookie : splitCookies) {
             cookie = cookie.strip();
@@ -78,6 +80,8 @@ public class Utils {
 
             parsedCookies.put(name, value);
         }
+
         return parsedCookies;
     }
+
 }

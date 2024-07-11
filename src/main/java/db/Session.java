@@ -4,7 +4,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Session {
-    private static ConcurrentHashMap<String, String> sessionDatabase = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, String> sessionDatabase = new ConcurrentHashMap<>();
 
     public static String createSession(String userId){
         String sid = UUID.randomUUID().toString();
@@ -23,7 +23,6 @@ public class Session {
     public static Boolean isLogin(String sid){
         if(sid == null) return false;
         String userId = sessionDatabase.get(sid);
-        if(userId == null) return false;
-        else return true;
+        return userId != null;
     }
 }

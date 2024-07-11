@@ -9,14 +9,14 @@ import util.Utils.ResponseWithStatus;
 import java.io.IOException;
 import java.util.HashMap;
 
+import static db.Session.isLogin;
 import static util.TemplateEngine.showAlert;
 import static util.Utils.*;
 
 public class GetHandler {
     private static final String staticPath = getStaticPath();
 
-    public static HttpResponse sendResponse(String requestUrl) throws IOException {
-
+    public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
         String[] tokens = requestUrl.split("\\.");
         String type = tokens[tokens.length - 1];
 
@@ -29,6 +29,15 @@ public class GetHandler {
                 .addHeader("Content-Type", getContentType(type))
                 .addHeader("Content-Length", String.valueOf(body.length))
                 .addBody(body);
+    }
+
+    public static HttpResponse serveRootPage(HttpRequest httpRequest) throws IOException {
+        String cookie = httpRequest.getHeaders("Cookie");
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get("sid");
+
+        if (isLogin(sid)) return serveStaticFile("/main/index.html");
+        else return serveStaticFile("/index.html");
     }
 
     public static HttpResponse loginCheck(HttpRequest httpRequest) {

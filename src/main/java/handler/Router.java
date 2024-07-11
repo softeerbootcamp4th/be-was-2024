@@ -28,10 +28,11 @@ public class Router {
         String requestTarget = splitUrl[0];
 
         return switch (requestTarget) {
-            case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html");
+            case "/" -> serveRootPage(httpRequest);
+            case "/registration", "/login" -> serveStaticFile(requestTarget + "/index.html");
             case "/loginCheck" -> loginCheck(httpRequest);
             case "/logout" -> logout(httpRequest);
-            default -> sendResponse(requestTarget);
+            default -> serveStaticFile(requestTarget);
         };
     }
 
