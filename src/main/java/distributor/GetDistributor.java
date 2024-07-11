@@ -9,17 +9,19 @@ import java.io.IOException;
 
 public class GetDistributor extends Distributor {
     Request request;
+    DataOutputStream dos;
 
-    protected GetDistributor(Request request) {
+    protected GetDistributor(Request request, DataOutputStream dos) {
         this.request = request;
+        this.dos = dos;
     }
 
     @Override
-    public void process(DataOutputStream dos) throws IOException {
+    public void process() throws IOException {
         if (request.isQueryString()) {
-            processQuery(dos);
+            processQuery(this.dos);
         } else {
-            processNonQuery(dos);
+            processNonQuery(this.dos);
         }
     }
 

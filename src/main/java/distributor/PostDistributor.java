@@ -10,15 +10,17 @@ import java.io.IOException;
 
 public class PostDistributor extends Distributor {
     Request request;
+    DataOutputStream dos;
     UserProcessor userProcessor = new UserProcessor();
 
-    PostDistributor(Request request) {
+    PostDistributor(Request request, DataOutputStream dos) {
         this.request = request;
+        this.dos = dos;
     }
 
     @Override
-    public void process(DataOutputStream dos) throws IOException {
-        processQuery(dos);
+    public void process() throws IOException {
+        processQuery(this.dos);
     }
 
     private void processQuery(DataOutputStream dos) throws IOException {

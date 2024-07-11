@@ -29,8 +29,8 @@ public class RequestHandler implements Runnable {
 
                 Request request = Request.from(in);
 
-                Distributor distributor = Distributor.from(request);
-                distributor.process(dos);
+                Distributor distributor = Distributor.of(request, dos);
+                distributor.process();
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
