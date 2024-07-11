@@ -1,5 +1,6 @@
 package handler;
 
+import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +8,7 @@ import util.FileDetection;
 import util.RequestObject;
 
 import java.io.*;
+import java.util.Collection;
 
 public class GetHandler
 {
@@ -35,6 +37,17 @@ public class GetHandler
                 logger.debug("이게 왜 안되는건데");
             }
             return;
+        }
+        if(path.equals("/user/list"))//사용자 목록 요청이 들어왔을때
+        {
+            try
+            {
+                handleUserListRequest(dos,requestObject);
+            }
+            catch (IOException e)
+            {
+                logger.debug("사용자 목록 예외");
+            }
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
         logger.debug(path);
@@ -124,6 +137,23 @@ public class GetHandler
                 responseBody(dos,bodyBytes);
             }
         }
+    }
+
+    //사용자 목록을 출력한다
+    private void handleUserListRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        Collection<User> list = Database.findAll();
+        for(User temp : list)//list에 담겨있는 모든 유저 정보를 StringBuilder에 담아준다
+        {
+            sb.append(temp.toString()+"\n");
+        }
+        String body = "<html><head></head><body>" + sb.toString() + " </body></html>";
+        byte[] bodyBytes = body.getBytes("UTF-8");
+        dos.writeBytes("HTTP/1.1 200 OK \r\n");
+        dos.writeBytes("Content-Type: text/html ;charset=utf-8\r\n");
+        dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+        dos.writeBytes("\r\n");
+        responseBody(dos,bodyBytes);
     }
 
     private String match(String extensions)
