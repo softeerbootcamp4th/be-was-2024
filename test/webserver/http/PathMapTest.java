@@ -2,12 +2,15 @@ package webserver.http;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.api.Login;
-import webserver.api.Logout;
-import webserver.api.RequestHandler;
-import webserver.api.ReadFile;
+import webserver.api.Unauthorized;
+import webserver.api.login.LoginHandler;
+import webserver.api.logout.LogoutHandler;
+import webserver.api.FunctionHandler;
+import webserver.api.ReadFileHandler;
+import webserver.api.pagehandler.RegistrationPageHandler;
 import webserver.api.registration.Registration;
 import webserver.http.enums.Methods;
+import webserver.http.path.PathMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +24,7 @@ class PathMapTest {
         String path = "/create";
 
         //when
-        RequestHandler function = PathMap.getPathMethod(method, path);
+        FunctionHandler function = PathMap.getPathMethod(method, path , null);
 
         //then
         assertEquals(function.getClass(), Registration.class);
@@ -32,13 +35,13 @@ class PathMapTest {
     void getReadFileTest(){
         //given
         Methods method = Methods.GET;
-        String path = "/";
+        String path = "/resource";
 
         //when
-        RequestHandler function = PathMap.getPathMethod(method, path);
+        FunctionHandler function = PathMap.getPathMethod(method, path , null);
 
         //then
-        assertEquals(function.getClass(), ReadFile.class);
+        assertEquals(function.getClass(), ReadFileHandler.class);
     }
 
     @DisplayName("check login file function")
@@ -49,10 +52,10 @@ class PathMapTest {
         String path = "/login";
 
         //when
-        RequestHandler function = PathMap.getPathMethod(method, path);
+        FunctionHandler function = PathMap.getPathMethod(method, path , null);
 
         //then
-        assertEquals(function.getClass(), Login.class);
+        assertEquals(function.getClass(), LoginHandler.class);
     }
 
     @DisplayName("check logout file function")
@@ -63,10 +66,40 @@ class PathMapTest {
         String path = "/logout";
 
         //when
-        RequestHandler function = PathMap.getPathMethod(method, path);
+        FunctionHandler function = PathMap.getPathMethod(method, path, null);
 
         //then
-        assertEquals(function.getClass(), Logout.class);
+        assertEquals(function.getClass(), LogoutHandler.class);
     }
+
+
+    @DisplayName("check unauthorized access")
+    @Test
+    void unauthorizedTest(){
+        //given
+        Methods method = Methods.GET;
+        String path = "/user/login";
+
+        //when
+        FunctionHandler function = PathMap.getPathMethod(method, path, null);
+
+        //then
+        assertEquals(function.getClass(), Unauthorized.class);
+    }
+
+    @DisplayName("check pagehanlder access")
+    @Test
+    void pagehandlerTest(){
+        //given
+        Methods method = Methods.GET;
+        String path = "/registration";
+
+        //when
+        FunctionHandler function = PathMap.getPathMethod(method, path, null);
+
+        //then
+        assertEquals(function.getClass(), RegistrationPageHandler.class);
+    }
+
 
 }

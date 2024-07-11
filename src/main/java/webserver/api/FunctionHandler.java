@@ -10,6 +10,6 @@ import java.io.IOException;
 * interface of all functions of WAS
 * all server functions should implement this interface
 * */
-public interface RequestHandler {
+public interface FunctionHandler {
     HttpResponse function(HttpRequest request) throws IOException;
 }

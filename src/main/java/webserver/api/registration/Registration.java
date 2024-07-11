@@ -2,7 +2,8 @@ package webserver.api.registration;
 
 import db.Database;
 import model.User;
-import webserver.api.RequestHandler;
+import webserver.api.FunctionHandler;
+import webserver.api.login.LoginHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.util.ParamsParser;
@@ -14,7 +15,17 @@ import java.util.Map;
 /*
 * Registration function
 * */
-public class Registration implements RequestHandler {
+public class Registration implements FunctionHandler {
+    //singleton pattern
+    private static FunctionHandler single_instance = null;
+    public static synchronized FunctionHandler getInstance()
+    {
+        if (single_instance == null)
+            single_instance = new Registration();
+
+        return single_instance;
+    }
+
     @Override
     public HttpResponse function(HttpRequest request) {
 

@@ -1,4 +1,4 @@
-package webserver.http;
+package webserver.http.url;
 
 import java.util.HashMap;
 import java.util.Map;

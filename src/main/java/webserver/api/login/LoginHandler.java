@@ -1,11 +1,13 @@
-package webserver.api;
+package webserver.api.login;
 
 import db.Database;
 import model.User;
+import webserver.api.FunctionHandler;
 import webserver.http.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.Extension;
+import webserver.http.response.PageBuilder;
 import webserver.session.Session;
 import webserver.util.ParamsParser;
 
@@ -16,7 +18,16 @@ import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
-public class Login implements RequestHandler {
+public class LoginHandler implements FunctionHandler {
+    //singleton pattern
+    private static FunctionHandler single_instance = null;
+    public static synchronized FunctionHandler getInstance()
+    {
+        if (single_instance == null)
+            single_instance = new LoginHandler();
+
+        return single_instance;
+    }
 
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
@@ -43,12 +54,11 @@ public class Login implements RequestHandler {
 
         // if user information is valid
         String sessionString = Session.createSession(user);
-        byte[] responseBody = Files.readAllBytes(new File(HtmlFiles.login_success).toPath());
+        byte[] responseBody = PageBuilder.buildLoggedinPage(user.getName());
 
         //go to logined main page
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
-                .addheader("Content-Length", String.valueOf(responseBody.length))
                 .addheader("Set-Cookie","sid="+sessionString +"; Path=/") //set cookie
                 .setBody(responseBody)
                 .build();

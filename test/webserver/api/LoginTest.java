@@ -4,6 +4,7 @@ import db.Database;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.api.login.LoginHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
@@ -32,7 +33,7 @@ class LoginTest {
                 .build();
 
         //when
-        HttpResponse response = new Login().function(request);
+        HttpResponse response = new LoginHandler().function(request);
 
         //then
         assertEquals(StatusCode.CODE200, response.getStatusCode());

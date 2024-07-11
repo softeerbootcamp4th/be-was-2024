@@ -1,10 +1,12 @@
 package webserver.http;
 
 import webserver.http.enums.Methods;
+import webserver.http.url.Url;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 /*
@@ -24,6 +26,7 @@ public class HttpRequest {
     private String protocol;
     private Map<String, String> headers;
     private Map<String, String> cookies;
+    private String sessionid;
 
     public Methods getMethod() {
         return method;
@@ -47,6 +50,8 @@ public class HttpRequest {
 
     public Map<String, String> getCookie(String key) {return cookies;}
 
+    public String getSessionid() {return sessionid;}
+
     public String printRequest(){
         return "method: " + method.getMethod() + "\n" +
                 "url: " + url.getPath() + "\n" +
@@ -63,6 +68,7 @@ public class HttpRequest {
         this.body = builder.body;
         this.headers = builder.headers;
         this.cookies = builder.cookies;
+        this.sessionid = builder.sessionid;
     }
 
     public static class ReqeustBuilder{
@@ -72,6 +78,7 @@ public class HttpRequest {
         private String protocol;
         private Map<String, String> headers= new HashMap<>();
         private Map<String, String> cookies= new HashMap<>();
+        private String sessionid;
 
         public ReqeustBuilder(String startline) throws IOException {
             String[] split = startline.split(" ");
@@ -98,8 +105,11 @@ public class HttpRequest {
             if(headers.containsKey("Cookie")){
                 String[] split = headers.get("Cookie").trim().split(";");
                 for(String cookie : split){
-                    String[] keyValue = cookie.split("=");
-                    cookies.put(keyValue[0], keyValue[1]);
+                    String[] keyValue = cookie.trim().split("=");
+                    cookies.put(keyValue[0].trim(), keyValue[1].trim());
+                    if(Objects.equals(keyValue[0].trim(), "sid")){
+                        sessionid = keyValue[1].trim();
+                    }
                 }
             }
         }

@@ -141,3 +141,7 @@
   color: #ffffff;
   cursor: hover;
 }
+
+.user__name{
+  padding: 16px;
+}

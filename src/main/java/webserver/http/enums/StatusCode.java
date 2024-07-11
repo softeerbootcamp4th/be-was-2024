@@ -43,6 +43,14 @@ public enum StatusCode {
         return BY_CODE.get(code);
     }
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     public String getStartline() {
         return "HTTP/1.1 " +code + " " + description + "\r\n";
     }

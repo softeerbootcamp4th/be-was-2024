@@ -11,12 +11,12 @@ import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReadFileTest {
-    ReadFile readFile;
+    ReadFileHandler readFile;
     HttpRequest request;
 
     @BeforeEach
     void setUp() {
-        readFile = new ReadFile();
+        readFile = new ReadFileHandler();
     }
 
     @DisplayName("check readfile")

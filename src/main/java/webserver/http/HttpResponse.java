@@ -59,7 +59,7 @@ public class HttpResponse{
 
         public ResponseBuilder setBody(byte[] body){
             this.body = body;
-            return this;
+            return this.addheader("Content-Length", String.valueOf(body.length));
         }
 
         public HttpResponse build(){

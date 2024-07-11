@@ -6,9 +6,11 @@ import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.PathMap;
+import webserver.http.path.PathMap;
+import webserver.http.response.ResponseLibrary;
 import webserver.util.StreamByteReader;
 
 
@@ -57,10 +59,10 @@ public class RequestHandler implements Runnable {
 
             logger.info(request.printRequest());
 
-            webserver.api.RequestHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            FunctionHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath(), request.getSessionid()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
                     (api == null)
-                            ? new HttpResponse.ResponseBuilder(404).build()
+                            ? ResponseLibrary.notFound
                             : api.function(request); // 해당 function을 실행
 
             // response 출력
