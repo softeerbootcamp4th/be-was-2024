@@ -34,14 +34,11 @@ public class GetHandler
             {
                 logger.debug("이게 왜 안되는건데");
             }
-
-
             return;
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
         staticFileHandler(dos,path);
     }
-
 
     //static html 파일은 여기서 다뤄준다
     private void staticFileHandler(DataOutputStream dos, String path)

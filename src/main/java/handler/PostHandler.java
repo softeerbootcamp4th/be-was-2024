@@ -91,6 +91,5 @@ public class PostHandler
         {
             logger.error(e.getMessage());
         }
-
     }
 }

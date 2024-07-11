@@ -1,6 +1,5 @@
 package util;
 
-import handler.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,7 +100,6 @@ public class RequestObject {
     {
         this.body = body;
     }
-
 
     //헤더에서 쿠키를 파싱한다
     public Map<String, String> getCookies() {
