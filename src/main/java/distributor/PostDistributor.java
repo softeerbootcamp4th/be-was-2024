@@ -45,7 +45,7 @@ public class PostDistributor extends Distributor {
         if (userProcessor.login(request)) {
             String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
             Response response = new Response.Builder()
-                    .url("/index.html")
+                    .url("/main/index.html")
                     .dataOutputStream(dos)
                     .cookie(sessionId)
                     .redirectCode(302)
