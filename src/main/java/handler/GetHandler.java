@@ -42,12 +42,18 @@ public class GetHandler
         {
             try
             {
+                if(requestObject.getCookies().isEmpty())//쿠키 값이 비어 있다면, 즉 로그인 안해있으면
+                {
+                    logger.debug("쿠키 값이 비어있음");
+                    return ;
+                }
                 handleUserListRequest(dos,requestObject);
             }
             catch (IOException e)
             {
                 logger.debug("사용자 목록 예외");
             }
+            return;
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
         logger.debug(path);
@@ -71,7 +77,7 @@ public class GetHandler
         {
             body = new byte[(int)fi.length()];
             bi.read(body);
-            response200Header(dos,body.length,path);
+            response200Header(dos,body,path);
             responseBody(dos, body);
         }
         catch(IOException e)
@@ -80,18 +86,20 @@ public class GetHandler
         }
     }
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent,String url) {
+    private void response200Header(DataOutputStream dos,byte[] body,String url) {
         try {
             String[] temp = url.split("\\.");
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: "+match(temp[1])+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
+            dos.writeBytes("Content-Length: " + body.length + "\r\n");
             dos.writeBytes("\r\n");
+            responseBody(dos,body);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
+    //응답의 Body섹션
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
             dos.write(body, 0, body.length);
@@ -145,7 +153,7 @@ public class GetHandler
         Collection<User> list = Database.findAll();
         for(User temp : list)//list에 담겨있는 모든 유저 정보를 StringBuilder에 담아준다
         {
-            sb.append(temp.toString()+"\n");
+            sb.append(temp.toString()+"<br>");
         }
         String body = "<html><head></head><body>" + sb.toString() + " </body></html>";
         byte[] bodyBytes = body.getBytes("UTF-8");
