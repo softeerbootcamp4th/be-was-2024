@@ -123,8 +123,12 @@ public class Request {
     private String getStaticPath() {
         File testFile = new File("src/main/resources/static" + path);
 
-        if (testFile.isDirectory()) {
-            return path + "/index.html";
+        if (testFile.exists()) {
+            if (testFile.isDirectory()) {
+                return path + "/index.html";
+            } else {
+                return path;
+            }
         } else {
             return path;
         }
