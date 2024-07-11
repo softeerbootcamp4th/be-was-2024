@@ -9,14 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static util.constant.StringConstants.*;
+
 public class HttpRequestConverter {
-    private static final String CHARSET = "UTF-8";
-    private static final String SPACE = " ";
-    private static final String EMPTY_SPACE = "";
-    private static final String COLON = ":";
-    private static final String QUESTION_MARK = "?";
-    private static final String AMPERSAND = "&";
-    private static final String EQUAL = "=";
+
 
     /**
      * InputStream을 HttpRequest 객체로 변환하는 로직

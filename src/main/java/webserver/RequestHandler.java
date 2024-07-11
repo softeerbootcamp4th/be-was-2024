@@ -36,8 +36,7 @@ public class RequestHandler implements Runnable {
             HttpResponseConverter httpResponseConverter = new HttpResponseConverter();
             HttpResponse httpResponse = httpResponseConverter.with(httpRequest);
 
-            //HttpResponse 객체를 기반으로 outputStream으로 HttpResponse 발송
-//            httpResponse.sendHttpResponse(out,httpResponse);
+            //HttpResponse 객체를 기반으로 outputStream 으로 HttpResponse 발송
             HttpSender httpSender = new HttpSender();
             httpSender.sendHttpResponse(out,httpResponse);
 
