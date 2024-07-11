@@ -2,8 +2,8 @@ plugins {
     id 'java'
 }
 
-group 'codesquad'
-version '1.0-SNAPSHOT'
+group 'violet-mj'
+version '2.2.0'
 
 repositories {
     mavenCentral()
@@ -12,10 +12,15 @@ repositories {
 sourceSets {
     main {
         resources {
-            srcDirs = ['src/main/resources/static']
+            srcDirs = ['src/main/resources/templates', 'src/main/resources/static']
         }
     }
 }
+
+tasks.withType(Copy).configureEach {
+   duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
 
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
@@ -23,7 +28,6 @@ dependencies {
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
-
 }
 
 test {
