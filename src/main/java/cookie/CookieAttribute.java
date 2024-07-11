@@ -1,4 +1,4 @@
-package Cookie;
+package cookie;
 
 public enum CookieAttribute {
     SESSION_ID("sessionId"),
