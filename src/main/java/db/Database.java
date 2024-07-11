@@ -5,10 +5,12 @@ import model.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class Database {
-    private static Map<String, User> users = new HashMap<>();
-    private static Map<String, String> sessions = new HashMap<>();
+    private static ConcurrentHashMap<String, User> users = new ConcurrentHashMap<String, User>();
+    private static ConcurrentHashMap<String, String> sessions = new ConcurrentHashMap<>();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
