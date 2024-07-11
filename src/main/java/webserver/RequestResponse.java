@@ -57,6 +57,27 @@ public class RequestResponse {
         }
     }
 
+    public void openPathWithUsername(String url, String username) throws IOException {
+        if (url != null) {
+            File file = new File(url);
+            if (!file.exists()) {
+                response404Header();
+                return;
+            }
+
+            byte[] fileBody = FileHandler.readFileToByteArray(file);
+            String content = new String(fileBody);
+            content = content.replace("{{username}}", username);
+            byte[] modifiedFileBody = content.getBytes();
+
+            String contentType = FileHandler.determineContentType(file.getName());
+
+            response200Header(modifiedFileBody.length, contentType);
+            responseBody(modifiedFileBody);
+        }
+    }
+
+
     private void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
         dos.writeBytes("HTTP/1.1 200 OK\r\n");
         dos.writeBytes("Content-Type: " + contentType + "\r\n");
