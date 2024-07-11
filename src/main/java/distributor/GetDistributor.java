@@ -18,13 +18,7 @@ public class GetDistributor extends Distributor {
         if (request.isQueryString()) {
             processQuery(dos);
         } else {
-            Response response = new Response.Builder()
-                    .url(request.getPath())
-                    .statusCode(200)
-                    .dataOutputStream(dos)
-                    .build();
-
-            response.sendResponse();
+            processNonQuery(dos);
         }
     }
 
@@ -35,6 +29,28 @@ public class GetDistributor extends Distributor {
                     .url("/not_found.html")
                     .dataOutputStream(dos)
                     .redirectCode(404)
+                    .build();
+
+            response.sendResponse();
+        }
+    }
+
+    private void processNonQuery(DataOutputStream dos) throws IOException {
+        String path = request.getPath();
+        if (path.equals("/logout")) {
+            // 세션 삭제해줘야 함
+            Response response = new Response.Builder()
+                    .url("/index.html")
+                    .dataOutputStream(dos)
+                    .redirectCode(302)
+                    .build();
+
+            response.sendResponse();
+        } else {
+            Response response = new Response.Builder()
+                    .url(path)
+                    .statusCode(200)
+                    .dataOutputStream(dos)
                     .build();
 
             response.sendResponse();
