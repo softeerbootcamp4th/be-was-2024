@@ -12,8 +12,10 @@ import routehandler.core.IRouteHandler;
 import session.MySession;
 import url.MyURL;
 import utils.FileReadUtil;
+import view.MyView;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 public class SignInHandler implements IRouteHandler {
@@ -31,7 +33,8 @@ public class SignInHandler implements IRouteHandler {
         // 유저가 없거나, 비밀번호가 일치하지 않는 경우
         if(user == null || !user.getPassword().equals(password)) {
             res.setStatusInfo(HttpStatusType.UNAUTHORIZED);
-            res.send("/login/login_failed.html");
+//            res.send("/login/login_failed.html");
+            MyView.render(req, res, "/login/login_failed", new HashMap<>());
 
             return;
         }

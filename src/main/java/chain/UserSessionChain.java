@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import session.MySession;
 
 public class UserSessionChain extends MiddlewareChain {
-    private static Logger logger = LoggerFactory.getLogger(UserSessionChain.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserSessionChain.class);
     @Override
     public void act(MyHttpRequest req, MyHttpResponse res) {
         String sessionId = req.getCookies().getValue(AppConfig.SESSION_NAME);
@@ -29,6 +29,7 @@ public class UserSessionChain extends MiddlewareChain {
         }
 
         User user = Database.findUserById(userId);
+        req.setStoreData("user", user);
         logger.debug("user is {}", user);
 
         next(req,res);
