@@ -3,6 +3,8 @@ package util;
 import java.io.*;
 import java.util.Map;
 
+import static util.Constants.*;
+
 public class TemplateEngine {
 
     public static byte[] showAlert(String msg, String redirectUrl) {
@@ -21,7 +23,7 @@ public class TemplateEngine {
 
     public static byte[] getNotFoundPage() throws IOException {
         StringBuilder content = new StringBuilder();
-        File file = new File("./src/main/resources/static/error/NOT_FOUND.html");
+        File file = new File(STATIC_PATH + PATH_ERROR + FILE_NOT_FOUND);
         BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
         String line;
         while ((line = bufferedReader.readLine()) != null) {

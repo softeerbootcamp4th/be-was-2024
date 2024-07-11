@@ -16,58 +16,59 @@ import java.util.Map;
 
 import static db.Session.getUser;
 import static db.Session.isLogin;
+import static util.Constants.*;
 import static util.Utils.*;
 
 public class GetHandler {
 
     public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
-        String[] tokens = requestUrl.split("\\.");
+        String[] tokens = requestUrl.split(REG_DOT);
         String type = tokens[tokens.length - 1];
 
-        ResponseWithStatus responseWithStatus = getFileContent(staticPath + requestUrl);
+        ResponseWithStatus responseWithStatus = getFileContent(STATIC_PATH + requestUrl);
 
         byte[] body = responseWithStatus.body;
 
         return new HttpResponse()
                 .addStatus(responseWithStatus.status)
-                .addHeader("Content-Type", getContentType(type))
-                .addHeader("Content-Length", String.valueOf(body.length))
+                .addHeader(CONTENT_TYPE, getContentType(type))
+                .addHeader(CONTENT_LENGTH, String.valueOf(body.length))
                 .addBody(body);
     }
 
     public static HttpResponse serveDynamicFile(String requestUrl, Map<String, String> data) throws IOException {
-        String[] tokens = requestUrl.split("\\.");
+        String[] tokens = requestUrl.split(REG_DOT);
         String type = tokens[tokens.length - 1];
 
-        ResponseWithStatus responseWithStatus = getFileContent(staticPath + requestUrl);
+        ResponseWithStatus responseWithStatus = getFileContent(STATIC_PATH + requestUrl);
         byte[] body = TemplateEngine.renderTemplate(responseWithStatus.body, data);
 
         return new HttpResponse()
                 .addStatus(responseWithStatus.status)
-                .addHeader("Content-Type", getContentType(type))
-                .addHeader("Content-Length", String.valueOf(body.length))
+                .addHeader(CONTENT_TYPE, getContentType(type))
+                .addHeader(CONTENT_LENGTH, String.valueOf(body.length))
                 .addBody(body);
     }
 
     public static HttpResponse serveRootPage(HttpRequest httpRequest) throws IOException {
-        String cookie = httpRequest.getHeaders("Cookie");
+        String cookie = httpRequest.getHeaders(COOKIE);
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
-        String sid = parsedCookie.get("sid");
+        String sid = parsedCookie.get(SID);
 
-        if (!isLogin(sid)) return serveStaticFile("/index.html");
+        if (!isLogin(sid)) return serveStaticFile(FILE_INDEX);
 
         String userId = getUser(sid);
         User user = Database.findUserById(userId);
         Map<String, String> data = new HashMap<>();
-        data.put("userName", user.getName());
+        data.put(USER_NAME, user.getName());
 
-        return serveDynamicFile("/main/index.html", data);
+        return serveDynamicFile(PATH_MAIN + FILE_INDEX, data);
     }
 
     public static HttpResponse logout(HttpRequest httpRequest) {
-        String cookie = httpRequest.getHeaders("Cookie");
+        String cookie = httpRequest.getHeaders(COOKIE);
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
-        String sid = parsedCookie.get("sid");
+        String sid = parsedCookie.get(SID);
 
         Session.deleteSession(sid);
 
@@ -75,40 +76,39 @@ public class GetHandler {
 
         return new HttpResponse()
                 .addStatus(HttpStatus.FOUND)
-                .addHeader("Location", "/")
-                .addHeader("Content-Type", "text/html;charset=UTF-8")
-                .addHeader("Content-Length", String.valueOf(body.length))
+                .addHeader(LOCATION, PATH_ROOT)
+                .addHeader(CONTENT_TYPE, TEXT_HTML)
+                .addHeader(CONTENT_LENGTH, String.valueOf(body.length))
                 .addBody(body);
     }
 
     public static HttpResponse getUserList(HttpRequest httpRequest) throws IOException {
-        String cookie = httpRequest.getHeaders("Cookie");
+        String cookie = httpRequest.getHeaders(COOKIE);
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
-        String sid = parsedCookie.get("sid");
+        String sid = parsedCookie.get(SID);
 
         if (!isLogin(sid)) {
             return new HttpResponse()
                     .addStatus(HttpStatus.FOUND)
-                    .addHeader("Location", "/")
-                    .addHeader("Content-Type", "text/html")
+                    .addHeader(LOCATION, PATH_ROOT)
+                    .addHeader(CONTENT_TYPE, TEXT_HTML)
                     .addBody(new byte[0]);
-        }
-        else{
+        } else {
             Collection<User> users = Database.findAll();
 
             StringBuilder userList = new StringBuilder();
             for (User user : users) {
-                userList.append("<tr>");
-                userList.append("<td>").append(user.getUserId()).append("</td>");
-                userList.append("<td>").append(user.getName()).append("</td>");
-                userList.append("<td>").append(user.getEmail()).append("</td>");
-                userList.append("</tr>");
+                userList.append(TABLE_ROW_START);
+                userList.append(TABLE_DATA_START).append(user.getUserId()).append(TABLE_DATA_END);
+                userList.append(TABLE_DATA_START).append(user.getName()).append(TABLE_DATA_END);
+                userList.append(TABLE_DATA_START).append(user.getEmail()).append(TABLE_DATA_END);
+                userList.append(TABLE_ROW_END);
             }
 
             Map<String, String> data = new HashMap<>();
-            data.put("userList", userList.toString());
-            data.put("userName", Database.findUserById(Session.getUser(sid)).getName());
-            return serveDynamicFile("/user/userList.html", data);
+            data.put(USER_LIST, userList.toString());
+            data.put(USER_NAME, Database.findUserById(Session.getUser(sid)).getName());
+            return serveDynamicFile(PATH_USER + FILE_LIST, data);
         }
     }
 }

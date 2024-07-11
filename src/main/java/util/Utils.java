@@ -1,13 +1,12 @@
 package util;
 
 import http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.Properties;
 
+import static util.Constants.REG_EQ;
+import static util.Constants.REG_SMCLN;
 import static util.TemplateEngine.getNotFoundPage;
 
 public class Utils {
@@ -53,10 +52,10 @@ public class Utils {
         HashMap<String, String> parsedCookies = new HashMap<>();
 
         if(cookies == null) return parsedCookies;
-        String[] splitCookies = cookies.split(";");
+        String[] splitCookies = cookies.split(REG_SMCLN);
         for (String cookie : splitCookies) {
             cookie = cookie.strip();
-            String[] nameAndValue = cookie.split("=");
+            String[] nameAndValue = cookie.split(REG_EQ);
 
             String name = nameAndValue[0];
             String value = nameAndValue[1];

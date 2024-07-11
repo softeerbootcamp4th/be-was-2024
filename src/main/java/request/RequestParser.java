@@ -10,6 +10,7 @@ import java.io.*;
 import java.util.HashMap;
 
 import static handler.Router.requestMapping;
+import static util.Constants.*;
 
 public class RequestParser {
     private static final Logger logger = LoggerFactory.getLogger(RequestParser.class);
@@ -34,7 +35,7 @@ public class RequestParser {
     private void setStartLine(String startLine, HttpRequest request, StringBuilder log) {
 
         log.append(startLine).append("\n");
-        String[] splitStartLine = startLine.split(" ", 3);
+        String[] splitStartLine = startLine.split(REG_SPC, 3);
 
         HttpMethod method = HttpMethod.getMethod(splitStartLine[0]);
         String requestUrl = splitStartLine[1];
@@ -50,7 +51,7 @@ public class RequestParser {
         while (!(headerLine = bufferedReader.readLine()).isEmpty()) {
             log.append(headerLine).append("\n");
 
-            String[] headerParts = headerLine.split(":", 2);
+            String[] headerParts = headerLine.split(REG_CLN, 2);
 
             String key = headerParts[0].strip();
             String value = headerParts[1].strip();
@@ -62,7 +63,7 @@ public class RequestParser {
     }
 
     private void setBody(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
-        String contentLengthValue = request.getHeaders("Content-Length");
+        String contentLengthValue = request.getHeaders(CONTENT_LENGTH);
         if (contentLengthValue == null) return;
 
         int contentLength = Integer.parseInt(contentLengthValue);
