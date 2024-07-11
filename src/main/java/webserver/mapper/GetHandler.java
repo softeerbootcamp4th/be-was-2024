@@ -1,7 +1,6 @@
 package webserver.mapper;
 
 import db.Session;
-import model.SessionIdControl;
 import model.User;
 import model.UserInfoExtract;
 import webserver.HttpRequest;
@@ -17,6 +16,7 @@ public class GetHandler {
     public static synchronized void handle(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
         String url = httpRequest.getUrl();
         Map<String, String> headers = httpRequest.getHeaders();
+        String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
         switch (url) {
             case "/registration":
                 url = staticResourceDir + "/registration/index.html";
@@ -25,10 +25,16 @@ public class GetHandler {
                 url = staticResourceDir + "/login/index.html";
                 break;
             case "/main/index.html":
-                String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
                 User user = Session.findUserBySessionId(sessionId);
                 url = staticResourceDir + "/main/index.html";
                 requestResponse.openPathWithUsername(url, user.getName());
+                return;
+            case "/user/list?":
+                if(Session.findUserBySessionId(sessionId) == null){
+                    url = staticResourceDir + "/login/index.html";
+                    break;
+                }
+                requestResponse.openUserList();
                 return;
             default:
                 url = staticResourceDir + url;
