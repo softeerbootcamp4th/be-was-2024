@@ -2,7 +2,6 @@ package util;
 
 import model.User;
 
-import java.io.IOException;
 import java.util.List;
 
 public class DynamicHtmlUtil {
@@ -15,8 +14,7 @@ public class DynamicHtmlUtil {
     public static final String LOGIN_BUTTON_TAG = "<!--LOGIN-BUTTON-->";
     public static final String LOGIN_BUTTON_HTML = "<li><a href=\"/user/login.html\" role=\"button\">로그인</a></li>";
 
-    public static String generateUserListHtml(String path, List<User> users) throws IOException {
-        String body = new String(IOUtil.readBytesFromFile(false, path));
+    public static String generateUserListHtml(List<User> users) {
         StringBuilder sb = new StringBuilder();
         for (User user : users) {
             sb.append("<tr>")
@@ -27,7 +25,7 @@ public class DynamicHtmlUtil {
                     .append("<td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>")
                     .append("</tr>");
         }
-        return body.replace(USER_LIST_TAG, sb.toString());
+        return sb.toString();
     }
 
     public static String generateUserIdHtml(String userId){

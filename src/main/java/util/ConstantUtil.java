@@ -31,6 +31,7 @@ public class ConstantUtil {
     public static final String INVALID_PATH = "Invalid Path: ";
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
+    public static final String INVALID_SESSION = "Invalid Session";
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";

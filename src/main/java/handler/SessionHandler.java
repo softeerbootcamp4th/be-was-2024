@@ -50,8 +50,8 @@ public class SessionHandler {
         return Optional.of(session);
     }
 
-    public Session findSessionById(String sessionId) {
-        return Database.findSessionById(sessionId).orElse(null);
+    public Optional<Session> findSessionById(String sessionId) {
+        return Database.findSessionById(sessionId);
     }
 
     public void logout(String sessionId) {
