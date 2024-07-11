@@ -24,7 +24,6 @@ class ResponseHandlerTest {
         void testResponseIndexHtmlSuccess() throws IOException {
             //given
             Request request = new Request.Builder(Method.GET, "/login/index.html")
-                    .addHeader("Host", "localhost:8080")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -45,8 +44,6 @@ class ResponseHandlerTest {
         void testAccessStaticResourcePngSuccess() throws IOException {
             //given
             Request request = new Request.Builder(Method.GET, "/img/signiture.png")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -68,8 +65,6 @@ class ResponseHandlerTest {
 
             //given
             Request request = new Request.Builder(Method.GET, "/img/signiture.svg")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -91,8 +86,6 @@ class ResponseHandlerTest {
 
             //given
             Request request = new Request.Builder(Method.GET, "/main.css")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -114,8 +107,6 @@ class ResponseHandlerTest {
 
             //given
             Request request = new Request.Builder(Method.GET, "/favicon.ico")
-                    .addHeader("Host", "localhost:8080")
-                    .addHeader("Connection", "keep-alive")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)

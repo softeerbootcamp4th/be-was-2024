@@ -17,16 +17,14 @@ class RequestReaderTest {
         //given
         ByteArrayInputStream inputStream = new ByteArrayInputStream((
                 "POST /create HTTP/1.1\r\n" +
-                        "Host: localhost:8080\r\n" +
                         "Content-Length: 93\r\n" +
                         "\r\n" +
                         "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net\r\n").getBytes()
         );
 
         Request expected = new Request.Builder(Method.POST, "/create")
-                .addHeader("Host", "localhost:8080")
                 .addHeader("Content-Length", "93")
-                .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
+                .body("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")
                 .build();
 
         //when
@@ -43,7 +41,6 @@ class RequestReaderTest {
         //given
         ByteArrayInputStream inputStream = new ByteArrayInputStream((
                 "GET /create?userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net HTTP/1.1\r\n" +
-                        "Host: localhost:8080\r\n" +
                         "Content-Length: 0\r\n" +
                         "\r\n").getBytes()
         );
@@ -53,7 +50,6 @@ class RequestReaderTest {
                 .addParameter("password", "password")
                 .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
                 .addParameter("email", "javajigi%40slipp.net")
-                .addHeader("Host", "localhost:8080")
                 .addHeader("Content-Length", "0")
                 .build();
 

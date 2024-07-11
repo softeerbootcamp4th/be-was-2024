@@ -12,11 +12,15 @@ class SessionTest {
     @Test
     @DisplayName("서버는 세션 아이디에 해당하는 User 정보에 접근할 수 있어야 한다.")
     public void testGetUserWithSessionId(){
+
+        //given
         User user = createTestUser();
         String sessionId = Session.save(user);
 
+        //when
         User findUser = Session.get(sessionId);
 
+        //then
         assertEquals(findUser, user);
     }
 
