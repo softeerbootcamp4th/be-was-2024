@@ -1,5 +1,6 @@
 package util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,7 +74,10 @@ public class HttpResponse {
 
     public String getTotalHeaders(){
         StringBuilder sb = new StringBuilder();
-        sb.append(httpVersion).append(StringUtil.SPACE).append(statusCode).append(StringUtil.SPACE).append(HttpCode.getMessage(statusCode)).append(StringUtil.CRLF);
+        sb.append(httpVersion).append(StringUtil.SPACE)
+            .append(statusCode).append(StringUtil.SPACE)
+            .append(HttpCode.getMessage(statusCode)).append(StringUtil.CRLF);
+
         for (Map.Entry<String, String> entry : header.entrySet()) {
             sb.append(entry.getKey()).append(StringUtil.COLON_WITH_SPACE).append(entry.getValue()).append(StringUtil.CRLF);
         }
@@ -86,7 +90,7 @@ public class HttpResponse {
     }
 
     private void putBody(String body){
-        this.body = body.getBytes();
+        this.body = body.getBytes(StandardCharsets.UTF_8);
     }
 
     public void setSessionId(String sessionId){

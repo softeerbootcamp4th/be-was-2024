@@ -76,9 +76,15 @@ public class HttpRequest {
         // byte[] to String, "&"으로 split
         String restoredString = new String(requestBody, StandardCharsets.UTF_8);
         String[] pairs = restoredString.split(StringUtil.AND);
+        // 만약 body가 없는 경우
+        if(pairs.length == 1 && pairs[0].isEmpty()) throw new RequestException(StringUtil.INVALID_BODY);
+
+        // 디코딩한 후 "="으로 split하여 Map에 저장
         for (String pair : pairs) {
             String[] keyValue = pair.split(StringUtil.EQUAL);
-            bodyMap.put(keyValue[0].trim(), keyValue[1].trim());
+            String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
+            String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
+            bodyMap.put(key.trim(), value.trim());
         }
         return bodyMap;
     }
