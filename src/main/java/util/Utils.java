@@ -11,24 +11,6 @@ import java.util.Properties;
 import static util.TemplateEngine.getNotFoundPage;
 
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
-    private static final Properties properties = new Properties();
-
-    static {
-        try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                logger.error("Unable to find config.properties");
-            }
-            properties.load(input);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public static String getStaticPath() {
-        return properties.getProperty("staticPath");
-    }
-
     public static class ResponseWithStatus {
         public HttpStatus status;
         public byte[] body;

@@ -16,11 +16,9 @@ import java.util.Map;
 
 import static db.Session.getUser;
 import static db.Session.isLogin;
-import static util.TemplateEngine.showAlert;
 import static util.Utils.*;
 
 public class GetHandler {
-    private static final String staticPath = getStaticPath();
 
     public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
         String[] tokens = requestUrl.split("\\.");
@@ -40,9 +38,6 @@ public class GetHandler {
     public static HttpResponse serveDynamicFile(String requestUrl, Map<String, String> data) throws IOException {
         String[] tokens = requestUrl.split("\\.");
         String type = tokens[tokens.length - 1];
-
-        System.out.println("type = " + type);
-        System.out.println("requestUrl = " + requestUrl);
 
         ResponseWithStatus responseWithStatus = getFileContent(staticPath + requestUrl);
         byte[] body = TemplateEngine.renderTemplate(responseWithStatus.body, data);
@@ -67,21 +62,6 @@ public class GetHandler {
         data.put("userName", user.getName());
 
         return serveDynamicFile("/main/index.html", data);
-    }
-
-    public static HttpResponse loginCheck(HttpRequest httpRequest) {
-        String cookie = httpRequest.getHeaders("Cookie");
-        HashMap<String, String> parsedCookie = cookieParsing(cookie);
-        String sid = parsedCookie.get("sid");
-        String userId = Session.getUser(sid);
-
-        byte[] body = showAlert(userId, "http://localhost:8080");
-
-        return new HttpResponse()
-                .addStatus(HttpStatus.FOUND)
-                .addHeader("Content-Type", "text/html;charset=UTF-8")
-                .addHeader("Content-Length", String.valueOf(body.length))
-                .addBody(body);
     }
 
     public static HttpResponse logout(HttpRequest httpRequest) {

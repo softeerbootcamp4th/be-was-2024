@@ -30,7 +30,6 @@ public class Router {
         return switch (requestTarget) {
             case "/" -> serveRootPage(httpRequest);
             case "/registration", "/login", "/article", "/comment" -> serveStaticFile(requestTarget + "/index.html");
-            case "/loginCheck" -> loginCheck(httpRequest);
             case "/logout" -> logout(httpRequest);
             case "/user/list" -> getUserList(httpRequest);
             default -> serveStaticFile(requestTarget);
