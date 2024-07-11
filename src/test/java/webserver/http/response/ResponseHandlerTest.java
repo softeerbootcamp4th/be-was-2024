@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import webserver.PluginMapper;
-import webserver.http.request.Method;
+import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 import static util.Utils.getFile;
 
@@ -23,7 +23,7 @@ class ResponseHandlerTest {
         @DisplayName("HTML")
         void testResponseIndexHtmlSuccess() throws IOException {
             //given
-            Request request = new Request.Builder(Method.GET, "/login/index.html")
+            Request request = new Request.Builder(HttpMethod.GET, "/login/index.html")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -43,7 +43,7 @@ class ResponseHandlerTest {
         @DisplayName("PNG")
         void testAccessStaticResourcePngSuccess() throws IOException {
             //given
-            Request request = new Request.Builder(Method.GET, "/img/signiture.png")
+            Request request = new Request.Builder(HttpMethod.GET, "/img/signiture.png")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -64,7 +64,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceSvgSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/img/signiture.svg")
+            Request request = new Request.Builder(HttpMethod.GET, "/img/signiture.svg")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -85,7 +85,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceCssSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/main.css")
+            Request request = new Request.Builder(HttpMethod.GET, "/main.css")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)
@@ -106,7 +106,7 @@ class ResponseHandlerTest {
         void testAccessStaticResourceIcoSuccess() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/favicon.ico")
+            Request request = new Request.Builder(HttpMethod.GET, "/favicon.ico")
                     .build();
 
             Response expected = new Response.Builder(Status.OK)

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.PluginMapper;
 import webserver.http.Session;
+import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 
 import java.io.IOException;
@@ -74,7 +75,7 @@ public class ResponseHandler {
     }
 
     // 플러그인 실행 메소드
-    public Optional<Object> runPlugin(webserver.http.request.Method httpMethod, String path, Object... args) {
+    public Optional<Object> runPlugin(HttpMethod httpMethod, String path, Object... args) {
         Method method = pluginMapper.get(httpMethod, path);
         logger.debug(path);
         if (method != null) {

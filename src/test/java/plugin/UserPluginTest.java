@@ -5,7 +5,7 @@ import model.User;
 import org.junit.jupiter.api.*;
 import webserver.PluginMapper;
 import webserver.http.Session;
-import webserver.http.request.Method;
+import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 import webserver.http.response.Response;
 import webserver.http.response.ResponseHandler;
@@ -34,7 +34,7 @@ public class UserPluginTest {
         void testRegistrationSuccessful() {
 
             //given
-            Request request = new Request.Builder(Method.POST, "/create")
+            Request request = new Request.Builder(HttpMethod.POST, "/create")
                     .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
                     .build();
 
@@ -54,7 +54,7 @@ public class UserPluginTest {
         void testAccessRegistrationSuccess() {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/registration")
+            Request request = new Request.Builder(HttpMethod.GET, "/registration")
                     .addHeader("Host", "localhost:8080")
                     .addHeader("Connection", "keep-alive")
                     .build();
@@ -76,7 +76,7 @@ public class UserPluginTest {
         void testRegistrationRedirection() {
 
             //given
-            Request request = new Request.Builder(Method.POST, "/create")
+            Request request = new Request.Builder(HttpMethod.POST, "/create")
                     .body(("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net").getBytes())
                     .build();
 
@@ -94,7 +94,7 @@ public class UserPluginTest {
         void testRegistrationGETFailure() {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/create")
+            Request request = new Request.Builder(HttpMethod.GET, "/create")
                     .addParameter("userId", "javajigi")
                     .addParameter("password", "password")
                     .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")
@@ -122,7 +122,7 @@ public class UserPluginTest {
         public void testAccessLoginPage(){
 
             //given
-            Request request = new Request.Builder(Method.GET, "/login")
+            Request request = new Request.Builder(HttpMethod.GET, "/login")
                     .build();
 
             //when
@@ -141,7 +141,7 @@ public class UserPluginTest {
             //given
             Database.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
 
-            Request request = new Request.Builder(Method.POST, "/login")
+            Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
                     .body("userId=testUserId&password=testPassword")
                     .build();
@@ -157,7 +157,7 @@ public class UserPluginTest {
         @DisplayName("로그인이 실패하면 /user/login_failed.html로 이동")
         public void testLoginFailure(){
 
-            Request request = new Request.Builder(Method.POST, "/login")
+            Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
                     .body("userId=testUserId&password=testPassword")
                     .build();
@@ -177,7 +177,7 @@ public class UserPluginTest {
             //given
             Database.addUser(createTestUser());
 
-            Request request = new Request.Builder(Method.POST, "/login")
+            Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
                     .body("userId=testUserId&password=testPassword")
                     .build();
@@ -200,7 +200,7 @@ public class UserPluginTest {
             User user = createTestUser();
             String sessionId = Session.save(user);
 
-            Request request = new Request.Builder(Method.GET, "/index.html")
+            Request request = new Request.Builder(HttpMethod.GET, "/index.html")
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
@@ -221,7 +221,7 @@ public class UserPluginTest {
             User user = createTestUser();
             String sessionId = Session.save(user);
 
-            Request request = new Request.Builder(Method.GET, "/index.html")
+            Request request = new Request.Builder(HttpMethod.GET, "/index.html")
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
@@ -240,7 +240,7 @@ public class UserPluginTest {
         public void testIndexWithoutLogin() throws IOException {
 
             //given
-            Request request = new Request.Builder(Method.GET, "/index.html")
+            Request request = new Request.Builder(HttpMethod.GET, "/index.html")
                     .build();
 
             ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
@@ -261,7 +261,7 @@ public class UserPluginTest {
             User user = createTestUser();
             String sessionId = Session.save(user);
 
-            Request request = new Request.Builder(Method.POST, "/logout")
+            Request request = new Request.Builder(HttpMethod.POST, "/logout")
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
@@ -280,7 +280,7 @@ public class UserPluginTest {
             //given
             String sessionId = Session.save(createTestUser());
 
-            Request request = new Request.Builder(Method.GET, "/user/list")
+            Request request = new Request.Builder(HttpMethod.GET, "/user/list")
                     .addHeader("Cookie", "sid="+sessionId)
                     .build();
 
@@ -297,11 +297,11 @@ public class UserPluginTest {
 
             //given
             //쿠키가 없는 경우
-            Request request1 = new Request.Builder(Method.GET, "/user/list")
+            Request request1 = new Request.Builder(HttpMethod.GET, "/user/list")
                     .build();
 
             //쿠키가 있으나 서버에 저장되지 않은 경우
-            Request request2 = new Request.Builder(Method.GET, "/user/list")
+            Request request2 = new Request.Builder(HttpMethod.GET, "/user/list")
                     .addHeader("Cookie", "sid=123")
                     .build();
 

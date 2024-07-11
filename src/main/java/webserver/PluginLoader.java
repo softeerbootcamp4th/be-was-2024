@@ -5,6 +5,7 @@ import annotations.Plugin;
 import annotations.Post;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.http.request.HttpMethod;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class PluginLoader {
     }
 
     // 특정 패키지에서 플러그인 클래스를 동적으로 로드하는 메소드
-    public void loadPlugins() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, URISyntaxException {
+    public void loadPlugins() throws ClassNotFoundException, IOException, URISyntaxException {
         // 패키지 내 모든 클래스를 가져옴
         for (Class<?> cls : getAllClasses()) {
             // Plugin 인터페이스를 구현한 클래스인 경우만 추가
@@ -33,11 +34,11 @@ public class PluginLoader {
                 for (Method method : cls.getDeclaredMethods()) {
                     if (method.isAnnotationPresent(Post.class)) {
                         Post post = method.getAnnotation(Post.class);
-                        pluginMapper.put(webserver.http.request.Method.POST, post.path(), method);
+                        pluginMapper.put(HttpMethod.POST, post.path(), method);
                     }
                     if (method.isAnnotationPresent(Get.class)) {
                         Get get = method.getAnnotation(Get.class);
-                        pluginMapper.put(webserver.http.request.Method.GET, get.path(), method);
+                        pluginMapper.put(HttpMethod.GET, get.path(), method);
                     }
                 }
             }

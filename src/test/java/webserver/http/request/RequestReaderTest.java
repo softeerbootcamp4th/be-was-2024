@@ -24,7 +24,7 @@ class RequestReaderTest {
         );
 
         RequestReader requestReader = new RequestReader(inputStream);
-        Request expected = new Request.Builder(Method.POST, "/create")
+        Request expected = new Request.Builder(HttpMethod.POST, "/create")
                 .addHeader("Content-Length", "93")
                 .body("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net")
                 .build();
@@ -48,7 +48,7 @@ class RequestReaderTest {
         );
 
         RequestReader requestReader = new RequestReader(inputStream);
-        Request expected = new Request.Builder(Method.GET, "/create")
+        Request expected = new Request.Builder(HttpMethod.GET, "/create")
                 .addParameter("userId", "javajigi")
                 .addParameter("password", "password")
                 .addParameter("name", "%EB%B0%95%EC%9E%AC%EC%84%B1")

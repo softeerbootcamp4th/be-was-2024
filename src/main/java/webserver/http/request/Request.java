@@ -18,7 +18,7 @@ public class Request {
     private static final String CRLF = "\r\n";
     private static final char SPACE = ' ';
     public static final Logger logger = LoggerFactory.getLogger(Request.class);
-    private final Method method;
+    private final HttpMethod httpMethod;
     private final String path;
     private final String version = "HTTP/1.1";
     private final Map<String, String> parameter;
@@ -27,7 +27,7 @@ public class Request {
     private final byte[] body;
 
     private Request(Builder builder){
-        this.method = builder.method;
+        this.httpMethod = builder.httpMethod;
         this.path = builder.path;
         this.parameter = builder.parameter;
         this.header = builder.header;
@@ -36,15 +36,15 @@ public class Request {
     }
 
     public static class Builder {
-        private Method method;
+        private HttpMethod httpMethod;
         private String path;
         private Map<String, String> parameter;
         private Map<String, String> header;
         private Map<String, String> cookie;
         private byte[] body;
 
-        public Builder(Method method, String path){
-            this.method = method;
+        public Builder(HttpMethod httpMethod, String path){
+            this.httpMethod = httpMethod;
             this.path = path;
             this.body = new byte[0];
             parameter = new LinkedHashMap<>();
@@ -100,8 +100,8 @@ public class Request {
         return this.cookie.get(key);
     }
 
-    public Method getMethod(){
-        return this.method;
+    public HttpMethod getMethod(){
+        return this.httpMethod;
     }
 
     public Map<String, String> getParameter(){
@@ -137,7 +137,7 @@ public class Request {
         String[] inputLines = request.split("\n");
         String[] startLine = inputLines[0].split(" ");
 
-        return new Builder(Method.fromMethodName(startLine[0]), parsePath(startLine[1]))
+        return new Builder(HttpMethod.fromMethodName(startLine[0]), parsePath(startLine[1]))
                 .parameter(parseParameterMap(parseParameter(startLine[1])))
                 .header(parseHeaderMap(request))
                 .build();
@@ -258,7 +258,7 @@ public class Request {
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
-        sb.append(method.getMethodName()).append(SPACE).append(path);
+        sb.append(httpMethod.getMethodName()).append(SPACE).append(path);
 
         //parameter
         if(!parameter.isEmpty()) sb.append("?");
@@ -292,7 +292,7 @@ public class Request {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Request request = (Request) o;
-        if(!this.method.equals(request.method)) return false;
+        if(!this.httpMethod.equals(request.httpMethod)) return false;
         if(!this.path.equals(request.path)) return false;
         if(!this.parameter.equals(request.parameter)) return false;
         if(!this.header.equals(request.header)) return false;
