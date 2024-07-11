@@ -7,7 +7,6 @@ import distributor.Distributor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.Request;
-import webserver.Response;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
