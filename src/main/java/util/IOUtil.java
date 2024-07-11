@@ -10,14 +10,14 @@ public class IOUtil {
     }
 
     public static boolean isDirectory(boolean isStatic, String path) {
-        try(InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(StringUtil.PROPERTIES)){
+        try(InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(ConstantUtil.PROPERTIES)){
             if(input == null){
                 throw new FileNotFoundException();
             }
             Properties prop = new Properties();
             prop.load(input);
 
-            String fullPath = (isStatic ? prop.getProperty(StringUtil.STATIC_DIR) : prop.getProperty(StringUtil.TEMPLATES_DIR)) + path;
+            String fullPath = (isStatic ? prop.getProperty(ConstantUtil.STATIC_DIR) : prop.getProperty(ConstantUtil.TEMPLATES_DIR)) + path;
             File file = new File(fullPath);
             return file.isDirectory();
         } catch (IOException e) {
@@ -27,14 +27,14 @@ public class IOUtil {
     }
 
     public static byte[] readBytesFromFile(boolean isStatic, String path) throws IOException {
-        try (InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(StringUtil.PROPERTIES)){
+        try (InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(ConstantUtil.PROPERTIES)){
             if(input == null){
                 throw new FileNotFoundException();
             }
             Properties prop = new Properties();
             prop.load(input);
 
-            String fullPath = (isStatic ? prop.getProperty(StringUtil.STATIC_DIR) : prop.getProperty(StringUtil.TEMPLATES_DIR)) + path;
+            String fullPath = (isStatic ? prop.getProperty(ConstantUtil.STATIC_DIR) : prop.getProperty(ConstantUtil.TEMPLATES_DIR)) + path;
             File file = new File(fullPath);
             if(file.isDirectory()){
                 file = new File(fullPath + HttpRequestMapper.INDEX_HTML.getPath());

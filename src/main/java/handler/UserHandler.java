@@ -3,7 +3,7 @@ package handler;
 import db.Database;
 import exception.ModelException;
 import model.User;
-import util.StringUtil;
+import util.ConstantUtil;
 
 import java.util.Collection;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class UserHandler implements ModelHandler<User>{
 
     private void validateFields(Map<String, String> fields) {
         if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
-            throw new ModelException(StringUtil.INVALID_LOGIN);
+            throw new ModelException(ConstantUtil.INVALID_LOGIN);
         }
     }
 }

@@ -3,7 +3,7 @@ package handler;
 import db.Database;
 import model.Session;
 import model.User;
-import util.StringUtil;
+import util.ConstantUtil;
 
 import java.util.Map;
 import java.util.Optional;
@@ -26,7 +26,7 @@ public class SessionHandler {
             return Optional.empty();
         }
 
-        String[] cookies = cookie.split(StringUtil.SEMICOLON_WITH_SPACES); // ;로 시작되는 1개 이상의 공백문자 기준으로 split
+        String[] cookies = cookie.split(ConstantUtil.SEMICOLON_WITH_SPACES); // ;로 시작되는 1개 이상의 공백문자 기준으로 split
         for (String c : cookies) {
             if (c.contains("sid")) {
                 int idx = c.indexOf("=");

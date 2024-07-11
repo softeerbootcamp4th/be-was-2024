@@ -1,8 +1,8 @@
 package util;
 
-public class StringUtil {
+public class ConstantUtil {
 
-    private StringUtil() {
+    private ConstantUtil() {
     }
 
     public static final String SPACE = " ";
@@ -31,4 +31,9 @@ public class StringUtil {
     public static final String INVALID_PATH = "Invalid Path: ";
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
+
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String LOCATION = "Location";
+    public static final String SET_COOKIE = "Set-Cookie";
 }

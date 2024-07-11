@@ -23,15 +23,15 @@ public class HttpResponse {
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
         response.putBody(body);
-        response.putHeader("Content-Type", ContentType.getType(path.contains(StringUtil.DOT) ? path.split(StringUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
-        response.putHeader("Content-Length", response.getBody().length + "");
+        response.putHeader(ConstantUtil.CONTENT_TYPE, ContentType.getType(path.contains(ConstantUtil.DOT) ? path.split(ConstantUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
+        response.putHeader(ConstantUtil.CONTENT_LENGTH, response.getBody().length + "");
         return response;
     }
 
     // staticResponse에서 담당하기에 Header/Body를 설정하지 않음
     public static HttpResponse okStatic(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
-        response.type = StringUtil.STATIC;
+        response.type = ConstantUtil.STATIC;
         response.path = path;
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
@@ -40,7 +40,7 @@ public class HttpResponse {
 
     public static HttpResponse error(String statusCode, String httpVersion) {
         HttpResponse response = new HttpResponse();
-        response.type = StringUtil.FAULT;
+        response.type = ConstantUtil.FAULT;
         response.statusCode = statusCode;
         response.httpVersion = httpVersion;
         return response;
@@ -48,11 +48,11 @@ public class HttpResponse {
 
     public static HttpResponse redirect(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
-        response.type = StringUtil.DYNAMIC;
+        response.type = ConstantUtil.DYNAMIC;
         response.path = path;
         response.statusCode = HttpCode.FOUND.getStatus();
         response.httpVersion = httpVersion;
-        response.putHeader("Location", path);
+        response.putHeader(ConstantUtil.LOCATION, path);
         return response;
     }
 
@@ -74,14 +74,14 @@ public class HttpResponse {
 
     public String getTotalHeaders(){
         StringBuilder sb = new StringBuilder();
-        sb.append(httpVersion).append(StringUtil.SPACE)
-            .append(statusCode).append(StringUtil.SPACE)
-            .append(HttpCode.getMessage(statusCode)).append(StringUtil.CRLF);
+        sb.append(httpVersion).append(ConstantUtil.SPACE)
+            .append(statusCode).append(ConstantUtil.SPACE)
+            .append(HttpCode.getMessage(statusCode)).append(ConstantUtil.CRLF);
 
         for (Map.Entry<String, String> entry : header.entrySet()) {
-            sb.append(entry.getKey()).append(StringUtil.COLON_WITH_SPACE).append(entry.getValue()).append(StringUtil.CRLF);
+            sb.append(entry.getKey()).append(ConstantUtil.COLON_WITH_SPACE).append(entry.getValue()).append(ConstantUtil.CRLF);
         }
-        sb.append(StringUtil.CRLF);
+        sb.append(ConstantUtil.CRLF);
         return sb.toString();
     }
 
@@ -94,7 +94,7 @@ public class HttpResponse {
     }
 
     public void setSessionId(String sessionId){
-        putHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
+        putHeader(ConstantUtil.SET_COOKIE, "sid=" + sessionId + "; Path=/");
     }
 
     public void deleteSessionId(String sessionId){

@@ -26,15 +26,15 @@ public class HttpRequest {
     }
 
     public static HttpRequest from(String requestLine) {
-        String[] requestLineElements = Arrays.stream(requestLine.split(StringUtil.SPACES)).map(String::trim).toArray(String[]::new);
+        String[] requestLineElements = Arrays.stream(requestLine.split(ConstantUtil.SPACES)).map(String::trim).toArray(String[]::new);
         String requestMethod = requestLineElements[0];
-        String[] requestURIElements = Arrays.stream(requestLineElements[1].split(StringUtil.QUESTION_MARK)).map(String::trim).toArray(String[]::new);
+        String[] requestURIElements = Arrays.stream(requestLineElements[1].split(ConstantUtil.QUESTION_MARK)).map(String::trim).toArray(String[]::new);
         String requestPath = requestURIElements[0];
         Map<String, String> requestParams = new HashMap<>();
         if(requestURIElements.length > 1) {
-            String[] params = requestURIElements[1].split(StringUtil.AND);
+            String[] params = requestURIElements[1].split(ConstantUtil.AND);
             for (String param : params) {
-                String[] keyValue = param.split(StringUtil.EQUAL);
+                String[] keyValue = param.split(ConstantUtil.EQUAL);
                 requestParams.put(keyValue[0], URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8));
             }
         }
@@ -75,13 +75,13 @@ public class HttpRequest {
 
         // byte[] to String, "&"으로 split
         String restoredString = new String(requestBody, StandardCharsets.UTF_8);
-        String[] pairs = restoredString.split(StringUtil.AND);
+        String[] pairs = restoredString.split(ConstantUtil.AND);
         // 만약 body가 없는 경우
-        if(pairs.length == 1 && pairs[0].isEmpty()) throw new RequestException(StringUtil.INVALID_BODY);
+        if(pairs.length == 1 && pairs[0].isEmpty()) throw new RequestException(ConstantUtil.INVALID_BODY);
 
         // 디코딩한 후 "="으로 split하여 Map에 저장
         for (String pair : pairs) {
-            String[] keyValue = pair.split(StringUtil.EQUAL);
+            String[] keyValue = pair.split(ConstantUtil.EQUAL);
             String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
             String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
             bodyMap.put(key.trim(), value.trim());
@@ -91,10 +91,10 @@ public class HttpRequest {
 
     public void putHeaders(String headerLine){
         if(headerLine.isEmpty()) return;
-        headerLine = headerLine.replaceAll(StringUtil.SPACES, StringUtil.SPACE); // remove multiple spaces
-        int idx = headerLine.indexOf(StringUtil.COLON);
+        headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
+        int idx = headerLine.indexOf(ConstantUtil.COLON);
         if(idx == -1) {
-            throw new RequestException(StringUtil.INVALID_HEADER + headerLine);
+            throw new RequestException(ConstantUtil.INVALID_HEADER + headerLine);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
         requestHeaders.put(header[0].trim(), header[1].trim());
