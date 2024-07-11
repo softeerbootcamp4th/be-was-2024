@@ -19,4 +19,11 @@ public class Session {
     public static void deleteSession(String sid){
         sessionDatabase.remove(sid);
     }
+
+    public static Boolean isLogin(String sid){
+        if(sid == null) return false;
+        String userId = sessionDatabase.get(sid);
+        if(userId == null) return false;
+        else return true;
+    }
 }
