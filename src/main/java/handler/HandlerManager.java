@@ -4,6 +4,7 @@ import constant.FileExtensionType;
 import constant.HttpMethod;
 import constant.HttpStatus;
 import constant.MimeType;
+import cookie.Cookie;
 import db.Database;
 import dto.HttpRequest;
 import dto.HttpResponse;
@@ -12,6 +13,7 @@ import exception.ResourceNotFoundException;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import session.Session;
 import util.HttpRequestParser;
 
 import java.io.*;
@@ -40,6 +42,7 @@ public class HandlerManager {
 
         // 각 HttpRequest를 처리하는 Handler 등록
 
+        // 회원가입 handler
         handlers.get(HttpMethod.POST).put("/user/create", (httpRequest, httpResponse) -> {
 
             Map<String, String> bodyParams = getBodyParams(httpRequest);
@@ -52,25 +55,49 @@ public class HandlerManager {
             httpResponse.setRedirect("/index.html");
         });
 
+        // 로그인 처리 handler
         handlers.get(HttpMethod.POST).put("/user/login", (httpRequest, httpResponse) -> {
 
             Map<String, String> bodyParams = getBodyParams(httpRequest);
 
+            String userId = bodyParams.get("userId");
+            String password = bodyParams.get("password");
+            if(userId == null || password == null){
+                httpResponse.setRedirect("/login/login_failed.html");
+                return;
+            }
+
             if(Database.userExists(bodyParams.get("userId"))){
-                String userId = bodyParams.get("userId");
-                String password = bodyParams.get("password");
 
                 User user = Database.findUserById(userId);
 
                 // 로그인 성공 시, /index.html로 redirect
                 if(user.getPassword().equals(password)){
+                    String sessionId = Session.createSession(userId);
+                    httpResponse.setCookie(new Cookie(sessionId));
                     httpResponse.setRedirect("/index.html");
-                }
-                // 로그인 실패 시, /login/failed.html로 redirect
-                else{
-                    httpResponse.setRedirect("/login/failed.html");
+                    return;
                 }
             }
+
+            // 로그인 실패 시, /login/failed.html로 redirect
+            httpResponse.setRedirect("/login/login_failed.html");
+
+        });
+
+        // 로그아웃 handler
+        handlers.get(HttpMethod.POST).put("/logout", (httpRequest, httpResponse) -> {
+
+            if(httpRequest.getSessionId().isPresent()){
+                String sessionId = httpRequest.getSessionId().get();
+                Session.deleteSession(sessionId);
+
+                Cookie cookie = new Cookie(sessionId);
+                cookie.setMaxAge(0);
+                httpResponse.setCookie(cookie);
+            }
+
+            httpResponse.setRedirect("/index.html");
 
         });
     }
