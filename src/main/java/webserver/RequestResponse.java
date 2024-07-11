@@ -1,10 +1,13 @@
 package webserver;
 
+import db.Database;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 public class RequestResponse {
 
@@ -75,6 +78,26 @@ public class RequestResponse {
             response200Header(modifiedFileBody.length, contentType);
             responseBody(modifiedFileBody);
         }
+    }
+
+    public void openUserList() throws IOException {
+        Collection<User> users = Database.findAll();
+
+        StringBuilder userListHtml = new StringBuilder();
+        userListHtml.append("<html><head><title>User List</title></head><body>");
+        userListHtml.append("<h1>User List</h1>");
+        userListHtml.append("<ul>");
+        for (User user : users) {
+            userListHtml.append("<li> ID: ").append(user.getUserId())
+                    .append(" & Name: ").append(user.getName())
+                    .append("</li>");
+        }
+        userListHtml.append("</ul>");
+        userListHtml.append("</body></html>");
+        byte[] fileBody = userListHtml.toString().getBytes("UTF-8");
+
+        response200Header(fileBody.length, "text/html");
+        responseBody(fileBody);
     }
 
 
