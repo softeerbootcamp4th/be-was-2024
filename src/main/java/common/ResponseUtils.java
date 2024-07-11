@@ -17,7 +17,6 @@ public class ResponseUtils {
     }
 
     public static HttpResponse redirectToViewWithCookie(Map<String, String> cookie) {
-        System.out.println("cookie.get(\"SID\") = " + cookie.get("SID"));
         return new HttpResponse.HttpResponseBuilder()
                 .code(ResponseCode.FOUND)
                 .cookie(cookie)

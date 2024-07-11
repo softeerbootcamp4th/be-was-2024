@@ -122,7 +122,6 @@ public class WebAdapter {
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
                 hashMap.put(SESSION_ID, session.getId());
 
-                System.out.println("here = ");
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
             } else { // id, pwd 불일치
