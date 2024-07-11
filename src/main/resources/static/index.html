@@ -167,8 +167,10 @@
           <li class="header__menu__item">
             <button class="btn btn_contained btn_size_s" id="logout-button">로그아웃</button>
           </li>
+          <li class ="header__menu__time">
+            <button class="btn btn_contained btn_size_s" href="/user/list">회원 목록</button>
+          </li>
         `;
-
         document.getElementById("logout-button").addEventListener("click", () => {
           document.cookie = "SID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           location.reload();
