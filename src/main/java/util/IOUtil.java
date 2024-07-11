@@ -37,7 +37,7 @@ public class IOUtil {
             String fullPath = (isStatic ? prop.getProperty(StringUtil.STATIC_DIR) : prop.getProperty(StringUtil.TEMPLATES_DIR)) + path;
             File file = new File(fullPath);
             if(file.isDirectory()){
-                file = new File(fullPath + StringUtil.INDEX_HTML);
+                file = new File(fullPath + HttpRequestMapper.INDEX_HTML.getPath());
             }
             int lengthOfBodyContent = (int) file.length();
             byte[] body = new byte[lengthOfBodyContent];

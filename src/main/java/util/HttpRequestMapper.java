@@ -7,12 +7,14 @@ public enum HttpRequestMapper {
 
     // OK
     INDEX_HTML("/index.html", "GET"),
-    USER_LOGIN_FAIL("/user/login_failed.html", "GET"),
+    LOGIN_FAIL("/user/login_failed.html", "GET"),
+    LOGIN("/user/login.html" , "GET"),
+    SIGNUP("/user/form.html", "GET"),
+    USER_LIST("/user/list", "GET"),
 
     // Redirect
     ROOT("/", "GET"),
     REGISTER("/registration", "GET"),
-    LOGIN("/login", "GET"),
     SIGNUP_REQUEST("/user/create", "POST"),
     LOGIN_REQUEST("/user/login", "POST"),
     LOGOUT_REQUEST("/user/logout", "POST"),
@@ -43,6 +45,10 @@ public enum HttpRequestMapper {
 
     public static boolean isAuthRequest(String path, String method) {
         return LOGIN_REQUEST.equals(of(path, method)) || LOGOUT_REQUEST.equals(of(path, method));
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public String getMethod() {
