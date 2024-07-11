@@ -14,7 +14,8 @@ public class HttpRequestParser {
     private final String path;
     private final byte[] body;
     private final String extension;
-    private Method method;
+    private final Method method;
+    private final Map<String, String> cookiesMap = new HashMap<>();
     private final Map<String, String> requestHeadersMap = new HashMap<>();
     private final Map<String, String> queryParametersMap = new HashMap<>();
     public HttpRequestParser(InputStream inputStream) throws IOException {
@@ -45,6 +46,20 @@ public class HttpRequestParser {
                 String key = line.substring(0, colonIndex).trim();
                 String value = line.substring(colonIndex + 1).trim();
                 requestHeadersMap.put(key, value);
+            }
+        }
+
+        // 쿠키 파싱
+        String cookieHeader = requestHeadersMap.get("Cookie");
+        if (cookieHeader != null) {
+            for (String keyValue : cookieHeader.split(";")) {
+                int equalsIndex = keyValue.indexOf("=");
+                if (equalsIndex != -1) {
+                    String key = keyValue.substring(0, equalsIndex).trim();
+                    String value = keyValue.substring(equalsIndex + 1).trim();
+
+                    cookiesMap.put(key, value);
+                }
             }
         }
 
@@ -119,16 +134,20 @@ public class HttpRequestParser {
         return method;
     }
 
-    public String headersToString() {
-        StringBuilder sb = new StringBuilder();
-        for (String key : requestHeadersMap.keySet()) {
-            sb.append(key).append(": ").append(requestHeadersMap.get(key));
-        }
-
-        return sb.toString();
+    public Map<String, String> getCookiesMap() {
+        return cookiesMap;
     }
 
     public String getExtension() {
         return extension;
+    }
+
+    public String headersToString() {
+        StringBuilder sb = new StringBuilder();
+        for (String key : requestHeadersMap.keySet()) {
+            sb.append(key).append(": ").append(requestHeadersMap.get(key)).append("\n");
+        }
+
+        return sb.toString();
     }
 }
