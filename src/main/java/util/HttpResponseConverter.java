@@ -1,18 +1,12 @@
 package util;
 
-import db.Database;
-import model.HttpRequest;
-import model.HttpResponse;
-import model.User;
-import model.enums.HttpStatus;
+import dto.HttpRequest;
+import dto.HttpResponse;
+import dto.enums.HttpStatus;
 import util.constant.StringConstants;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static util.constant.StringConstants.*;

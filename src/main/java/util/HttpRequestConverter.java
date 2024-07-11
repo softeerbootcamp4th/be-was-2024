@@ -1,7 +1,7 @@
 package util;
 
-import model.HttpRequest;
-import model.enums.HttpMethod;
+import dto.HttpRequest;
+import dto.enums.HttpMethod;
 
 import java.io.*;
 import java.net.URLDecoder;

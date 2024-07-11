@@ -1,5 +1,7 @@
 package util.constant;
 
+import logic.Logics;
+
 public class StringConstants {
     public static final String SPACE = " ";
     public static final String CHARSET = "UTF-8";
@@ -26,4 +28,5 @@ public class StringConstants {
     public static final String PATH_CREATE = "/create";
     public static final String PATH_LOGIN = "/login";
 
+    public static final Long EXPIRE_TIME = 1000000L;
 }

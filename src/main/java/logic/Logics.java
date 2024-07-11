@@ -1,21 +1,21 @@
 package logic;
 
-import db.Database;
-import model.HttpRequest;
-import model.HttpResponse;
+import db.SessionDatabase;
+import db.UserDatabase;
+import dto.HttpRequest;
+import dto.HttpResponse;
+import model.Session;
 import model.User;
-import model.enums.HttpMethod;
-import model.enums.HttpStatus;
+import dto.enums.HttpMethod;
+import dto.enums.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestConverter;
-import webserver.RequestHandler;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import static util.constant.StringConstants.*;
 
@@ -43,7 +43,7 @@ public class Logics {
         String email = bodyToMap.get(EMAIL);
 
         User user = new User(userId, password, name, email);
-        Database.addUser(user);
+        UserDatabase.addUser(user);
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
         //TODO : body를 리턴하지 않아도 되는가
     }
@@ -53,22 +53,29 @@ public class Logics {
             throw new RuntimeException("Invalid method");
         }
 
-        //아이디와 비밀번호를 매칭
-        //TODO :get 하기전 getOrThrow 처리
-
         ///header
         Map<String, String> headers = new HashMap<>();
 
         // body
         Map<String, String> bodyToMap = HttpRequestConverter.bodyToMap(httpRequest.getBody());
-
         String userId = bodyToMap.get(USER_ID);
         String password = bodyToMap.get(PASSWORD);
 
-        User user = Database.findUserById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = UserDatabase.findUserById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (userId.equals(user.getUserId()) && password.equals(user.getPassword())) {
             headers.put("Location", "/index.html");
             logger.info("userId : "+userId+"Login successful");
+
+            //세션이 있는지 파악하고(home에서하기
+            // 세션을 생성하여
+            Session session = new Session(UUID.randomUUID().toString(),userId,EXPIRE_TIME);
+            SessionDatabase.addSession(session);
+            //쿠키에담아서
+            headers.put("Set-Cookie", "sid="+session.getSessionId()+"; Path=/");
+
+            //이후 모든 요청엔 알아서 쿠키가 담김!
+
+
         } else {
             headers.put("Location", "/login_failed.html");
             logger.info("userId : "+userId+"Login failed");

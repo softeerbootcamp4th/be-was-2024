@@ -1,15 +1,8 @@
-package model;
+package dto;
 
-import model.enums.HttpStatus;
-import util.FileMapper;
-import util.HttpResponseConverter;
+import dto.enums.HttpStatus;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class HttpResponse {

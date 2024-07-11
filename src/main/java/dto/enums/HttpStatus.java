@@ -1,4 +1,4 @@
-package model.enums;
+package dto.enums;
 
 public enum HttpStatus {
 

@@ -1,16 +1,7 @@
-package model;
+package dto;
 
-import db.Database;
-import model.HttpResponse;
-import model.User;
-import model.enums.HttpMethod;
-import model.enums.HttpStatus;
-import util.FileMapper;
+import dto.enums.HttpMethod;
 
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.io.*;
 import java.util.Map;
 
 public class HttpRequest {
