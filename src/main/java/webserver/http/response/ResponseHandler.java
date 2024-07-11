@@ -4,7 +4,6 @@ import exception.NotExistException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.PluginMapper;
-import webserver.http.Session;
 import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 
@@ -28,41 +27,26 @@ public class ResponseHandler {
         Response response = new Response.Builder(Status.NOT_FOUND).build();
 
         try {
-            Optional<Object> returnValue = runPlugin(request.getMethod(), request.getPath(), request);
-            if (returnValue.isPresent()) {
-                if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
-            }
-        } catch (NotExistException e) {
-
-            if(request.getPath().equals("/index.html")){
-
-                String body = new String(getFile(request.getPath()));
-                String replacedBody;
-
-                if(request.isLogin()){
-                    replacedBody = body.replace("{USERNAME}", Session.get(request.getSessionId()).getName());
-                    replacedBody = replacedBody.replace("{LOGINBTN}", "<form action=\"/logout\" method=\"post\"><button type=\"submit\" class=\"btn btn_contained btn_size_s\">로그아웃</button></form>");
-                }else {
-                    replacedBody = body.replace("{USERNAME}", "");
-                    replacedBody = replacedBody.replace("{LOGINBTN}", "<a class=\"btn btn_contained btn_size_s\" href=\"/login\">로그인</a>");
+            if (pluginMapper.isExist(request.getMethod(), request.getPath())) {
+                Optional<Object> returnValue = runPlugin(request.getMethod(), request.getPath(), request);
+                if (returnValue.isPresent()) {
+                    if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
                 }
+            } else {
                 response = new Response.Builder(Status.OK)
                         .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
-                        .body(replacedBody.getBytes())
+                        .body(getFile(request.getPath()))
                         .build();
-                return response;
             }
-
-            response = new Response.Builder(Status.OK)
-                    .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
-                    .body(getFile(request.getPath()))
+        }catch (Exception e){
+            response = new Response.Builder(Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
 
         return response;
     }
 
-    private String getContentType(String extension){
+    public static String getContentType(String extension){
         return switch (extension){
             case "html" -> "text/html";
             case "css" -> "text/css";

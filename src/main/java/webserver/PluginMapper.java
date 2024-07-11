@@ -23,4 +23,8 @@ public class PluginMapper {
         return httpMethod.getMethodName()+" "+path;
     }
 
+    public boolean isExist(HttpMethod httpMethod, String path){
+        return pathMap.containsKey(httpMethodAndPathToString(httpMethod, path));
+    }
+
 }
