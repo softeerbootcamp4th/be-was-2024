@@ -11,6 +11,11 @@
 <div class="container">
   <header class="header">
     <a href="/"><img src="./img/signiture.svg" /></a>
+    <ul class = "header_menu">
+      <li class ="header__menu__time">
+        <button class="btn btn_contained btn_size_s" href="/user/list">회원 목록</button>
+      </li>
+    </ul>
     <ul class="header__menu" id="header-menu">
       <!-- 동적으로 버튼을 생성할 영역 -->
     </ul>
@@ -166,9 +171,6 @@
           <li class="header__menu__item">반갑습니다, ${userName}님</li>
           <li class="header__menu__item">
             <button class="btn btn_contained btn_size_s" id="logout-button">로그아웃</button>
-          </li>
-          <li class ="header__menu__time">
-            <button class="btn btn_contained btn_size_s" href="/user/list">회원 목록</button>
           </li>
         `;
         document.getElementById("logout-button").addEventListener("click", () => {
