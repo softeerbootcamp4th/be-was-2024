@@ -14,7 +14,7 @@ public class SessionDatabase {
 
     public static Session createDefaultSession() {
         String SID = StringUtils.createRandomUUID();
-        Session createSession = new Session(SID, System.currentTimeMillis()+1800);
+        Session createSession = new Session(SID, System.currentTimeMillis()+1800*1000);
         sessions.put(SID, createSession);
         return createSession;
     }
@@ -26,6 +26,9 @@ public class SessionDatabase {
     public static void removeExpiredSessions() {
         for (String id : sessions.keySet()) {
             if(sessions.get(id).getAge()<System.currentTimeMillis()) {
+                System.out.println("sessions.get(id).getAge() = " + sessions.get(id).getAge());
+                System.out.println("System.currentTimeMillis() = " + System.currentTimeMillis());
+                System.out.println(id+" 가 메모리에서 제거되었습니다.");
                 sessions.remove(id);
             }
         }

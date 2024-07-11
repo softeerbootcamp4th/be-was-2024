@@ -115,12 +115,10 @@ public class WebAdapter {
             HttpResponse response;
 
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
-                // 세션 생성
-                Session session = SessionDatabase.createDefaultSession();
-                // 생성된 세션을 세션 저장소에 저장
-                SessionIdMapper.addSessionId(session.getId(), map.get("userId"));
+                Session newSession = SessionFacade.createSession(map.get("userId"));
+
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
-                hashMap.put(SESSION_ID, session.getId());
+                hashMap.put(SESSION_ID, newSession.getId());
 
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
@@ -153,11 +151,18 @@ public class WebAdapter {
             response.writeInBytes(out);
         }
         // 유저 리스트 찾아서 json으로 반환
-        if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
-            Collection<User> users = UserDatabase.findAll();
-            String jsonUser = JsonBuilder.buildJsonResponse(users);
+        else if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
+            HttpResponse response;
+            // 인증된 요청일경우 표시
+            if(SessionFacade.isAuthenticatedRequest(request)) {
+                Collection<User> users = UserDatabase.findAll();
+                String jsonUser = JsonBuilder.buildJsonResponse(users);
 
-            HttpResponse response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
+                response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
+            } else {
+                System.out.println("인증되지 않은 요청입니다");
+                response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
+            }
             response.writeInBytes(out);
         }
         // 데이터베이스 초기화
