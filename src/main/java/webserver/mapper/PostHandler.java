@@ -1,9 +1,6 @@
 package webserver.mapper;
 
-import model.SessionIdControl;
-import model.User;
-import model.UserCreate;
-import model.UserLogin;
+import model.*;
 import webserver.HttpRequest;
 import webserver.RequestResponse;
 import java.io.IOException;
@@ -34,7 +31,7 @@ public class PostHandler {
                 requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
                 break;
             case "/logout":
-                sessionId = headers.get("Cookie").split(";")[1].substring(5);
+                sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
                 SessionIdControl.deleteSessionId(sessionId);
                 redirectUrl = "/index.html";
                 requestResponse.resetCookieAndRedirectPath(redirectUrl);

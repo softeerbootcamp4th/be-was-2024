@@ -1,6 +1,9 @@
 package webserver.mapper;
 
+import db.Session;
 import model.SessionIdControl;
+import model.User;
+import model.UserInfoExtract;
 import webserver.HttpRequest;
 import webserver.RequestResponse;
 
@@ -21,6 +24,12 @@ public class GetHandler {
             case "/login":
                 url = staticResourceDir + "/login/index.html";
                 break;
+            case "/main/index.html":
+                String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
+                User user = Session.findUserBySessionId(sessionId);
+                url = staticResourceDir + "/main/index.html";
+                requestResponse.openPathWithUsername(url, user.getName());
+                return;
             default:
                 url = staticResourceDir + url;
                 break;
