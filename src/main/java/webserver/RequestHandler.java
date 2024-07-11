@@ -1,5 +1,6 @@
 package webserver;
 
+import common.ResponseUtils;
 import common.WebUtils;
 import exception.SizeNotMatchException;
 import file.ViewFile;
@@ -46,9 +47,9 @@ public class RequestHandler implements Runnable {
             // Request객체의 정보를 바탕으로 적절한 응답 뷰 파일 탐색
             ViewFile viewFile = ViewResolver.getProperFileFromRequest(httpRequest, out);
             // 뷰 파일에 맞게 적절한 Response객체 생성
-            HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.OK, WebUtils.getProperContentType(viewFile.getExtension()));
+            HttpResponse httpResponse = ResponseUtils.createResponse(ResponseCode.OK, WebUtils.getProperContentType(viewFile.getExtension()));
             // Stream을 이용하여 HTTP 응답
-            readAndResponseFromPath(out, STATIC_DIR_PATH +viewFile.getPath(), httpResponse.getContentType());
+            readAndResponseFromPath(out, STATIC_DIR_PATH+viewFile.getPath(), httpResponse.getContentType());
 
         } catch (IOException e) {
             e.printStackTrace();

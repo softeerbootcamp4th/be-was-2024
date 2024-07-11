@@ -127,4 +127,8 @@ public class HttpRequest {
             return false;
         }
     }
+
+    public String getPathWithoutQueryParam() {
+        return this.getPath().split("\\?")[0];
+    }
 }

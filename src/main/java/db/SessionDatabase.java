@@ -36,4 +36,8 @@ public class SessionDatabase {
         if(session!=null)
             session.invalidateSession();
     }
+
+    public static boolean isValidateSession(String SID) {
+        return sessions.get(SID)!=null;
+    }
 }

@@ -1,11 +1,14 @@
 package webserver;
 
 import common.JsonBuilder;
+import common.StringUtils;
 import db.SessionDatabase;
 import db.SessionIdMapper;
 import db.UserDatabase;
 import exception.CannotResolveRequestException;
+import facade.SessionFacade;
 import facade.UserFacade;
+import common.ResponseUtils;
 import model.Session;
 import model.User;
 import web.*;
@@ -45,6 +48,7 @@ public class WebAdapter {
         method = HttpMethod.valueOf(line_1[0]);
         path = line_1[1];
 
+        // Header
         for(int i=1; i<requestLine.length; i++) {
             if(requestLine[i].split(":").length==1) continue;
             String[] line_N = requestLine[i].split(":");
@@ -82,10 +86,6 @@ public class WebAdapter {
                 .build();
     }
 
-    public static HttpResponse createResponse(ResponseCode code, String contentType) {
-        return new HttpResponse.HttpResponseBuilder().code(code).contentType(contentType).build();
-    }
-
     public static String resolveRequestUri(HttpRequest request, OutputStream out) throws IOException {
         if(request.isGetRequest()) {
             return resolveGetRequestUri(request, out);
@@ -101,21 +101,19 @@ public class WebAdapter {
      */
     private static String resolvePostRequestUri(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
-        if(request.getPath().equals("/signUp")) {
-            Map<String, String> map = parseBodyInForm(request.getBody()); // userId, password, name
+        if(request.getPath().equals(RestUri.SIGN_UP.getUri())) {
+            // body의 유저 정보 파싱
+            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody());
+            // 유저 생성
             UserFacade.createUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
-            HttpResponse response = new HttpResponse.HttpResponseBuilder()
-                    .code(ResponseCode.FOUND)
-                    .build();
-
+            HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
 
-        } else if(request.getPath().equals("/signIn")) {
-            Map<String, String> map = parseBodyInForm(request.getBody()); // userId, password
-
+        } else if(request.getPath().equals(RestUri.SIGN_IN.getUri())) {
+            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody()); // userId, password
             HttpResponse response;
-            // 로그인시 새로운 세션 쿠키 발급
+
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
                 // 세션 생성
                 Session session = SessionDatabase.createDefaultSession();
@@ -124,85 +122,50 @@ public class WebAdapter {
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
                 hashMap.put(SESSION_ID, session.getId());
 
-                response = new HttpResponse.HttpResponseBuilder()
-                        .code(ResponseCode.FOUND)
-                        .cookie(hashMap)
-                        .build();
+                System.out.println("here = ");
+                response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
             } else { // id, pwd 불일치
-                response = new HttpResponse.HttpResponseBuilder()
-                        .code(ResponseCode.FOUND)
-                        .location("/login/index.html")
-                        .build();
+                response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             }
 
             response.writeInBytes(out);
 
-        } else if(request.getPath().equals("/logout")) {
-            String sid = request.getCookie().get(SESSION_ID);
-            SessionDatabase.invalidateSession(sid);
-            SessionDatabase.removeExpiredSessions();
+        } else if(request.getPath().equals(RestUri.LOGOUT.getUri())) {
+            // 세션 저장소의 정보 삭제
+            SessionFacade.invalidateAndRemoveSession(request);
 
-            HttpResponse response = new HttpResponse.HttpResponseBuilder()
-                    .code(ResponseCode.FOUND)
-                    .location("/login/index.html")
-                    .build();
-
+            HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             response.writeInBytes(out);
-
         }
 
-        return "/index.html";
+        return ViewPath.DEFAULT.getFilePath();
     }
 
-    private static Map<String, String> parseBodyInForm(byte[] body) {
-        HashMap<String, String> map = new HashMap<>();
-        String bodyStr = new String(body);
-        String[] chunks = bodyStr.split("&");
-        for (String chunk : chunks) {
-            String key = chunk.split("=")[0];
-            String value = chunk.split("=")[1];
-            map.put(key, value);
-        }
-        return map;
-    }
+
 
     /**
      * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답
      */
     private static String resolveGetRequestUri(HttpRequest request, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
-        if(request.getPath().split("\\?")[0].equals("/signUp")) {
-
-            HttpResponse response = new HttpResponse.HttpResponseBuilder()
-                    .code(ResponseCode.BAD_REQUEST)
-                    .build();
-
+        if(request.getPathWithoutQueryParam().equals(RestUri.SIGN_UP.getUri())) {
+            HttpResponse response = ResponseUtils.responseBadRequest();
             response.writeInBytes(out);
         }
         // 유저 리스트 찾아서 json으로 반환
-        if(request.getPath().split("\\?")[0].equals("/user/list")) {
-
+        if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
             Collection<User> users = UserDatabase.findAll();
             String jsonUser = JsonBuilder.buildJsonResponse(users);
 
-            HttpResponse response = new HttpResponse.HttpResponseBuilder()
-                    .code(ResponseCode.OK)
-                    .contentType(MIME.JSON.getType())
-                    .contentLength(jsonUser.length())
-                    .body(jsonUser.getBytes())
-                    .build();
-
+            HttpResponse response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
             response.writeInBytes(out);
         }
         // 데이터베이스 초기화
-        else if(request.getPath().split("\\?")[0].equals("/database/init")) {
+        else if(request.getPathWithoutQueryParam().equals(RestUri.DATABASE_INIT.getUri())) {
             UserDatabase.initialize();
 
-            HttpResponse response = new HttpResponse.HttpResponseBuilder()
-                    .code(ResponseCode.OK)
-                    .build();
-
+            HttpResponse response = ResponseUtils.responseSuccess();
             response.writeInBytes(out);
         }
 
@@ -214,13 +177,6 @@ public class WebAdapter {
      * GET 요청에 적절한 뷰를 응답해준다
      */
     private static String resolveGetRequestUri(String restUri) {
-
-        return switch(restUri) {
-            case "/login" -> "/login/index.html";
-            case "/registration" -> "/registration/index.html";
-            case "/comment" -> "/comment/index.html";
-            case "/article" -> "/article/index.html";
-            default -> "/index.html";
-        };
+        return ViewPath.findByRequestUri(restUri).getFilePath();
     }
 }
