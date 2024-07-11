@@ -3,6 +3,7 @@ package util;
 public final class StringUtil {
     public static final String SPACES = "\\s+";
     public static final String COLON = ":";
+    public static final String SEMICOLON = ";";
     public static final String BLANK = " ";
     public static final String DOT = ".";
     public static final String QUESTION_MARK = "?";
@@ -20,6 +21,7 @@ public final class StringUtil {
         public static final String CONTENT_TYPE = "Content-Type";
         public static final String CONTENT_LENGTH = "Content-Length";
         public static final String LOCATION = "Location";
+        public static final String SET_COOKIE = "Set-Cookie";
     }
 
     public static class Method {

@@ -1,6 +1,8 @@
 package http;
 
 
+import model.Session;
+
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -30,6 +32,12 @@ public class HttpResponse {
         HttpResponse response = new HttpResponse();
         response.setStatusCode(SC_FOUND);
         response.addHeader(LOCATION, redirectUrl);
+        return response;
+    }
+
+    public static HttpResponse redirect(String redirectUrl, Session session) {
+        HttpResponse response = redirect(redirectUrl);
+        response.addHeader(SET_COOKIE, session.toString());
         return response;
     }
 
