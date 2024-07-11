@@ -1,6 +1,7 @@
 package dto;
 
 import constant.HttpStatus;
+import cookie.Cookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,7 @@ public class HttpResponse {
 
     private HttpStatus status;
     private Map<String, List<String>> headers;
+    private Cookie cookie;
     private byte[] body;
 
     public HttpResponse(){
@@ -57,6 +59,9 @@ public class HttpResponse {
                 dos.writeBytes(CRLF);
             }
         }
+        if(cookie != null){
+            dos.writeBytes(cookie.getCookieString());
+        }
         dos.writeBytes(CRLF);
 
         // response body 생성
@@ -80,6 +85,9 @@ public class HttpResponse {
         this.body = body;
     }
 
+    public void setCookie(Cookie cookie){
+        this.cookie = cookie;
+    }
 
 
 }
