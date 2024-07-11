@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <ul class="header__menu">
+            <my-template if-not="user">
+                <li class="header__menu__item">
+                    <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+                </li>
+                <li class="header__menu__item">
+                    <a class="btn btn_ghost btn_size_s" href="/registration">
+                        회원 가입
+                    </a>
+                </li>
+            </my-template>
+            <my-template if="user">
+                <li>{user.name} 님, 안녕하세요!</li>
+                <li class="header__menu__item">
+                    <form method="post" action="/auth/signout">
+                        <button class="btn btn_ghost btn_size_s" type="submit">로그아웃</button>
+                    </form>
+                </li>
+            </my-template>
+        </ul>
+    </header>
+    <div class="page">
+        <h2 class="page-title">회원가입</h2>
+        <form class="form" method="post" action="/auth/signup">
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">아이디</p>
+                <input
+                        name="userId"
+                        class="input_textfield"
+                        placeholder="아이디를 입력해주세요"
+                        autocomplete="username"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">닉네임</p>
+                <input
+                        name="name"
+                        class="input_textfield"
+                        placeholder="닉네임을 입력해주세요"
+                        autocomplete="username"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">비밀번호</p>
+                <input
+                        name="password"
+                        class="input_textfield"
+                        type="password"
+                        placeholder="비밀번호를 입력해주세요"
+                        autocomplete="current-password"
+                />
+            </div>
+            <div class="textfield textfield_size_s">
+                <p class="title_textfield">이메일</p>
+                <input
+                        name="email"
+                        class="input_textfield"
+                        type="email"
+                        placeholder="이메일을 입력해주세요"
+                        autocomplete="current-email"
+                />
+            </div>
+            <button
+                    id="registration-btn"
+                    class="btn btn_contained btn_size_m"
+                    style="margin-top: 24px"
+                    type="submit"
+            >
+                회원가입
+            </button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

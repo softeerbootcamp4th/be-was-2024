@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import session.MySession;
 
-public class UserTestChain extends MiddlewareChain {
-    private static Logger logger = LoggerFactory.getLogger(UserTestChain.class);
+public class UserSessionChain extends MiddlewareChain {
+    private static Logger logger = LoggerFactory.getLogger(UserSessionChain.class);
     @Override
     public void act(MyHttpRequest req, MyHttpResponse res) {
         String sessionId = req.getCookies().getValue(AppConfig.SESSION_NAME);

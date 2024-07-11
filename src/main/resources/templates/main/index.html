@@ -10,26 +10,16 @@
   <body>
     <div class="container">
       <header class="header">
-        <a href="/"><img src="/img/signiture.svg" /></a>
+        <a href="/main"><img src="../img/signiture.svg" /></a>
         <ul class="header__menu">
-          <my-template if-not="user">
           <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
           </li>
           <li class="header__menu__item">
-            <a class="btn btn_ghost btn_size_s" href="/registration">
-              회원 가입
-            </a>
+            <button id="logout-btn" class="btn btn_ghost btn_size_s">
+              로그아웃
+            </button>
           </li>
-          </my-template>
-          <my-template if="user">
-            <li>{user.name} 님, 안녕하세요!</li>
-          <li class="header__menu__item">
-            <form method="post" action="/auth/signout">
-              <button class="btn btn_ghost btn_size_s" type="submit">로그아웃</button>
-            </form>
-          </li>
-          </my-template>
         </ul>
       </header>
       <div class="wrapper">
@@ -140,7 +130,7 @@
               </a>
             </li>
             <li class="nav__menu__item">
-              <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+              <a class="btn btn_ghost btn_size_m" href="/comment">댓글 작성</a>
             </li>
             <li class="nav__menu__item">
               <a class="nav__menu__item__btn" href="">
