@@ -44,7 +44,7 @@ public class GetHandler
             {
                 if(requestObject.getCookies().isEmpty())//쿠키 값이 비어 있다면, 즉 로그인 안해있으면
                 {
-                    logger.debug("쿠키 값이 비어있음");
+                    staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
                     return ;
                 }
                 handleUserListRequest(dos,requestObject);
@@ -56,7 +56,6 @@ public class GetHandler
             return;
         }
         path= FileDetection.getPath(FileDetection.fixedPath+path);
-        logger.debug(path);
         staticFileHandler(dos,path);
     }
 
@@ -155,7 +154,7 @@ public class GetHandler
         {
             sb.append(temp.toString()+"<br>");
         }
-        String body = "<html><head></head><body>" + sb.toString() + " </body></html>";
+        String body = "<html><head></head><body>" + sb + " </body></html>";
         byte[] bodyBytes = body.getBytes("UTF-8");
         dos.writeBytes("HTTP/1.1 200 OK \r\n");
         dos.writeBytes("Content-Type: text/html ;charset=utf-8\r\n");
