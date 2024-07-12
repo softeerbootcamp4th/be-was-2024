@@ -41,7 +41,7 @@ public class UserProcessor {
         Database.addUser(user);
     }
 
-    public User findUser(RequestObject requestObject) throws Exception {
+    public User userFind(RequestObject requestObject) throws Exception {
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
         String[] idLine = pairs[0].split("=");

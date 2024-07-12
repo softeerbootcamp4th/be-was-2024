@@ -40,7 +40,7 @@ public class PostHandler
         {
             try
             {
-                User user = userProcessor.findUser(requestObject);
+                User user = userProcessor.userFind(requestObject);
                 loginSuccess(dos,user);//로그인 성공 시
             }
             catch(Exception e)//해당하는 예외 메세지를 출력한다
