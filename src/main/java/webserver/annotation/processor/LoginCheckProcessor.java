@@ -15,7 +15,7 @@ public class LoginCheckProcessor {
     }
 
     public MyHttpResponse toLoginPage() {
-        return new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/login"), null);
+        return new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/login"));
     }
 }
 

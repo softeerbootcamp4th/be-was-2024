@@ -1,4 +1,4 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.post;
 
 import db.SessionTable;
 import org.slf4j.Logger;
@@ -7,13 +7,14 @@ import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 
 import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
-public class POSTLogoutUserMapper implements HttpMapper {
-    private static final Logger logger = LoggerFactory.getLogger(POSTLogoutUserMapper.class);
+public class LogoutUserMapper implements HttpMapper {
+    private static final Logger logger = LoggerFactory.getLogger(LogoutUserMapper.class);
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override

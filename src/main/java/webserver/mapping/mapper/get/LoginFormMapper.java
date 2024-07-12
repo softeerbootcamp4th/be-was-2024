@@ -1,12 +1,13 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.get;
 
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 import webserver.util.FileContentReader;
 
 import java.io.IOException;
 
-public class GETRegistrationFormMapper implements HttpMapper {
+public class LoginFormMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override

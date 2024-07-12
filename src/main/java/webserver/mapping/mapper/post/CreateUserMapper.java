@@ -1,4 +1,4 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.post;
 
 import db.Database;
 import model.User;
@@ -8,12 +8,13 @@ import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class POSTCreateUserMapper implements HttpMapper {
-    private static final Logger logger = LoggerFactory.getLogger(POSTCreateUserMapper.class);
+public class CreateUserMapper implements HttpMapper {
+    private static final Logger logger = LoggerFactory.getLogger(CreateUserMapper.class);
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override

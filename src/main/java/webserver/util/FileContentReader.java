@@ -1,5 +1,7 @@
-package webserver;
+package webserver.util;
 
+import webserver.enums.ContentType;
+import webserver.enums.HttpStatus;
 import webserver.http.MyHttpResponse;
 
 import java.io.ByteArrayOutputStream;
@@ -50,7 +52,7 @@ public class FileContentReader {
             String extension = uri.substring(uri.lastIndexOf(".") + 1);
             String contentType = ContentType.valueOf(extension).getContentType();
 
-            return new MyHttpResponse(200, "OK", new HashMap<>() {
+            return new MyHttpResponse(HttpStatus.OK, new HashMap<>() {
                 {
                     put(CONTENT_TYPE, contentType);
                     put(CONTENT_LENGTH, String.valueOf(combinedByteArray.length));

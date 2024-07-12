@@ -1,13 +1,14 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.get;
 
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 import webserver.util.FileContentReader;
 
 import java.io.IOException;
 
-public class GETHomeMapper implements HttpMapper {
+public class HomeMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
     private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 

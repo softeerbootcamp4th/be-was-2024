@@ -27,50 +27,6 @@ public class HttpRequestParser {
     }
 
     public MyHttpRequest parseRequest(InputStream in) throws IOException {
-//        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-//
-//        // Read the request line
-//        String requestLine = br.readLine();
-//        if (requestLine == null) {
-//            return null;
-//        }
-//
-//        String[] requestLineParts = parseRequestFirstLine(requestLine);
-//        String method = requestLineParts[0];
-//
-//        String[] url = requestLineParts[1].split("\\?");
-//
-//        String path = url[0];
-//        Map<String, String> queries = new HashMap<>();
-//        if (url.length > 1) {
-//            queries = parseQuery(queries, url[1]);
-//        }
-//
-//        String version = requestLineParts[2];
-//
-//        // Read the request headers
-//        Map<String, String> requestHeaders = new HashMap<>();
-//
-//        while ((requestLine = br.readLine()) != null && !requestLine.isEmpty()) {
-//            int index = requestLine.indexOf(':');
-//            if (index > 0) {
-//                String headerName = requestLine.substring(0, index).trim();
-//                String headerValue = requestLine.substring(index + 1).trim();
-//                requestHeaders.put(headerName, headerValue);
-//            }
-//        }
-//
-////         Read the request body
-//        char[] requestBody = null;
-//        if (requestHeaders.containsKey(CONTENT_LENGTH)) {
-//            int contentLength = Integer.parseInt(requestHeaders.get(CONTENT_LENGTH));
-//            requestBody = new char[contentLength];
-//            br.read(requestBody, 0, contentLength);
-//        }
-//
-//        return new MyHttpRequest(method, path, queries, version, requestHeaders, new byte[0]);
-
-
         ByteArrayOutputStream requestLineBuffer = new ByteArrayOutputStream();
         int nextByte;
 

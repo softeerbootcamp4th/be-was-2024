@@ -1,4 +1,4 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.get;
 
 import db.Database;
 import webserver.annotation.LoginCheck;
@@ -6,12 +6,13 @@ import webserver.annotation.processor.LoginCheckProcessor;
 import webserver.enums.HttpStatus;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 
 import java.io.IOException;
 import java.util.Map;
 
 @LoginCheck
-public class GETUserListMapper implements HttpMapper {
+public class UserListMapper implements HttpMapper {
     LoginCheckProcessor loginCheckProcessor = new LoginCheckProcessor();
 
     @Override

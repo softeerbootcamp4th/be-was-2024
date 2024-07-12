@@ -32,6 +32,10 @@ public class MyHttpResponse {
         this.body = body;
     }
 
+    public MyHttpResponse(HttpStatus httpStatus, Map<String, String> headers) {
+        this(httpStatus, headers, null);
+    }
+
     public String getVersion() {
         return version;
     }

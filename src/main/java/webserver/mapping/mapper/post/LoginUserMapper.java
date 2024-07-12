@@ -1,4 +1,4 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.post;
 
 import db.Database;
 import db.SessionTable;
@@ -9,14 +9,15 @@ import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class POSTLoginUserMapper implements HttpMapper {
-    private static final Logger logger = LoggerFactory.getLogger(POSTLoginUserMapper.class);
+public class LoginUserMapper implements HttpMapper {
+    private static final Logger logger = LoggerFactory.getLogger(LoginUserMapper.class);
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override
@@ -45,7 +46,7 @@ public class POSTLoginUserMapper implements HttpMapper {
         responseHeaders.put("Set-Cookie", "sId=" + sessionId + "; Path=/");
         responseHeaders.put("Location", "/");
 
-        MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, responseHeaders, null);
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, responseHeaders);
 
         return response;
     }
