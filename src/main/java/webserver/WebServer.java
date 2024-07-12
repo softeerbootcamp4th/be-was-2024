@@ -10,7 +10,7 @@ import chain.StaticResourceChain;
 import chain.UserSessionChain;
 import chain.core.ChainManager;
 import config.AppConfig;
-import config.RouteConfig;
+import route.RouteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

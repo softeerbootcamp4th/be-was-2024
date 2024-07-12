@@ -1,4 +1,4 @@
-package routehandler.route.auth;
+package route.routes.auth;
 
 import config.AppConfig;
 import db.Database;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import session.MySession;
 import url.MyURL;
-import utils.FileReadUtil;
 import view.MyView;
 
 import java.nio.charset.StandardCharsets;

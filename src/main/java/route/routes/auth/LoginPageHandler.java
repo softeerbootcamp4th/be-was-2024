@@ -1,4 +1,4 @@
-package routehandler.route.auth;
+package route.routes.auth;
 
 import http.MyHttpRequest;
 import http.MyHttpResponse;
@@ -6,7 +6,6 @@ import http.enums.HttpStatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
-import utils.FileReadUtil;
 import view.MyView;
 
 import java.util.HashMap;

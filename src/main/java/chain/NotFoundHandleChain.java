@@ -3,7 +3,7 @@ package chain;
 import chain.core.MiddlewareChain;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
-import routehandler.route.NotFoundPageHandler;
+import route.routes.NotFoundPageHandler;
 
 public class NotFoundHandleChain extends MiddlewareChain {
     private final NotFoundPageHandler handler;

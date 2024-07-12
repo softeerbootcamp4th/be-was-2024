@@ -1,4 +1,4 @@
-package routehandler.route.user;
+package route.routes.user;
 
 import db.Database;
 import http.MyHttpRequest;

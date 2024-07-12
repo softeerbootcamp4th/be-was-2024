@@ -1,13 +1,13 @@
-package config;
+package route;
 
 import chain.RouteHandleChain;
-import routehandler.route.IndexPageHandler;
-import routehandler.route.auth.SignOutHandler;
-import routehandler.route.registration.RegistrationPageHandler;
-import routehandler.route.auth.LoginPageHandler;
-import routehandler.route.auth.SignInHandler;
-import routehandler.route.auth.SignUpHandler;
-import routehandler.route.user.UserListPageHandler;
+import route.routes.IndexPageHandler;
+import route.routes.auth.SignOutHandler;
+import route.routes.registration.RegistrationPageHandler;
+import route.routes.auth.LoginPageHandler;
+import route.routes.auth.SignInHandler;
+import route.routes.auth.SignUpHandler;
+import route.routes.user.UserListPageHandler;
 import routehandler.utils.Route;
 
 public class RouteConfig {

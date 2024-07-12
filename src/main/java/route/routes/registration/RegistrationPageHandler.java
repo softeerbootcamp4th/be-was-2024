@@ -1,4 +1,4 @@
-package routehandler.route.registration;
+package route.routes.registration;
 
 import http.MyHttpRequest;
 import http.MyHttpResponse;

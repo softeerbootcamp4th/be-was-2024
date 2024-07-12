@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import routehandler.core.IRouteHandler;
-import routehandler.route.IndexPageHandler;
+import route.routes.IndexPageHandler;
 
 class RouteTrieTest {
     @Test

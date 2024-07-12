@@ -7,10 +7,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import route.routes.StaticResourceHandler;
 
 import java.util.ArrayList;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class StaticResourceHandlerTest {
     private StaticResourceHandler staticResourceHandler;

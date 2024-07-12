@@ -1,4 +1,4 @@
-package routehandler.route;
+package route.routes;
 
 import config.AppConfig;
 import http.MyHttpRequest;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import utils.FileExtensionUtil;
 import utils.FileReadUtil;
-import webserver.WebServer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

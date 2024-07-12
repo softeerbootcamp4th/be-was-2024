@@ -1,4 +1,4 @@
-package routehandler.route.auth;
+package route.routes.auth;
 
 import db.Database;
 import http.MyHttpRequest;
@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import url.MyURL;
-import utils.FileReadUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
