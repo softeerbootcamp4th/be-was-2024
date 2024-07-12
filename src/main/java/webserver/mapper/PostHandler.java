@@ -15,29 +15,33 @@ public class PostHandler {
         String url = httpRequest.getUrl();
         byte[] body = httpRequest.getBody();
         Map<String, String> headers = httpRequest.getHeaders();
-        switch (url) {
-            case "/user/create":
-                UserCreate.createUser(new String(body, "UTF-8"));
-                requestResponse.redirectPath(redirectUrl);
-                break;
-            case "/login":
-                User user = UserLogin.login(new String(body, "UTF-8"));
-                if(user == null){
+        try {
+            switch (url) {
+                case "/user/create":
+                    UserCreate.createUser(new String(body, "UTF-8"));
                     requestResponse.redirectPath(redirectUrl);
                     break;
-                }
-                redirectUrl = "/main/index.html";
-                sessionId = SessionIdControl.createSessionId(user);
-                requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
-                break;
-            case "/logout":
-                sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
-                SessionIdControl.deleteSessionId(sessionId);
-                redirectUrl = "/index.html";
-                requestResponse.resetCookieAndRedirectPath(redirectUrl);
-                break;
-            default:
-                break;
+                case "/login":
+                    User user = UserLogin.login(new String(body, "UTF-8"));
+                    if(user == null){
+                        requestResponse.redirectPath(redirectUrl);
+                        break;
+                    }
+                    redirectUrl = "/main/index.html";
+                    sessionId = SessionIdControl.createSessionId(user);
+                    requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
+                    break;
+                case "/logout":
+                    sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
+                    SessionIdControl.deleteSessionId(sessionId);
+                    redirectUrl = "/index.html";
+                    requestResponse.resetCookieAndRedirectPath(redirectUrl);
+                    break;
+                default:
+                    break;
+            }
+        }catch (Exception e) {
+            requestResponse.sendErrorPage("Internal Server Error: An unexpected error occurred", redirectUrl);
         }
 
     }

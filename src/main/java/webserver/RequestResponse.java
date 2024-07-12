@@ -123,4 +123,25 @@ public class RequestResponse {
         }
         dos.flush();
     }
+
+    public void sendHtmlResponse(String html) throws IOException {
+        byte[] responseBytes = html.getBytes("UTF-8");
+        dos.write(("HTTP/1.1 200 OK\r\n" +
+                "Content-Type: text/html; charset=UTF-8\r\n" +
+                "Content-Length: " + responseBytes.length + "\r\n" +
+                "\r\n").getBytes("UTF-8"));
+        dos.write(responseBytes);
+        dos.flush();
+    }
+
+    public void sendErrorPage(String errorMessage, String redirectUrl) throws IOException {
+        String errorPage = "<html><head><title>Error</title></head><body>" +
+                "<h1>Error</h1>" +
+                "<p>" + errorMessage + "</p>" +
+                "<script>alert('" + errorMessage + "');" +
+                "window.location.href = '" + redirectUrl + "';" +
+                "</script>" +
+                "</body></html>";
+        sendHtmlResponse(errorPage);
+    }
 }
