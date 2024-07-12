@@ -1,6 +1,5 @@
 package utils;
 
-import enums.HttpCode;
 import enums.HttpMethod;
 import enums.MimeType;
 import org.slf4j.Logger;
@@ -108,7 +107,6 @@ public class RequestParser {
         if(queryString.isEmpty()) return tmpStore;
         String[] rawKeyValues= queryString.split(pairDelimeter);
         for(String rawKeyValue: rawKeyValues) {
-            logger.debug("rawKeyValue = {}, {}, {}", rawKeyValue, pairDelimeter, keyValueDelimeter);
             String[] keyValue = rawKeyValue.split(keyValueDelimeter);
             if(keyValue.length == 2) {
                 String key = URLDecoder.decode(keyValue[0].trim(), StandardCharsets.UTF_8);
