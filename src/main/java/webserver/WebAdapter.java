@@ -154,7 +154,6 @@ public class WebAdapter {
 
                 response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
             } else {
-                System.out.println("인증되지 않은 요청입니다");
                 response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             }
             response.writeInBytes(out);
