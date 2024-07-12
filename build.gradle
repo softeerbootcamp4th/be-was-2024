@@ -16,6 +16,15 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
 
+    // JUnit Jupiter API and Engine
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+
+    // JUnit Jupiter Params (for @ParameterizedTest)
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
+
+    testImplementation 'io.rest-assured:rest-assured:4.4.0'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
 
 }
 
