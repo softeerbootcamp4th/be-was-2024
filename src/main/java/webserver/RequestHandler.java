@@ -4,14 +4,16 @@ import java.io.*;
 import java.net.Socket;
 
 import model.HttpRequest;
+import model.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.RequestParser;
+import util.InputStreamParser;
 
-
+/**
+ * 클라이언트가 연결(http 요청)을
+ */
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private static final String RESOURCE_PATH = "src/main/resources/static";
 
     private Socket connection;
 
@@ -24,44 +26,19 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            //inputstream을 HttpRequest 객체로 변환
-            HttpRequest httpRequest = RequestParser.convertInputStreamToHttpRequest(in);
-            String contentType = RequestParser.parseContentTypeFromRequestPath(httpRequest.getPath());
+            // inputStream -> HttpRequest 객체로 변환
+            HttpRequest httpRequest = InputStreamParser.convertInputStreamToHttpRequest(in);
 
-            DataOutputStream dos = new DataOutputStream(out);
-            File file = new File(RESOURCE_PATH + httpRequest.getPath());
+            // HttpRequest -> HttpResponse 객체로 변환
+            HttpResponse httpResponse = httpRequest.createHttpResponse();
 
-            //io를 사용하여 파일 읽어오기
-            InputStream fileInputStream = new FileInputStream(file);
-            byte[] body = fileInputStream.readAllBytes();
+            //HttpResponse 객체를 기반으로 outputStream으로 HttpResponse 발송
+            httpResponse.sendHttpResponse(out);
 
-            response200Header(dos, contentType,body.length);
-            responseBody(dos, body);
         } catch (IOException e) {
             logger.error(e.getMessage());
 
         }
     }
 
-    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + contentType + ";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-            ;
-            logger.info(dos.toString());
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
 }
