@@ -15,10 +15,12 @@ import util.HttpRequestConverter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static util.constant.StringConstants.*;
 
+// 알맞은 HttpRequest 에 대해 로직을 처리하고 HttpResponse 를 반환
 public class Logics {
     private static final Logger logger = LoggerFactory.getLogger(Logics.class);
 
@@ -66,20 +68,36 @@ public class Logics {
             headers.put("Location", "/index.html");
             logger.info("userId : "+userId+"Login successful");
 
-            //세션이 있는지 파악하고(home에서하기
-            // 세션을 생성하여
             Session session = new Session(UUID.randomUUID().toString(),userId,EXPIRE_TIME);
             SessionDatabase.addSession(session);
-            //쿠키에담아서
-            headers.put("Set-Cookie", "sid="+session.getSessionId()+"; Path=/");
 
-            //이후 모든 요청엔 알아서 쿠키가 담김!
-
+            //TODO : TOHeaderString 메서드로 만들기
+            headers.put("Set-Cookie", SessionDatabase.convertSessionIdToHeaderString(session.getSessionId()));
 
         } else {
             headers.put("Location", "/login_failed.html");
             logger.info("userId : "+userId+"Login failed");
         }
+
+        return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
+    }
+    public static HttpResponse logout(HttpRequest httpRequest) throws IOException {
+        if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
+            throw new RuntimeException("Invalid method");
+        }
+
+        String cookie = httpRequest.getHeaders().get("Cookie");
+        if (cookie != null && cookie.startsWith("sid=")) {
+            String sessionId = cookie.substring("sid=".length());
+
+            SessionDatabase.deleteSession(sessionId);
+            logger.info(SessionDatabase.getLogoutString(sessionId));
+        }
+
+        ///header
+        Map<String, String> headers = new HashMap<>();
+
+        headers.put("Location", "/index.html");
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
     }

@@ -43,13 +43,12 @@ public class HttpRequestConverter {
         Map<String, String> headers = new HashMap<>();
         httpRequestLine = buffer.readLine();
         while (!httpRequestLine.isEmpty()) {
-            String s = httpRequestLine.replaceAll(SPACE, EMPTY_SPACE); /// 반홚
-            String headerName = httpRequestLine.split(COLON)[0];
-            String headerValue = httpRequestLine.split(COLON)[1]; //idx
+            String httpRequestLineElemSpace = httpRequestLine.replaceAll(SPACE, EMPTY_SPACE); /// 반홚
+            String headerName = httpRequestLineElemSpace.split(COLON)[0];
+            String headerValue = httpRequestLineElemSpace.split(COLON)[1]; //idx
             headers.put(headerName, headerValue);
             httpRequestLine = buffer.readLine();
         }
-
         /* httpRequest bodys */
         List<Byte> body = new ArrayList<Byte>();
 

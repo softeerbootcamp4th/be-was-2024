@@ -20,6 +20,7 @@ public class HttpPathMapper {
         return switch (httpRequest.getPath()) {
             case PATH_CREATE -> create(httpRequest);
             case PATH_LOGIN -> login(httpRequest);
+            case PATH_LOGOUT -> logout(httpRequest);
             default -> throw new RuntimeException("Invalid path");
         };
 

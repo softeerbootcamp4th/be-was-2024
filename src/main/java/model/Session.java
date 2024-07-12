@@ -19,6 +19,7 @@ public class Session {
         return expires;
     }
 
+    // 왜 jwt에서 ms를 사용했는지
     public Session(String sessionId, String userId, Long expires) {
         this.sessionId = sessionId;
         this.userId = userId;

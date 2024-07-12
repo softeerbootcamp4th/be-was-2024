@@ -15,7 +15,7 @@ public class HttpResponseConverter {
 
 
 
-    // httpRequest를 httpresponse로 변경하는 로직
+    // httpRequest 를 httpResponse 로 변경하는 로직
     public HttpResponse with(HttpRequest httpRequest) throws IOException {
         if (isHttpResponseDynamic(httpRequest.getPath())) {
             return createDynamicHttpResponse(httpRequest);
@@ -44,7 +44,6 @@ public class HttpResponseConverter {
         Map<String,String> headers = new HashMap<>();
         headers.put(StringConstants.HEADER_CONTENT_TYPE, contentType + SEMICOLON + HEADER_CHARSET_UTF_8);
         headers.put(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
-//        headers.add("\r\n"); //TODO : get,post방식에 따라 필요할수도 있고 필요없을수도 있음,
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, body);
     }
 }

@@ -21,7 +21,15 @@ public class SessionDatabase {
         return Optional.ofNullable(sessions.get(sessionId));
     }
 
-//    public static Collection<User> findAll() {
-//        return users.values();
-//    }
+    public static void deleteSession(String sessionId) {
+        sessions.remove(sessionId);
+    }
+
+    public static String convertSessionIdToHeaderString(String sessionId){
+        return "sid=" + sessionId + "; Path=/";
+    }
+    public static String getLogoutString(String sessionId){
+        return "Logout Success : " + sessionId;
+    }
+
 }

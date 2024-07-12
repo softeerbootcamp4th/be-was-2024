@@ -12,6 +12,17 @@
       <header class="header">
         <a href="/"><img src="./img/signiture.svg" /></a>
         <ul class="header__menu">
+          <form class="form" action="/logout" method="post">
+            <li class="header__menu__item">
+              <input
+                      type="submit"
+                      id="login-btn"
+                      class="btn btn_contained btn_size_m"
+                      style="margin-top: 24px"
+                      value="로그아웃!"
+              />
+            </li>
+          </form>
           <li class="header__menu__item">
             <a class="btn btn_contained btn_size_s" href="/login.html">로그인</a>
           </li>
