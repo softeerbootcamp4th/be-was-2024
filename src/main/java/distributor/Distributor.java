@@ -1,11 +1,12 @@
 package distributor;
 
+import model.ViewData;
 import webserver.Request;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Distributor {
+public abstract class Distributor {
     public static Distributor of(Request request, DataOutputStream dos) {
         String method = request.getHttpMethod();
         if (method.equals("GET")) {
@@ -18,4 +19,6 @@ public class Distributor {
 
     public void process() throws IOException {
     }
+
+    public abstract ViewData getViewDate();
 }
