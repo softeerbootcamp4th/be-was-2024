@@ -26,7 +26,7 @@ public class UserHandler implements ModelHandler<User>{
         if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
             throw new ModelException(ConstantUtil.INVALID_SIGNUP);
         }
-        if(!fields.get("email").matches(ConstantUtil.EMAIL_REGEX)){
+        if(!fields.get(ConstantUtil.EMAIL).matches(ConstantUtil.EMAIL_REGEX)){
             throw new ModelException(ConstantUtil.INVALID_SIGNUP);
         }
 

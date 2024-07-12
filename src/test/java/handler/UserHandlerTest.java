@@ -27,6 +27,11 @@ class UserHandlerTest {
         Database.clearUsers();
     }
 
+    private Map<String, String> createFields(String userId, String password, String name, String email) {
+        return new HashMap<>
+                (Map.of(ConstantUtil.USER_ID, userId, ConstantUtil.PASSWORD, password, ConstantUtil.NAME, name, ConstantUtil.EMAIL, email));
+    }
+
     @DisplayName("create: requestBody로부터 User 객체를 생성하고 필드값을 확인한다.")
     @ParameterizedTest(name = "userId: {0}, password: {1}, name: {2}, email: {3}")
     @CsvSource({
@@ -38,14 +43,10 @@ class UserHandlerTest {
     })
     void create(String userId, String password, String name, String email) {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("userId", userId);
-        params.put("password", password);
-        params.put("name", name);
-        params.put("email", email);
+        Map<String, String> fields = createFields(userId, password, name, email);
 
         // when
-        User user = userHandler.create(params).get();
+        User user = userHandler.create(fields).get();
 
         // then
         assertThat(user.getUserId()).isEqualTo(userId);
@@ -63,10 +64,10 @@ class UserHandlerTest {
     })
     void createWithWrongEmail(String userId, String password, String name, String email) {
         // given
-        Map<String, String> params = new HashMap<>(Map.of("userId", userId, "password", password, "name", name, "email", email));
+        Map<String, String> fields = createFields(userId, password, name, email);
 
         // when & then
-        assertThatThrownBy(() -> userHandler.create(params))
+        assertThatThrownBy(() -> userHandler.create(fields))
                 .isInstanceOf(ModelException.class)
                 .hasMessage(ConstantUtil.INVALID_SIGNUP);
     }
@@ -75,10 +76,11 @@ class UserHandlerTest {
     @Test
     void createWithInvalidParams() {
         // given
-        Map<String, String> params = new HashMap<>(Map.of("userId", "userId", "password", "password", "name", "name"));
+        Map<String, String> fields = new HashMap<>
+                (Map.of(ConstantUtil.USER_ID, "userId", ConstantUtil.PASSWORD, "pw"));
 
         // when & then
-        assertThatThrownBy(() -> userHandler.create(params))
+        assertThatThrownBy(() -> userHandler.create(fields))
                 .isInstanceOf(ModelException.class)
                 .hasMessage(ConstantUtil.INVALID_SIGNUP);
     }
@@ -87,10 +89,10 @@ class UserHandlerTest {
     @Test
     void createWithEmptyFields() {
         // given
-        Map<String, String> params = new HashMap<>(Map.of("userId", "userId", "password", "password", "name", "name", "email", ""));
+        Map<String, String> fields = createFields("userId", "pw", "name", "");
 
         // when & then
-        assertThatThrownBy(() -> userHandler.create(params))
+        assertThatThrownBy(() -> userHandler.create(fields))
                 .isInstanceOf(ModelException.class)
                 .hasMessage(ConstantUtil.INVALID_SIGNUP);
     }
@@ -104,7 +106,8 @@ class UserHandlerTest {
     })
     void findById(String userId, String password, String name, String email){
         // given
-        Database.addUser(User.from(Map.of("userId", userId, "password", password, "name", name, "email", email)));
+        Map<String, String> fields = createFields(userId, password, name, email);
+        Database.addUser(User.from(fields));
 
         // when
         User user = userHandler.findById(userId).get();
@@ -126,8 +129,8 @@ class UserHandlerTest {
     @Test
     void findAll() {
         // given
-        Database.addUser(User.from(Map.of("userId", "user1", "password", "pass1", "name", "John Doe", "email", "email1")));
-        Database.addUser(User.from(Map.of("userId", "user2", "password", "pass2", "name", "Jane Smith", "email", "email2")));
+        Database.addUser(User.from(createFields("user1", "pass1", "John Doe", "email1")));
+        Database.addUser(User.from(createFields("user2", "pass2", "Jane Smith", "email2")));
 
         // when
         List<User> users = userHandler.findAll();

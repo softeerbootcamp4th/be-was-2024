@@ -22,11 +22,17 @@ public class ConstantUtil {
     public static final String FAULT = "fault";
     public static final String STATIC = "static";
     public static final String COOKIE = "Cookie";
+    public static final String SESSION_ID = "sid";
     public static final String DOT_HTML = ".html";
 
     public static final String STATIC_DIR = "static.dir";
     public static final String TEMPLATES_DIR = "templates.dir";
     public static final String PROPERTIES = "project.properties";
+
+    public static final String USER_ID = "userId";
+    public static final String PASSWORD = "password";
+    public static final String NAME = "name";
+    public static final String EMAIL = "email";
 
     public static final String INVALID_LOGIN = "Invalid Login";
     public static final String INVALID_SIGNUP = "Invalid Signup";

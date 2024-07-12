@@ -12,11 +12,11 @@ public class Session {
     private LocalDateTime lastAccessedAt;
     private LocalDateTime expiredAt;
 
-    public Session(String sessionId, String userId) {
+    public Session(String sessionId, String userId, LocalDateTime time) {
         this.sessionId = sessionId;
         this.userId = userId;
-        this.lastAccessedAt = LocalDateTime.now(ZoneId.of("GMT"));
-        this.expiredAt = lastAccessedAt.plusMinutes(30); // 30분 뒤 만료
+        this.lastAccessedAt = time;
+        this.expiredAt = time.plusMinutes(30); // 30분 뒤 만료
     }
 
     public String getUserId() {
@@ -29,9 +29,12 @@ public class Session {
 
     public void updateSession() {
         this.lastAccessedAt = LocalDateTime.now(ZoneId.of("GMT"));
+        this.expiredAt = lastAccessedAt.plusMinutes(30);
     }
 
     public boolean isExpired() {
+        System.out.println(expiredAt);
+        System.out.println(LocalDateTime.now(ZoneId.of("GMT")));
         return LocalDateTime.now(ZoneId.of("GMT")).isAfter(expiredAt);
     }
 

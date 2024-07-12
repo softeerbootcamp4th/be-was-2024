@@ -1,7 +1,8 @@
 package handler;
 
 import db.Database;
-import model.Session;
+import db.SessionDatabase;
+import session.Session;
 import model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import session.SessionHandler;
+import util.ConstantUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +30,11 @@ class SessionHandlerTest {
         sessionHandler = SessionHandler.getInstance();
     }
 
+    private Map<String, String> createFields(String userId, String password) {
+        return new HashMap<>
+                (Map.of(ConstantUtil.USER_ID, userId, ConstantUtil.PASSWORD, password, ConstantUtil.NAME, "name", ConstantUtil.EMAIL, "email"));
+    }
+
     @DisplayName("login: 성공한다면 세션을 생성한다.")
     @ParameterizedTest(name = "Test {index} => userId={0}, password={1}")
     @CsvSource({
@@ -34,18 +44,15 @@ class SessionHandlerTest {
     })
     void login(String userId, String password) {
         // given
-        Map<String, String> field = new HashMap<>();
-        field.put("userId", userId);
-        field.put("password", password);
-        field.put("name", "name");
-        field.put("email", "email");
-        Database.addUser(User.from(field));
+        Map<String, String> fields = createFields(userId, password);
+        Database.addUser(User.from(fields));
 
         // when
-        Optional<Session> session = sessionHandler.login(Map.of("userId", userId, "password", password));
+        Optional<Session> session = sessionHandler.login(Map.of(ConstantUtil.USER_ID, userId, ConstantUtil.PASSWORD, password));
 
         // then
         assertThat(session).isPresent();
+        assertThat(session.toString()).hasToString(SessionDatabase.findSessionById(session.get().getSessionId()).toString());
     }
 
     @DisplayName("login: 실패하면 세션을 생성하지 않으며 빈 Optional을 반환한다.")
@@ -57,15 +64,11 @@ class SessionHandlerTest {
     })
     void login_fail(String userId, String password) {
         // given
-        Map<String, String> field = new HashMap<>();
-        field.put("userId", userId);
-        field.put("password", password);
-        field.put("name", "name");
-        field.put("email", "email");
-        Database.addUser(User.from(field));
+        Map<String, String> fields = createFields(userId, password);
+        Database.addUser(User.from(fields));
 
         // when
-        Optional<Session> session = sessionHandler.login(Map.of("userId", userId, "password", "wrong_password"));
+        Optional<Session> session = sessionHandler.login(Map.of(ConstantUtil.USER_ID, userId, ConstantUtil.PASSWORD, "wrong_password"));
 
         // then
         assertThat(session).isEmpty();
@@ -80,14 +83,82 @@ class SessionHandlerTest {
     })
     void logout(String sessionId, String userId) {
         // given
-        Session session = new Session(sessionId, userId);
-        Database.addSession(session);
+        Session session = new Session(sessionId, userId, LocalDateTime.now());
+        SessionDatabase.addSession(session);
 
         // when
         sessionHandler.logout(session.getSessionId());
 
         // then
-        assertThat(Database.findSessionById(session.getSessionId())).isEmpty();
+        assertThat(SessionDatabase.findSessionById(session.getSessionId())).isEmpty();
+    }
+
+    @DisplayName("findSessionById: 세션을 찾는다.")
+    @ParameterizedTest(name = "Test {index} => sessionId={0}, userId={1}")
+    @CsvSource({
+            "qdlqkwj, trekjel",
+            "eaklajw123, admekvv",
+            "892jlkdaw, adklwlkwad"
+    })
+    void findSessionById(String sessionId, String userId) {
+        // given
+        Session session = new Session(sessionId, userId, LocalDateTime.now(ZoneId.of("GMT")));
+        SessionDatabase.addSession(session);
+
+        // when
+        Optional<Session> foundSession = sessionHandler.findSessionById(session.getSessionId());
+
+        // then
+        assertThat(foundSession).isPresent();
+        assertThat(foundSession.get().toString()).hasToString(session.toString());
+    }
+
+    @DisplayName("findSessionById: 세션을 찾지 못하면 빈 Optional을 반환한다.")
+    @Test
+    void findSessionById_fail(){
+        // when
+        Optional<Session> foundSession = sessionHandler.findSessionById("1");
+
+        // then
+        assertThat(foundSession).isEmpty();
+    }
+
+    @DisplayName("validateSession: 세션이 유효하면 true를 반환한다.")
+    @ParameterizedTest(name = "Test {index} => sessionId={0}, userId={1}")
+    @CsvSource({
+            "qdlqkwj, trekjel",
+            "eaklajw123, admekvv",
+            "892jlkdaw, adklwlkwad"
+    })
+    void validateSession(String sessionId, String userId) {
+        // given
+        Session session = new Session(sessionId, userId, LocalDateTime.now(ZoneId.of("GMT")));
+        SessionDatabase.addSession(session);
+
+        // when
+        boolean isValid = sessionHandler.validateSession(session);
+
+        // then
+        assertThat(isValid).isTrue();
+    }
+
+    @DisplayName("validateSession: 세션이 만료되면 false를 반환한다.")
+    @ParameterizedTest(name = "Test {index} => sessionId={0}, userId={1}")
+    @CsvSource({
+            "qdlqkwj, trekjel",
+            "eaklajw123, admekvv",
+            "892jlkdaw, adklwlkwad"
+    })
+    void validateSession_expired(String sessionId, String userId) {
+        // given
+        Session session = new Session(sessionId, userId, LocalDateTime.now(ZoneId.of("GMT")).minusMinutes(31));
+        SessionDatabase.addSession(session);
+
+        // when
+        boolean isValid = sessionHandler.validateSession(session);
+
+        // then
+        assertThat(isValid).isFalse();
     }
 
     @DisplayName("parseSessionId: 세션 쿠키에서 세션 아이디를 추출한다.")
@@ -121,8 +192,11 @@ class SessionHandlerTest {
             "userId=1234; email=1234",
             "name=1234; email=1234",
             "userId=1234; name=1234; email=1234",
+            "",
+            " ",
+            "   "
     })
-    void parseSessionId_no_sid(String cookie) {
+    void filterSessionId_no_sid(String cookie) {
         // when
         Optional<String> sessionId = sessionHandler.parseSessionId(cookie);
 
@@ -132,20 +206,9 @@ class SessionHandlerTest {
 
     @DisplayName("parseSessionId: 세션 쿠키가 null이면 빈 Optional을 반환한다.")
     @Test
-    void parseSessionId_null() {
+    void filterSessionId_null() {
         // when
         Optional<String> sessionId = sessionHandler.parseSessionId(null);
-
-        // then
-        assertThat(sessionId).isEmpty();
-    }
-
-    @DisplayName("parseSessionId: 세션 쿠키가 공백이라면 빈 Optional을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"", " ", "  ", "   ", "    "})
-    void parseSessionId_empty(String blank) {
-        // when
-        Optional<String> sessionId = sessionHandler.parseSessionId(blank);
 
         // then
         assertThat(sessionId).isEmpty();
