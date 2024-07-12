@@ -1,12 +1,9 @@
 package webserver.api;
 
-import webserver.http.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class Unauthorized implements FunctionHandler {
 

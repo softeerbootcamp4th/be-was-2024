@@ -1,16 +1,11 @@
 package webserver.api.logout;
 
 import webserver.api.FunctionHandler;
-import webserver.api.login.LoginHandler;
-import webserver.http.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.enums.Extension;
 import webserver.session.Session;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class LogoutHandler implements FunctionHandler {
     //singleton pattern

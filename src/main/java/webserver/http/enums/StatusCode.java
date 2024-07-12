@@ -9,6 +9,9 @@ public enum StatusCode {
     CODE404(404, "not found"),
     CODE403(403, "Forbidden"),
     CODE405(405, "Method Not Allowed"),
+    CODE406(406, "Not Acceptable"),
+
+    CODE422(422, "Unprocessable Entity"),
 
     CODE300(300, "Multiple Choices"),
     CODE301(301, "Moved Permanently"),

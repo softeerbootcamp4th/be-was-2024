@@ -3,6 +3,7 @@ package webserver.util;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
 public class StreamByteReader {
@@ -21,6 +22,7 @@ public class StreamByteReader {
             previous = current;
         }
 
+
         if (buffer.size() == 0) {
             return "";
         }
@@ -32,6 +34,6 @@ public class StreamByteReader {
             length -= 2;
         }
 
-        return new String(bytes, 0, length, StandardCharsets.UTF_8);
+        return URLDecoder.decode(new String(bytes, 0, length, StandardCharsets.UTF_8),StandardCharsets.UTF_8);
     }
 }

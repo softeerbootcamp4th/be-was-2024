@@ -2,6 +2,8 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -58,6 +60,8 @@ public class RequestHandler implements Runnable {
             HttpRequest request = reqeustBuilder.build();
 
             logger.info(request.printRequest());
+            if(request.getBody() != null && request.getBody().length > 0)
+                logger.info(URLDecoder.decode("body: " + new String(request.getBody()), StandardCharsets.UTF_8));
 
             FunctionHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath(), request.getSessionid()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
@@ -69,7 +73,7 @@ public class RequestHandler implements Runnable {
             dos.writeBytes(response.getHeader());
             dos.write(response.getBody());
             dos.flush();
-        } catch (IOException | NumberFormatException e) {
+        } catch (IOException | NumberFormatException | NullPointerException e) {
             logger.error("error{}", e.getMessage());
             logger.error(Arrays.toString(e.getStackTrace()));
         }

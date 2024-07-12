@@ -1,9 +1,7 @@
 package webserver.api.pagehandler;
 
-import model.User;
 import webserver.api.FunctionHandler;
-import webserver.api.logout.LogoutHandler;
-import webserver.http.HtmlFiles;
+import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.response.PageBuilder;
@@ -38,7 +36,7 @@ public class LoginPageHandler implements FunctionHandler {
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(Files.readAllBytes(new File(HtmlFiles.login).toPath()))
+                .setBody(PageBuilder.buildLoginPage())
                 .build();
     }
 }

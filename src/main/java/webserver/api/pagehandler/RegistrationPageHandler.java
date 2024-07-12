@@ -1,17 +1,12 @@
 package webserver.api.pagehandler;
 
-import model.User;
 import webserver.api.FunctionHandler;
-import webserver.api.ReadFileHandler;
-import webserver.http.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.response.PageBuilder;
 import webserver.session.Session;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 
 public class RegistrationPageHandler implements FunctionHandler {
@@ -38,7 +33,7 @@ public class RegistrationPageHandler implements FunctionHandler {
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(Files.readAllBytes(new File(HtmlFiles.register).toPath()))
+                .setBody(PageBuilder.buildRegistrationPage())
                 .build();
 
 

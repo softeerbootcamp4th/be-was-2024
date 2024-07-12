@@ -3,7 +3,7 @@ package webserver.api.login;
 import db.Database;
 import model.User;
 import webserver.api.FunctionHandler;
-import webserver.http.HtmlFiles;
+import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.Extension;
@@ -42,25 +42,21 @@ public class LoginHandler implements FunctionHandler {
         if(id == null || id.isEmpty()
                 || password == null || password.isEmpty()
                 || user == null || !Objects.equals(user.getPassword(), password)){
-
-            byte[] responseBody = Files.readAllBytes(new File(HtmlFiles.login_failed).toPath());
             return new HttpResponse.ResponseBuilder(401)
                     .addheader("Content-Type", Extension.HTML.getContentType())
-                    .addheader("Content-Length", String.valueOf(responseBody.length))
-                    .setBody(responseBody)
+                    .setBody(PageBuilder.buildFailedLoginPage())
                     .build();
 
         }
 
         // if user information is valid
         String sessionString = Session.createSession(user);
-        byte[] responseBody = PageBuilder.buildLoggedinPage(user.getName());
 
         //go to logined main page
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
                 .addheader("Set-Cookie","sid="+sessionString +"; Max-Age=3600; Path=/") //set cookie
-                .setBody(responseBody)
+                .setBody(PageBuilder.buildLoggedinPage(user.getName()))
                 .build();
     }
 }

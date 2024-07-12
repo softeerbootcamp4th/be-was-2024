@@ -4,6 +4,7 @@ import webserver.http.enums.Methods;
 import webserver.http.url.Url;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -57,9 +58,9 @@ public class HttpRequest {
                 "url: " + url.getPath() + "\n" +
                 "url params: " + url.getParamsMap().toString() + "\n" +
                 "protocol: " + protocol + "\n" +
-                "headers: " + headers.toString() + "\n" +
-                "body: " + body + "\n";
+                "headers: " + headers.toString() + "\n";
     }
+
 
     private HttpRequest(ReqeustBuilder builder) {
         this.method = builder.method;

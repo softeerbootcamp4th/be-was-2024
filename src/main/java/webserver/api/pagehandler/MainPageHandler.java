@@ -2,8 +2,7 @@ package webserver.api.pagehandler;
 
 import model.User;
 import webserver.api.FunctionHandler;
-import webserver.api.registration.Registration;
-import webserver.http.HtmlFiles;
+import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.response.PageBuilder;
@@ -37,7 +36,7 @@ public class MainPageHandler implements FunctionHandler {
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(Files.readAllBytes(new File(HtmlFiles.main_page).toPath()))
+                .setBody(PageBuilder.buildMainPage())
                 .build();
     }
 }
