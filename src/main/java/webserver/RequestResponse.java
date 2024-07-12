@@ -90,7 +90,6 @@ public class RequestResponse {
         for (Map.Entry<String, User> entry : users.entrySet()) {
             userListHtml.append("<li> ID: ").append(entry.getKey())
                     .append(" & Name: ").append(entry.getValue().getName())
-                    .append(" & email: ").append(entry.getValue().getEmail().replace("%40", "@"))
                     .append("</li>");
         }
         userListHtml.append("</ul>");
