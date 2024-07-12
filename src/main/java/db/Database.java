@@ -36,4 +36,9 @@ public class Database {
     public static Collection<User> findAll() {
         return users.values();
     }
+
+    // for test
+    public static void clearUsers() {
+        users.clear();
+    }
 }

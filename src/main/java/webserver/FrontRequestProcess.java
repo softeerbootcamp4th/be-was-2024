@@ -1,5 +1,6 @@
 package webserver;
 
+import exception.ModelException;
 import exception.RequestException;
 import session.SessionHandler;
 import handler.ModelHandler;
@@ -77,8 +78,12 @@ public class FrontRequestProcess {
     }
 
     public HttpResponse handleSignUpRequest(HttpRequest request){
-        userHandler.create(request.getBodyMap());
-        return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+        try {
+            userHandler.create(request.getBodyMap());
+            return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+        } catch (ModelException e) {
+            return HttpResponse.redirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
+        }
     }
 
     // 로그인 및 로그아웃 요청 처리 및 세션 관리
@@ -111,7 +116,7 @@ public class FrontRequestProcess {
         if(session == null)
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
 
-        List<User> users = userHandler.findAll().stream().toList();
+        List<User> users = userHandler.findAll();
         String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
         return HttpResponse.ok(ConstantUtil.DYNAMIC, pathWithHtml, request.getHttpVersion(), bodyWithUserList);
     }

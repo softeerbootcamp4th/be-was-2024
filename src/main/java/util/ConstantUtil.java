@@ -16,6 +16,7 @@ public class ConstantUtil {
     public static final String DOT = ".";
     public static final String REGDOT = "\\.";
     public static final String QUESTION_MARK = "\\?";
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
 
     public static final String DYNAMIC = "dynamic";
     public static final String FAULT = "fault";
@@ -28,6 +29,7 @@ public class ConstantUtil {
     public static final String PROPERTIES = "project.properties";
 
     public static final String INVALID_LOGIN = "Invalid Login";
+    public static final String INVALID_SIGNUP = "Invalid Signup";
     public static final String INVALID_PATH = "Invalid Path: ";
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
