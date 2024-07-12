@@ -5,6 +5,7 @@ import db.SessionTable;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
@@ -28,7 +29,7 @@ public class POSTLoginUserMapper implements HttpMapper {
         // UserId not found or password does not match
         if (user == null || !user.getPassword().equals(body.get("password"))) {
             String redirectUrl = "/login?error=unauthorized";
-            MyHttpResponse response = new MyHttpResponse(302, "Found", Map.of(
+            MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of(
                     "Content-Type", "text/plain",
                     "Content-Length", "0",
                     "Location", redirectUrl
@@ -44,7 +45,7 @@ public class POSTLoginUserMapper implements HttpMapper {
         responseHeaders.put("Set-Cookie", "sId=" + sessionId + "; Path=/");
         responseHeaders.put("Location", "/");
 
-        MyHttpResponse response = new MyHttpResponse(302, "Found", responseHeaders, null);
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, responseHeaders, null);
 
         return response;
     }

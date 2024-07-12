@@ -1,5 +1,6 @@
 package webserver.annotation.processor;
 
+import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
@@ -14,7 +15,7 @@ public class LoginCheckProcessor {
     }
 
     public MyHttpResponse toLoginPage() {
-        return new MyHttpResponse(302, "Found", Map.of("Location", "/login"), null);
+        return new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/login"), null);
     }
 }
 

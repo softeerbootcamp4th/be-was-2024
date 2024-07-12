@@ -3,8 +3,9 @@ package webserver.http;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.FileContentReader;
+import webserver.enums.HttpStatus;
 import webserver.mapping.MappingHandler;
+import webserver.util.FileContentReader;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -37,7 +38,7 @@ class HttpResponseParserTest {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
 
-        MyHttpResponse httpResponse = new MyHttpResponse(200, "OK", Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
+        MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         //When
         httpResponseParser.sendResponse(dos, httpResponse);
@@ -52,7 +53,7 @@ class HttpResponseParserTest {
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
 
         MyHttpRequest httpRequest = new MyHttpRequest("GET", "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
-        MyHttpResponse httpResponse = new MyHttpResponse(200, "OK", Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
+        MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         when(fileContentReader.isStaticResource(anyString())).thenReturn(true);
         when(fileContentReader.readStaticResource(anyString())).thenReturn(httpResponse);
@@ -73,7 +74,7 @@ class HttpResponseParserTest {
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
 
         MyHttpRequest httpRequest = new MyHttpRequest("GET", "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
-        MyHttpResponse httpResponse = new MyHttpResponse(200, "OK", Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
+        MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         when(fileContentReader.isStaticResource(any())).thenReturn(false);
         when(mappingHandler.mapping(any())).thenReturn(httpResponse);

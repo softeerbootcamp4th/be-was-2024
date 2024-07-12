@@ -2,8 +2,8 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.FileContentReader;
 import webserver.mapping.MappingHandler;
+import webserver.util.FileContentReader;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class HttpResponseParser {
 
     public void sendResponse(DataOutputStream dos, MyHttpResponse httpResponse) {
         try {
-            dos.writeBytes(httpResponse.getVersion() + " " + httpResponse.getStatusCode() + " " + httpResponse.getStatusMessage() + " \r\n");
+            dos.writeBytes(httpResponse.getVersion() + " " + httpResponse.getHttpStatus().value() + " " + httpResponse.getHttpStatus().getReasonPhrase() + " \r\n");
             for (String key : httpResponse.getHeaders().keySet()) {
                 dos.writeBytes(key + ": " + httpResponse.getHeaders().get(key) + "\r\n");
             }

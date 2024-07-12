@@ -4,6 +4,7 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
@@ -23,7 +24,7 @@ public class POSTCreateUserMapper implements HttpMapper {
         Database.addUser(newUser);
         logger.debug("User created: {}", Database.findUserById(body.get("userId")));
 
-        MyHttpResponse response = new MyHttpResponse(302, "Found", Map.of("Location", "/"), null);
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/"), null);
 
         return response;
     }

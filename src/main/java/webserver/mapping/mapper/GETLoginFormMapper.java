@@ -1,8 +1,8 @@
 package webserver.mapping.mapper;
 
-import webserver.FileContentReader;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.util.FileContentReader;
 
 import java.io.IOException;
 

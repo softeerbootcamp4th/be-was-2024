@@ -3,6 +3,7 @@ package webserver.mapping.mapper;
 import db.Database;
 import webserver.annotation.LoginCheck;
 import webserver.annotation.processor.LoginCheckProcessor;
+import webserver.enums.HttpStatus;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
 
@@ -18,7 +19,7 @@ public class GETUserListMapper implements HttpMapper {
         try {
             return getUserList();
         } catch (Exception e) {
-            return new MyHttpResponse(500, "Internal Server Error", Map.of(), "Internal Server Error".getBytes());
+            return new MyHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, Map.of(), "Internal Server Error".getBytes());
         }
     }
 
@@ -28,6 +29,6 @@ public class GETUserListMapper implements HttpMapper {
         Database.findAll().forEach(user -> userList.append("<li>").append(user.getName()).append(" : ").append(user.getEmail()).append("</li>"));
         userList.append("</ul></body></html>");
 
-        return new MyHttpResponse(200, "OK", Map.of(), userList.toString().getBytes());
+        return new MyHttpResponse(HttpStatus.OK, Map.of(), userList.toString().getBytes());
     }
 }
