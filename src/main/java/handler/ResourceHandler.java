@@ -1,36 +1,11 @@
-package webserver;
+package handler;
+
+import enums.Type;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
-enum TYPE {
-    HTML("html", "text/html"),
-    CSS("css", "text/css"),
-    JS("js", "text/javascript"),
-    JSON("json", "application/json"),
-    ICO("ico", "image/x-icon"),
-    PNG("png", "image/png"),
-    SVG("svg", "image/svg+xml"),
-    JPG("jpg", "image/jpeg");
-
-    private final String type;
-    private final String mime;
-
-    TYPE(String type, String mime) {
-        this.type = type;
-        this.mime = mime;
-    }
-
-    public String getType() {
-        return this.type;
-    }
-
-    public String getMime() {
-        return this.mime;
-    }
-}
 
 public class ResourceHandler {
     public byte[] getByteArray(String url) throws IOException {
@@ -53,7 +28,7 @@ public class ResourceHandler {
         String type = url.substring(url.lastIndexOf(".") + 1);
 
         // TYPE을 순회하면서 type에 해당하는 mime type 찾기
-        for (TYPE t : TYPE.values()) {
+        for (Type t : Type.values()) {
             if (t.getType().equals(type)) {
                 return t.getMime();
             }

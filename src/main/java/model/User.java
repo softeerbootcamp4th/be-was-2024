@@ -1,16 +1,22 @@
 package model;
 
+import java.util.HashMap;
+
 public class User {
     private String userId;
     private String password;
     private String name;
     private String email;
 
-    public User(String userId, String password, String name, String email) {
+    protected User(String userId, String password, String name, String email) {
         this.userId = userId;
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public static User from(HashMap<String, String> data) {
+        return new User(data.get("userId"), data.get("password"), data.get("name"), data.get("email"));
     }
 
     public String getUserId() {
