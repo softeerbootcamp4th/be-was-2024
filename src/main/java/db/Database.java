@@ -24,8 +24,10 @@ public class Database {
         return users.values();
     }
 
-    public static void addSession(String sessionId, String userId) {
+    public static boolean addSession(String sessionId, String userId) {
+        if (sessions.contains(sessionId)) return false;
         sessions.put(sessionId, userId);
+        return true;
     }
 
     public static void removeSession(String sessionId) {

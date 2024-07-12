@@ -125,8 +125,10 @@ public class UserRequestProcessor extends RequestProcessor {
             User user = Database.findUserById(userId);
             if (user.getPassword().equals(password)) { // 로그인 성공
                 // 세션 생성
-                String sessionId = StringUtils.generateRandomString(16);
-                Database.addSession(sessionId, userId);
+                String sessionId;
+                do {
+                    sessionId = StringUtils.generateRandomString(16);
+                } while (!Database.addSession(sessionId, userId));
 
                 // 결과값 작성
                 insertToResponseHeader("Set-Cookie", "sid=" + sessionId + "; Path=/");
