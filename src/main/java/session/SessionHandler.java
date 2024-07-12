@@ -55,7 +55,12 @@ public class SessionHandler {
     }
 
     public boolean validateSession(Session session) {
-        return session != null && !session.isExpired();
+        if(session == null || session.isExpired()){
+            return false;
+        }
+
+        session.updateSession();
+        return true;
     }
 
     public void logout(String sessionId) {
