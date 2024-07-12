@@ -53,20 +53,28 @@ public class FrontRequestProcess {
             return handleAuthRequest(request);
         }
 
+        // 세션이 유효한지 검사하고 세션 객체 반환
+        Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+                .flatMap(sessionHandler::findSessionById)
+                .filter(sessionHandler::validateSession)
+                .orElse(null); // 세션이 없거나 만료되었다면 null
+
         // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
         return switch (HttpRequestMapper.of(path, method)) {
             case ROOT -> HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
-            case INDEX_HTML -> handleIndexRequest(path, request.getRequestHeaders().get(ConstantUtil.COOKIE), request.getHttpVersion());
+            case INDEX_HTML -> handleIndexRequest(path, request, session);
+            case USER_LIST -> handleUserListRequest(path, request, session);
+            case SIGNUP_REQUEST -> handleSignUpRequest(request);
             case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), readBytesFromFile(path));
-            case SIGNUP_REQUEST -> {
-                userHandler.create(request.getBodyMap());
-                yield HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
-            }
-            case USER_LIST -> handleUserListRequest(path, request.getRequestHeaders().get(ConstantUtil.COOKIE), request.getHttpVersion());
             case MESSAGE_NOT_ALLOWED -> HttpResponse.error(HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
             case NOT_FOUND -> HttpResponse.error(HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
             default -> HttpResponse.okStatic(path, request.getHttpVersion());
         };
+    }
+
+    public HttpResponse handleSignUpRequest(HttpRequest request){
+        userHandler.create(request.getBodyMap());
+        return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
     }
 
     // 로그인 및 로그아웃 요청 처리 및 세션 관리
@@ -93,33 +101,27 @@ public class FrontRequestProcess {
     }
 
     // 세션ID가 있는 경우 [총 사용자 목록 출력], 없다면 [로그인 페이지로 이동]
-    public HttpResponse handleUserListRequest(String path, String cookieLine, String httpVersion) throws IOException{
+    public HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
         String pathWithHtml = path + ConstantUtil.DOT_HTML;
         String body = readBytesFromFile(pathWithHtml);
-        return sessionHandler.parseSessionId(cookieLine)
-                .map(sessionId -> {
-                    List<User> users = userHandler.findAll().stream().toList();
-                    String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
-                    return HttpResponse.ok(ConstantUtil.DYNAMIC, pathWithHtml, httpVersion, bodyWithUserList);
-                })
-                .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), httpVersion));
+        if(session == null)
+            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+
+        List<User> users = userHandler.findAll().stream().toList();
+        String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
+        return HttpResponse.ok(ConstantUtil.DYNAMIC, pathWithHtml, request.getHttpVersion(), bodyWithUserList);
     }
 
     // 세션ID가 있는 경우 로그인 상태로 간주하여 [사용자 ID] 표시, 없다면 [로그인 버튼] 표시
-    public HttpResponse handleIndexRequest(String path, String cookieLine, String httpVersion) throws IOException {
+    public HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
         String body = readBytesFromFile(path);
-        return sessionHandler.parseSessionId(cookieLine)
-                .map(sessionId -> {
-                    String userId = sessionHandler.findSessionById(sessionId)
-                            .map(Session::getUserId)
-                            .orElseThrow(() -> new RequestException(ConstantUtil.INVALID_SESSION));
-                    String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId));
-                    return HttpResponse.ok(ConstantUtil.DYNAMIC, path, httpVersion, bodyWithUser);
-                })
-                .orElseGet(() -> {
-                    String bodyWithLogin = body.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_HTML);
-                    return HttpResponse.ok(ConstantUtil.DYNAMIC, path, httpVersion, bodyWithLogin);
-                });
+        if(session == null)
+            return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), body);
+
+        String userId = session.getUserId();
+        String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId));
+        bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE);
+        return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), bodyWithUser);
     }
 
     public void handleResponse(OutputStream out, HttpResponse response) throws IOException {

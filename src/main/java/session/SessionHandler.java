@@ -54,6 +54,10 @@ public class SessionHandler {
         return SessionDatabase.findSessionById(sessionId);
     }
 
+    public boolean validateSession(Session session) {
+        return session != null && !session.isExpired();
+    }
+
     public void logout(String sessionId) {
         SessionDatabase.removeSession(sessionId);
     }
