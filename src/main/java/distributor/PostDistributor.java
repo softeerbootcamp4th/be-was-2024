@@ -1,6 +1,7 @@
 package distributor;
 
 import handler.SessionHandler;
+import model.ViewData;
 import processor.ResponseProcessor;
 import processor.UserProcessor;
 import webserver.Request;
@@ -12,6 +13,7 @@ public class PostDistributor extends Distributor {
     Request request;
     DataOutputStream dos;
     UserProcessor userProcessor = new UserProcessor();
+    ViewData viewData;
 
     protected PostDistributor(Request request, DataOutputStream dos) {
         this.request = request;
@@ -35,19 +37,24 @@ public class PostDistributor extends Distributor {
     private void processUserCreate(DataOutputStream dos) throws IOException {
         userProcessor.createUser(request);
 
-        ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-        responseProcessor.createUserResponse();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.createUserResponse();
     }
 
     private void processUserLogin(DataOutputStream dos) throws IOException {
         if (userProcessor.login(request)) {
             String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
 
-            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-            responseProcessor.loginSuccessResponse(sessionId);
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginSuccessResponse(sessionId);
         } else {
-            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-            responseProcessor.loginFailedResponse();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginFailedResponse();
         }
+    }
+
+    @Override
+    public ViewData getViewDate() {
+        return this.viewData;
     }
 }

@@ -1,6 +1,7 @@
 package distributor;
 
 import handler.SessionHandler;
+import model.ViewData;
 import processor.ResponseProcessor;
 import webserver.Request;
 
@@ -10,6 +11,7 @@ import java.io.IOException;
 public class GetDistributor extends Distributor {
     Request request;
     DataOutputStream dos;
+    ViewData viewData;
 
     protected GetDistributor(Request request, DataOutputStream dos) {
         this.request = request;
@@ -28,8 +30,8 @@ public class GetDistributor extends Distributor {
     private void processQuery(DataOutputStream dos) throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-            responseProcessor.notFoundResponse();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData =  responseProcessor.notFoundResponse();
         }
     }
 
@@ -45,8 +47,9 @@ public class GetDistributor extends Distributor {
     }
 
     private void processDefault(DataOutputStream dos, String path) throws IOException {
-        ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-        responseProcessor.defaultResponse(path);
+        System.out.println("default process");
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.defaultResponse(path);
     }
 
     private void processLogout(DataOutputStream dos) throws IOException {
@@ -54,8 +57,8 @@ public class GetDistributor extends Distributor {
         String userId = request.getSessionId();
         SessionHandler.deleteSession(userId);
 
-        ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-        responseProcessor.logoutResponse();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.logoutResponse();
     }
 
     private void processLogin(DataOutputStream dos, String path) throws IOException {
@@ -63,12 +66,17 @@ public class GetDistributor extends Distributor {
 
         // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
         if (SessionHandler.verifySessionId(sessionId)) {
-            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-            responseProcessor.loginSuccessWithSessionId();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginSuccessWithSessionId();
         } else {
             // 세션아이디가 존재하지 않는다면 그대로
-            ResponseProcessor responseProcessor = ResponseProcessor.from(dos);
-            responseProcessor.loginResponse(path);
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginResponse(path);
         }
+    }
+
+    @Override
+    public ViewData getViewDate() {
+        return this.viewData;
     }
 }
