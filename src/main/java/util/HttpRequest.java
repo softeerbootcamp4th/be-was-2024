@@ -93,11 +93,19 @@ public class HttpRequest {
         if(headerLine.isEmpty()) return;
         headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
         int elementsCount = headerLine.split(ConstantUtil.COLON).length;
-        if(elementsCount == 1 || elementsCount > 3) { // 콜론이 없거나 3개 이상인 경우 (2개는 localhost 케이스 때문에 허용)
+
+        // 콜론이 없는 경우
+        if(elementsCount == 1) {
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
+        // 특정 헤더가 아닌데 3개 이상의 콜론을 갖는 경우
+        if(elementsCount > 3 && !headerLine.startsWith("Referer") && !headerLine.startsWith("Origin")){
+            throw new RequestException(ConstantUtil.INVALID_HEADER);
+        }
+
         int idx = headerLine.indexOf(ConstantUtil.COLON);
-        if(headerLine.substring(0, idx).contains("localhost") && elementsCount == 2){ // "Host localhost:8080" 같은 경우
+        // "Host localhost:8080" 같은 경우
+        if(headerLine.substring(0, idx).contains("localhost") && elementsCount == 2){
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
@@ -111,6 +119,6 @@ public class HttpRequest {
             byteArray[i] = body.get(i);
         }
         // byte[] to String 후 디코딩하여 다시 byte[]로 변환
-        this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes(StandardCharsets.UTF_8);
+        this.requestBody = new String(byteArray, StandardCharsets.ISO_8859_1).getBytes(StandardCharsets.UTF_8);
     }
 }

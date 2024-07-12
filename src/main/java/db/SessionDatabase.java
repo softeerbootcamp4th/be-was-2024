@@ -2,13 +2,13 @@ package db;
 
 import session.Session;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionDatabase {
 
-    private static Map<String, Session> sessions = new HashMap<>();
+    private static Map<String, Session> sessions = new ConcurrentHashMap<>();
 
     public static void addSession(Session session) {
         sessions.put(session.getSessionId(), session);

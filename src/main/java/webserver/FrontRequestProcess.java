@@ -77,7 +77,7 @@ public class FrontRequestProcess {
         };
     }
 
-    public HttpResponse handleSignUpRequest(HttpRequest request){
+    private HttpResponse handleSignUpRequest(HttpRequest request){
         try {
             userHandler.create(request.getBodyMap());
             return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
@@ -87,7 +87,7 @@ public class FrontRequestProcess {
     }
 
     // 로그인 및 로그아웃 요청 처리 및 세션 관리
-    public HttpResponse handleAuthRequest(HttpRequest request){
+    private HttpResponse handleAuthRequest(HttpRequest request){
         HttpRequestMapper mapper = HttpRequestMapper.of(request.getRequestPath(), request.getRequestMethod());
         if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인 성공 시 세션ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
             return sessionHandler.login(request.getBodyMap())
@@ -110,7 +110,7 @@ public class FrontRequestProcess {
     }
 
     // 세션ID가 있는 경우 [총 사용자 목록 출력], 없다면 [로그인 페이지로 이동]
-    public HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
+    private HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
         String pathWithHtml = path + ConstantUtil.DOT_HTML;
         String body = readBytesFromFile(pathWithHtml);
         if(session == null)
@@ -122,7 +122,7 @@ public class FrontRequestProcess {
     }
 
     // 세션ID가 있는 경우 로그인 상태로 간주하여 [사용자 ID] 표시, 없다면 [로그인 버튼] 표시
-    public HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
+    private HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
         String body = readBytesFromFile(path);
         if(session == null)
             return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), body);

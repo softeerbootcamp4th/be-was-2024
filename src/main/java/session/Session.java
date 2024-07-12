@@ -33,8 +33,6 @@ public class Session {
     }
 
     public boolean isExpired() {
-        System.out.println(expiredAt);
-        System.out.println(LocalDateTime.now(ZoneId.of("GMT")));
         return LocalDateTime.now(ZoneId.of("GMT")).isAfter(expiredAt);
     }
 

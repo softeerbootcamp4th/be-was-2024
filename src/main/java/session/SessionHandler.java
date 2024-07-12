@@ -61,7 +61,8 @@ public class SessionHandler {
     }
 
     public boolean validateSession(Session session) {
-        if(session == null || session.isExpired()){
+        if(session.isExpired()){
+            SessionDatabase.removeSession(session.getSessionId());
             return false;
         }
 
