@@ -119,8 +119,8 @@ public class FrontRequestProcess {
             return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), body);
 
         String userId = session.getUserId();
-        String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId));
-        bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE);
+        String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId)); // 사용자 ID 표시
+        bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
         return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), bodyWithUser);
     }
 

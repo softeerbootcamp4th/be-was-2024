@@ -11,8 +11,8 @@ public class DynamicHtmlUtil {
 
     public static final String USER_NAME_TAG = "<!--USER-ID-->";
     public static final String USER_LIST_TAG = "<!--USER-LIST-->";
-    public static final String LOGIN_BUTTON_TAG = "<!--LOGIN-BUTTON-->";
-    public static final String LOGIN_BUTTON_HTML = "<li><a href=\"/user/login.html\" role=\"button\">로그인</a></li>";
+    public static final String LOGIN_BUTTON_TAG = "<li><a id=\"optional_login_button\"";
+    public static final String LOGIN_BUTTON_INVISIBLE = "<li><a id=\"optional_login_button\" style=\"display:none;\"";
 
     public static String generateUserListHtml(List<User> users) {
         StringBuilder sb = new StringBuilder();
