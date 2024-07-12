@@ -4,6 +4,7 @@ import dto.enums.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpResponse {
     public String getProtocolVersion() {
@@ -38,29 +39,6 @@ public class HttpResponse {
         return new HttpResponse(protocolVersion, httpStatus, headers, body);
     }
 
-
-//    /**
-//     * HttpRequest 객체로부터 HttpResponse 객체를 생성하는 팩터리메서드
-//     * @param httpRequest 생성한 httpRequest 객체
-//     * @return HttpResponse
-//     */
-//    public static HttpResponse from(HttpRequest httpRequest) {
-//
-//        // 확장자를 가지고 있으면 정적 파일
-//
-//        return null;
-//    }
-//
-//    private HttpResponse createStaticHttpResponse() throws IOException {
-////        String contentType = getContentTypeFromRequestPath();
-//        List<String> headers = new ArrayList<>();
-//
-//        byte[] body = FileMapper.getByteConvertedFile(this.path);
-//        headers.add("Content-Type: " + contentType + ";charset=utf-8\r\n");
-//        headers.add("Content-Length: " + String.valueOf(body.length) + "\r\n");
-//        headers.add("\r\n"); //Blank l
-//        return new HttpResponse("HTTP/1.1", HttpStatus.OK, headers, body);
-//    }
 
 
 

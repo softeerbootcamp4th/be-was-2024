@@ -86,12 +86,10 @@ public class Logics {
             throw new RuntimeException("Invalid method");
         }
 
-        String cookie = httpRequest.getHeaders().get("Cookie");
-        if (cookie != null && cookie.startsWith("sid=")) {
-            String sessionId = cookie.substring("sid=".length());
-
-            SessionDatabase.deleteSession(sessionId);
-            logger.info(SessionDatabase.getLogoutString(sessionId));
+        String session = httpRequest.getSessionOrNull().orElse(null);
+        if (session!=null) {
+            SessionDatabase.deleteSession(session);
+            logger.info(SessionDatabase.getLogoutString(session));
         }
 
         ///header

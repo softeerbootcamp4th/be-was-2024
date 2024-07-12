@@ -30,4 +30,11 @@ public class StringConstants {
     public static final String PATH_LOGOUT = "/logout";
 
     public static final Long EXPIRE_TIME = 1000000L;
+
+    //html
+    public static final String DYNAMIC_CONTENT_IS_LOGIN = "<!-- DYNAMIC_CONTENT_IS_LOGIN -->";
+    public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN = "<!-- DYNAMIC_CONTENT_IS_NOT_LOGIN -->";
+
+    public static final String DYNAMIC_CONTENT_IS_LOGIN_CONTENT = "<li class=\"header__menu__item\" id=\"login_success\"><div>로그인완료!</div></li>";
+    public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT = "<li class=\"header__menu__item\" id=\"login_success\"><div>로그인미완료!!</div></li>";
 }

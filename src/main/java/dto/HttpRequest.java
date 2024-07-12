@@ -3,6 +3,7 @@ package dto;
 import dto.enums.HttpMethod;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class HttpRequest {
 
@@ -29,53 +30,15 @@ public class HttpRequest {
         return new HttpRequest(httpMethod, path, queryParams, protocolVersion, headers, body);
     }
 
-//
-//
-//    /**
-//     * HttpRequest를 통해 HttpResponse를 생성하는 로직
-//     *
-//     * @return 생성된 HttpRequest
-//     * @throws IOException
-//     */
-//    public HttpResponse createHttpResponse() throws IOException {
-//        if (isDynamicHttpRequest()) {
-//            return createDynamicHttpResponse();
-//        } else {
-//            return createStaticHttpResponse();
-//        }
-//    }
-////
-////    //path에 ?가 포함되면 동적 요청, 아니라면 정적파일요청
-////    private boolean isDynamicHttpRequest() {
-////        return this.path.contains("?");
-////    }
-////
-////    private HttpResponse createStaticHttpResponse() throws IOException {
-////        String contentType = getContentTypeFromRequestPath();
-////        List<String> headers = new ArrayList<>();
-////
-////        byte[] body = FileMapper.getByteConvertedFile(this.path);
-////        headers.add("Content-Type: " + contentType + ";charset=utf-8\r\n");
-////        headers.add("Content-Length: " + String.valueOf(body.length) + "\r\n");
-////        headers.add("\r\n"); //Blank l
-////        return new HttpResponse("HTTP/1.1", HttpStatus.OK, headers, body);
-////    }
-////
-////    private HttpResponse createDynamicHttpResponse() throws UnsupportedEncodingException {
-////        List<String> headers = new ArrayList<>();
-////        headers.add("Location: /index.html \r\n");
-////        String content = path.substring(this.path.indexOf("?") + 1);
-////        String[] splitPath = content.split("&");
-////        List<String> infos = new ArrayList<>();
-////        for (String s : splitPath) {
-////            infos.add(URLDecoder.decode(s.split("=")[1], "UTF-8"));
-////        }
-////
-////        User user = new User(infos.get(0), infos.get(1), infos.get(2), infos.get(3));
-////        Database.addUser(user);
-////        return new HttpResponse("HTTP/1.1", HttpStatus.SEE_OTHER, headers, new byte[0]);
-////    }
+    public Optional<String> getSessionOrNull(){
+        String cookie = this.getHeaders().get("Cookie");
+        if(cookie.startsWith("sid=")){
+            String sessionId = cookie.substring("sid=".length());
+            return Optional.of(sessionId);
+        }
+        return Optional.empty();
 
+    }
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
