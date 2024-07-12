@@ -26,32 +26,34 @@ public class GetHandler
     public void handleGetRequest(DataOutputStream dos, RequestObject requestObject)
     {
         String path = requestObject.getPath();
-        try
-        {
-            if(path.equals("/user/info"))
-            {//세션값 요청이 들어왔다면
-                handleUserInfoRequest(dos,requestObject);
+        try {
+            switch(path) {
+                case "/user/info" : handleUserInfoRequest(dos,requestObject);
+                                    break;
+                case "/user/list" : checkCookies(dos,requestObject,path);
+                                    break;
+                default :  path= FileDetection.getPath(FileDetection.fixedPath+path);
+                                staticFileHandler(dos,path);
+                                break;
             }
-            else if(path.equals("/user/list"))//사용자 목록 요청이 들어왔다면
-            {
-                if(requestObject.getCookies().isEmpty())
-                {//쿠키 값이 비어있다면, 즉 로그인이 안 돼있으면
-                    staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
-                }
-                else
-                {
-                    handleUserListRequest(dos,requestObject);
-                }
-            }
-            else
-            {
-                path = FileDetection.getPath(FileDetection.fixedPath+path);
-                staticFileHandler(dos,path);
-            }
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             logger.error("Request handling error : {}",e.getMessage());
+        }
+    }
+
+
+    private void checkCookies(DataOutputStream dos,RequestObject requestObject,String path)
+    {
+        if(requestObject.getCookies().isEmpty()) {//쿠키 값이 비어있다면, 즉 로그인이 안 돼있으면
+            staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
+        } else {
+            try{
+                handleUserListRequest(dos,requestObject);
+            }
+            catch(IOException e)
+            {
+                logger.debug(e.getMessage());
+            }
         }
     }
 
@@ -110,8 +112,6 @@ public class GetHandler
             logger.error("404 response error : {}",e.getMessage());
         }
     }
-
-
     //세션을 얻어낸다
     private void handleUserInfoRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
         String sessionId = requestObject.getCookies().get("SID");

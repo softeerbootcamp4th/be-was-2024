@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+//SessionDatabase
 public class SessionHandler {
     private static final ConcurrentHashMap<String, User> sessionMap = new ConcurrentHashMap<>();
     //멀티스레드 환경에서 Thread-safe 한 HashMap 이다
@@ -27,5 +28,5 @@ public class SessionHandler {
 
     public static void invalidateSession(String sessionId) {
         sessionMap.remove(sessionId);
-    }
+    }//실행시켜줘야돼요
 }
