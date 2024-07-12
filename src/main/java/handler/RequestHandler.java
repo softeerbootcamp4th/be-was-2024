@@ -4,9 +4,12 @@ import java.io.*;
 import java.net.Socket;
 
 import distributor.Distributor;
+import model.ViewData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import processor.ResponseProcessor;
 import webserver.Request;
+import webserver.Response;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -29,11 +32,50 @@ public class RequestHandler implements Runnable {
 
                 Request request = Request.from(in);
 
-                Distributor distributor = Distributor.of(request, dos);
-                distributor.process();
+                String path = request.getPath();
+
+                if (isStaticResource(path)) {
+                    ResponseProcessor responseProcessor = new ResponseProcessor();
+                    ViewData viewData =  responseProcessor.defaultResponse(path);
+
+                    Response response = new Response.Builder()
+                            .url(viewData.getUrl())
+                            .dataOutputStream(dos)
+                            .redirectCode(viewData.getRedirectCode())
+                            .statusCode(viewData.getStatusCode())
+                            .cookie(viewData.getCookie())
+                            .build();
+
+                    response.sendResponse();
+                } else {
+                    Distributor distributor = Distributor.of(request, dos);
+                    distributor.process();
+
+                    ViewData viewData = distributor.getViewDate();
+
+                    System.out.println(viewData.getUrl());
+                    System.out.println(viewData.getStatusCode());
+
+                    Response response = new Response.Builder()
+                            .url(viewData.getUrl())
+                            .dataOutputStream(dos)
+                            .redirectCode(viewData.getRedirectCode())
+                            .statusCode(viewData.getStatusCode())
+                            .cookie(viewData.getCookie())
+                            .build();
+
+                    response.sendResponse();
+                }
+
+
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private boolean isStaticResource(String url) {
+        ResourceHandler resourceHandler = new ResourceHandler();
+        return resourceHandler.isStaticResource(url);
     }
 }
