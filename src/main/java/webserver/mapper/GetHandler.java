@@ -29,7 +29,7 @@ public class GetHandler {
                 url = staticResourceDir + "/main/index.html";
                 requestResponse.openPathWithUsername(url, user.getName());
                 return;
-            case "/user/list?":
+            case "/user/list":
                 if(Session.findUserBySessionId(sessionId) == null){
                     url = staticResourceDir + "/login/index.html";
                     break;
