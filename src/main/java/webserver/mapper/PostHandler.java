@@ -41,7 +41,7 @@ public class PostHandler {
                     break;
             }
         }catch (Exception e) {
-            requestResponse.sendErrorPage("Internal Server Error: An unexpected error occurred", redirectUrl);
+            requestResponse.sendErrorPage("Invalid information has been entered", redirectUrl);
         }
 
     }
