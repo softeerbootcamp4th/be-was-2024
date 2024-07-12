@@ -37,4 +37,12 @@ public class ResourceHandler {
 
         return "text/plain";
     }
+
+    public boolean isStaticResource(String url) {
+        if (url.contains(".")) {
+            return !url.endsWith("html");
+        } else {
+            return false;
+        }
+    }
 }
