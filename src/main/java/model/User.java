@@ -1,5 +1,7 @@
 package model;
 
+import util.ConstantUtil;
+
 import java.util.Map;
 
 public class User {
@@ -16,7 +18,11 @@ public class User {
     }
 
     public static User from(Map<String, String> params){
-        return new User(params.get("userId"), params.get("password"), params.get("name"), params.get("email"));
+        String userId = params.get(ConstantUtil.USER_ID);
+        String password = params.get(ConstantUtil.PASSWORD);
+        String name = params.get(ConstantUtil.NAME);
+        String email = params.get(ConstantUtil.EMAIL);
+        return new User(userId, password, name, email);
     }
 
     public String getUserId() {

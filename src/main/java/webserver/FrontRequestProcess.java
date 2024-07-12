@@ -1,7 +1,11 @@
 package webserver;
 
+import exception.ModelException;
+import exception.RequestException;
+import session.SessionHandler;
 import handler.ModelHandler;
 import handler.UserHandler;
+import session.Session;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,16 +14,17 @@ import util.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
     private final ModelHandler<User> userHandler;
+    private final SessionHandler sessionHandler;
 
     private FrontRequestProcess() {
         this.userHandler = UserHandler.getInstance();
+        this.sessionHandler = SessionHandler.getInstance();
     }
 
     public static FrontRequestProcess getInstance() {
@@ -30,84 +35,139 @@ public class FrontRequestProcess {
         private static final FrontRequestProcess INSTANCE = new FrontRequestProcess();
     }
 
-    public Map<String, String> handleRequest(HttpRequestObject httpRequestObject) {
-        String path = httpRequestObject.getRequestPath();
-        String method = httpRequestObject.getRequestMethod();
-        // TODO: 추후 기능 확장 시 관심사별로 분리 필요
-        Map<String, String> responseInfo = new HashMap<>();
-        switch (HttpRequestMapper.of(path, method)) {
-            case USER_SIGNUP:
-                userHandler.create(httpRequestObject.getRequestParams());
-                responseInfo.put("type", "dynamic");
-                responseInfo.put("path", "/index.html");
-                responseInfo.put("statusCode", "302");
-                break;
-            case REGISTER:
-                responseInfo.put("type", "dynamic");
-                responseInfo.put("path", "/registration");
-                responseInfo.put("statusCode", "302");
-                break;
-            default:
-                responseInfo.put("type", "static");
-                responseInfo.put("path", path);
-                responseInfo.put("statusCode", "200");
-                break;
+    public HttpResponse handleRequest(HttpRequest request) throws IOException {
+        String path = request.getRequestPath();
+        String method = request.getRequestMethod();
+
+        // css, img 등 html이 아닌 정적 자원인 경우 즉시 반환
+        if (path.contains(ConstantUtil.DOT)) {
+            int idx = path.lastIndexOf(ConstantUtil.DOT);
+            if(idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
+            String extension = path.substring(idx + 1);
+            if (!extension.equals(ContentType.HTML.getExtension())) {
+                return HttpResponse.okStatic(path, request.getHttpVersion());
+            }
         }
-        return responseInfo;
+
+        // 로그인 및 로그아웃 요청은 별도로 처리
+        if(HttpRequestMapper.isAuthRequest(path, method)){
+            return handleAuthRequest(request);
+        }
+
+        // 세션이 유효한지 검사하고 세션 객체 반환
+        Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+                .flatMap(sessionHandler::findSessionById)
+                .orElse(null);
+
+        // 세션이 존재하나 유효하지 않은 경우 세션 삭제하고 로그인 페이지로 리다이렉트
+        if(session != null && !sessionHandler.validateSession(session)) {
+            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+        }
+
+        // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
+        return switch (HttpRequestMapper.of(path, method)) {
+            case ROOT -> HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+            case INDEX_HTML -> handleIndexRequest(path, request, session);
+            case USER_LIST -> handleUserListRequest(path, request, session);
+            case SIGNUP_REQUEST -> handleSignUpRequest(request);
+            case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), readBytesFromFile(path));
+            case MESSAGE_NOT_ALLOWED -> HttpResponse.error(HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
+            case NOT_FOUND -> HttpResponse.error(HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
+            default -> HttpResponse.okStatic(path, request.getHttpVersion());
+        };
     }
 
-    public void handleResponse(OutputStream out, Map<String, String> responseInfo) throws IOException {
+    private HttpResponse handleSignUpRequest(HttpRequest request){
+        try {
+            userHandler.create(request.getBodyMap());
+            return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+        } catch (ModelException e) {
+            return HttpResponse.redirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
+        }
+    }
+
+    // 로그인 및 로그아웃 요청 처리 및 세션 관리
+    private HttpResponse handleAuthRequest(HttpRequest request){
+        HttpRequestMapper mapper = HttpRequestMapper.of(request.getRequestPath(), request.getRequestMethod());
+        if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인 성공 시 세션ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
+            return sessionHandler.login(request.getBodyMap())
+                    .map(session -> {
+                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+                        response.setSessionId(session.toString());
+                        return response;
+                    })
+                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.LOGIN_FAIL.getPath(), request.getHttpVersion()));
+        } else { // // 로그아웃 시 세션 ID를 추출하여 세션 삭제, 세션이 없는데 로그아웃 요청이 들어온 경우 리다이렉트
+            return sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+                    .map(sessionId -> {
+                        sessionHandler.logout(sessionId);
+                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+                        response.deleteSessionId(sessionId);
+                        return response;
+                    })
+                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion()));
+        }
+    }
+
+    // 세션ID가 있는 경우 [총 사용자 목록 출력], 없다면 [로그인 페이지로 이동]
+    private HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
+        String pathWithHtml = path + ConstantUtil.DOT_HTML;
+        String body = readBytesFromFile(pathWithHtml);
+        if(session == null)
+            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+
+        List<User> users = userHandler.findAll();
+        String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
+        return HttpResponse.ok(ConstantUtil.DYNAMIC, pathWithHtml, request.getHttpVersion(), bodyWithUserList);
+    }
+
+    // 세션ID가 있는 경우 로그인 상태로 간주하여 [사용자 ID] 표시, 없다면 [로그인 버튼] 표시
+    private HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
+        String body = readBytesFromFile(path);
+        if(session == null)
+            return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), body);
+
+        String userId = session.getUserId();
+        String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId)); // 사용자 ID 표시
+        bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
+        return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), bodyWithUser);
+    }
+
+    public void handleResponse(OutputStream out, HttpResponse response) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
-        if (responseInfo.get("type").equals("static")) {
-            staticResponse(dos, responseInfo.get("path"));
+
+        // 정적 자원인 경우 바로 반환
+        if (response.getType().equals(ConstantUtil.STATIC)) {
+            staticResponse(dos, response.getPath());
             return;
         }
 
-        switch(responseInfo.get("statusCode")) {
-            case "302":
-                response302Header(dos, responseInfo.get("path"));
-                break;
-            default:
-                break;
+        dos.writeBytes(response.getTotalHeaders());
+        byte[] body = response.getBody();
+        if(body != null) {
+            dos.write(body, 0, body.length);
+            dos.flush();
         }
     }
 
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
-        byte[] body = IOUtil.readBytesFromFile(IOUtil.STATIC_PATH + path);
-        boolean isDir = IOUtil.isDirectory(IOUtil.STATIC_PATH + path);
-        response200Header(dos, body.length, isDir ? "html" : path.split("\\.")[1]);
-        responseBody(dos, body);
-    }
-
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String extension) {
+        byte[] body = IOUtil.readBytesFromFile(true, path);
+        boolean isDir = IOUtil.isDirectory(true, path);
+        String[] element = path.split(ConstantUtil.REGDOT);
+        String extension = isDir ? ContentType.HTML.getExtension() : element[element.length - 1];
         try {
-            logger.debug("200 OK 응답을 보냅니다.");
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + ContentType.getType(extension) + "\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response302Header(DataOutputStream dos, String location) {
-        try {
-            logger.debug("302 리다이렉트 발생하여 {}로 이동합니다.", location);
-            dos.writeBytes("HTTP/1.1 302 Found \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
+            dos.writeBytes("HTTP/1.1 200 OK " + ConstantUtil.CRLF);
+            dos.writeBytes("Content-Type: " + ContentType.getType(extension) + ConstantUtil.CRLF);
+            dos.writeBytes("Content-Length: " + body.length + ConstantUtil.CRLF);
+            dos.writeBytes(ConstantUtil.CRLF);
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private String readBytesFromFile(String path) throws IOException {
+        return new String(IOUtil.readBytesFromFile(false, path));
     }
 }

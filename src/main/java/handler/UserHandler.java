@@ -1,11 +1,15 @@
 package handler;
 
 import db.Database;
+import exception.ModelException;
 import model.User;
+import util.ConstantUtil;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-public class UserHandler implements ModelHandler<User> {
+public class UserHandler implements ModelHandler<User>{
 
     private UserHandler() {}
 
@@ -18,11 +22,26 @@ public class UserHandler implements ModelHandler<User> {
     }
 
     @Override
-    public User create(Map<String, String> fields) {
+    public Optional<User> create(Map<String, String> fields) {
+        if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
+            throw new ModelException(ConstantUtil.INVALID_SIGNUP);
+        }
+        if(!fields.get(ConstantUtil.EMAIL).matches(ConstantUtil.EMAIL_REGEX)){
+            throw new ModelException(ConstantUtil.INVALID_SIGNUP);
+        }
+
         User user = User.from(fields);
         Database.addUser(user);
-        return user;
+        return Optional.of(user);
     }
 
-    // 추후 update, read, delete 추가 가능
+    @Override
+    public Optional<User> findById(String userId) {
+        return Database.findUserById(userId);
+    }
+
+    @Override
+    public List<User> findAll() {
+        return Database.findAll().stream().toList();
+    }
 }

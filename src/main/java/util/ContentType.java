@@ -25,7 +25,7 @@ public enum ContentType {
                 return contentType.type;
             }
         }
-        return null;
+        return "text/plain;charset=utf-8";
     }
 
     public String getExtension() {
