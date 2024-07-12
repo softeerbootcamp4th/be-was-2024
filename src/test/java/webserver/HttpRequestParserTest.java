@@ -1,6 +1,5 @@
 package webserver;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +15,7 @@ public class HttpRequestParserTest {
         InputStream inputStream = new FileInputStream("src/test/resources/test.txt");
 
         //when
-        String requestString = HttpRequestParser.getRequestString(inputStream);
+        String requestString = HttpRequestParser.getHttpRequestMessage(inputStream);
 
         //then
         assertThat(requestString).isEqualTo("file test\n");

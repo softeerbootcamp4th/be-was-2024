@@ -2,13 +2,10 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import data.HttpRequestMessage;
-import db.Database;
-import model.User;
+import data.HttpResponseMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.FileUtil;
@@ -29,22 +26,28 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            String requestString = HttpRequestParser.getRequestString(in);
-            logger.debug(requestString);
-            HttpRequestMessage httpRequestMessage = HttpRequestParser.getHttpRequestMessage(requestString);
-            String path = UriMapper.mapUri(httpRequestMessage.getUri());
-            if (path.startsWith("redirect:")) redirect(dos,path.substring(9));
-            else response200(path, dos);
+            HttpRequestMessage httpRequestMessage = HttpRequestParser.getHttpRequestMessage(in);
+            logger.debug("Request Message: {}", httpRequestMessage);
+            try {
+                HttpResponseMessage response = UriMapper.mapUri(httpRequestMessage);
+                if (response.getStatusCode().startsWith("3")) redirect(dos, response.getHeaders());
+                else response(response, dos);
+            }
+            catch (Exception e) {
+                response404(dos);
+            }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-    private void redirect(DataOutputStream dos, String location) throws IOException {
+    private void redirect(DataOutputStream dos, Map<String,String> map) throws IOException {
         try {
             dos.writeBytes("HTTP/1.1 303 \r\n");
-            dos.writeBytes("Location: " + location + "\r\n");
-            dos.writeBytes("Content-Type: " + findContentType("html") +";charset=utf-8\r\n");
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                dos.writeBytes(entry.getKey() + ": " + entry.getValue() + "\r\n");
+            }
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: 0" + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
@@ -53,16 +56,15 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response200(String path, DataOutputStream dos) throws IOException {
-        byte[] body = FileUtil.readAllBytesFromFile(new File(path));
-        response200Header(dos, path.split("\\.")[1] ,body.length);
-        responseBody(dos, body);
+    private void response(HttpResponseMessage response, DataOutputStream dos) throws IOException {
+        response200Header(dos, response.getHeaders().get("Content-Type"),response.getBody().length);
+        responseBody(dos, response.getBody());
     }
 
-    private void response200Header(DataOutputStream dos, String ext, int lengthOfBodyContent) {
+    private void response200Header(DataOutputStream dos, String contentType, int lengthOfBodyContent) {
         try {
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + findContentType(ext) +";charset=utf-8\r\n");
+            dos.writeBytes("Content-Type: " + contentType +";charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -70,18 +72,19 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private String findContentType(String ext){
-        return switch (ext) {
-            case "css" -> "text/css";
-            case "js" -> "application/javascript";
-            case "html" -> "text/html";
-            case "jpg" -> "image/jpeg";
-            case "png" -> "image/png";
-            case "ico" -> "image/x-icon";
-            case "svg" -> "image/svg+xml";
-            default -> "text/plain";
-        };
+    private void response404(DataOutputStream dos) {
+        try {
+            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: 0 \r\n");
+            dos.writeBytes("\r\n");
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
+
+
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {

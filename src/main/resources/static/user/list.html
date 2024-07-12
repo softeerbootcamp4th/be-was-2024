@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../reset.css" rel="stylesheet" />
+    <link href="../global.css" rel="stylesheet" />
+    <link href="../main.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="../img/signiture.svg" /></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+            </li>
+            <li class="header__menu__item">
+                <button onclick="logout()" id="logout-btn" class="btn btn_ghost btn_size_s">
+                    로그아웃
+                </button>
+            </li>
+        </ul>
+    </header>
+    <h2 class="page-title">유저목록</h2>
+    $list
+</div>
+</body>
+<script>
+    async function logout(){
+        try {
+            const response = await fetch('/logout', {
+                method: 'POST',
+            });
+            if (response.redirected){
+                window.location.href = "/"
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
+        }
+    }
+</script>
+</html>

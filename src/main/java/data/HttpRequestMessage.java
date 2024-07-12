@@ -1,5 +1,6 @@
 package data;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,14 +8,22 @@ public class HttpRequestMessage {
     String method;
     String uri;
     String version;
+    Map<String, String> queryParam;
     Map<String,String> headers;
-    String body;
+    Map<String,String> cookies;
+    byte[] body;
 
-    public HttpRequestMessage(String method, String uri, String version, Map<String, String> headers, String body) {
+    public HttpRequestMessage(String method, String uri, String version, Map<String,String> queryParam, Map<String, String> headers, byte[] body, Map<String,String> cookies) {
         this.method = method;
         this.uri = uri;
         this.version = version;
+        this.queryParam = queryParam;
         this.headers = headers;
+        this.body = body;
+        this.cookies = cookies;
+    }
+
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
@@ -26,6 +35,10 @@ public class HttpRequestMessage {
         return uri;
     }
 
+    public Map<String,String> getQueryParam() {
+        return queryParam;
+    }
+
     public String getVersion() {
         return version;
     }
@@ -34,27 +47,24 @@ public class HttpRequestMessage {
         return headers;
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return body;
     }
 
-    public void setMethod(String method) {
-        this.method = method;
+    public Map<String, String> getCookies() {
+        return cookies;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
+    @Override
+    public String toString() {
+        return "HttpRequestMessage{" +
+                "method='" + method + '\'' +
+                ", uri='" + uri + '\'' +
+                ", version='" + version + '\'' +
+                ", queryParam=" + queryParam +
+                ", headers=" + headers +
+                ", cookies=" + cookies +
+                ", body=" + Arrays.toString(body) +
+                '}';
     }
 }

@@ -2,48 +2,91 @@ package webserver;
 
 import data.HttpRequestMessage;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class HttpRequestParser {
-    public static String getRequestString(InputStream in) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
-        String tempStr;
+    public static HttpRequestMessage getHttpRequestMessage(InputStream in) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
-        while ((tempStr = bufferedReader.readLine()) != null && !tempStr.isEmpty()) {
-            stringBuilder.append(tempStr);
+        BufferedInputStream bis = new BufferedInputStream(in);
+        String tempString;
+        while (!(tempString = readLine(bis)).isEmpty()) {
+            stringBuilder.append(tempString);
             stringBuilder.append("\n");
         }
-        return stringBuilder.toString();
+
+        HttpRequestMessage httpRequestMessage = getHttpRequestMessage(stringBuilder.toString());
+        Map<String, String> headers = httpRequestMessage.getHeaders();
+        String length = headers.get("Content-Length");
+        if (length != null) {
+            byte[] bytes = new byte[Integer.parseInt(length)];
+            bis.read(bytes,0,bytes.length);
+            httpRequestMessage.setBody(bytes);
+        }
+        return httpRequestMessage;
     }
 
-    public static HttpRequestMessage getHttpRequestMessage(String requestMessage){
-        String[] messageSplit = requestMessage.split("\n\n",2);
-        String headerPart = messageSplit[0];
-        String bodyPart = "";
-        if (messageSplit.length > 1) {
-            bodyPart = messageSplit[1];
+    private static String readLine(BufferedInputStream bis) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int ch;
+        while ((ch = bis.read()) != -1) {
+            if (ch == '\r'){
+                bis.read();
+                break;
+            }
+            byteArrayOutputStream.write(ch);
         }
+        return byteArrayOutputStream.toString();
+    }
 
-        String[] headerSplit = headerPart.split("\n",2);
+    private static HttpRequestMessage getHttpRequestMessage(String requestMessage){
+        Map<String, String> queryParams = new HashMap<>();
+        String[] headerSplit = requestMessage.split("\n",2);
         String startLine = headerSplit[0];
 
         String[] startLineSplit = startLine.split(" ");
         String method = startLineSplit[0];
         String uri = startLineSplit[1];
         String version = startLineSplit[2];
-
+        if (uri.contains("?")) {
+            uri = processQuery(uri, queryParams);
+        }
         String[] headerArray =  headerSplit[1].split("\n");
+        Map<String, String> headers = getHeaderMap(headerArray);
+        Map<String, String> cookies = getCookie(headers.get("Cookie"));
+        return new HttpRequestMessage(method,uri,version,queryParams,headers, null,cookies);
+    }
+
+    private static Map<String, String> getHeaderMap(String[] headerArray) {
         Map<String, String> headers = new HashMap<>();
         for (String header : headerArray) {
-            String[] headerParts = header.split(": ", 2);
-            headers.put(headerParts[0], headerParts[1]);
+            String[] headerParts = header.split(":", 2);
+            headers.put(headerParts[0].strip(), headerParts[1].strip());
         }
+        return headers;
+    }
 
-        return new HttpRequestMessage(method,uri,version,headers,bodyPart);
+    private static Map<String,String> getCookie(String cookieString){
+        HashMap<String, String> cookies = new HashMap<>();
+        if (cookieString == null) return cookies;
+        String[] cookieArray = cookieString.split(";");
+        for (String cookie : cookieArray) {
+            String[] cookieEntry = cookie.split("=");
+            cookies.put(cookieEntry[0].strip(), cookieEntry[1].strip());
+        }
+        return cookies;
+    }
+
+    private static String processQuery(String uri, Map<String, String> queryParams) {
+        String queryString = uri.substring(uri.indexOf("?") + 1);
+        String[] queries = queryString.split("&");
+        for (String query : queries) {
+            String[] entry = query.split("=");
+            queryParams.put(entry[0], entry[1]);
+        }
+        uri = uri.substring(0, uri.indexOf("?"));
+        return uri;
     }
 }
