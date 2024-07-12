@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Map;
-
 public class User {
     private String userId;
     private String password;
@@ -34,14 +32,5 @@ public class User {
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
-    }
-
-    public static User toEntity(Map<String, String> query) {
-        String userId = query.get("userId");
-        String password = query.get("password");
-        String name = query.get("username");
-        String email = query.get("userId");
-
-        return new User(userId, password, name, email);
     }
 }

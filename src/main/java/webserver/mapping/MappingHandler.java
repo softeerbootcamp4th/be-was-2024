@@ -1,9 +1,8 @@
 package webserver.mapping;
 
-import webserver.mapping.mapper.GetCreateUserMapper;
-import webserver.mapping.mapper.GetHomeMapper;
-import webserver.mapping.mapper.GetRegistrationMapper;
-import webserver.mapping.mapper.HttpMapper;
+import webserver.http.MyHttpRequest;
+import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.*;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -23,23 +22,22 @@ public class MappingHandler {
     }
 
     static {
-        getHandlers.put("/", new GetHomeMapper());
-        getHandlers.put("/registration", new GetRegistrationMapper());
-        getHandlers.put("/user/create", new GetCreateUserMapper());
+        getHandlers.put("/", new GETHomeMapper());
+        getHandlers.put("/registration", new GETRegistrationFormMapper());
+        getHandlers.put("/login", new GETLoginFormMapper());
+//        getHandlers.put("/user/create", new GETCreateUserMapper());
 
+        postHandlers.put("/user/create", new POSTCreateUserMapper());
+        postHandlers.put("/user/login", new POSTLoginUserMapper());
     }
 
-    public Map<String, Object> mapping(String method, String path) throws IOException {
-        int indexOfQuery = path.indexOf('?');
-
-        String mappingPath = path;
-        if (indexOfQuery != -1) {
-            mappingPath = path.substring(0, indexOfQuery);
-        }
+    public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
+        String method = httpRequest.getMethod();
+        String path = httpRequest.getPath();
 
         return switch (method) {
-            case "GET" -> getHandlers.get(mappingPath).handle(path);
-            case "POST" -> postHandlers.get(mappingPath).handle(path);
+            case "GET" -> getHandlers.get(path).handle(httpRequest);
+            case "POST" -> postHandlers.get(path).handle(httpRequest);
             default -> null;
         };
     }
