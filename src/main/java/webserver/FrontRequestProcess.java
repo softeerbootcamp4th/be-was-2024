@@ -56,8 +56,12 @@ public class FrontRequestProcess {
         // 세션이 유효한지 검사하고 세션 객체 반환
         Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
                 .flatMap(sessionHandler::findSessionById)
-                .filter(sessionHandler::validateSession)
-                .orElse(null); // 세션이 없거나 만료되었다면 null
+                .orElse(null);
+
+        // 세션이 존재하나 유효하지 않은 경우 세션 삭제하고 로그인 페이지로 리다이렉트
+        if(session != null && !sessionHandler.validateSession(session)) {
+            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+        }
 
         // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
         return switch (HttpRequestMapper.of(path, method)) {
