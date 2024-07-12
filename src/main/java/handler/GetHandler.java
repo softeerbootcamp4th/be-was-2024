@@ -9,7 +9,6 @@ public class GetHandler
 {
     private GetHandler() {}
 
-
     private static final Logger logger = LoggerFactory.getLogger(GetHandler.class);
     private static class LazyHolder{
         private static final GetHandler INSTANCE = new GetHandler();
@@ -24,6 +23,13 @@ public class GetHandler
     {
         byte[] body;
         File fi = new File(path);
+
+        if(!fi.exists())
+        {
+            response404Header(dos);
+            return;
+        }
+
         try(FileInputStream fin = new FileInputStream(fi);
             BufferedInputStream bi = new BufferedInputStream(fin);)
         {
@@ -54,6 +60,23 @@ public class GetHandler
         try {
             dos.write(body, 0, body.length);
             dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
+    //404헤더를 보내준다
+    private void response404Header(DataOutputStream dos)
+    {
+        try {
+            String body = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>";
+            byte[] bodyBytes = body.getBytes("UTF-8");
+            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("Content-Type: text/html ;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+            dos.writeBytes("\r\n");
+            responseBody(dos,bodyBytes);
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

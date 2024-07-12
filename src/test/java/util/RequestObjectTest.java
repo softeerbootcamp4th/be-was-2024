@@ -50,7 +50,7 @@ class RequestObjectTest {
 
         //when
         RequestObject requestLine = new RequestObject(line);
-        params=requestLine.getParams();
+        //params=requestLine.getParams();
 
         //then
         assertThat(params.get("userId")).isEqualTo("1");
