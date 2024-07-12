@@ -92,9 +92,13 @@ public class HttpRequest {
     public void putHeaders(String headerLine){
         if(headerLine.isEmpty()) return;
         headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
+        int elementsCount = headerLine.split(ConstantUtil.COLON).length;
+        if(elementsCount == 1 || elementsCount > 3) { // 콜론이 없거나 3개 이상인 경우 (2개는 localhost 케이스 때문에 허용)
+            throw new RequestException(ConstantUtil.INVALID_HEADER);
+        }
         int idx = headerLine.indexOf(ConstantUtil.COLON);
-        if(idx == -1) {
-            throw new RequestException(ConstantUtil.INVALID_HEADER + headerLine);
+        if(headerLine.substring(0, idx).contains("localhost") && elementsCount == 2){ // "Host localhost:8080" 같은 경우
+            throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
         requestHeaders.put(header[0].trim(), header[1].trim());
