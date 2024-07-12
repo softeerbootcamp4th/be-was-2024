@@ -17,8 +17,8 @@ public class Database {
         return users.get(userId);
     }
 
-    public static Collection<User> findAll() {
-        return users.values();
+    public static Map<String, User> findAll() {
+        return users;
     }
 
 }

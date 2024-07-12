@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Map;
 
 public class RequestResponse {
 
@@ -81,15 +81,16 @@ public class RequestResponse {
     }
 
     public void openUserList() throws IOException {
-        Collection<User> users = Database.findAll();
+        Map<String, User> users = Database.findAll();
 
         StringBuilder userListHtml = new StringBuilder();
         userListHtml.append("<html><head><title>User List</title></head><body>");
         userListHtml.append("<h1>User List</h1>");
         userListHtml.append("<ul>");
-        for (User user : users) {
-            userListHtml.append("<li> ID: ").append(user.getUserId())
-                    .append(" & Name: ").append(user.getName())
+        for (Map.Entry<String, User> entry : users.entrySet()) {
+            userListHtml.append("<li> ID: ").append(entry.getKey())
+                    .append(" & Name: ").append(entry.getValue().getName())
+                    .append(" & email: ").append(entry.getValue().getEmail().replace("%40", "@"))
                     .append("</li>");
         }
         userListHtml.append("</ul>");
@@ -124,7 +125,7 @@ public class RequestResponse {
         dos.flush();
     }
 
-    public void sendHtmlResponse(String html) throws IOException {
+    public void responseErrorPage(String html) throws IOException {
         byte[] responseBytes = html.getBytes("UTF-8");
         dos.write(("HTTP/1.1 200 OK\r\n" +
                 "Content-Type: text/html; charset=UTF-8\r\n" +
@@ -142,6 +143,6 @@ public class RequestResponse {
                 "window.location.href = '" + redirectUrl + "';" +
                 "</script>" +
                 "</body></html>";
-        sendHtmlResponse(errorPage);
+        responseErrorPage(errorPage);
     }
 }
