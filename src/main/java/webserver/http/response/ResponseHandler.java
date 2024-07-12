@@ -1,39 +1,38 @@
 package webserver.http.response;
 
-import db.Database;
-import model.User;
+import exception.NotExistException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.PluginLoader;
 import webserver.http.request.Request;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static util.Utils.getFile;
 
 public class ResponseHandler {
+    public static final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
-    public static Response response(Request request) throws IOException {
+    public final PluginLoader pluginLoader;
+
+    public ResponseHandler(PluginLoader pluginLoader){
+        this.pluginLoader = pluginLoader;
+    }
+
+    public Response response(Request request) throws IOException {
         Response response = new Response.Builder(Status.NOT_FOUND).build();
 
-        switch(request.getPath()) {
-            case "/registration" ->
-                response = new Response.Builder(Status.SEE_OTHER)
-                        .addHeader("Location", "/registration/index.html")
-                        .build();
-
-            case "/create" -> {
-                User user = new User(
-                        request.getParameterValue("userId"),
-                        request.getParameterValue("password"),
-                        request.getParameterValue("name"),
-                        request.getParameterValue("email")
-                );
-                Database.addUser(user);
+        try {
+            Optional<Object> returnValue = pluginLoader.runPlugin(request.getMethod().getMethodName() + " " + request.getPath(), request);
+            if (returnValue.isPresent()) {
+                if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
             }
-
-            default ->
-                response = new Response.Builder(Status.OK)
-                        .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
-                        .body(getFile(request.getPath()))
-                        .build();
+        } catch (NotExistException e) {
+            response = new Response.Builder(Status.OK)
+                    .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
+                    .body(getFile(request.getPath()))
+                    .build();
         }
 
         return response;
