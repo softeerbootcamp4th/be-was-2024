@@ -5,8 +5,6 @@ import db.SessionIdMapper;
 import model.Session;
 import web.HttpRequest;
 
-import java.util.Map;
-
 public class SessionFacade {
 
     private static final String SESSION_ID = "SID";
@@ -20,8 +18,7 @@ public class SessionFacade {
     }
 
     public static boolean isAuthenticatedRequest(HttpRequest request) {
-        Map<String, String> cookie = request.getCookie();
-        String SID = cookie.get(SESSION_ID);
+        String SID = request.getCookie().get(SESSION_ID);
 
         SessionDatabase.removeExpiredSessions();
 
@@ -32,6 +29,11 @@ public class SessionFacade {
         String SID = request.getCookie().get(SESSION_ID);
         SessionDatabase.invalidateSession(SID);
         SessionDatabase.removeExpiredSessions();
+    }
+
+    public static String getUserIdFromSession(HttpRequest request) {
+        String SID = request.getCookie().get(SESSION_ID);
+        return SessionIdMapper.findUserIdBySessionId(SID);
     }
 
 }

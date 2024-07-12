@@ -170,7 +170,7 @@ public class WebAdapter {
         // 별도 GET 처리 로직이 없는경우 뷰를 찾아 반환
         String filePath = resolveGetRequest(request.getPath());
         ViewFile viewFile = new ViewFile(filePath, FileUtils.getExtensionFromPath(filePath));
-        ViewResolver.readAndResponseFromPath(out, FileUtils.getStaticFilePath(viewFile.getPath()), WebUtils.getProperContentType(viewFile.getExtension()));
+        ViewResolver.readAndResponseFromPath(request, out, FileUtils.getStaticFilePath(viewFile.getPath()), WebUtils.getProperContentType(viewFile.getExtension()));
     }
 
     /**

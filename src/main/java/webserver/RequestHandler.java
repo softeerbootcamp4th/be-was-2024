@@ -2,7 +2,6 @@ package webserver;
 
 import common.RequestUtils;
 import common.WebUtils;
-import exception.SizeNotMatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.HttpRequest;
