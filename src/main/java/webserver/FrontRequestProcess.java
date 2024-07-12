@@ -70,7 +70,7 @@ public class FrontRequestProcess {
             case INDEX_HTML -> handleIndexRequest(path, request, session);
             case USER_LIST -> handleUserListRequest(path, request, session);
             case SIGNUP_REQUEST -> handleSignUpRequest(request);
-            case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), readBytesFromFile(path));
+            case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
             case MESSAGE_NOT_ALLOWED -> HttpResponse.error(HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
             case NOT_FOUND -> HttpResponse.error(HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
             default -> HttpResponse.okStatic(path, request.getHttpVersion());
@@ -118,19 +118,19 @@ public class FrontRequestProcess {
 
         List<User> users = userHandler.findAll();
         String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
-        return HttpResponse.ok(ConstantUtil.DYNAMIC, pathWithHtml, request.getHttpVersion(), bodyWithUserList);
+        return HttpResponse.ok(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
     }
 
     // 세션ID가 있는 경우 로그인 상태로 간주하여 [사용자 ID] 표시, 없다면 [로그인 버튼] 표시
     private HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
         String body = readBytesFromFile(path);
         if(session == null)
-            return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), body);
+            return HttpResponse.ok(path, request.getHttpVersion(), body);
 
         String userId = session.getUserId();
         String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId)); // 사용자 ID 표시
         bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
-        return HttpResponse.ok(ConstantUtil.DYNAMIC, path, request.getHttpVersion(), bodyWithUser);
+        return HttpResponse.ok(path, request.getHttpVersion(), bodyWithUser);
     }
 
     public void handleResponse(OutputStream out, HttpResponse response) throws IOException {

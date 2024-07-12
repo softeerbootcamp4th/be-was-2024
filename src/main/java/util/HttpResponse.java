@@ -16,9 +16,9 @@ public class HttpResponse {
     protected HttpResponse() {
     }
 
-    public static HttpResponse ok(String type, String path, String httpVersion, String body) {
+    public static HttpResponse ok(String path, String httpVersion, String body) {
         HttpResponse response = new HttpResponse();
-        response.type = type;
+        response.type = ConstantUtil.DYNAMIC;
         response.path = path;
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
@@ -73,6 +73,10 @@ public class HttpResponse {
         return statusCode;
     }
 
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
     public byte[] getBody(){
         return body;
     }
@@ -103,6 +107,6 @@ public class HttpResponse {
     }
 
     public void deleteSessionId(String sessionId){
-        putHeader("Set-Cookie", "sid=" + sessionId + "; Path=/; Max-Age=0");
+        putHeader(ConstantUtil.SET_COOKIE, "sid=" + sessionId + "; Path=/; Max-Age=0");
     }
 }
