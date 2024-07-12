@@ -2,14 +2,11 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Map;
 
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static db.Database.*;
-import static webserver.FileHandler.*;
-import static webserver.AddressHandler.*;
+import webserver.mapper.MappingHandler;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -20,27 +17,31 @@ public class RequestHandler implements Runnable {
         this.connection = connectionSocket;
     }
 
+    @Override
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-            String line = br.readLine();
 
-            if (line == null || line.isEmpty()) {
-                return;
+            HttpRequestParser requestParser = new HttpRequestParser();
+            HttpRequest httpRequest = requestParser.parse(in);
+
+            logger.debug("request line : {} {}", httpRequest.getMethod(), httpRequest.getUrl());
+
+            // Use headers as needed
+            for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
+                logger.debug("header : {}={}", entry.getKey(), entry.getValue());
             }
 
-            logger.debug("request line : {}", line);
-
-            String[] url = line.split(" ");
-            while ((line = br.readLine()) != null && !line.isEmpty()) {
-                logger.debug("header : {}", line);
+            // Handle body if present
+            byte[] body = httpRequest.getBody();
+            if (body != null && body.length > 0) {
+                logger.debug("body : {}", new String(body, "UTF-8"));
             }
 
             DataOutputStream dos = new DataOutputStream(out);
-
-            String filePath = getFilePath(url[1], dos);
+            String filePath = MappingHandler.mapRequest(httpRequest, dos);
 
             File file = new File(filePath);
             if (!file.exists()) {
@@ -48,15 +49,11 @@ public class RequestHandler implements Runnable {
                 return;
             }
 
-            for(User u : findAll()){
-                System.out.println(u);
-            }
+            byte[] fileBody = FileHandler.readFileToByteArray(file);
+            String contentType = FileHandler.determineContentType(file.getName());
 
-            byte[] body = readFileToByteArray(file);
-            String contentType = determineContentType(file.getName());
-
-            response200Header(dos, body.length, contentType);
-            responseBody(dos, body);
+            response200Header(dos, fileBody.length, contentType);
+            responseBody(dos, fileBody);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -64,7 +61,7 @@ public class RequestHandler implements Runnable {
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String contentType) {
         try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("HTTP/1.1 200 OK\r\n");
             dos.writeBytes("Content-Type: " + contentType + "\r\n");
             dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
             dos.writeBytes("\r\n");
@@ -75,10 +72,11 @@ public class RequestHandler implements Runnable {
 
     private void response404Header(DataOutputStream dos) {
         try {
-            dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+            dos.writeBytes("HTTP/1.1 404 Not Found\r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
             dos.writeBytes("\r\n");
             dos.writeBytes("<h1>404 Not Found</h1>");
+            dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
@@ -86,11 +84,12 @@ public class RequestHandler implements Runnable {
 
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
-            dos.write(body, 0, body.length);
+            if (body != null) {
+                dos.write(body, 0, body.length);
+            }
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
         }
     }
-
 }

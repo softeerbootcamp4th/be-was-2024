@@ -1,5 +1,11 @@
 package model;
 
+import db.Database;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 public class User {
     private String userId;
     private String password;
@@ -13,18 +19,26 @@ public class User {
         this.email = email;
     }
 
-    public static User createUserFromUrl(String urlPath) {
-        int parameterIndex = urlPath.indexOf("?");
-        if (parameterIndex != -1) {
-            String[] userInfo = urlPath.substring(parameterIndex + 1).split("&");
-            return new User(
-                    userInfo[0].substring(userInfo[0].indexOf("=") + 1),
-                    userInfo[1].substring(userInfo[1].indexOf("=") + 1),
-                    userInfo[2].substring(userInfo[2].indexOf("=") + 1),
-                    userInfo[3].substring(userInfo[3].indexOf("=") + 1)
-            );
+    public static void createUser(String urlPath) {
+        Map<String, String> userInfo = extractUserInfoFromUrl(urlPath);
+        String userId = userInfo.get("userId");
+        String password = userInfo.get("password");
+        String name = userInfo.get("name");
+        String email = userInfo.get("email");
+
+        if (userId != null && password != null && name != null && email != null) {
+            Database.addUser(new User(userId, password, name, email));
         }
-        return null;
+    }
+
+    public static Map<String, String> extractUserInfoFromUrl(String urlPath) {
+        String[] params = urlPath.split("&");
+        Map<String, String> userInfo = new HashMap<>();
+        for (String param : params) {
+            String[] keyValue = param.split("=");
+            userInfo.put(keyValue[0], keyValue[1]);
+        }
+        return userInfo;
     }
 
     public String getUserId() {
@@ -47,4 +61,5 @@ public class User {
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
     }
+
 }
