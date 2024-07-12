@@ -1,10 +1,10 @@
 package webserver;
 
 import exception.RequestException;
-import handler.SessionHandler;
+import session.SessionHandler;
 import handler.ModelHandler;
 import handler.UserHandler;
-import model.Session;
+import session.Session;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class FrontRequestProcess {
             return sessionHandler.login(request.getBodyMap())
                     .map(session -> {
                         HttpResponse response = HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
-                        response.setSessionId(session.getSessionId());
+                        response.setSessionId(session.toString());
                         return response;
                     })
                     .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.LOGIN_FAIL.getPath(), request.getHttpVersion()));

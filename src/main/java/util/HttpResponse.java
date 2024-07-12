@@ -99,7 +99,7 @@ public class HttpResponse {
     }
 
     public void setSessionId(String sessionId){
-        putHeader(ConstantUtil.SET_COOKIE, "sid=" + sessionId + "; Path=/");
+        putHeader(ConstantUtil.SET_COOKIE, sessionId);
     }
 
     public void deleteSessionId(String sessionId){

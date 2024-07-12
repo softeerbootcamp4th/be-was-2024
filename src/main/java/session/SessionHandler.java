@@ -1,7 +1,7 @@
-package handler;
+package session;
 
 import db.Database;
-import model.Session;
+import db.SessionDatabase;
 import model.User;
 import util.ConstantUtil;
 
@@ -46,15 +46,15 @@ public class SessionHandler {
 
         String sessionId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6);
         Session session = new Session(sessionId, user.getUserId());
-        Database.addSession(session);
+        SessionDatabase.addSession(session);
         return Optional.of(session);
     }
 
     public Optional<Session> findSessionById(String sessionId) {
-        return Database.findSessionById(sessionId);
+        return SessionDatabase.findSessionById(sessionId);
     }
 
     public void logout(String sessionId) {
-        Database.removeSession(sessionId);
+        SessionDatabase.removeSession(sessionId);
     }
 }
