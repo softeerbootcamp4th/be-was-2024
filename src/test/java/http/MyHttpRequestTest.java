@@ -26,7 +26,7 @@ class MyHttpRequestTest {
         Assertions.assertThat(request.getMethod()).isEqualTo(expectedMethod);
         Assertions.assertThat(request.getUrl().getPathname()).isEqualTo(expectedPathname);
         Assertions.assertThat(request.getVersion()).isEqualTo(expectedVersion);
-        Assertions.assertThat(request.getHeaders().getHeader("Accept")).isEqualTo(expectedAcceptType);
+        Assertions.assertThat(request.getHeaders().getHeader("accept")).isEqualTo(expectedAcceptType);
     }
 
     @Test

@@ -32,7 +32,7 @@ public class MyHttpHeaders {
         String[] parts = headerLine.split(":", 2);
         // 속성 이름: 값 구조가 아닌 경우 예외 처리
         if (parts.length != 2) return; // TODO 적절한 예외처리 필요
-        headers.put(parts[0].trim(), parts[1].trim());
+        this.putHeader(parts[0].strip(), parts[1].strip());
     }
 
     /**
@@ -41,7 +41,9 @@ public class MyHttpHeaders {
      * @param value 헤더의 값
      */
     public void putHeader(String name, String value) {
-        headers.put(name, value);
+        // 대소문자를 구분하지 않음.
+        String lowerName = name.toLowerCase();
+        headers.put(lowerName, value);
     }
 
     /**
@@ -80,7 +82,7 @@ public class MyHttpHeaders {
      * @return Content-Length의 값 ( int )
      */
     public int getContentLength() {
-        Integer value = getHeader("Content-Length", Integer::parseInt);
+        Integer value = getHeader("content-length", Integer::parseInt);
         if(value == null) return 0;
         return value;
     }

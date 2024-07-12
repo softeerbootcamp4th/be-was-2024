@@ -75,7 +75,7 @@ public class RequestHandler implements Runnable {
         headers.putHeaders(headerLines);
 
         // 쿠키 파싱
-        String cookieLine = headers.getHeader("Cookie");
+        String cookieLine = headers.getHeader("cookie");
         MyCookies cookies = HttpParseUtil.parseCookies(cookieLine);
 
         // body 읽기

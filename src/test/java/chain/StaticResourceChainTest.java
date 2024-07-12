@@ -29,7 +29,7 @@ class StaticResourceChainTest {
         staticResourceChain.act(req, res);
 
         HttpStatusType type = res.getStatusType();
-        String contentType = res.getHeaders().getHeader("Content-Type");
+        String contentType = res.getHeaders().getHeader("content-type");
 
         Assertions.assertThat(type).isEqualTo(HttpStatusType.OK);
         Assertions.assertThat(contentType).isEqualTo("text/html");
