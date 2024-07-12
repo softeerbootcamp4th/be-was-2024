@@ -1,99 +1,78 @@
 package processor;
 
-import webserver.Response;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
+import model.ViewData;
 
 public class ResponseProcessor {
-    private final DataOutputStream dos;
-
-    protected ResponseProcessor(DataOutputStream dos) {
-        this.dos = dos;
-    }
-
-    public static ResponseProcessor from(DataOutputStream dos) {
-        return new ResponseProcessor(dos);
-    }
-
-    public void defaultResponse(String path) throws IOException {
-        Response response = new Response.Builder()
+    public ViewData defaultResponse(String path) {
+        ViewData viewData = new ViewData.Builder()
                 .url(path)
                 .statusCode(200)
-                .dataOutputStream(dos)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void notFoundResponse() throws IOException {
-        Response response = new Response.Builder()
+    public ViewData notFoundResponse() {
+        ViewData viewData = new ViewData.Builder()
                 .url("/not_found.html")
-                .dataOutputStream(dos)
                 .redirectCode(404)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void createUserResponse() throws IOException {
-        Response response = new Response.Builder()
+    public ViewData createUserResponse() {
+        ViewData viewData = new ViewData.Builder()
                 .url("/index.html")
-                .dataOutputStream(dos)
                 .redirectCode(302)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void loginSuccessResponse(String sessionId) throws IOException {
-        Response response = new Response.Builder()
+    public ViewData loginSuccessResponse(String sessionId) {
+        ViewData viewData = new ViewData.Builder()
                 .url("/main/index.html")
-                .dataOutputStream(dos)
                 .cookie(sessionId)
                 .redirectCode(302)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void loginFailedResponse() throws IOException {
-        Response response = new Response.Builder()
+    public ViewData loginFailedResponse() {
+        ViewData viewData = new ViewData.Builder()
                 .url("/login/login_failed.html")
-                .dataOutputStream(dos)
                 .redirectCode(404)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void logoutResponse() throws IOException {
-        Response response = new Response.Builder()
+    public ViewData logoutResponse() {
+        ViewData viewData = new ViewData.Builder()
                 .url("/index.html")
-                .dataOutputStream(dos)
                 .redirectCode(302)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void loginSuccessWithSessionId() throws IOException {
-        Response response = new Response.Builder()
+    public ViewData loginSuccessWithSessionId() {
+        ViewData viewData = new ViewData.Builder()
                 .url("/main/index.html")
                 .statusCode(200)
-                .dataOutputStream(dos)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 
-    public void loginResponse(String path) throws IOException {
-        Response response = new Response.Builder()
+    public ViewData loginResponse(String path) {
+        ViewData viewData = new ViewData.Builder()
                 .url(path)
                 .statusCode(200)
-                .dataOutputStream(dos)
                 .build();
 
-        response.sendResponse();
+        return viewData;
     }
 }
