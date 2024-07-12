@@ -7,6 +7,7 @@ import routehandler.route.registration.RegistrationPageHandler;
 import routehandler.route.auth.LoginPageHandler;
 import routehandler.route.auth.SignInHandler;
 import routehandler.route.auth.SignUpHandler;
+import routehandler.route.user.UserListPageHandler;
 import routehandler.utils.Route;
 
 public class RouteConfig {
@@ -18,6 +19,10 @@ public class RouteConfig {
                 Route.at("/signup").POST(new SignUpHandler()),
                 Route.at("/signin").POST(new SignInHandler()),
                 Route.at("/signout").POST(new SignOutHandler())
+            ),
+            Route.at("/user")
+            .routes(
+                Route.at("/list").GET(new UserListPageHandler())
             ),
             Route.at("/login")
                 .GET(new LoginPageHandler()),
