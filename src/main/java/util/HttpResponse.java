@@ -23,8 +23,13 @@ public class HttpResponse {
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
         response.putBody(body);
-        response.putHeader(ConstantUtil.CONTENT_TYPE, ContentType.getType(path.contains(ConstantUtil.DOT) ? path.split(ConstantUtil.REGDOT)[1] : String.valueOf(ContentType.HTML)));
         response.putHeader(ConstantUtil.CONTENT_LENGTH, response.getBody().length + "");
+        if(path.contains(ConstantUtil.DOT)){
+            String[] element = path.split(ConstantUtil.REGDOT);
+            response.putHeader(ConstantUtil.CONTENT_TYPE, ContentType.getType(element[element.length - 1]));
+        } else {
+            response.putHeader(ConstantUtil.CONTENT_TYPE, ContentType.HTML.getExtension());
+        }
         return response;
     }
 

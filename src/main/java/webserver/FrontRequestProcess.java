@@ -142,7 +142,8 @@ public class FrontRequestProcess {
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
         byte[] body = IOUtil.readBytesFromFile(true, path);
         boolean isDir = IOUtil.isDirectory(true, path);
-        String extension = isDir ? ContentType.HTML.getExtension() : path.split(ConstantUtil.REGDOT)[1];
+        String[] element = path.split(ConstantUtil.REGDOT);
+        String extension = isDir ? ContentType.HTML.getExtension() : element[element.length - 1];
         try {
             dos.writeBytes("HTTP/1.1 200 OK " + ConstantUtil.CRLF);
             dos.writeBytes("Content-Type: " + ContentType.getType(extension) + ConstantUtil.CRLF);
