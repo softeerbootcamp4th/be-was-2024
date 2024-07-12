@@ -109,7 +109,7 @@ public class HttpRequest {
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
-        requestHeaders.put(header[0].trim(), header[1].trim());
+        requestHeaders.put(header[0].toLowerCase().trim(), header[1].toLowerCase().trim());
     }
 
     public void putBody(List<Byte> body){
@@ -119,6 +119,6 @@ public class HttpRequest {
             byteArray[i] = body.get(i);
         }
         // byte[] to String 후 디코딩하여 다시 byte[]로 변환
-        this.requestBody = new String(byteArray, StandardCharsets.ISO_8859_1).getBytes(StandardCharsets.UTF_8);
+        this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes();
     }
 }

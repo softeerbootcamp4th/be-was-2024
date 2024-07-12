@@ -37,7 +37,7 @@ public class IOUtil {
             String fullPath = (isStatic ? prop.getProperty(ConstantUtil.STATIC_DIR) : prop.getProperty(ConstantUtil.TEMPLATES_DIR)) + path;
             File file = new File(fullPath);
             if(file.isDirectory()){
-                file = new File(fullPath + HttpRequestMapper.INDEX_HTML.getPath());
+                file = new File(fullPath + HttpRequestMapper.DEFAULT_PAGE.getPath());
             }
             int lengthOfBodyContent = (int) file.length();
             byte[] body = new byte[lengthOfBodyContent];
@@ -47,14 +47,6 @@ public class IOUtil {
             return body;
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException();
-        }
-    }
-
-    public static byte[] convertObjectToBytes(Object obj) throws IOException {
-        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-        try (ObjectOutputStream ois = new ObjectOutputStream(boas)) {
-            ois.writeObject(obj);
-            return boas.toByteArray();
         }
     }
 }

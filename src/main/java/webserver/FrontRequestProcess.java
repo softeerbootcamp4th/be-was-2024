@@ -66,8 +66,8 @@ public class FrontRequestProcess {
 
         // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
         return switch (HttpRequestMapper.of(path, method)) {
-            case ROOT -> HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
-            case INDEX_HTML -> handleIndexRequest(path, request, session);
+            case ROOT -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+            case DEFAULT_PAGE -> handleIndexRequest(path, request, session);
             case USER_LIST -> handleUserListRequest(path, request, session);
             case SIGNUP_REQUEST -> handleSignUpRequest(request);
             case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
@@ -80,7 +80,7 @@ public class FrontRequestProcess {
     private HttpResponse handleSignUpRequest(HttpRequest request){
         try {
             userHandler.create(request.getBodyMap());
-            return HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+            return HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         } catch (ModelException e) {
             return HttpResponse.redirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
         }
@@ -92,7 +92,7 @@ public class FrontRequestProcess {
         if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인 성공 시 세션ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
             return sessionHandler.login(request.getBodyMap())
                     .map(session -> {
-                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                         response.setSessionId(session.toString());
                         return response;
                     })
@@ -101,11 +101,11 @@ public class FrontRequestProcess {
             return sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
                     .map(sessionId -> {
                         sessionHandler.logout(sessionId);
-                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion());
+                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                         response.deleteSessionId(sessionId);
                         return response;
                     })
-                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.INDEX_HTML.getPath(), request.getHttpVersion()));
+                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion()));
         }
     }
 

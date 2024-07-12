@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,17 +23,13 @@ public class RequestHandler implements Runnable {
     }
 
     public void run() {
-        //logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(),
-          //      connection.getPort());
-
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream();
-             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"))) {
-            // 요청 Header 출력
+             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             String line = br.readLine(); // Request Line (ex: "GET /index.html HTTP/1.1")
-            //logger.debug("request line: {}", line);
             HttpRequest httpRequest = HttpRequest.from(line);
+
+            // Request Headers
             while(!line.isEmpty()) {
-                //logger.debug("header: {}", line);
                 line = br.readLine();
                 httpRequest.putHeaders(line);
             }

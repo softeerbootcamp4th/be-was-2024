@@ -21,7 +21,7 @@ public class ConstantUtil {
     public static final String DYNAMIC = "dynamic";
     public static final String FAULT = "fault";
     public static final String STATIC = "static";
-    public static final String COOKIE = "Cookie";
+    public static final String COOKIE = "cookie";
     public static final String SESSION_ID = "sid";
     public static final String DOT_HTML = ".html";
 

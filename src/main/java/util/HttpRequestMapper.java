@@ -6,11 +6,12 @@ package util;
 public enum HttpRequestMapper {
 
     // OK
-    INDEX_HTML("/index.html", "GET"),
+    DEFAULT_PAGE("/index.html", "GET"),
     LOGIN_FAIL("/user/login_failed.html", "GET"),
     LOGIN("/user/login.html" , "GET"),
     SIGNUP("/user/form.html", "GET"),
     USER_LIST("/user/list", "GET"),
+    ARTICLE("/article/index.html", "GET"),
 
     // Redirect
     ROOT("/", "GET"),
