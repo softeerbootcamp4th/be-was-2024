@@ -2,8 +2,6 @@ package processor;
 
 import db.Database;
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import util.RequestObject;
 
 import java.util.HashMap;
@@ -11,7 +9,6 @@ import java.util.Map;
 
 public class UserProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserProcessor.class);
 
     private UserProcessor() {}
 
