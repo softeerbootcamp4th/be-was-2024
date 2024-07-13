@@ -2,10 +2,14 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import ApiProcess.ApiProcess;
+import ApiProcess.StaticApiProcess;
 
+import db.Database;
 import enums.HttpResult;
 import enums.MimeType;
 import org.slf4j.Logger;
@@ -32,10 +36,11 @@ public class RequestHandler implements Callable<Void> {
             Request request = requestParser.getRequest(in);
             Response response = new Response();
 
+            Map<String, Object> model = new HashMap<>();
+
             if(AuthUtil.isLogin(request) != null) {
-                logger.debug("로그인 된 상태 입니다.");
-            } else {
-                logger.debug("로그인 되지 않은 상태 입니다.");
+                model.put("user", AuthUtil.isLogin(request));
+                model.put("users", Database.findAll());
             }
 
             /**
@@ -44,7 +49,7 @@ public class RequestHandler implements Callable<Void> {
              * ApiProcessManager가 해당 하는 구체화 클래스를 주입 합니다.
              * RequestHandler는 로직 처리를 위한 구체화 클래스를 알지 못해도 된다.
              */
-            ApiProcessManager apiProcessManager = new ApiProcessManager();
+            ApiProcessManager apiProcessManager = ApiProcessManager.getInstance();
             ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
             String fileNameWithoutExt = apiProcess.process(request, response);
 
@@ -59,6 +64,10 @@ public class RequestHandler implements Callable<Void> {
 
             // 파일의 바이너리 데이터 읽기
             byte[] body = ResourcesLoader.getFile(fileName);
+
+            if(!(apiProcess instanceof StaticApiProcess)) {
+               body = Template.render(body, model);
+            }
 
             // mimeType 변환
             MimeType mimeType = PathUtils.extToMimetype(fileName);
