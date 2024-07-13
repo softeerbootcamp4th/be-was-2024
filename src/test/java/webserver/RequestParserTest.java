@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RequestParserTest {
 
     private static Logger logger = LoggerFactory.getLogger(RequestParserTest.class);
+    ApiProcessManager apiProcessManager = ApiProcessManager.getInstance();
 
     @Test
     @DisplayName("정상적인 http request가 들어온 경우")
@@ -144,7 +145,6 @@ class RequestParserTest {
         Request request = RequestParser.getRequestParser().getRequest(bis);
         Response response = new Response();
         String userId = request.getParameter("userId");
-        ApiProcessManager apiProcessManager = new ApiProcessManager();
         ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
         logger.debug("apiProcess={}", apiProcess.getClass());
 
@@ -176,7 +176,6 @@ class RequestParserTest {
         Request request = RequestParser.getRequestParser().getRequest(bis);
         Response response = new Response();
         String userId = request.getParameter("userId");
-        ApiProcessManager apiProcessManager = new ApiProcessManager();
         ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
         logger.debug("apiProcess={}", apiProcess.getClass());
 
