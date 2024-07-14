@@ -2,11 +2,14 @@ package dto;
 
 import constant.HttpMethod;
 import exception.InvalidHttpRequestException;
-import session.Session;
 
 import java.util.*;
 
 public class HttpRequest {
+    private static final String COOKIE_HEADER = "Cookie";
+    private static final String COOKIE_NAME_SESSION_ID = "sessionId";
+    private static final String COOKIE_NAME_REDIRECT = "redirect";
+
     private HttpMethod httpMethod;
     private String path;
     private Map<String, String> queryParams;
@@ -78,14 +81,28 @@ public class HttpRequest {
         if(headers == null)
             return Optional.empty();
 
-        List<String> cookies = headers.get("Cookie");
+        List<String> cookies = headers.get(COOKIE_HEADER);
         for(String cookie : cookies){
-            if(cookie.startsWith("sessionId=")){
-                String sessionId = cookie.substring("sessionId=".length());
+            if(cookie.contains(COOKIE_NAME_SESSION_ID)){
+                String sessionId = cookie.substring((COOKIE_NAME_SESSION_ID + "=").length());
                 return Optional.of(sessionId);
             }
         }
 
+        return Optional.empty();
+    }
+
+    public Optional<String> getRedirectUrl(){
+        if(headers == null)
+            return Optional.empty();
+
+        List<String> cookies = headers.get("Cookie");
+        for(String cookie : cookies){
+            if(cookie.contains(COOKIE_NAME_REDIRECT)){
+                String redirectUrl = cookie.substring((COOKIE_NAME_REDIRECT + "=").length());
+                return Optional.of(redirectUrl);
+            }
+        }
         return Optional.empty();
     }
 }
