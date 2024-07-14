@@ -5,6 +5,7 @@ import constant.FileExtensionType;
 import constant.HttpStatus;
 import dto.HttpRequest;
 import dto.HttpResponse;
+import exception.DynamicFileBuildException;
 import exception.InvalidHttpRequestException;
 import exception.ResourceNotFoundException;
 import handler.Handler;
@@ -56,7 +57,7 @@ public class Dispatcher {
             httpResponse.sendHttpResponse(dos);
         }
         catch (IOException | IllegalArgumentException | InvalidHttpRequestException
-               | ResourceNotFoundException e){
+               | ResourceNotFoundException | DynamicFileBuildException e){
             logger.error(e.getMessage());
 
             // 에러 응답을 저장할 HttpResponse 객체 생성
