@@ -1,7 +1,9 @@
 package dto;
 
+import constant.FileExtensionType;
 import constant.HttpStatus;
 import cookie.Cookie;
+import cookie.SessionCookie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,14 +19,22 @@ public class HttpResponse {
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
     private static final String LOCATION = "Location";
+    private static final String CONTENT_TYPE = "Content-Type";
+    private static final String CONTENT_LENGTH = "Content-Length";
+    private static final String ERROR_MESSAGE_404 =
+            "<html>" +
+                    "<head><title>404 Not Found</title></head>" +
+                    "<body><h1>404 Not Found</h1></body>" +
+                    "</html>";
 
     private HttpStatus status;
     private Map<String, List<String>> headers;
-    private Cookie cookie;
+    private List<Cookie> cookies;
     private byte[] body;
 
     public HttpResponse(){
         headers = new HashMap<>();
+        cookies = new ArrayList<>();
     }
 
     // client에 HttpResponse 응답
@@ -37,6 +47,13 @@ public class HttpResponse {
     public void setRedirect(String url){
         setHttpStatus(HttpStatus.FOUND);
         addHeader(LOCATION, url);
+    }
+
+    public void setErrorResponse(HttpStatus errorStatus){
+        setHttpStatus(HttpStatus.NOT_FOUND);
+        addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
+        addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
+        setBody(ERROR_MESSAGE_404.getBytes());
     }
     // HttpResponse header 생성
     private void makeHttpResponse(DataOutputStream dos) throws IOException {
@@ -59,7 +76,7 @@ public class HttpResponse {
                 dos.writeBytes(CRLF);
             }
         }
-        if(cookie != null){
+        for(Cookie cookie : cookies){
             dos.writeBytes(cookie.getCookieString());
         }
         dos.writeBytes(CRLF);
@@ -86,7 +103,7 @@ public class HttpResponse {
     }
 
     public void setCookie(Cookie cookie){
-        this.cookie = cookie;
+        this.cookies.add(cookie);
     }
 
 
