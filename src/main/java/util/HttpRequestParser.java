@@ -72,9 +72,8 @@ public class HttpRequestParser {
             request.setPath(path);
 
             String[] pathParts = path.split("\\.");
-            if(pathParts.length == 2){
-                request.setExtensionType(pathParts[1]);
-            }
+            if(pathParts.length >= 2)
+                request.setExtensionType(pathParts[pathParts.length-1]);
         }
         else if(uriParts.length == 2){
             request.setPath(uriParts[0]);
