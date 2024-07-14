@@ -6,7 +6,8 @@ public enum CookieAttribute {
     PATH("Path"),
     MAX_AGE("Max-Age"),
     SECURE("Secure"),
-    HTTPONLY("HttpOnly");
+    HTTPONLY("HttpOnly"),
+    REDIRECT("redirect");
 
     final String attributeName;
 
