@@ -1,10 +1,11 @@
 package session;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class Session {
-    private static final ConcurrentHashMap<String, String> sessionDb = new ConcurrentHashMap<>();
+    private static final Map<String, String> sessionDb = new ConcurrentHashMap<>();
 
     // 세션 DB에 userId 저장
     public static String createSession(String userId) {
