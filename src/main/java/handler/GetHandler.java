@@ -1,6 +1,7 @@
 package handler;
 
 import db.Database;
+import model.Board;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import util.FileDetection;
 import util.RequestObject;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public class GetHandler
@@ -32,6 +34,8 @@ public class GetHandler
                                     break;
                 case "/write"   : case "/user/list" : checkCookies(dos,requestObject ,path);
                                     break;
+                case "/board/list" : sendBoardList(dos);
+                                     break;
                 default :  path= FileDetection.getPath(FileDetection.fixedPath+path);
                                 staticFileHandler(dos,path);
                                 break;
@@ -115,6 +119,7 @@ public class GetHandler
             logger.error("404 response error : {}",e.getMessage());
         }
     }
+
     //세션을 얻어낸다
     private void handleUserInfoRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
         String sessionId = requestObject.getCookies().get("SID");
@@ -150,6 +155,27 @@ public class GetHandler
         dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
         dos.writeBytes("\r\n");
         responseBody(dos,bodyBytes);
+    }
+
+    private void sendBoardList(DataOutputStream dos) {
+        try {
+            StringBuilder sb = new StringBuilder();
+            Collection<Board> list = PostHandler.getBoards();
+            for(Board temp : list)
+            {
+                sb.append(temp.getTitle()).append("<br>");
+            }
+            String body = "<html><head></head><body>" + sb + " </body></html>";
+            byte[] bodyBytes = body.getBytes("UTF-8");
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.write(bodyBytes);
+            dos.flush();
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
     }
 
     private String getContentType(String url)
