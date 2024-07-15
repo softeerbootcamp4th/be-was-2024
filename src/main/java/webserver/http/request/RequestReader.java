@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class RequestReader {
 
@@ -34,7 +36,7 @@ public class RequestReader {
             int contentLength = Integer.parseInt(contentLengthString);
             byte[] buf = new byte[contentLength];
             readRequestBody(inputStream, buf, contentLength);
-            requestBuilder.body(buf);
+            requestBuilder.body(decodeBody(buf));
             StringBuilder sb = new StringBuilder(request);
             sb.append(new String(buf));
             request = sb.toString();
@@ -43,6 +45,10 @@ public class RequestReader {
         logger.debug(request);
 
         return requestBuilder.build();
+    }
+
+    private String decodeBody(byte[] body){
+        return URLDecoder.decode(new String(body), StandardCharsets.UTF_8);
     }
 
     private int readRequestHeader(InputStream bufferedInputStream, byte[] buf) throws IOException {
