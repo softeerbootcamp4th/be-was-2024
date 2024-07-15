@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -34,11 +35,11 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        byte[] expectedContent = HandlerManager.readStaticFile("index.html");
+        String expectedContent = new String(HandlerManager.readStaticFile("index.html"), StandardCharsets.UTF_8);
 
         // then
         // index.html 파일 검증
-        assertEquals(responseBody, Arrays.toString(expectedContent));
+        assertEquals(responseBody, expectedContent);
 
     }
 

@@ -224,7 +224,7 @@ public class HandlerManager {
 
         String extensionType = httpRequest.getExtensionType().get().toUpperCase();
 
-        if(body != null) {
+        if(body.length!=0) {
             // 정적 파일 응답 생성
             httpResponse.setHttpStatus(HttpStatus.OK);
             httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.valueOf(extensionType).getContentType());
@@ -253,7 +253,7 @@ public class HandlerManager {
             return inputStream.readAllBytes();
         } catch (IOException e) {
             logger.error(e.getMessage());
-            return null;
+            return new byte[0];
         }
     }
 
