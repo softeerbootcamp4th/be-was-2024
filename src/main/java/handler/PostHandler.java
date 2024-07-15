@@ -37,6 +37,7 @@ public class PostHandler
         switch(path){
             case "/user/create" -> userCreate(dos,requestObject);
             case "/user/login" -> userLogin(dos,requestObject);
+            case "/write" -> boardWrite(dos,requestObject);
         }
     }
 
@@ -55,6 +56,11 @@ public class PostHandler
     private void userCreate(DataOutputStream dos, RequestObject requestObject) {
         userProcessor.userCreate(requestObject);
         response302Header(dos,"/index.html");
+    }
+
+    private void boardWrite(DataOutputStream dos,RequestObject requestObject)
+    {
+
     }
 
     private void response302Header(DataOutputStream dos, String loc)
