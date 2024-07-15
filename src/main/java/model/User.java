@@ -19,14 +19,20 @@ public class User implements MyTagDomain{
     }
 
     public User(Map<String, String> map) {
-        String[] keys = {"userId", "password", "name", "email"};
-        if(Stream.of(keys).anyMatch(key -> map.get(key) == null || map.get(key).isEmpty()))
-            throw new InvalidHttpRequestException("User information cannot be null");
+        this(
+                getValueFromMap(map, "userId"),
+                getValueFromMap(map, "password"),
+                getValueFromMap(map, "name"),
+                getValueFromMap(map, "email")
+        );
+    }
 
-        this.userId = map.get("userId");
-        this.password = map.get("password");
-        this.name = map.get("name");
-        this.email = map.get("email");
+    private static String getValueFromMap(Map<String, String> map, String key) {
+        String value = map.get(key);
+        if (value == null || value.isEmpty()) {
+            throw new InvalidHttpRequestException("User information cannot be null");
+        }
+        return value;
     }
 
     public String getUserId() {
