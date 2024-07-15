@@ -30,7 +30,7 @@ public class GetHandler
             switch(path) {
                 case "/user/info" : handleUserInfoRequest(dos,requestObject);
                                     break;
-                                    
+                case "/write"     :
                 case "/user/list" : checkCookies(dos,requestObject,path);
                                     break;
                 default :  path= FileDetection.getPath(FileDetection.fixedPath+path);
