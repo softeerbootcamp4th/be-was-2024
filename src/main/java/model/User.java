@@ -1,12 +1,15 @@
 package model;
 
+import exception.InvalidHttpRequestException;
+
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class User {
-    private String userId;
-    private String password;
-    private String name;
-    private String email;
+    private final String userId;
+    private final String password;
+    private final String name;
+    private final String email;
 
     public User(String userId, String password, String name, String email) {
         this.userId = userId;
@@ -16,9 +19,9 @@ public class User {
     }
 
     public User(Map<String, String> map) {
-        if (map.get("userId") == null || map.get("password") == null || map.get("name") == null || map.get("email") == null) {
-            throw new IllegalArgumentException("User information cannot be null");
-        }
+        String[] keys = {"userId", "password", "name", "email"};
+        if(Stream.of(keys).anyMatch(key -> map.get(key) == null || map.get(key).isEmpty()))
+            throw new InvalidHttpRequestException("User information cannot be null");
 
         this.userId = map.get("userId");
         this.password = map.get("password");

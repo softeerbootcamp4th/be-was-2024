@@ -1,18 +1,17 @@
 package dto;
 
 import constant.HttpMethod;
-import exception.HttpRequestParsingException;
+import exception.InvalidHttpRequestException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class HttpRequest {
     private HttpMethod httpMethod;
     private String path;
     private Map<String, String> queryParams;
     private String extensionType;
-    private Map<String, String> headers = new HashMap<>();
+    private Map<String, List<String>> headers;
+    private String body;
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
@@ -30,8 +29,14 @@ public class HttpRequest {
         return Optional.ofNullable(extensionType);
     }
 
-    public Optional<String> getHeader(String key) {
+    public Optional<List<String>> getHeader(String key) {
+        if(headers == null)
+            return Optional.empty();
         return Optional.ofNullable(headers.get(key));
+    }
+
+    public Optional<String> getBody() {
+        return Optional.ofNullable(body);
     }
 
     public void setHttpMethod(String httpMethod) {
@@ -39,7 +44,7 @@ public class HttpRequest {
             this.httpMethod = HttpMethod.valueOf(httpMethod);
         }
         catch (IllegalArgumentException e){
-            throw new HttpRequestParsingException("Incorrect HttpMethod");
+            throw new InvalidHttpRequestException("Incorrect HttpMethod");
         }
 
     }
@@ -57,6 +62,14 @@ public class HttpRequest {
     }
 
     public void setHeader(String headerName, String headerValue) {
-        headers.put(headerName, headerValue);
+        if(headers == null)
+            headers = new HashMap<>();
+        if(!headers.containsKey(headerName))
+            headers.put(headerName, new ArrayList<>());
+        headers.get(headerName).add(headerValue);
+    }
+
+    public void setBody(String body) {
+        this.body = body;
     }
 }

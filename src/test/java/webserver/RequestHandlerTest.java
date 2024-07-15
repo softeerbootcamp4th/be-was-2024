@@ -3,23 +3,17 @@ package webserver;
 import constant.HttpMethod;
 import db.Database;
 import dto.HttpRequest;
+import dto.HttpResponse;
+import exception.InvalidHttpRequestException;
 import handler.Handler;
 import handler.HandlerManager;
 import model.User;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.Socket;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.when;
 
 @DisplayName("RequestHandler 테스트")
 public class RequestHandlerTest {
@@ -32,21 +26,22 @@ public class RequestHandlerTest {
     public void HandleRequestCreateSuccess() throws IOException {
         // given
         HttpRequest httpRequest = new HttpRequest();
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("userId", "javajigi");
-        queryParams.put("password", "password");
-        queryParams.put("name", "박재성");
-        queryParams.put("email", "javajigi@slipp.net");
+        String requestBody = "userId=javajigi" +
+                "&password=password" +
+                "&name=%EB%B0%95%EC%9E%AC%EC%84%B1" +
+                "&email=javajigi%40slipp.net";
+
 
         httpRequest.setPath("/user/create");
-        httpRequest.setHttpMethod(HttpMethod.GET.name());
-        httpRequest.setQueryParams(queryParams);
+        httpRequest.setHttpMethod(HttpMethod.POST.name());
+        httpRequest.setBody(requestBody);
+        httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
         Handler handler = handlerManager.getHandler(httpRequest);
-        DataOutputStream dataOutputStream = Mockito.mock(DataOutputStream.class);
 
         // when
-        handler.handle(new DataOutputStream(dataOutputStream), queryParams);
+        handler.handle(httpRequest, new HttpResponse());
 
         // then
         User user = Database.findUserById("javajigi");
@@ -57,27 +52,48 @@ public class RequestHandlerTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패")
-    public void HandleRequestCreateFail() throws IOException {
+    @DisplayName("회원가입 실패 (회원정보 일부 누락)")
+    public void HandleRequestCreateFail1() {
 
         // given
         // email 정보 누락
         HttpRequest httpRequest = new HttpRequest();
-        Map<String, String> queryParams = new HashMap<>();
-        queryParams.put("userId", "javajigi");
-        queryParams.put("password", "password");
-        queryParams.put("name", "박재성");
+        String requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1";
+
+        httpRequest.setPath("/user/create");
+        httpRequest.setHttpMethod(HttpMethod.POST.name());
+        httpRequest.setBody(requestBody);
+        httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
+
+        Handler handler = handlerManager.getHandler(httpRequest);
+
+        // when & then
+        assertThatThrownBy(() -> handler.handle(httpRequest, new HttpResponse()))
+                .isInstanceOf(InvalidHttpRequestException.class)
+                .hasMessage("User information cannot be null");
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 (GET 요청)")
+    public void HandleRequestCreateFail2() {
+
+        // given
+        // email 정보 누락
+        HttpRequest httpRequest = new HttpRequest();
+        String requestBody = "userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net";
 
         httpRequest.setPath("/user/create");
         httpRequest.setHttpMethod(HttpMethod.GET.name());
-        httpRequest.setQueryParams(queryParams);
-
-        Handler handler = handlerManager.getHandler(httpRequest);
-        DataOutputStream dataOutputStream = Mockito.mock(DataOutputStream.class);
+        httpRequest.setBody(requestBody);
+        httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
+        httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
         // when & then
-        assertThatThrownBy(() -> handler.handle(new DataOutputStream(dataOutputStream), queryParams))
-                .isInstanceOf(IllegalArgumentException.class);
+        // GET 요청일 경우, handler를 찾지 못해서 예외 발생
+        assertThatThrownBy(() -> handlerManager.getHandler(httpRequest))
+                .isInstanceOf(InvalidHttpRequestException.class)
+                .hasMessage("handler not found");
     }
 
 }

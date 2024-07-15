@@ -1,22 +1,19 @@
+import handler.HandlerManager;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.util.Objects;
 
-import java.io.File;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class IntegrationTest {
 
     @Test
     @DisplayName("GET /index.html 200 SUCCESS")
-    void getIndexHtmlTest() throws IOException {
+    void getIndexHtmlTest(){
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
@@ -36,8 +33,7 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        File file = new File("src/main/resources/static/index.html");
-        String expectedContent = new String(Files.readAllBytes(file.toPath()));
+        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readFile("index.html")));
 
         // then
         // index.html 파일 검증
@@ -47,7 +43,7 @@ public class IntegrationTest {
 
     @Test
     @DisplayName("GET /register/index.html 200 SUCCESS")
-    void getRegisterIndexHtmlTest() throws IOException {
+    void getRegisterIndexHtmlTest(){
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
@@ -67,8 +63,7 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        File file = new File("src/main/resources/static/register/index.html");
-        String expectedContent = new String(Files.readAllBytes(file.toPath()));
+        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readFile("register/index.html")));
 
         // then
         // index.html 파일 검증
@@ -97,42 +92,30 @@ public class IntegrationTest {
     }
 
     @Test
-    @DisplayName("GET /user/create 200 SUCCESS")
-    void getUserCreateTest() throws IOException {
+    @DisplayName("POST /user/create 302 FOUND")
+    void postUserCreateTest() {
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
-        // when
-        // email 정보 누락
-        Response response = RestAssured
+        // when & then
+        // 정상 처리시, 302 redirect 응답 반환
+        RestAssured
                 .given().log().all()
-                    .param("userId","javajigi")
-                    .param("password","password")
-                    .param("name","%EB%B0%95%EC%9E%AC%EC%84%B1")
-                    .param("email","javajigi@gmail.com")
-                .when().get("/user/create")
+                    .contentType("application/x-www-form-urlencoded")
+                    .formParam("userId","javajigi")
+                    .formParam("password","password")
+                    .formParam("name","%EB%B0%95%EC%9E%AC%EC%84%B1")
+                    .formParam("email","javajigi@gmail.com")
+                .when().post("/user/create")
                 .then().log().all()
                 // Http Status 및 Content Type 검증
                 .assertThat()
-                    .statusCode(200)
-                    .contentType("text/html")
-                .extract().response();
-
-        // 응답 본문을 문자열로 읽기
-        String responseBody = response.getBody().asString();
-
-        // 예상되는 파일 내용 읽기
-        File file = new File("src/main/resources/static/login/index.html");
-        String expectedContent = new String(Files.readAllBytes(file.toPath()));
-
-        // then
-        // login/index.html 파일 검증
-        assertEquals(responseBody, expectedContent);
+                    .statusCode(302);
     }
 
     @Test
-    @DisplayName("GET /user/create 404 NOT FOUND")
-    void getUserCreateFail() throws IOException {
+    @DisplayName("POST /user/create 404 NOT FOUND (user 정보 누락)")
+    void getUserCreateFail1(){
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
@@ -141,15 +124,39 @@ public class IntegrationTest {
         // 404 오류 응답
         RestAssured
                 .given().log().all()
-                .param("userId","javajigi")
-                .param("password","password")
-                .param("name","%EB%B0%95%EC%9E%AC%EC%84%B1")
+                .contentType("application/x-www-form-urlencoded")
+                .formParam("userId","javajigi")
+                .formParam("password","password")
+                .formParam("name","%EB%B0%95%EC%9E%AC%EC%84%B1")
                 .when().get("/user/create")
                 .then().log().all()
                 // Http Status 및 Content Type 검증
                 .assertThat()
                     .statusCode(404)
                     .contentType("text/html");
+    }
 
+    @Test
+    @DisplayName("POST /user/create 404 NOT FOUND (잘못된 Http Method)")
+    void getUserCreateFail2(){
+        // given
+        RestAssured.baseURI = "http://localhost:8080";
+
+        // when & then
+        // email 정보 누락
+        // 404 오류 응답
+        RestAssured
+                .given().log().all()
+                .contentType("application/x-www-form-urlencoded")
+                .formParam("userId","javajigi")
+                .formParam("password","password")
+                .formParam("name","%EB%B0%95%EC%9E%AC%EC%84%B1")
+                .formParam("email","javajigi@gmail.com")
+                .when().get("/user/create")
+                .then().log().all()
+                // Http Status 및 Content Type 검증
+                .assertThat()
+                .statusCode(404)
+                .contentType("text/html");
     }
 }
