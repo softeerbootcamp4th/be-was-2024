@@ -30,8 +30,7 @@ public class GetHandler
             switch(path) {
                 case "/user/info" : handleUserInfoRequest(dos,requestObject);
                                     break;
-                case "/write"     :
-                case "/user/list" : checkCookies(dos,requestObject,path);
+                case "/write"   : case "/user/list" : checkCookies(dos,requestObject ,path);
                                     break;
                 default :  path= FileDetection.getPath(FileDetection.fixedPath+path);
                                 staticFileHandler(dos,path);
@@ -43,11 +42,11 @@ public class GetHandler
     }
 
 
-    private void checkCookies(DataOutputStream dos,RequestObject requestObject,String path)
+    private void checkCookies(DataOutputStream dos,RequestObject requestObject, String path)
     {
         if(requestObject.getCookies().isEmpty()) {//쿠키 값이 비어있다면, 즉 로그인이 안 돼있으면
             staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
-        } else {
+        } else if(path.equals("/user/list")){ //유저 목록 정보
             try{
                 handleUserListRequest(dos,requestObject);
             }
@@ -55,6 +54,9 @@ public class GetHandler
             {
                 logger.debug(e.getMessage());
             }
+        } else if(path.equals("/write"))//로그인이 된 상태에서 접근 시 글 작성 페이지로 이동한다
+        {
+            staticFileHandler(dos, FileDetection.fixedPath+"/article/index.html");
         }
     }
 
