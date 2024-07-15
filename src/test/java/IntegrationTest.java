@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,11 +34,11 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readStaticFile("index.html")));
+        byte[] expectedContent = HandlerManager.readStaticFile("index.html");
 
         // then
         // index.html 파일 검증
-        assertEquals(responseBody, expectedContent);
+        assertEquals(responseBody, Arrays.toString(expectedContent));
 
     }
 
