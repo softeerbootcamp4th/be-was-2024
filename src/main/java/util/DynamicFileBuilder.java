@@ -189,6 +189,10 @@ public class DynamicFileBuilder {
     // my-tag의 적용 여부를 반환하는 메서드
     private static boolean isTagAttributeValid(MyTagAttribute attribute, String attributeValue,
                                                Map<String, List<MyTagDomain>> model){
+        // model에 담긴 값이 없으면 유효x
+        if(model.isEmpty())
+            return false;
+
         // 속성이 if-not이면 속성 값이 model의 key에 없어야 유효
         if(attribute == MyTagAttribute.IF_NOT)
             return !model.containsKey(attributeValue);

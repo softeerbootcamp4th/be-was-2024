@@ -94,14 +94,14 @@ public class IntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /user/create 302 FOUND")
+    @DisplayName("POST /user/create 200 OK")
     void postUserCreateTest() {
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
         // when & then
         // 정상 처리시, 302 redirect 응답 반환
-        RestAssured
+        Response response = RestAssured
                 .given().log().all()
                     .contentType("application/x-www-form-urlencoded")
                     .formParam("userId","javajigi")
@@ -112,7 +112,19 @@ public class IntegrationTest {
                 .then().log().all()
                 // Http Status 및 Content Type 검증
                 .assertThat()
-                    .statusCode(302);
+                    .statusCode(302)
+                .extract().response();
+
+        // given
+        String redirectUrl = response.getHeader("Location");
+
+        // when & then
+        // 리다이렉트 시, 200 OK 응답 반환
+        RestAssured.given().log().all()
+                .when().get(redirectUrl)
+                .then().log().all()
+                .assertThat()
+                .statusCode(200);
     }
 
     @Test

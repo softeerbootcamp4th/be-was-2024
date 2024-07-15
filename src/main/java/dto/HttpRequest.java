@@ -82,10 +82,12 @@ public class HttpRequest {
             return Optional.empty();
 
         List<String> cookies = headers.get(COOKIE_HEADER);
-        for(String cookie : cookies){
-            if(cookie.contains(COOKIE_NAME_SESSION_ID)){
-                String sessionId = cookie.substring((COOKIE_NAME_SESSION_ID + "=").length());
-                return Optional.of(sessionId);
+        if(cookies!=null){
+            for(String cookie : cookies){
+                if(cookie.contains(COOKIE_NAME_SESSION_ID)){
+                    String sessionId = cookie.substring((COOKIE_NAME_SESSION_ID + "=").length());
+                    return Optional.of(sessionId);
+                }
             }
         }
 
