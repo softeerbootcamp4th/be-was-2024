@@ -2,7 +2,7 @@ package webserver.http.path;
 
 import webserver.api.*;
 import webserver.http.enums.Methods;
-import webserver.session.Session;
+import webserver.session.SessionDAO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -78,8 +78,9 @@ public class PathMap {
         }
 
         //secured but no session
+        SessionDAO sessionDAO = new SessionDAO();
         if(current.secured){
-            if(sessionid == null || Session.getSession(sessionid) == null)
+            if(sessionid == null || sessionDAO.findSession(sessionid) == null)
                 return Unauthorized.getInstance();
         }
 

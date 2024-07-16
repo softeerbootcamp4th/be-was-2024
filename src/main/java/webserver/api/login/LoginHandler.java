@@ -6,9 +6,9 @@ import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.Extension;
+import webserver.session.SessionDAO;
 import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
-import webserver.session.Session;
 import webserver.util.ParamsParser;
 
 import java.io.IOException;
@@ -49,7 +49,8 @@ public class LoginHandler implements FunctionHandler {
         }
 
         // if user information is valid
-        String sessionString = Session.createSession(user);
+        SessionDAO sessionDAO = new SessionDAO();
+        String sessionString = sessionDAO.insertSession(user.getUserId());
 
         //go to logined main page
         return new HttpResponse.ResponseBuilder(200)

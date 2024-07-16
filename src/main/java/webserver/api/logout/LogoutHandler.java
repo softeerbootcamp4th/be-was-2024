@@ -3,7 +3,7 @@ package webserver.api.logout;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.session.Session;
+import webserver.session.SessionDAO;
 
 import java.io.IOException;
 
@@ -24,7 +24,8 @@ public class LogoutHandler implements FunctionHandler {
         //check session id
         String sessionid = request.getSessionid();
         if (sessionid != null){
-            Session.deleteSession(sessionid);
+            SessionDAO  sessionDAO = new SessionDAO();
+            sessionDAO.deleteSession(sessionid);
         }
 
         //go to main page

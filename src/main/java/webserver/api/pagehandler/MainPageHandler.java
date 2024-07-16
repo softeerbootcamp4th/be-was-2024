@@ -1,12 +1,13 @@
 package webserver.api.pagehandler;
 
 import model.user.User;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.session.SessionDAO;
 import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
-import webserver.session.Session;
 
 import java.io.IOException;
 
@@ -23,9 +24,11 @@ public class MainPageHandler implements FunctionHandler {
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();
+        SessionDAO sessionDAO = new SessionDAO();
+        UserDAO userDAO = new UserDAO();
 
-        if(sessionid !=null && Session.getSession(sessionid) != null){
-            User user = Session.getSession(sessionid);
+        if(sessionid !=null && sessionDAO.findSession(sessionid) != null){
+            User user = userDAO.getUser(sessionDAO.findSession(sessionid));
             return new HttpResponse.ResponseBuilder(200)
                     .addheader("Content-Type", "text/html; charset=utf-8")
                     .setBody(PageBuilder.buildLoggedinPage(user.getName()))

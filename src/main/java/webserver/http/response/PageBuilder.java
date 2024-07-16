@@ -1,7 +1,7 @@
 package webserver.http.response;
 
-import db.Database;
 import model.user.User;
+import model.user.UserDAO;
 import webserver.http.enums.StatusCode;
 import webserver.util.HtmlFiles;
 
@@ -10,9 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 public class PageBuilder {
     public static byte[] buildUserList() throws IOException {
-
+        UserDAO userDAO = new UserDAO();
         StringBuilder userlist = new StringBuilder();
-        for( User user : Database.findAll()){
+        for( User user : userDAO.getUserList()){
             userlist.append("<li>User : ").append(user.getName());
             userlist.append("<ul>");
             userlist.append("<li>ID : ").append(user.getUserId()).append("</li>");

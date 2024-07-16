@@ -1,14 +1,14 @@
 package webserver.api;
 
-import db.Database;
 import model.user.User;
+import model.user.UserDAO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.api.pagehandler.UserListPageHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
-import webserver.session.Session;
+import webserver.session.SessionDAO;
 
 import java.io.IOException;
 
@@ -19,11 +19,12 @@ class UserListTest {
     @DisplayName("test userlist function")
     @Test
     void testUserList() throws IOException {
+        UserDAO userDAO = new UserDAO();
+        SessionDAO sessionDAO = new SessionDAO();
         //given
-        User user = new User("a", "1", "test1", "");
-        Database.addUser(user);
-        String sessionId = Session.createSession(user);
-        assertNotNull(Session.getSession(sessionId));
+        User user = userDAO.insertUser("testuser", "1", "test1", "asdfasdasdff");
+        String sessionId = sessionDAO.insertSession(user.getUserId());
+        assertNotNull(sessionDAO.findSession(sessionId));
 
         HttpRequest request;
         request = new HttpRequest.ReqeustBuilder("GET /user HTTP/1.1")
@@ -35,6 +36,8 @@ class UserListTest {
 
 
         //then
+        sessionDAO.deleteSession(sessionId);
+        userDAO.deleteUser(user.getUserId());
         assertEquals(StatusCode.CODE200, response.getStatusCode());
         assertNotNull(response.getBody());
 

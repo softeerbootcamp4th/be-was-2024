@@ -1,14 +1,14 @@
 package webserver.api;
 
-import db.Database;
 import model.user.User;
+import model.user.UserDAO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.api.logout.LogoutHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
-import webserver.session.Session;
+import webserver.session.SessionDAO;
 
 import java.io.IOException;
 
@@ -24,11 +24,12 @@ class LogoutTest {
         String password = "testpassword";
         String name = "testname";
         String email = "testemail";
-        User user = new User(userid, password, name, email);
-        Database.addUser(user);
-        String sessionId = Session.createSession(user);
+        SessionDAO sessionDAO = new SessionDAO();
+        UserDAO userDAO = new UserDAO();
+        User user = userDAO.insertUser(userid, name, email, password);
+        String sessionId = sessionDAO.insertSession(user.getUserId());
 
-        assertNotNull(Session.getSession(sessionId));
+        assertNotNull(sessionDAO.findSession(sessionId));
 
         HttpRequest request;
         request = new HttpRequest.ReqeustBuilder("GET /logout HTTP/1.1")
@@ -39,8 +40,10 @@ class LogoutTest {
         HttpResponse response = new LogoutHandler().function(request);
 
         //then
+        userDAO.deleteUser(user.getUserId());
         assertEquals(StatusCode.CODE302, response.getStatusCode());
-        assertNull(Session.getSession(sessionId));
+        assertNull(sessionDAO.findSession(sessionId));
+        sessionDAO.deleteSession(sessionId);
     }
 
 }

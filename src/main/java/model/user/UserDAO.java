@@ -35,7 +35,7 @@ public class UserDAO {
     }
 
     // 회원 삽입
-    public void insertUser(String userid, String username, String email, String password) {
+    public User insertUser(String userid, String username, String email, String password) {
         try {
             conn = JDBC.getConnection();
             stmt = conn.prepareStatement(MEMBER_INSERT);
@@ -51,6 +51,7 @@ public class UserDAO {
         } finally {
             JDBC.close(stmt, conn);
         }
+        return new User(userid, username, email, password);
     }
 
     // 회원 검색
@@ -82,7 +83,7 @@ public class UserDAO {
     }
 
     // 회원 목록
-    public void getUserList() {
+    public ArrayList<User> getUserList() {
         ArrayList<User> userlist = new ArrayList<User>();
         try {
             conn = JDBC.getConnection();
@@ -107,6 +108,7 @@ public class UserDAO {
         } finally {
             JDBC.close(rs, stmt, conn);
         }
+        return userlist;
     }
 
 }

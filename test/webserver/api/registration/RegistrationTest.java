@@ -1,10 +1,9 @@
 package webserver.api.registration;
 
-import db.Database;
+import model.user.UserDAO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
@@ -30,6 +29,7 @@ class RegistrationTest {
     @Test
     void register() throws IOException {
         //given
+        UserDAO userDAO = new UserDAO();
         String body = "id=" + id + "&username=" + username + "&email=" + email + "&password=" + password;
         HttpRequest request = new HttpRequest.ReqeustBuilder("POST /registration HTTP/1.1")
                 .addHeader("Content-Length", "34")
@@ -41,8 +41,8 @@ class RegistrationTest {
 
         //then
         assertEquals(StatusCode.CODE302, response.getStatusCode());
-        assertNotNull(Database.findUserById(id));
-
+        assertNotNull(userDAO.getUser(id));
+        userDAO.deleteUser(id);
 
     }
 
