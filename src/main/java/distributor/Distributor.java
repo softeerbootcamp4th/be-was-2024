@@ -20,5 +20,5 @@ public abstract class Distributor {
     public void process() throws IOException {
     }
 
-    public abstract ViewData getViewDate();
+    public abstract ViewData getViewData();
 }

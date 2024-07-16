@@ -31,7 +31,7 @@ public class GetDistributor extends Distributor {
         String path = request.getPath();
         if (path.equals("/user/create")) {
             ResponseProcessor responseProcessor = new ResponseProcessor();
-            this.viewData =  responseProcessor.notFoundResponse();
+            this.viewData = responseProcessor.notFoundResponse();
         }
     }
 
@@ -76,7 +76,7 @@ public class GetDistributor extends Distributor {
     }
 
     @Override
-    public ViewData getViewDate() {
+    public ViewData getViewData() {
         return this.viewData;
     }
 }

@@ -54,7 +54,7 @@ public class PostDistributor extends Distributor {
     }
 
     @Override
-    public ViewData getViewDate() {
+    public ViewData getViewData() {
         return this.viewData;
     }
 }
