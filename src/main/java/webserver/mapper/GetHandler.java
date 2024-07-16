@@ -37,12 +37,10 @@ public class GetHandler {
                 requestResponse.openUserList();
                 return;
             case "/write":
-                System.out.println(1);
                 if(Session.findUserBySessionId(sessionId) == null){
                     url = staticResourceDir + "/login/index.html";
                     break;
                 }
-                System.out.println(2);
                 url = staticResourceDir + "/article/index.html";
                 break;
             default:
