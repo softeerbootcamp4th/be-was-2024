@@ -33,12 +33,6 @@ public class RequestHandler implements Runnable {
                 logger.debug("header : {}={}", entry.getKey(), entry.getValue());
             }
 
-            // Handle body if present
-            byte[] body = httpRequest.getBody();
-            if (body != null && body.length > 0) {
-                logger.debug("body : {}", new String(body, "UTF-8"));
-            }
-
             DataOutputStream dos = new DataOutputStream(out);
             RequestResponse requestResponse = new RequestResponse(httpRequest, dos);
             MappingHandler.mapRequest(httpRequest, requestResponse);
