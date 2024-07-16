@@ -1,15 +1,30 @@
 package webserver.mapper;
 
+import model.SessionIdControl;
+import webserver.HttpRequest;
+import webserver.RequestResponse;
+
+import java.io.IOException;
+import java.util.Map;
+
 public class GetHandler {
 
-    public static String handle(String url) {
+    private static final String staticResourceDir = System.getProperty("staticResourceDir");
+
+    public static synchronized void handle(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
+        String url = httpRequest.getUrl();
+        Map<String, String> headers = httpRequest.getHeaders();
         switch (url) {
             case "/registration":
-                return "/registration/index.html";
+                url = staticResourceDir + "/registration/index.html";
+                break;
             case "/login":
-                return "/login/index.html";
+                url = staticResourceDir + "/login/index.html";
+                break;
             default:
-                return url;
+                url = staticResourceDir + url;
+                break;
         }
+        requestResponse.openPath(url);
     }
 }

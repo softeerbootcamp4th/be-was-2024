@@ -1,31 +1,26 @@
 package webserver.mapper;
 
 import webserver.HttpRequest;
-
-import java.io.DataOutputStream;
+import webserver.RequestResponse;
 import java.io.IOException;
 
 public class MappingHandler {
 
-    private static final String staticResourceDir = System.getProperty("staticResourceDir");
-
-    public static String mapRequest(HttpRequest httpRequest, DataOutputStream dos) throws IOException {
+    public static void mapRequest(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
         String method = httpRequest.getMethod();
         String url = httpRequest.getUrl();
         byte[] body = httpRequest.getBody();
 
         switch (method) {
             case "GET":
-                url = GetHandler.handle(url);
+                GetHandler.handle(httpRequest, requestResponse);
                 break;
             case "POST":
-                PostHandler.handle(url, body, dos);
+                PostHandler.handle(httpRequest, requestResponse);
                 break;
             default:
                 break;
         }
-
-        return staticResourceDir + url;
     }
 
 }
