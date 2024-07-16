@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Session {
     private static Map<String, User> sessions = new ConcurrentHashMap<>();
 
-    //session 생성
-    public static String createSession(User user){
+    //session 생성 동시성 처리
+    public static synchronized String createSession(User user){
         String sessionId =
                 String.valueOf(System.currentTimeMillis()).substring(8, 13)
                         + UUID.randomUUID().toString().substring(1,10);
