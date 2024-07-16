@@ -22,7 +22,6 @@ public class ViewBuilder {
             int end = blockMatcher.start();
             builder.append(template, nextStart, end);
             nextStart = blockMatcher.end();
-            System.out.println(blockMatcher.start() + blockMatcher.end());
             // block의 attributes / body부 캡쳐
             String attrString = blockMatcher.group(1);
             String body = blockMatcher.group(3);

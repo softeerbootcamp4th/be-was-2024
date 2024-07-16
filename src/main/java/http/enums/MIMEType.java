@@ -7,7 +7,8 @@ public enum MIMEType {
     ico("image/ico"),
     png("image/png"),
     jpg("image/jpg"),
-    svg("image/svg+xml");
+    svg("image/svg+xml"),
+    multipart_form_data("multipart/form-data");
 
     private final String mimeType;
 

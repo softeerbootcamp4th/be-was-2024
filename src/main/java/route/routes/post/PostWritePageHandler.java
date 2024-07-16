@@ -6,12 +6,10 @@ import http.enums.HttpStatusType;
 import routehandler.core.IRouteHandler;
 import view.MyView;
 
-import java.util.ArrayList;
-
-public class PostListPageHandler implements IRouteHandler {
+public class PostWritePageHandler implements IRouteHandler {
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         res.setStatusInfo(HttpStatusType.OK);
-        MyView.render(req, res, "/posts");
+        MyView.render(req, res, "/posts/write");
     }
 }

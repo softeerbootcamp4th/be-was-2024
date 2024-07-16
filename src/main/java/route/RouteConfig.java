@@ -3,6 +3,7 @@ package route;
 import chain.RouteHandleChain;
 import route.routes.IndexPageHandler;
 import route.routes.auth.SignOutHandler;
+import route.routes.post.PostWriteHandler;
 import route.routes.post.PostWritePageHandler;
 import route.routes.registration.RegistrationPageHandler;
 import route.routes.auth.LoginPageHandler;
@@ -25,7 +26,9 @@ public class RouteConfig {
                 Route.at("/list").GET(new UserListPageHandler())
             ),
             Route.at("/posts").routes(
-                Route.at("/write").GET(new PostWritePageHandler())
+                Route.at("/write")
+                    .GET(new PostWritePageHandler())
+                    .POST(new PostWriteHandler())
             ),
             Route.at("/login").GET(new LoginPageHandler()),
             Route.at("/").GET(new IndexPageHandler())

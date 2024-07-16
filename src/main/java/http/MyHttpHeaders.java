@@ -41,7 +41,7 @@ public class MyHttpHeaders {
      * @param value 헤더의 값
      */
     public void putHeader(String name, String value) {
-        // 대소문자를 구분하지 않음.
+        // key, value 모두 대소문자를 구분하지 않음.
         String lowerName = name.toLowerCase();
         headers.put(lowerName, value);
     }

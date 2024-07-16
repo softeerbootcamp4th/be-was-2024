@@ -3,11 +3,9 @@ package utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 public class ByteReadUtil {
     private static final Logger logger = LoggerFactory.getLogger(ByteReadUtil.class);
@@ -29,7 +27,7 @@ public class ByteReadUtil {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("{}", e.getMessage());
         }
         return bos.toByteArray();
     }

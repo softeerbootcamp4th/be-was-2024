@@ -38,10 +38,6 @@ public class RequestHandler implements Runnable {
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
             MyHttpRequest request = buildRequest(in);
             MyHttpResponse response = new MyHttpResponse(request.getVersion());
-            logger.debug("request url: {}", request.getUrl().getPathname());
-
-            logger.debug("request body: {}", new String(request.getBody()));
-
             chainManager.execute(request, response);
 
             DataOutputStream dos = new DataOutputStream(out);
@@ -64,7 +60,7 @@ public class RequestHandler implements Runnable {
         MyURL url = new MyURL(reqLineItems[1]);
         String version = reqLineItems[2];
 
-        logger.debug("reqline = {}", requestLine);
+//        logger.debug("reqline = {}", requestLine);
 
         // header 목록 읽기
         List<String> headerLines = new ArrayList<>();
@@ -72,7 +68,7 @@ public class RequestHandler implements Runnable {
         while (!(headerLine = ByteReadUtil.readLineToString(in)).isEmpty()) {
             headerLines.add(headerLine);
         }
-        logger.debug("headers = {}", headerLines);
+//        logger.debug("headers = {}", headerLines);
 
         // 헤더 객체 생성
         MyHttpHeaders headers = new MyHttpHeaders();

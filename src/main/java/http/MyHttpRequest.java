@@ -1,5 +1,6 @@
 package http;
 
+import config.AppConfig;
 import http.cookie.MyCookies;
 import http.enums.HttpMethodType;
 import http.utils.HttpMethodTypeUtil;
