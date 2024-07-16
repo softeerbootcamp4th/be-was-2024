@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum StatusCode {
+    CODE400(400, "Bad Request"),
     CODE401(401, "Unauthorized"),
     CODE404(404, "not found"),
     CODE403(403, "Forbidden"),

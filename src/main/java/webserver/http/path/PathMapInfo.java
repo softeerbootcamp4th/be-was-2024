@@ -5,6 +5,7 @@ import webserver.api.login.LoginHandler;
 import webserver.api.logout.LogoutHandler;
 import webserver.api.pagehandler.*;
 import webserver.api.registration.Registration;
+import webserver.api.writepost.WritePost;
 
 public class PathMapInfo {
 
@@ -43,5 +44,10 @@ public class PathMapInfo {
             .addChild(
                     new PathMap.PathNode("resource")
                             .Get(ReadFileHandler.getInstance())
+            )
+            .addChild(
+                    new PathMap.PathNode("write")
+                            .Post(WritePost.getInstance())
+                            .secured()
             );
 }
