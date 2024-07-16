@@ -5,7 +5,8 @@ public enum RestUri {
     SIGN_IN("/signIn"),
     LOGOUT("/logout"),
     USER_LIST("/user/list"),
-    DATABASE_INIT("/database/init");
+    DATABASE_INIT("/database/init"),
+    ARTICLE("/article");
 
     private final String uri;
 

@@ -130,6 +130,14 @@ public class WebAdapter {
 
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             response.writeInBytes(out);
+        } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
+            HttpResponse response;
+            if(SessionFacade.isAuthenticatedRequest(request)) {
+                response = ResponseUtils.redirectToView(ViewPath.ARTICLE);
+            } else {
+                response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+            }
+            response.writeInBytes(out);
         }
     }
 
