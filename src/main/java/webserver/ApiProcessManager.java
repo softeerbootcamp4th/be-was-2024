@@ -1,17 +1,12 @@
 package webserver;
 
-import ApiProcess.ApiProcess;
-import ApiProcess.HomepageApiProcess;
-import ApiProcess.RegisterpageApiProcess;
-import ApiProcess.RegisterApiProcess;
-import ApiProcess.StaticApiProcess;
-import ApiProcess.NotFoundApiProcess;
+import ApiProcess.*;
+
 import enums.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ApiPair;
 
-import java.io.File;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,6 +20,9 @@ public class ApiProcessManager {
            put(new ApiPair("/", HttpMethod.GET), new HomepageApiProcess());
            put(new ApiPair("/registration", HttpMethod.GET), new RegisterpageApiProcess());
            put(new ApiPair("/user/create", HttpMethod.POST), new RegisterApiProcess());
+           put(new ApiPair("/user/login", HttpMethod.POST), new LoginApiProcess());
+           put(new ApiPair("/login", HttpMethod.GET), new LoginPageApiProcess());
+           put(new ApiPair("/user/logout", HttpMethod.POST), new LogoutApiProcess());
        }};
     }
 

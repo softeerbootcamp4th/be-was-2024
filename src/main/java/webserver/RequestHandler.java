@@ -10,10 +10,7 @@ import enums.HttpResult;
 import enums.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.MimeTypeMapper;
-import utils.PathUtils;
-import utils.RequestParser;
-import utils.ResourcesLoader;
+import utils.*;
 
 public class RequestHandler implements Callable<Void> {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -35,6 +32,12 @@ public class RequestHandler implements Callable<Void> {
             Request request = requestParser.getRequest(in);
             Response response = new Response();
 
+            if(AuthUtil.isLogin(request) != null) {
+                logger.debug("로그인 된 상태 입니다.");
+            } else {
+                logger.debug("로그인 되지 않은 상태 입니다.");
+            }
+
             /**
              * 경로에 따른 로직 처리
              * ApiProcess 인터페이스를 만들어 로직 처리를 추상화
@@ -47,14 +50,12 @@ public class RequestHandler implements Callable<Void> {
 
             // 리다이렉트 시
             if(isRedirect(response)) {
-               response.sendRedirect(dos, fileNameWithoutExt);
+               response.sendRedirect(dos);
                return null;
             }
 
             // 확장자를 넣어주는 메서드 사용
             String fileName = PathUtils.filePathResolver(fileNameWithoutExt);
-
-            logger.debug("fileName = {}", fileName);
 
             // 파일의 바이너리 데이터 읽기
             byte[] body = ResourcesLoader.getFile(fileName);

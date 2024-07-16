@@ -4,28 +4,87 @@ import enums.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Request{
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    public static final String CONTENT_TYPE = "Content-Type";
+    public static final String CONTENT_LENGTH = "Content-Length";
+  public static final String LOCATION = "Location";
     private HttpMethod method;
     private String path;
     private String httpVersion;
     private Map<String, String> httpHeaders;
     private Map<String, String> parameters;
+    private Map<String, String> cookies;
     private String body;
+
+    public Request(RequestBuilder builder) {
+      this.method = builder.method;
+      this.path = builder.path;
+      this.httpVersion = builder.httpVersion;
+      this.httpHeaders = builder.httpHeaders;
+      this.parameters = builder.parameters;
+      this.cookies = builder.cookies;
+      this.body = builder.body;
+    }
+
+    public static class RequestBuilder {
+      private HttpMethod method;
+      private String path;
+      private String httpVersion;
+      private Map<String, String> httpHeaders;
+      private Map<String, String> parameters;
+      private Map<String, String> cookies;
+      private String body;
+
+      public RequestBuilder setMethod(HttpMethod method) {
+        this.method = method;
+        return this;
+      }
+
+      public RequestBuilder setPath(String path) {
+        this.path = path;
+        return this;
+      }
+
+      public RequestBuilder setHttpVersion(String httpVersion) {
+        this.httpVersion = httpVersion;
+        return this;
+      }
+
+      public RequestBuilder setHttpHeaders(Map<String, String> httpHeaders) {
+        this.httpHeaders = httpHeaders;
+        return this;
+      }
+
+      public RequestBuilder setParameters(Map<String, String> parameters) {
+        this.parameters = parameters;
+        return this;
+      }
+
+      public RequestBuilder setCookies(Map<String, String> cookies) {
+        this.cookies = cookies;
+        return this;
+      }
+
+      public RequestBuilder setBody(String body) {
+        this.body = body;
+        return this;
+      }
+
+      public Request build() {
+        return new Request(this);
+      }
+    }
 
     public Request(HttpMethod method,
                    String path,
                    String httpVersion,
                    Map<String, String> httpHeaders,
                    Map<String, String> parameters,
-                   String body
+                   String body,
+                   Map<String, String> cookies
                    ) {
        this.method = method;
        this.path = path;
@@ -33,6 +92,7 @@ public class Request{
        this.httpHeaders = httpHeaders;
        this.parameters = parameters;
        this.body = body;
+       this.cookies = cookies;
     }
 
     public String getHeader(String HeaderKey) {
@@ -41,6 +101,10 @@ public class Request{
 
     public String getParameter(String parameterKey) {
         return parameters.get(parameterKey);
+    }
+
+    public String getCookie(String cookieKey) {
+      return cookies.get(cookieKey);
     }
 
     public HttpMethod getMethod() {

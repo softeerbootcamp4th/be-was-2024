@@ -1,6 +1,8 @@
 package utils;
 
+import enums.HttpCode;
 import enums.HttpMethod;
+import enums.MimeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.Request;
@@ -9,6 +11,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,20 +38,39 @@ public class RequestParser {
         HttpMethod method = HttpMethod.from(requestLines[0]);
         Map<String, String> queryParameters = pathParse(requestLines[1]);
         String path = queryParameters.get("path");
-        queryParameters.remove("path");
         String httpVersion = requestLines[2];
 
         // request header parse
         Map<String, String> headers = requestHeaderParse(br);
 
         // request body parse
-        String body = requestBodyParse(headers.get("Content-Length"), br);
-        String contentType = headers.get("Content-Type");
-        if(contentType != null && contentType.equals("application/x-www-form-urlencoded")) {
-            Map<String, String> bodyQuerys = queryParse(body);
+        String body = requestBodyParse(headers.get(Request.CONTENT_LENGTH), br);
+        String contentType = headers.get(Request.CONTENT_TYPE);
+        if(contentType != null && contentType.equals(MimeType.FORM.getMimeType())) {
+            Map<String, String> bodyQuerys = new HashMap<>();
+            if(body != null) {
+                bodyQuerys = queryParse(body, "&", "=");
+            }
             queryParameters.putAll(bodyQuerys);
         }
-        return new Request(method, path, httpVersion, headers, queryParameters, body);
+
+        // cookie parse
+        Map<String, String> cookies;
+        String rawCookie = headers.get("Cookie");
+        if(rawCookie != null) {
+            cookies = queryParse(rawCookie, ";", "=");
+        } else {
+            cookies = new HashMap<>();
+        }
+        return new Request.RequestBuilder()
+                .setMethod(method)
+                .setPath(path)
+                .setHttpVersion(httpVersion)
+                .setHttpHeaders(headers)
+                .setParameters(queryParameters)
+                .setCookies(cookies)
+                .setBody(body)
+                .build();
     }
 
     private String[] requestLineParse(String requestLine) {
@@ -55,7 +78,6 @@ public class RequestParser {
     }
 
     private String requestBodyParse(String _contentLength, BufferedReader br) throws IOException {
-        Map<String, String> tmpStore = new HashMap<>();
         if(_contentLength == null) {
             return null;
         }
@@ -64,7 +86,6 @@ public class RequestParser {
         br.read(body, 0, contentLength);
         String s = String.valueOf(body);
         return s;
-
     }
 
     private Map<String, String> requestHeaderParse(BufferedReader br) throws IOException {
@@ -82,13 +103,19 @@ public class RequestParser {
         return headers;
     }
 
-    private Map<String, String> queryParse(String queryString) {
+    private Map<String, String> queryParse(String queryString, String pairDelimeter, String keyValueDelimeter) {
         Map<String, String> tmpStore = new HashMap<>();
-        String[] rawKeyValues= queryString.split("\\&");
+        if(queryString.isEmpty()) return tmpStore;
+        String[] rawKeyValues= queryString.split(pairDelimeter);
         for(String rawKeyValue: rawKeyValues) {
-            String[] keyValue = rawKeyValue.split("\\=");
+            logger.debug("rawKeyValue = {}, {}, {}", rawKeyValue, pairDelimeter, keyValueDelimeter);
+            String[] keyValue = rawKeyValue.split(keyValueDelimeter);
             if(keyValue.length == 2) {
-                tmpStore.put(keyValue[0], keyValue[1].trim());
+                String key = URLDecoder.decode(keyValue[0].trim(), StandardCharsets.UTF_8);
+                String value = URLDecoder.decode(keyValue[1].trim(), StandardCharsets.UTF_8);
+                tmpStore.put(key, value);
+            } else if(!rawKeyValue.contains(keyValueDelimeter)) {
+                throw new IllegalArgumentException("잘못된 인자가 들어왔습니다.");
             }
         }
         return tmpStore;
@@ -104,13 +131,7 @@ public class RequestParser {
         if(pathSplit.length == 1) return queryParameters;
 
         String rawQueryParameter = pathSplit[1];
-        String[] rawQueryParameters = rawQueryParameter.split("\\&");
-        for(String queryParameter: rawQueryParameters) {
-            String[] queryKeyValue = queryParameter.split("\\=");
-            if(queryKeyValue.length == 2) {
-                queryParameters.put(queryKeyValue[0], queryKeyValue[1]);
-            }
-        }
+        queryParameters = queryParse(rawQueryParameter, "&", "=");
         return queryParameters;
     }
 }

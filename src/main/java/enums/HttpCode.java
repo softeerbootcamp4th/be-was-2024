@@ -4,7 +4,8 @@ public enum HttpCode {
     OK(200, HttpResult.SUCCESS, "OK"),
     Found(302, HttpResult.REDIRECT, "Found"),
     UNPROCESSABLE_CONTENT(422, HttpResult.CLIENT_ERROR, "Unprocessable Content"),
-    BAD_REQUEST(400, HttpResult.CLIENT_ERROR, "Bad Request");
+    BAD_REQUEST(400, HttpResult.CLIENT_ERROR, "Bad Request"),
+    UNAUTHORIZED(401, HttpResult.CLIENT_ERROR, "Unauthorized");
 
     private int code;
     private HttpResult httpResult;
@@ -24,6 +25,10 @@ public enum HttpCode {
            }
         }
         throw new IllegalArgumentException("해당 코드와 일치하는 HttpCode는 없습니다.");
+    }
+
+    public boolean isRedirect() {
+        return httpResult.equals(HttpResult.REDIRECT);
     }
 
     public int getCode() {
