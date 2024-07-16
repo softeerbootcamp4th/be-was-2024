@@ -32,7 +32,7 @@ public class PostHandler {
                     requestResponse.setCookieAndRedirectPath(sessionId, redirectUrl);
                     break;
                 case "/logout":
-                    sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
+                    sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
                     SessionIdControl.deleteSessionId(sessionId);
                     redirectUrl = "/index.html";
                     requestResponse.resetCookieAndRedirectPath(redirectUrl);
