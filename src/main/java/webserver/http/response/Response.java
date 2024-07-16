@@ -38,6 +38,11 @@ public class Response {
             return this;
         }
 
+        public Builder redirect(String path){
+            this.headers.put("Location", path);
+            return this;
+        }
+
         public Builder body(byte[] body){
             this.body = body;
             return this;

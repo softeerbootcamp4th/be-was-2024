@@ -33,7 +33,7 @@ public class UserPlugin{
         logger.debug(user.toString());
 
         return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/index.html")
+                .redirect("/index.html")
                 .build();
 
     }
@@ -41,14 +41,14 @@ public class UserPlugin{
     @Get(path = "/registration")
     public Response registration(Request request){
         return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/registration/index.html")
+                .redirect("/registration/index.html")
                 .build();
     }
 
     @Get(path = "/login")
     public Response redirect(Request request) {
         return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/login/index.html")
+                .redirect("/login/index.html")
                 .build();
     }
 
@@ -66,20 +66,20 @@ public class UserPlugin{
         if(user==null) {
             logger.debug("user null");
             return new Response.Builder(Status.SEE_OTHER)
-                    .addHeader("Location", "/user/login_failed.html")
+                    .redirect("/user/login_failed.html")
                     .build();
         }
 
         if(user.getUserId().equals(userId) && user.getPassword().equals(password))
             return new Response.Builder(Status.SEE_OTHER)
-                    .addHeader("Location", "/index.html")
+                    .redirect("/index.html")
                     .addHeader("Set-Cookie", "sid="+ Session.save(user)+"; Path=\\/")
                     .build();
 
         logger.debug(user.toString());
 
         return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/user/login_failed.html")
+                .redirect("/user/login_failed.html")
                 .build();
 
     }
@@ -92,7 +92,7 @@ public class UserPlugin{
         Session.delete(sessionId);
 
         return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/index.html")
+                .redirect("/index.html")
                 .build();
 
     }
@@ -101,7 +101,7 @@ public class UserPlugin{
     public Response userList(Request request){
 
         if(!request.isLogin()) return new Response.Builder(Status.SEE_OTHER)
-                .addHeader("Location", "/login/index.html")
+                .redirect("/login/index.html")
                 .build();
 
         StringBuilder sb = new StringBuilder();
