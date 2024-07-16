@@ -2,7 +2,7 @@ package plugin;
 
 import annotations.Get;
 import annotations.Plugin;
-import db.PostDatabase;
+import db.PostH2Database;
 import model.Post;
 import webserver.http.Session;
 import webserver.http.request.Request;
@@ -46,8 +46,8 @@ public class IndexPlugin {
         String content = "";
         String authorName = "";
 
-        if(PostDatabase.isExist(postId)){
-            Post post = PostDatabase.findById(postId);
+        if(PostH2Database.isExist(postId)){
+            Post post = PostH2Database.findById(postId).get();
             title = post.getTitle();
             content = post.getContent();
             authorName = post.getAuthorName();
