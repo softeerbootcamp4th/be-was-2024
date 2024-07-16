@@ -37,7 +37,6 @@ public class Constants {
     public static String STATIC_PATH;
     public static final String PATH_HOST = "http://localhost:8080";
     public static final String PATH_ROOT = "/";
-    public static final String PATH_MAIN = "/main";
     public static final String PATH_USER = "/user";
     public static final String PATH_CREATE = "/create";
     public static final String PATH_LIST = "/list";
@@ -59,6 +58,10 @@ public class Constants {
     public static final String TABLE_DATA_START = "<td>";
     public static final String TABLE_DATA_END = "</td>";
 
+    //database
+    public static String JDBC_URL;
+    public static String H2_USERNAME;
+    public static String H2_PASSWORD;
 
 
     private static final Properties properties = new Properties();
@@ -70,6 +73,9 @@ public class Constants {
             }
             properties.load(input);
             STATIC_PATH =  properties.getProperty("staticPath");
+            JDBC_URL = properties.getProperty("jdbc_url");
+            H2_USERNAME = properties.getProperty("database_username");
+            H2_PASSWORD = properties.getProperty("database_password");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

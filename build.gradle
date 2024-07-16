@@ -19,6 +19,8 @@ dependencies {
 
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
+
+    runtimeOnly 'com.h2database:h2:2.3.230'
 }
 
 test {
@@ -27,7 +29,7 @@ test {
 
 task writeProperties{
     doLast{
-        file('src/main/resources/config.properties').text = "staticPath = ./src/main/resources/static"
+        file('src/main/resources/config.properties').text = "staticPath = ./src/main/resources/static\njdbc_url = jdbc:h2:~/was\ndatabase_username = sa\ndatabase_password = "
     }
 }
 
