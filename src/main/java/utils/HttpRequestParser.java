@@ -18,6 +18,7 @@ public class HttpRequestParser {
     private final Map<String, String> cookiesMap = new HashMap<>();
     private final Map<String, String> requestHeadersMap = new HashMap<>();
     private final Map<String, String> queryParametersMap = new HashMap<>();
+    private final String EXTENTION_REGEX = "\\.([a-z]+)$";
     public HttpRequestParser(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
         int c;
@@ -85,9 +86,7 @@ public class HttpRequestParser {
         path = tokens[0];
 
         // 확장자 파싱
-        String extensionRegex = "\\.([a-z]+)$";
-
-        Pattern compile = Pattern.compile(extensionRegex);
+        Pattern compile = Pattern.compile(EXTENTION_REGEX);
         Matcher matcher = compile.matcher(path);
 
         // 파일 확장자를 가진 path인지 검증
