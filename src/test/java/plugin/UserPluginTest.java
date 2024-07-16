@@ -1,6 +1,6 @@
 package plugin;
 
-import db.Database;
+import db.UserDatabase;
 import model.User;
 import org.junit.jupiter.api.*;
 import webserver.http.Session;
@@ -17,7 +17,7 @@ public class UserPluginTest {
 
     @BeforeEach
     void after(){
-        Database.deleteAll();
+        UserDatabase.deleteAll();
         Session.deleteAll();
     }
 
@@ -38,7 +38,7 @@ public class UserPluginTest {
 
             //when
             userPlugin.create(request);
-            User actual = Database.findUserById("javajigi");
+            User actual = UserDatabase.findUserById("javajigi");
 
             //then
             assertEquals(expected, actual);
@@ -99,7 +99,7 @@ public class UserPluginTest {
 
             //when
             userPlugin.create(request);
-            User actual = Database.findUserById("javajigi");
+            User actual = UserDatabase.findUserById("javajigi");
 
             //then
             assertNull(actual);
@@ -135,7 +135,7 @@ public class UserPluginTest {
         public void testLoginSuccessRedirection(){
 
             //given
-            Database.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
+            UserDatabase.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
 
             Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
@@ -171,7 +171,7 @@ public class UserPluginTest {
         public void testLoginSuccessCookie(){
 
             //given
-            Database.addUser(createTestUser());
+            UserDatabase.addUser(createTestUser());
 
             Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))

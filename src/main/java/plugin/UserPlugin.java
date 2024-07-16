@@ -3,7 +3,7 @@ package plugin;
 import annotations.Get;
 import annotations.Plugin;
 import annotations.Post;
-import db.Database;
+import db.UserDatabase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +29,9 @@ public class UserPlugin{
                 parameterMap.get("name"),
                 parameterMap.get("email")
         );
-        Database.addUser(user);
         logger.debug(user.toString());
+        UserDatabase.addUser(user);
+        //logger.debug(user.toString());
 
         return new Response.Builder(Status.SEE_OTHER)
                 .redirect("/index.html")
@@ -61,7 +62,7 @@ public class UserPlugin{
         String userId = map.get("userId");
         String password = map.get("password");
 
-        User user = Database.findUserById(userId);
+        User user = UserDatabase.findUserById(userId);
 
         if(user==null) {
             logger.debug("user null");
@@ -106,7 +107,7 @@ public class UserPlugin{
 
         StringBuilder sb = new StringBuilder();
 
-        for(User user: Database.findAll()){
+        for(User user: UserDatabase.findAll()){
             sb.append(user.toString()).append("\n");
         }
 
