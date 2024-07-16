@@ -1,7 +1,7 @@
 package webserver;
 
 import common.*;
-import db.UserDatabase;
+import db.UserH2Database;
 import exception.CannotResolveRequestException;
 import facade.SessionFacade;
 import facade.UserFacade;
@@ -107,10 +107,13 @@ public class WebAdapter {
             response.writeInBytes(out);
 
         } else if(request.getPath().equals(RestUri.SIGN_IN.getUri())) {
+            System.out.println("1 = " + 1);
             Map<String, String> map = StringUtils.parseBodyInForm(request.getBody()); // userId, password
             HttpResponse response;
 
+            System.out.println("2 = " + 2);
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
+                System.out.println("3 = " + 3);
                 Session newSession = SessionFacade.createSession(map.get("userId"));
 
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
@@ -119,9 +122,11 @@ public class WebAdapter {
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
             } else { // id, pwd 불일치
+                System.out.println("4 = " + 4);
                 response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             }
 
+            System.out.println("5 = " + 5);
             response.writeInBytes(out);
 
         } else if(request.getPath().equals(RestUri.LOGOUT.getUri())) {
@@ -157,7 +162,7 @@ public class WebAdapter {
             HttpResponse response;
             // 인증된 요청일경우 표시
             if(SessionFacade.isAuthenticatedRequest(request)) {
-                Collection<User> users = UserDatabase.findAll();
+                Collection<User> users = UserH2Database.findAll();
                 String jsonUser = JsonBuilder.buildJsonResponse(users);
 
                 response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
@@ -168,7 +173,7 @@ public class WebAdapter {
         }
         // 데이터베이스 초기화
         else if(request.getPathWithoutQueryParam().equals(RestUri.DATABASE_INIT.getUri())) {
-            UserDatabase.initialize();
+            UserH2Database.removeAll();
 
             HttpResponse response = ResponseUtils.responseSuccess();
             response.writeInBytes(out);

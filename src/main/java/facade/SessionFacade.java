@@ -1,6 +1,7 @@
 package facade;
 
 import db.SessionDatabase;
+import db.SessionH2Database;
 import db.SessionIdMapper;
 import model.Session;
 import web.HttpRequest;
@@ -22,7 +23,7 @@ public class SessionFacade {
 
         SessionDatabase.removeExpiredSessions();
 
-        return SessionDatabase.isValidateSession(SID);
+        return SessionDatabase.isValidatedSession(SID);
     }
 
     public static void invalidateAndRemoveSession(HttpRequest request) {
