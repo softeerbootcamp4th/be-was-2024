@@ -96,8 +96,8 @@
       // 게시글 목록을 HTML에 추가
       postsContainer.innerHTML = data.boards.map(board => `
         <div class="post">
-          <h3 class="post__title">${board.title}</h3>
-          <p class="post__content">${board.content}</p>
+          <h3 >${board.title}</h3>
+          <p class="post__article">${board.content}</p>
         </div>
       `).join("");
 

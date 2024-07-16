@@ -10,7 +10,9 @@ import util.RequestObject;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class GetHandler
 {
@@ -159,14 +161,22 @@ public class GetHandler
 
     private void sendBoardList(DataOutputStream dos) {
         try {
-            StringBuilder sb = new StringBuilder();
-            Collection<Board> list = PostHandler.getBoards();
-            for(Board temp : list)
-            {
-                sb.append(temp.getTitle()).append("<br>");
+            List<Board> list = new ArrayList<>(PostHandler.getBoards());
+            StringBuilder json = new StringBuilder();
+            json.append("[");
+            for (int i = 0; i < list.size(); i++) {
+                Board temp = list.get(i);
+                json.append("{");
+                json.append("\"title\":\"").append(temp.getTitle()).append("\",");
+                json.append("\"content\":\"").append(temp.getContent()).append("\"");
+                json.append("}");
+                if (i < list.size() - 1) {
+                    json.append(",");
+                }
             }
-            String body = "<html><head></head><body>" + sb + " </body></html>";
-            byte[] bodyBytes = body.getBytes("UTF-8");
+            json.append("]");
+
+            byte[] bodyBytes = json.toString().getBytes("UTF-8");
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
