@@ -13,6 +13,7 @@ public class Response {
     private final int statusCode;
     private final DataOutputStream dos;
     private final String cookie;
+    private final byte[] body;
 
     private Response(Builder builder) {
         this.url = builder.url;
@@ -20,6 +21,7 @@ public class Response {
         this.statusCode = builder.statusCode;
         this.dos = builder.dos;
         this.cookie = builder.cookie;
+        this.body = builder.body;
     }
 
     public static class Builder {
@@ -28,6 +30,7 @@ public class Response {
         private int statusCode = 0;
         private DataOutputStream dos;
         private String cookie = "";
+        private byte[] body;
 
         public Builder url(String url) {
             this.url = url;
@@ -54,6 +57,11 @@ public class Response {
             return this;
         }
 
+        public Builder body(byte[] body) {
+            this.body = body;
+            return this;
+        }
+
         public Response build() {
             return new Response(this);
         }
@@ -71,17 +79,18 @@ public class Response {
         }
     }
 
-    public void response(String url, DataOutputStream dos) throws IOException {
-        // url로부터 html파일을 byte array로 읽어오기
-        byte[] body = resourceHandler.getByteArray(url);
-
-        if (cookie.isEmpty()) {
-            response200Header(dos, body.length, resourceHandler.getContentType(url));
+    public void response(String url, DataOutputStream dos) {
+        if (statusCode == 404) {
+            response404Header(dos, this.body.length);
+            responseBody(dos, this.body);
         } else {
-            response200HeaderWithCookie(dos, body.length, resourceHandler.getContentType(url));
+            if (cookie.isEmpty()) {
+                response200Header(dos, this.body.length, resourceHandler.getContentType(url));
+            } else {
+                response200HeaderWithCookie(dos, this.body.length, resourceHandler.getContentType(url));
+            }
+            responseBody(dos, this.body);
         }
-
-        responseBody(dos, body);
     }
 
     public void redirect(String url, DataOutputStream dos, int redirectionCode) throws IOException {
@@ -97,10 +106,6 @@ public class Response {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
             response302HeaderWithCookie(dos, url);
-        } else {
-            byte[] body = resourceHandler.getByteArray(url);
-            response404Header(dos, body.length);
-            responseBody(dos, body);
         }
     }
 
@@ -109,10 +114,6 @@ public class Response {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
             response302Header(dos, url);
-        } else {
-            byte[] body = resourceHandler.getByteArray(url);
-            response404Header(dos, body.length);
-            responseBody(dos, body);
         }
     }
 
