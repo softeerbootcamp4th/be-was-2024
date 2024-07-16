@@ -1,6 +1,7 @@
 package webserver.http.request;
 
 import exception.NotExistException;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.Session;
@@ -8,10 +9,7 @@ import webserver.http.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Request {
 
@@ -130,6 +128,13 @@ public class Request {
 
     public String getHeadValue(String key){
         return this.header.get(key);
+    }
+
+    public Optional<User> getUser(){
+        String sessionId = getSessionId();
+        logger.debug(sessionId);
+        if(!Session.isExist(sessionId)) return Optional.empty();
+        return Optional.of(Session.get(getSessionId()));
     }
 
     public static Request parseRequestWithoutBody(String request) throws IOException {
