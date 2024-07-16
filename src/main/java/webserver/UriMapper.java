@@ -18,7 +18,7 @@ public class UriMapper {
                 case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
                 case "/article" -> staticRequestProcess("src/main/resources/static/article/index.html");
                 case "/user/list" -> DynamicRequestProcess.userList(httpRequestMessage);
-                case "/registration.html" -> staticRequestProcess("src/main/resources/static/registration/index.html");
+                case "/registration" -> staticRequestProcess("src/main/resources/static/registration/index.html");
                 case "/login" -> staticRequestProcess("src/main/resources/static/login/index.html");
                 case "/logout" -> DynamicRequestProcess.logout(httpRequestMessage);
                 case "/create" -> DynamicRequestProcess.registration(httpRequestMessage);
