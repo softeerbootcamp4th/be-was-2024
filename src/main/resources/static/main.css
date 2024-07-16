@@ -144,3 +144,8 @@
   width: 32px;
   height: 32px;
 }
+
+.post__edit {
+  width: 100%;
+  resize: vertical;
+}

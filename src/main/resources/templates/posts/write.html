@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+    <link href="/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <my-template if-not="user">
+                <li class="header__menu__item">
+                    <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+                </li>
+                <li class="header__menu__item">
+                    <a class="btn btn_ghost btn_size_s" href="/registration">
+                        회원 가입
+                    </a>
+                </li>
+            </my-template>
+            <my-template if="user">
+                <li>{user.name} 님, 안녕하세요!</li>
+                <li class="header__menu__item">
+                    <form method="post" action="/auth/signout">
+                        <button class="btn btn_ghost btn_size_s" type="submit">로그아웃</button>
+                    </form>
+                </li>
+            </my-template>
+        </ul>
+    </header>
+    <form action="/posts/write" method="post"
+          enctype="multipart/form-data"
+          style="margin-top:2rem; display: flex; flex-flow: column; width: 70%; gap: 1rem">
+        <div style="display: flex; flex-flow: row; width: 100%; gap: 1rem">
+            <label for="title" style="font-size: large; font-weight: bold; flex-grow: 0">제목</label>
+            <input type="text" name="title" id="title" style="flex-grow: 1">
+        </div>
+        <hr style="width: 100%">
+        <label for="image[]">사진</label>
+        <input alt="이미지파일들" type="file" name="image[]" id="image[]" multiple/>
+        <label for="content" style="font-size: large; font-weight: bold">본문</label>
+        <textarea name="content" id="content" style="min-height:500px; resize: vertical"></textarea>
+        <div style="display: flex; flex-flow: row; gap: 2rem; align-self: flex-end">
+            <button type="submit" class="btn btn_contained btn_size_s">작성</button>
+            <a href="/" class="btn btn_ghost btn_size_s">취소</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

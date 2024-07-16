@@ -46,6 +46,7 @@
   text-decoration: none;
   cursor: pointer;
   text-align: center;
+  white-space: nowrap; /* 텍스트를 한 줄로 유지 */
 }
 
 .btn.hidden {
