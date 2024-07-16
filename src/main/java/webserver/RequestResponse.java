@@ -4,6 +4,11 @@ import db.Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.enumPackage.ContentType;
+import webserver.enumPackage.HtmlTemplate;
+import webserver.enumPackage.HttpStatus;
+import webserver.enumPackage.HttpVersion;
+
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -21,27 +26,17 @@ public class RequestResponse {
     }
 
     public void redirectPath(String redirectPath) throws IOException {
-        dos.writeBytes("HTTP/1.1 302 Found\r\n");
-        dos.writeBytes("Location: " + redirectPath + "\r\n");
-        dos.writeBytes("\r\n");
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(), "Location: " + redirectPath + "\r\n", null);
     }
 
     public void setCookieAndRedirectPath(String sessionId, String redirectPath) throws IOException {
-        dos.writeBytes("HTTP/1.1 302 Found\r\n");
-        dos.writeBytes("Location: " + redirectPath + "\r\n");
-        dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/\r\n");
-        dos.writeBytes("\r\n");
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(),
+                "Location: " + redirectPath + "\r\nSet-Cookie: sid=" + sessionId + "; Path=/\r\n", null);
     }
 
-    // 로그아웃 할 때 빈 세션으로 반환하게 하기 dos.writeBytes("Set-Cookie: sid=" + sessionId + "; Path=/; Max-Age=0\r\n");
     public void resetCookieAndRedirectPath(String redirectPath) throws IOException {
-        dos.writeBytes("HTTP/1.1 302 Found\r\n");
-        dos.writeBytes("Location: " + redirectPath + "\r\n");
-        dos.writeBytes("Set-Cookie: sid=; Path=/; Max-Age=0\r\n");
-        dos.writeBytes("\r\n");
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(),
+                "Location: " + redirectPath + "\r\nSet-Cookie: sid=; Path=/; Max-Age=0\r\n", null);
     }
 
     public void openPath(String url) throws IOException {
@@ -53,7 +48,7 @@ public class RequestResponse {
             }
 
             byte[] fileBody = FileHandler.readFileToByteArray(file);
-            String contentType = FileHandler.determineContentType(file.getName());
+            String contentType = ContentType.fromExtension(getFileExtension(file));
 
             response200Header(fileBody.length, contentType);
             responseBody(fileBody);
@@ -73,7 +68,7 @@ public class RequestResponse {
             content = content.replace("{{username}}", username);
             byte[] modifiedFileBody = content.getBytes();
 
-            String contentType = FileHandler.determineContentType(file.getName());
+            String contentType = ContentType.fromExtension(getFileExtension(file));
 
             response200Header(modifiedFileBody.length, contentType);
             responseBody(modifiedFileBody);
@@ -84,37 +79,24 @@ public class RequestResponse {
         Map<String, User> users = Database.findAll();
 
         StringBuilder userListHtml = new StringBuilder();
-        userListHtml.append("<html><head><title>User List</title></head><body>");
-        userListHtml.append("<h1>User List</h1>");
-        userListHtml.append("<ul>");
         for (Map.Entry<String, User> entry : users.entrySet()) {
             userListHtml.append("<li> ID: ").append(entry.getKey())
                     .append(" & Name: ").append(entry.getValue().getName())
                     .append("</li>");
         }
-        userListHtml.append("</ul>");
-        userListHtml.append("</body></html>");
-        byte[] fileBody = userListHtml.toString().getBytes("UTF-8");
+        String userListContent = HtmlTemplate.USER_LIST.getTemplate().replace("{{userList}}", userListHtml.toString());
+        byte[] fileBody = userListContent.getBytes("UTF-8");
 
-        response200Header(fileBody.length, "text/html");
+        response200Header(fileBody.length, ContentType.HTML.getMimeType());
         responseBody(fileBody);
     }
 
-
     private void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
-        dos.writeBytes("HTTP/1.1 200 OK\r\n");
-        dos.writeBytes("Content-Type: " + contentType + "\r\n");
-        dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-        dos.writeBytes("\r\n");
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, contentType, "Content-Length: " + lengthOfBodyContent + "\r\n", null);
     }
 
     public void response404Header() throws IOException {
-        dos.writeBytes("HTTP/1.1 404 Not Found\r\n");
-        dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-        dos.writeBytes("\r\n");
-        dos.writeBytes("<h1>404 Not Found</h1>");
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.NOT_FOUND, ContentType.HTML.getMimeType(), null, "<h1>404 Not Found</h1>".getBytes("UTF-8"));
     }
 
     private void responseBody(byte[] body) throws IOException {
@@ -126,22 +108,32 @@ public class RequestResponse {
 
     public void responseErrorPage(String html) throws IOException {
         byte[] responseBytes = html.getBytes("UTF-8");
-        dos.write(("HTTP/1.1 200 OK\r\n" +
-                "Content-Type: text/html; charset=UTF-8\r\n" +
-                "Content-Length: " + responseBytes.length + "\r\n" +
-                "\r\n").getBytes("UTF-8"));
-        dos.write(responseBytes);
-        dos.flush();
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, ContentType.HTML.getMimeType(), "Content-Length: " + responseBytes.length + "\r\n", responseBytes);
     }
 
     public void sendErrorPage(String errorMessage, String redirectUrl) throws IOException {
-        String errorPage = "<html><head><title>Error</title></head><body>" +
-                "<h1>Error</h1>" +
-                "<p>" + errorMessage + "</p>" +
-                "<script>alert('" + errorMessage + "');" +
-                "window.location.href = '" + redirectUrl + "';" +
-                "</script>" +
-                "</body></html>";
+        String errorPage = HtmlTemplate.ERROR_PAGE.getTemplate()
+                .replace("{{errorMessage}}", errorMessage)
+                .replace("{{redirectUrl}}", redirectUrl);
         responseErrorPage(errorPage);
+    }
+
+    private void sendResponse(HttpVersion version, HttpStatus status, String contentType, String headers, byte[] body) throws IOException {
+        dos.writeBytes(version.getVersion() + " " + status.toString() + "\r\n");
+        dos.writeBytes("Content-Type: " + contentType + "\r\n");
+        if (headers != null) {
+            dos.writeBytes(headers);
+        }
+        dos.writeBytes("\r\n");
+        if (body != null) {
+            dos.write(body);
+        }
+        dos.flush();
+    }
+
+    private String getFileExtension(File file) {
+        String name = file.getName();
+        int lastIndex = name.lastIndexOf('.');
+        return lastIndex == -1 ? "" : name.substring(lastIndex + 1);
     }
 }
