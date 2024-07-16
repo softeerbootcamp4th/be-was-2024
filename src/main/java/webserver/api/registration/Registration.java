@@ -1,8 +1,6 @@
 package webserver.api.registration;
 
-import db.Database;
-import model.User;
-import model.UserDAO;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;

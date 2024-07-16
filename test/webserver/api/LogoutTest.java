@@ -1,7 +1,7 @@
 package webserver.api;
 
 import db.Database;
-import model.User;
+import model.user.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.api.logout.LogoutHandler;

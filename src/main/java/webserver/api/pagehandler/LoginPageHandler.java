@@ -3,8 +3,7 @@ package webserver.api.pagehandler;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.response.HtmlFiles;
-import webserver.http.response.PageBuilder;
+import webserver.util.HtmlFiles;
 import webserver.session.Session;
 
 import java.io.IOException;

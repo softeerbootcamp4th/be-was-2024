@@ -1,5 +1,7 @@
 package model;
 
+import model.user.User;
+import model.user.UserDAO;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,15 +18,15 @@ class UserDAOTest {
     @Test
     void userCDTest(){
         //given
-        userDAO.insertUser("asdf","asdf","asdf","asdf");
+        userDAO.insertUser("asdfasdfasdf","asdf","asdf","asdf");
 
         //when
-        User user = userDAO.getUser("asdf");
+        User user = userDAO.getUser("asdfasdfasdf");
         //userDAO.getUserList();
 
         //then
-        userDAO.deleteUser("asdf");
-        assertEquals("asdf",user.getName());
+        userDAO.deleteUser("asdfasdfasdf");
+        assertEquals("asdfasdfasdf",user.getUserId());
     }
 
     @DisplayName("없는 유저 검색 테스트")

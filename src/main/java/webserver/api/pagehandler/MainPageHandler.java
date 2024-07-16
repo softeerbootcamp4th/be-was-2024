@@ -1,10 +1,10 @@
 package webserver.api.pagehandler;
 
-import model.User;
+import model.user.User;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.response.HtmlFiles;
+import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
 import webserver.session.Session;
 

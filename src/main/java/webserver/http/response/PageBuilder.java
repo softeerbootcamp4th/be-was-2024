@@ -1,13 +1,12 @@
 package webserver.http.response;
 
 import db.Database;
-import model.User;
+import model.user.User;
 import webserver.http.enums.StatusCode;
+import webserver.util.HtmlFiles;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 
 public class PageBuilder {
     public static byte[] buildUserList() throws IOException {

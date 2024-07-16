@@ -1,13 +1,12 @@
 package webserver.api.login;
 
-import db.Database;
-import model.User;
-import model.UserDAO;
+import model.user.User;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.Extension;
-import webserver.http.response.HtmlFiles;
+import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
 import webserver.session.Session;
 import webserver.util.ParamsParser;

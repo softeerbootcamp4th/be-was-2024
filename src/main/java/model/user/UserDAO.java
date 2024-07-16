@@ -1,4 +1,4 @@
-package model;
+package model.user;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,7 +16,7 @@ public class UserDAO {
     private final String MEMBER_LIST = "select * from usertable";
     private final String MEMBER_INSERT = "insert into usertable(USERID, USERNAME, EMAIL, PASSWORD) values(?, ?, ?, ?)"; //userid, username, email, password
     private String MEMBER_DELETE = "delete usertable where userid = ?";
-    private String MEMBER_FIND = "select * from usertable where userid = 'asdf'";
+    private String MEMBER_FIND = "select * from usertable where userid = ?";
 
     // 회원 삭제
     public void deleteUser(String userid) {
@@ -60,7 +60,7 @@ public class UserDAO {
             conn = JDBC.getConnection();
             stmt = conn.prepareStatement(MEMBER_FIND);
 
-            //stmt.setString(1, userid);
+            stmt.setString(1, userid);
             rs = stmt.executeQuery();
 
             if (rs.next()) {

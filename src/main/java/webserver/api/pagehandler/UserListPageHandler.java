@@ -1,7 +1,5 @@
 package webserver.api.pagehandler;
 
-import db.Database;
-import model.User;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
