@@ -55,14 +55,29 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        if (!isLogin(sid)) return serveStaticFile(FILE_INDEX);
-
-        String userId = getUser(sid);
-        User user = Database.findUserById(userId);
         Map<String, String> data = new HashMap<>();
-        data.put(USER_NAME, user.getName());
+        if (!isLogin(sid)) {
+            data.put(USER_NAME, "");
+            data.put("msg", "");
+            data.put("loginHref", "/login");
+            data.put("loginButton", "로그인");
+            data.put("registrationHref", "/registration");
+            data.put("registrationButton", "회원가입");
 
-        return serveDynamicFile(PATH_MAIN + FILE_INDEX, data);
+        } else {
+
+            String userId = getUser(sid);
+            User user = Database.findUserById(userId);
+            data.put(USER_NAME, user.getName());
+            data.put("msg", "님, 환영합니다.");
+            data.put("loginHref", "/article");
+            data.put("loginButton", "글쓰기");
+            data.put("registrationHref", "/logout");
+            data.put("registrationButton", "로그아웃");
+
+        }
+        return serveDynamicFile(FILE_INDEX, data);
+
     }
 
     public static HttpResponse logout(HttpRequest httpRequest) {

@@ -62,6 +62,7 @@ public class Constants {
 
 
     private static final Properties properties = new Properties();
+
     static {
         try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {

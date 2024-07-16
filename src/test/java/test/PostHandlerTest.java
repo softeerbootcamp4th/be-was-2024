@@ -65,7 +65,6 @@ public class PostHandlerTest {
 
         String userId = Session.getUser(sid);
         User user = Database.findUserById(userId);
-        ;
 
         assertEquals(user.getUserId(), "testId");
     }

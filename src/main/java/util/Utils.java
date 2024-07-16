@@ -19,6 +19,7 @@ public class Utils {
             this.body = body;
         }
     }
+    // 이너 클래스 -> 반환하니까 이너클래스랑 잘 안맞는다, 빼는게 더 나아보임
 
     public static ResponseWithStatus getFileContent(String path) throws IOException {
         try {

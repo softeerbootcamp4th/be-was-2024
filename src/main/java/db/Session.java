@@ -15,6 +15,7 @@ public class Session {
     public static String getUser(String sid){
         return sessionDatabase.get(sid);
     }
+    // 옵셔널 -> 가독성, 실수 줄이기, 체이닝 등 기능
 
     public static void deleteSession(String sid){
         sessionDatabase.remove(sid);
