@@ -73,5 +73,22 @@ class IndexPluginTest {
 
     }
 
+    @Test
+    @DisplayName("index.html 하단에 글쓰기 버튼을 추가한다")
+    public void testIndexWithLogin() throws IOException {
+
+        //given
+        Request request = new Request.Builder(HttpMethod.GET, "/index.html")
+                .build();
+
+        //when
+        Response response = indexPlugin.index(request);
+        String body = response.getBody();
+
+        //then
+        assertTrue(body.contains("글쓰기"));
+
+    }
+
 
 }

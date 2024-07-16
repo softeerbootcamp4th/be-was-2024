@@ -12,12 +12,18 @@
       <header class="header">
         <a href="/"><img src="./img/signiture.svg" /></a>
         <ul class="header__menu">
+          <li>
+            <form action="/post" method="get">
+              <button type="submit" class="btn btn_contained btn_size_s">글쓰기</button>
+            </form>
+          </li>
           <li class="header__menu__item">
             <p>{USERNAME}</p>
           </li>
           <li class="header__menu__item">
             {LOGINBTN}
           </li>
+
           <li class="header__menu__item">
             <a class="btn btn_ghost btn_size_s" href="/registration">
               회원 가입
