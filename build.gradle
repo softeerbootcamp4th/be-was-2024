@@ -27,7 +27,7 @@ test {
 sourceSets {
     main {
         resources {
-            srcDirs = ['src/main/resources/static']
+            srcDirs = ['src/main/resources']
         }
     }
 }

@@ -1,10 +1,12 @@
 package http.utils;
 
 import http.MyHttpResponse;
+import http.cookie.MyCookie;
+import http.cookie.MyCookies;
 import http.enums.HttpStatusType;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class HttpResponseMessageBuildUtil {
     public static byte[] build(MyHttpResponse response) {
@@ -31,6 +33,12 @@ public class HttpResponseMessageBuildUtil {
             builder.append(headerLine);
         }
 
+        // header - cookies
+        List<String> cookieInfos = getResponseCookieInfos(response.getCookies());
+        for(var cookieInfo: cookieInfos) {
+            builder.append("Set-Cookie: ").append(cookieInfo);
+        }
+
         // 빈 라인
         builder.append("\r\n");
 
@@ -45,5 +53,10 @@ public class HttpResponseMessageBuildUtil {
         System.arraycopy(response.getBody(), 0, httpResMessageBytes, startLineAndHeaderBytes.length, response.getBody().length);
 
         return httpResMessageBytes;
+    }
+
+    public static List<String> getResponseCookieInfos(MyCookies cookies) {
+        List<MyCookie> cookieList = cookies.getCookies();
+        return cookieList.stream().map(MyCookie::toString).toList();
     }
 }

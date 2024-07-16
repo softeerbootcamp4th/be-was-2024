@@ -9,6 +9,7 @@ import chain.core.ChainManager;
 import http.MyHttpHeaders;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
+import http.cookie.MyCookies;
 import http.enums.HttpMethodType;
 import http.utils.HttpMethodTypeUtil;
 import http.utils.HttpParseUtil;
@@ -73,6 +74,10 @@ public class RequestHandler implements Runnable {
         MyHttpHeaders headers = new MyHttpHeaders();
         headers.putHeaders(headerLines);
 
+        // 쿠키 파싱
+        String cookieLine = headers.getHeader("Cookie");
+        MyCookies cookies = HttpParseUtil.parseCookies(cookieLine);
+
         // body 읽기
         char[] charbody = new char[headers.getContentLength()];
         byte[] body = new byte[0];
@@ -82,7 +87,7 @@ public class RequestHandler implements Runnable {
             body = new String(charbody).getBytes(StandardCharsets.UTF_8);
         }
 
-        return new MyHttpRequest(method, url, version, headers, body);
+        return new MyHttpRequest(method, url, version, headers, cookies, body);
     }
 
     private void sendResponse(DataOutputStream dos, byte[] responseMessage) {

@@ -1,4 +1,4 @@
-package routehandler.route.auth;
+package route.routes.auth;
 
 import db.Database;
 import http.MyHttpRequest;
@@ -9,12 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import url.MyURL;
-import utils.FileReadUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-public class SignInHandler implements IRouteHandler {
+public class SignUpHandler implements IRouteHandler {
     private final static Logger logger = LoggerFactory.getLogger(SignUpHandler.class);
 
     @Override
@@ -24,20 +23,27 @@ public class SignInHandler implements IRouteHandler {
 
         var userId = formParams.get("userId");
         var password = formParams.get("password");
+        var name = formParams.get("name");
+        var email = formParams.get("email");
 
-        User user = Database.findUserById(userId);
-        // 유저가 없거나, 비밀번호가 일치하지 않는 경우
-        if(user == null || !user.getPassword().equals(password)) {
-            res.setStatusInfo(HttpStatusType.UNAUTHORIZED);
-            try {
-                byte[] html = FileReadUtil.read("/login/index.html");
-                res.setBody(html);
-            } catch(Exception e) {
-                res.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
-            }
+        if(!validateUser(userId, password, name, email)) {
+            res.setStatusInfo(HttpStatusType.BAD_REQUEST);
+            res.setBody("user info is not valid");
             return;
-        }
+        };
+
+        User user = new User(userId, password, name, email);
+        Database.addUser(user);
+        logger.debug("success to create user {}", user);
 
         res.redirect("/");
     }
+
+    private boolean validateUser(String userid, String password, String name, String email) {
+        return userid != null
+                && password != null
+                && name != null
+                && email != null;
+    }
+
 }

@@ -1,4 +1,4 @@
-package routehandler.route;
+package route.routes;
 
 import config.AppConfig;
 import http.MyHttpRequest;
@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
 import utils.FileExtensionUtil;
 import utils.FileReadUtil;
-import webserver.WebServer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,7 +44,7 @@ public class StaticResourceHandler implements IRouteHandler {
         // 본문 표현
         try {
             // 본문을 정상적으로 작성
-            byte[] data = FileReadUtil.read(filePath);
+            byte[] data = FileReadUtil.read(AppConfig.STATIC_BASE_PATH + filePath);
             res.setBody(data);
             res.setStatusInfo(HttpStatusType.OK);
         } catch (FileNotFoundException e) {

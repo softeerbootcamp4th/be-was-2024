@@ -4,7 +4,7 @@ import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
 import chain.core.MiddlewareChain;
-import routehandler.route.StaticResourceHandler;
+import route.routes.StaticResourceHandler;
 
 public class StaticResourceChain extends MiddlewareChain {
     private final StaticResourceHandler resourceHandler;

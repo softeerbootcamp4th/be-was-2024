@@ -12,7 +12,6 @@ public class RouteTrieNode {
     private RouteTrieNode pathVariableNode;
     private String pathVariableName;
 
-
     public Map<HttpMethodType, IRouteHandler> handlers;
 
     public RouteTrieNode() {
