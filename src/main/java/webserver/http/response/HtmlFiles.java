@@ -12,7 +12,8 @@ public enum HtmlFiles {
     LOGIN("/login/index"),
     REGISTER("/registration/index"),
     REGISTER_FAILED("/registration/registration_failed"),
-    USER_LIST("/user/userlist");
+    USER_LIST("/user/userlist"),
+    WRITE("/article/index");
 
     private static final String root= "./src/main/resources/static";
     private static final String html = ".html";
