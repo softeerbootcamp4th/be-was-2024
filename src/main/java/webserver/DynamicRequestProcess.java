@@ -88,4 +88,16 @@ public class DynamicRequestProcess {
         Session.removeSession(httpRequestMessage.getCookies().get("SID"));
         return new HttpResponseMessage("303",headers,null);
     }
+
+    public static HttpResponseMessage article(HttpRequestMessage httpRequestMessage) throws IOException {
+        if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
+        Map<String, String> cookies = httpRequestMessage.getCookies();
+        Map<String,String> headers = new HashMap<>();
+        String sid = cookies.get("SID");
+        if (sid == null || Database.findUserById(sid) == null) {
+            headers.put("Location","/login");
+            return new HttpResponseMessage("303",headers,null);
+        }
+        return UriMapper.staticRequestProcess("/src/main/resources/static/article/index.html");
+    }
 }

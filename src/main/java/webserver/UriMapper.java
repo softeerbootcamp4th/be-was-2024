@@ -16,7 +16,7 @@ public class UriMapper {
         String uri = httpRequestMessage.getUri();
         return switch (uri) {
                 case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
-                case "/article" -> staticRequestProcess("src/main/resources/static/article/index.html");
+                case "/article" -> DynamicRequestProcess.article(httpRequestMessage);
                 case "/user/list" -> DynamicRequestProcess.userList(httpRequestMessage);
                 case "/registration" -> staticRequestProcess("src/main/resources/static/registration/index.html");
                 case "/login" -> staticRequestProcess("src/main/resources/static/login/index.html");
