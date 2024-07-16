@@ -16,7 +16,7 @@ public class GetHandler {
     public static synchronized void handle(HttpRequest httpRequest, RequestResponse requestResponse) throws IOException {
         String url = httpRequest.getUrl();
         Map<String, String> headers = httpRequest.getHeaders();
-        String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("Cookie"));
+        String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
         switch (url) {
             case "/registration":
                 url = staticResourceDir + "/registration/index.html";

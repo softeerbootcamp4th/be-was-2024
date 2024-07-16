@@ -33,8 +33,8 @@ public class HttpRequestParser {
         }
 
         // Parse body if Content-Length header is present
-        if (headers.containsKey("Content-Length")) {
-            int contentLength = Integer.parseInt(headers.get("Content-Length"));
+        if (headers.containsKey("content-length")) {
+            int contentLength = Integer.parseInt(headers.get("content-length"));
             int bytesRead;
             while (contentLength > 0 && (bytesRead = inputStream.read(data, 0, Math.min(data.length, contentLength))) != -1) {
                 buffer.write(data, 0, bytesRead);
@@ -70,7 +70,7 @@ public class HttpRequestParser {
     private void parseHeaderLine(String headerLine) {
         int colonIndex = headerLine.indexOf(':');
         if (colonIndex != -1) {
-            String headerName = headerLine.substring(0, colonIndex).trim();
+            String headerName = headerLine.substring(0, colonIndex).trim().toLowerCase(); // Convert to lowercase
             String headerValue = headerLine.substring(colonIndex + 1).trim();
             headers.put(headerName, headerValue);
         }
