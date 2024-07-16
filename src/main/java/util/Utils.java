@@ -5,11 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.Properties;
 
 public class Utils {
     private static final Logger logger = LoggerFactory.getLogger(Utils.class);
-    private static String staticPath;
     private static final Properties properties = new Properties();
 
     static {
@@ -19,7 +19,7 @@ public class Utils {
             }
             properties.load(input);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         }
     }
 
@@ -39,15 +39,14 @@ public class Utils {
 
     public static ResponseWithStatus getFileContent(String path) throws IOException {
         try {
-            StringBuilder file = new StringBuilder();
-            BufferedReader br = new BufferedReader(new FileReader(path));
-            String fileLine = br.readLine();
-
-            while (fileLine != null) {
-                file.append(fileLine);
-                fileLine = br.readLine();
+            StringBuilder content = new StringBuilder();
+            File file = new File(path);
+            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                content.append(line).append("\n");
             }
-            return new ResponseWithStatus(HttpStatus.OK, file.toString().getBytes());
+            return new ResponseWithStatus(HttpStatus.OK, content.toString().getBytes());
         } catch (FileNotFoundException e) {
             String notFound = "<h1>Page Not Found</h1>";
             return new ResponseWithStatus(HttpStatus.NOT_FOUND, notFound.getBytes());
@@ -65,5 +64,20 @@ public class Utils {
             case "svg" -> "image/svg+xml";
             default -> "*/*"; // 이건 작동 안함 -> 406 에러 반환
         };
+    }
+
+    public static HashMap<String, String> cookieParsing(String cookies) {
+        HashMap<String, String> parsedCookies = new HashMap<>();
+        String[] splitCookies = cookies.split(";");
+        for (String cookie : splitCookies) {
+            cookie = cookie.strip();
+            String[] nameAndValue = cookie.split("=");
+
+            String name = nameAndValue[0];
+            String value = nameAndValue[1];
+
+            parsedCookies.put(name, value);
+        }
+        return parsedCookies;
     }
 }
