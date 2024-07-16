@@ -1,19 +1,18 @@
 package webserver;
 
-import ApiProcess.*;
+import apiprocess.*;
 
 import enums.HttpMethod;
+import model.ApiInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.ApiPair;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ApiProcessManager {
-    private static Logger logger = LoggerFactory.getLogger(ApiProcessManager.class);
-    private static Map<ApiPair, ApiProcess> apiProcessStore;
-
+    private List<ApiInfo> apiProcessStore;
     private static class LazyHolder {
         private static ApiProcessManager instance = new ApiProcessManager();
     }
@@ -23,27 +22,39 @@ public class ApiProcessManager {
     }
 
     private ApiProcessManager() {
-        // 로직 처리를 위한 구체 클래스를 설정한다. (RequestMapping에서 추상화 된 객체를 사용하기 위해 인터페이스 사용)
-       apiProcessStore = new ConcurrentHashMap<ApiPair, ApiProcess>(){{
-           put(ApiPair.of("/", HttpMethod.GET), new HomepageApiProcess());
-           put(ApiPair.of("/registration", HttpMethod.GET), new RegisterpageApiProcess());
-           put(ApiPair.of("/user/create", HttpMethod.POST), new RegisterApiProcess());
-           put(ApiPair.of("/user/login", HttpMethod.POST), new LoginApiProcess());
-           put(ApiPair.of("/login", HttpMethod.GET), new LoginPageApiProcess());
-           put(ApiPair.of("/user/logout", HttpMethod.POST), new LogoutApiProcess());
-           put(ApiPair.of("/user/list", HttpMethod.GET), new UserlistPageApiProcess());
-       }};
+        apiProcessStore = new ArrayList<>();
+        apiProcessStore.add(new ApiInfo("/", HttpMethod.GET, new HomepageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/registration", HttpMethod.GET, new RegisterpageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/create", HttpMethod.POST, new RegisterApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/login", HttpMethod.POST, new LoginApiProcess()));
+        apiProcessStore.add(new ApiInfo("/login", HttpMethod.GET, new LoginPageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/logout", HttpMethod.POST, new LogoutApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/list", HttpMethod.GET, new UserlistPageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/write", HttpMethod.GET, new WritePageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/write", HttpMethod.POST, new PostApiProcess()));
     }
 
-    public ApiProcess getApiProcess(String path, HttpMethod method) {
+    public ApiProcess get(String path, HttpMethod method) {
         int qmLoc = path.indexOf("/");
         String apiPath = path.substring(0, qmLoc);
         String lastPath = path.substring(qmLoc + 1);
 
         if(apiPath.isEmpty() && lastPath.contains(".")) {
-           return new StaticApiProcess();
+            return new StaticApiProcess();
         }
 
-        return apiProcessStore.getOrDefault(ApiPair.of(path, method), new NotFoundApiProcess());
+        boolean isApiPathExist = false;
+
+        for(ApiInfo apiInfo: apiProcessStore) {
+            if(apiInfo.isApiPathNotSame(path)) {
+                continue;
+            }
+            isApiPathExist = true;
+            if(apiInfo.isMethodSame(method)) {
+                return apiInfo.getApiProcess();
+            }
+        }
+
+        return isApiPathExist ? new MethodNotAllowedApiProcess() : new NotFoundApiProcess();
     }
 }
