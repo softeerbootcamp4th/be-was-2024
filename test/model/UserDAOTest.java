@@ -27,6 +27,19 @@ class UserDAOTest {
         assertEquals("asdf",user.getName());
     }
 
+    @DisplayName("없는 유저 검색 테스트")
+    @Test
+    void noUserTest(){
+        //given
+
+        //when
+        User user = userDAO.getUser("aasdfasdfdf");
+        //userDAO.getUserList();
+
+        //then
+        assertNull(user);
+    }
+
     @AfterEach
     void tearDown() {
     }

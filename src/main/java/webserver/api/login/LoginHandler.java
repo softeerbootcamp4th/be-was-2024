@@ -2,6 +2,7 @@ package webserver.api.login;
 
 import db.Database;
 import model.User;
+import model.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -31,10 +32,11 @@ public class LoginHandler implements FunctionHandler {
     public HttpResponse function(HttpRequest request) throws IOException {
         String body = new String(request.getBody(), StandardCharsets.UTF_8);
         Map<String, String> params = ParamsParser.parseParams(body);
+        UserDAO userDAO = new UserDAO();
 
         String id =params.get("id");
         String password = params.get("password");
-        User user = Database.findUserById(id);
+        User user = userDAO.getUser(id);
 
         // if user information is not valid
         if(id == null || id.isEmpty()
