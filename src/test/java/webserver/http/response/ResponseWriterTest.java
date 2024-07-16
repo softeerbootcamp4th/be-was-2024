@@ -29,4 +29,21 @@ class ResponseWriterTest {
 
     }
 
+    @Test
+    @DisplayName("405 응답에 대해 405 페이지로 이동하도록 구현한다.")
+    void test405() throws IOException {
+
+        //given
+        Response response = new Response.Builder(Status.METHOD_NOT_ALLOWED).build();
+        OutputStream outputStream = new ByteArrayOutputStream();
+        ResponseWriter responseWriter = new ResponseWriter(outputStream);
+
+        //when
+        responseWriter.write(response);
+
+        //then
+        assertTrue(outputStream.toString().contains("/error/405.html"));
+
+    }
+
 }

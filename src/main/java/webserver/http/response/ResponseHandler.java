@@ -24,28 +24,26 @@ public class ResponseHandler {
     }
 
     public Response response(Request request) throws IOException {
-        Response response = new Response.Builder(Status.NOT_FOUND).build();
-
         try {
+            if (pluginMapper.isExistOnlyPath(request.getMethod(), request.getPath())) return new Response.Builder(Status.METHOD_NOT_ALLOWED).build();
             if (pluginMapper.isExist(request.getMethod(), request.getPath())) {
                 Optional<Object> returnValue = runPlugin(request.getMethod(), request.getPath(), request);
                 if (returnValue.isPresent()) {
-                    if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
+                    if (returnValue.get() instanceof Response) return (Response) returnValue.get();
                 }
             } else {
-                response = new Response.Builder(Status.OK)
+                return new Response.Builder(Status.OK)
                         .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
                         .body(getFile(request.getPath()))
                         .build();
             }
         }catch (NotExistException e) {
-            response = new Response.Builder(Status.NOT_FOUND).build();
+            return new Response.Builder(Status.NOT_FOUND).build();
         }catch (Exception e){
-            response = new Response.Builder(Status.INTERNAL_SERVER_ERROR)
+            return new Response.Builder(Status.INTERNAL_SERVER_ERROR)
                     .build();
         }
-
-        return response;
+        return new Response.Builder(Status.OK).build();
     }
 
     public static String getContentType(String extension){

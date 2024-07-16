@@ -27,4 +27,14 @@ public class PluginMapper {
         return pathMap.containsKey(httpMethodAndPathToString(httpMethod, path));
     }
 
+    public boolean isExistOnlyPath(HttpMethod httpMethod, String path){
+        boolean isExist = isExist(httpMethod, path);
+        if(isExist) return false;
+        for(HttpMethod method :HttpMethod.values()){
+            if(isExist(method, path)) isExist = true;
+        }
+        if(isExist) return true;
+        return false;
+    }
+
 }

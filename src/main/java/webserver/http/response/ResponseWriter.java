@@ -16,6 +16,10 @@ public class ResponseWriter {
             response = new Response.Builder(Status.SEE_OTHER)
                     .redirect("/error/404.html")
                     .build();
+        }else if(response.getStatus().equals(Status.METHOD_NOT_ALLOWED)) {
+            response = new Response.Builder(Status.SEE_OTHER)
+                    .redirect("/error/405.html")
+                    .build();
         }
         outputStream.write(response.toByte());
     }
