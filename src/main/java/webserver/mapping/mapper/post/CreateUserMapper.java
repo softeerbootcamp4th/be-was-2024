@@ -28,7 +28,7 @@ public class CreateUserMapper implements HttpMapper {
         String email = body.get("email");
 
         if (userId == null || password == null || name == null || email == null) {
-            throw new InvalidSignUpParameterException("Invalid sign up parameter");
+            throw new InvalidSignUpParameterException("Invalid sign up parameter : userId, password, name, email required");
         }
 
         User newUser = new User(userId, password, name, email);
