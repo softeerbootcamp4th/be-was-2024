@@ -31,7 +31,7 @@ public class MyHttpRequest {
         this.url = url;
         this.version = version;
         this.headers = headers;
-        this.cookies = HttpParseUtil.parseCookies(headers.getHeader("Cookie"));
+        this.cookies = HttpParseUtil.parseCookies(headers.getHeader(HeaderConst.Cookie));
         this.body = body;
         this.store = new HashMap<>();
     }
@@ -54,7 +54,7 @@ public class MyHttpRequest {
 
         headers = new MyHttpHeaders();
         headers.putHeaders(headerLines);
-        this.cookies = HttpParseUtil.parseCookies(headers.getHeader("Cookie"));
+        this.cookies = HttpParseUtil.parseCookies(headers.getHeader(HeaderConst.Cookie));
         // body는 초기화하지 않은 상태로 취급. 나중에 설정해야 함.
         this.body = body;
         this.store = new HashMap<>();
@@ -67,7 +67,7 @@ public class MyHttpRequest {
         this.version = reqLineTokens[2];
 
         this.headers = headers;
-        this.cookies = HttpParseUtil.parseCookies(headers.getHeader("Cookie"));
+        this.cookies = HttpParseUtil.parseCookies(headers.getHeader(HeaderConst.Cookie));
         this.body = body;
         this.store = new HashMap<>();
     }

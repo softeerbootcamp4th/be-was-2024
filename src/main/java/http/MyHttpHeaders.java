@@ -82,7 +82,7 @@ public class MyHttpHeaders {
      * @return Content-Length의 값 ( int )
      */
     public int getContentLength() {
-        Integer value = getHeader("content-length", Integer::parseInt);
+        Integer value = getHeader(HeaderConst.ContentLength, Integer::parseInt);
         if(value == null) return 0;
         return value;
     }
