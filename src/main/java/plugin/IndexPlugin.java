@@ -24,9 +24,11 @@ public class IndexPlugin {
         if(request.isLogin()){
             replacedBody = body.replace("{USERNAME}", Session.get(request.getSessionId()).getName());
             replacedBody = replacedBody.replace("{LOGINBTN}", "<form action=\"/logout\" method=\"post\"><button type=\"submit\" class=\"btn btn_contained btn_size_s\">로그아웃</button></form>");
+            replacedBody = replacedBody.replace("{WRITE}", "/article/index.html");
         }else {
             replacedBody = body.replace("{USERNAME}", "");
-            replacedBody = replacedBody.replace("{LOGINBTN}", "<a class=\"btn btn_contained btn_size_s\" href=\"/login\">로그인</a>");
+            replacedBody = replacedBody.replace("{LOGINBTN}", "<form action=\"/login\" method=\"get\"><button type=\"submit\" class=\"btn btn_contained btn_size_s\">로그인</button></form>");
+            replacedBody = replacedBody.replace("{WRITE}", "/login");
         }
         return new Response.Builder(Status.OK)
                 .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")

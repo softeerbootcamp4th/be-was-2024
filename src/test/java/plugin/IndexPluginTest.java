@@ -23,11 +23,7 @@ class IndexPluginTest {
 
         //given
         User user = createTestUser();
-        String sessionId = Session.save(user);
-
-        Request request = new Request.Builder(HttpMethod.GET, "/index.html")
-                .addHeader("Cookie", "sid="+sessionId)
-                .build();
+        Request request = createLoginedRequest(user);
 
         //when
         Response response = indexPlugin.index(request);
@@ -41,13 +37,7 @@ class IndexPluginTest {
     @DisplayName("사용자가 로그인 상태일 경우 /index.html 에서 로그아웃 버튼을 표시해준다.")
     public void testIndexLogoutBtnWithLogin() throws IOException {
         //given
-        User user = createTestUser();
-        String sessionId = Session.save(user);
-
-        Request request = new Request.Builder(HttpMethod.GET, "/index.html")
-                .addHeader("Cookie", "sid="+sessionId)
-                .build();
-
+        Request request = createLoginedRequest(createTestUser());
         //when
         Response response = indexPlugin.index(request);
         String body = response.getBody();
@@ -90,5 +80,48 @@ class IndexPluginTest {
 
     }
 
+    @Test
+    @DisplayName("로그인한 사용자가 글쓰기 버튼을 클릭하면 /article/index.html 로 이동한다.")
+    public void testIndexWithWrite() throws IOException {
+
+        //given
+        Request request = createLoginedRequest(createTestUser());
+
+        //when
+        Response response = indexPlugin.index(request);
+        String body = response.getBody();
+
+        //then
+        assertTrue(body.contains("/article/index.html"));
+
+    }
+
+    @Test
+    @DisplayName("로그인하지 않은 사용자가 글쓰기 버튼을 클릭하면 로그인 페이지로 이동한다.")
+    public void testIndexWithLoginAndWrite() throws IOException {
+
+        //given
+        Request request = new Request.Builder(HttpMethod.GET, "/index.html")
+                .build();
+
+        //when
+        Response response = indexPlugin.index(request);
+
+        //then
+        assertTrue(response.getBody().contains("/login"));
+
+    }
+
+    private Request createLoginedRequest(User user){
+
+        String sessionId = Session.save(user);
+
+        Request request = new Request.Builder(HttpMethod.GET, "/index.html")
+                .addHeader("Cookie", "sid="+sessionId)
+                .build();
+
+        return request;
+
+    }
 
 }
