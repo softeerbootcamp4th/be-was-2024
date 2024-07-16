@@ -1,5 +1,7 @@
 package webserver.mapper;
 
+import db.BoardDatabase;
+import db.Session;
 import model.*;
 import webserver.HttpRequest;
 import webserver.RequestResponse;
@@ -15,6 +17,7 @@ public class PostHandler {
         String url = httpRequest.getUrl();
         byte[] body = httpRequest.getBody();
         Map<String, String> headers = httpRequest.getHeaders();
+        User user = null;
         try {
             switch (url) {
                 case "/user/create":
@@ -22,7 +25,7 @@ public class PostHandler {
                     requestResponse.redirectPath(redirectUrl);
                     break;
                 case "/login":
-                    User user = UserLogin.login(new String(body, "UTF-8"));
+                    user = UserLogin.login(new String(body, "UTF-8"));
                     if(user == null){
                         requestResponse.redirectPath(redirectUrl);
                         break;
@@ -36,6 +39,14 @@ public class PostHandler {
                     SessionIdControl.deleteSessionId(sessionId);
                     redirectUrl = "/index.html";
                     requestResponse.resetCookieAndRedirectPath(redirectUrl);
+                    break;
+                case "/board/create":
+                    sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
+                    user = Session.findUserBySessionId(sessionId);
+                    String content = new String(body, "UTF-8").split("=")[1];
+                    BoardDatabase.addBoard(new Board(user.getUserId(), content));
+                    redirectUrl = "/main/index.html";
+                    requestResponse.redirectPath(redirectUrl);
                     break;
                 default:
                     break;
