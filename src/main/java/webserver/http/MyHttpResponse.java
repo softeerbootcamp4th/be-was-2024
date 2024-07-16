@@ -1,5 +1,9 @@
 package webserver.http;
 
+import webserver.enums.ContentType;
+import webserver.enums.HttpStatus;
+
+import java.util.HashMap;
 import java.util.Map;
 
 public class MyHttpResponse {
@@ -7,9 +11,7 @@ public class MyHttpResponse {
      * Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
      */
     private final String version = "HTTP/1.1";
-    private int statusCode;
-    private String statusMessage;
-
+    private HttpStatus httpStatus;
     /**
      * Headers
      * <p>
@@ -26,23 +28,26 @@ public class MyHttpResponse {
     public MyHttpResponse() {
     }
 
-    public MyHttpResponse(int statusCode, String statusMessage, Map<String, String> headers, byte[] body) {
-        this.statusCode = statusCode;
-        this.statusMessage = statusMessage;
+    public MyHttpResponse(HttpStatus httpStatus, Map<String, String> headers, byte[] body) {
+        this.httpStatus = httpStatus;
         this.headers = headers;
         this.body = body;
+    }
+
+    public MyHttpResponse(HttpStatus httpStatus, Map<String, String> headers) {
+        this(httpStatus, headers, new byte[0]);
+    }
+
+    public MyHttpResponse(HttpStatus httpStatus) {
+        this(httpStatus, new HashMap<>(), new byte[0]);
     }
 
     public String getVersion() {
         return version;
     }
 
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getStatusMessage() {
-        return statusMessage;
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
     }
 
     public Map<String, String> getHeaders() {
@@ -53,26 +58,23 @@ public class MyHttpResponse {
         return body;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public void setStatusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
-    }
-
-    public void setHeaders(Map<String, String> headers) {
-        this.headers = headers;
-    }
-
     public void setBody(byte[] body) {
+        this.headers.put("Content-Length", String.valueOf(body.length));
         this.body = body;
+    }
+
+    public void addContentType(String contentType) {
+        int extensionIndex = contentType.lastIndexOf(".");
+
+        if (extensionIndex != -1) {
+            String extension = contentType.substring(extensionIndex + 1);
+            headers.put("Content-Type", ContentType.valueOf(extension).getContentType());
+        }
     }
 
     @Override
     public String toString() {
-        return "{ statusCode=" + statusCode +
-                ", statusMessage='" + statusMessage + '\'' +
+        return "{ httpStatus + " + httpStatus +
                 ", headers=" + headers +
                 ", body=" + body +
                 " }";

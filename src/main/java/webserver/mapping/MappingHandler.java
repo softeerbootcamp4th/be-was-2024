@@ -1,8 +1,18 @@
 package webserver.mapping;
 
+import webserver.annotation.LoginCheck;
+import webserver.annotation.processor.LoginCheckProcessor;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
-import webserver.mapping.mapper.*;
+import webserver.mapping.mapper.HttpMapper;
+import webserver.mapping.mapper.NotFoundMapper;
+import webserver.mapping.mapper.get.HomeMapper;
+import webserver.mapping.mapper.get.LoginFormMapper;
+import webserver.mapping.mapper.get.RegistrationFormMapper;
+import webserver.mapping.mapper.get.UserListMapper;
+import webserver.mapping.mapper.post.CreateUserMapper;
+import webserver.mapping.mapper.post.LoginUserMapper;
+import webserver.mapping.mapper.post.LogoutUserMapper;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,23 +32,34 @@ public class MappingHandler {
     }
 
     static {
-        getHandlers.put("/", new GETHomeMapper());
-        getHandlers.put("/registration", new GETRegistrationFormMapper());
-        getHandlers.put("/login", new GETLoginFormMapper());
-//        getHandlers.put("/user/create", new GETCreateUserMapper());
+        getHandlers.put("/", new HomeMapper());
+        getHandlers.put("/registration", new RegistrationFormMapper());
+        getHandlers.put("/login", new LoginFormMapper());
+        getHandlers.put("/user/list", new UserListMapper());
 
-        postHandlers.put("/user/create", new POSTCreateUserMapper());
-        postHandlers.put("/user/login", new POSTLoginUserMapper());
+        postHandlers.put("/user/create", new CreateUserMapper());
+        postHandlers.put("/user/login", new LoginUserMapper());
+        postHandlers.put("/user/logout", new LogoutUserMapper());
     }
 
     public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
         String method = httpRequest.getMethod();
         String path = httpRequest.getPath();
 
-        return switch (method) {
-            case "GET" -> getHandlers.get(path).handle(httpRequest);
-            case "POST" -> postHandlers.get(path).handle(httpRequest);
-            default -> null;
+        HttpMapper mapper = switch (method) {
+            case "GET" -> getHandlers.get(path) == null ? new NotFoundMapper() : getHandlers.get(path);
+            case "POST" -> postHandlers.get(path) == null ? new NotFoundMapper() : postHandlers.get(path);
+            default -> new NotFoundMapper();
         };
+
+        // 어노테이션 확인 및 처리
+        if (mapper.getClass().isAnnotationPresent(LoginCheck.class)) {
+            LoginCheckProcessor loginCheckProcessor = new LoginCheckProcessor();
+            if (!loginCheckProcessor.isUserLoggedIn(httpRequest)) {
+                return loginCheckProcessor.toLoginPage();
+            }
+        }
+
+        return mapper.handle(httpRequest);
     }
 }

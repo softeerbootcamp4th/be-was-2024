@@ -1,4 +1,4 @@
-package webserver;
+package webserver.util;
 
 import webserver.http.MyHttpResponse;
 
@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
 public class FileContentReader {
     private static final FileContentReader instance = new FileContentReader();
@@ -32,7 +31,7 @@ public class FileContentReader {
         return resourcePath != null && !Files.isDirectory(Paths.get(resourcePath.getPath()));
     }
 
-    public MyHttpResponse readStaticResource(String uri) throws IOException {
+    public MyHttpResponse readStaticResource(String uri, MyHttpResponse response) throws IOException {
         String resourcePath = STATIC_RESOURCE + uri;
 
         try (InputStream inputStream = classLoader.getResourceAsStream(resourcePath);
@@ -45,17 +44,9 @@ public class FileContentReader {
                 outputStream.write(byteArray, 0, bytesRead);
             }
 
-            byte[] combinedByteArray = outputStream.toByteArray();
-
-            String extension = uri.substring(uri.lastIndexOf(".") + 1);
-            String contentType = ContentType.valueOf(extension).getContentType();
-
-            return new MyHttpResponse(200, "OK", new HashMap<>() {
-                {
-                    put(CONTENT_TYPE, contentType);
-                    put(CONTENT_LENGTH, String.valueOf(combinedByteArray.length));
-                }
-            }, combinedByteArray);
+            response.setBody(outputStream.toByteArray());
+            response.addContentType(uri);
+            return response;
 
         }
     }

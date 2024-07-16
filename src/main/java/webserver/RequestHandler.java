@@ -6,9 +6,9 @@ import webserver.http.HttpRequestParser;
 import webserver.http.HttpResponseParser;
 import webserver.http.MyHttpRequest;
 import webserver.mapping.MappingHandler;
+import webserver.util.FileContentReader;
 
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -20,7 +20,7 @@ public class RequestHandler implements Runnable {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
     private final MappingHandler mappingHandler = MappingHandler.getInstance();
     private final HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
-    
+
     private final HttpResponseParser httpResponseParser = new HttpResponseParser(fileContentReader, mappingHandler);
 
     public RequestHandler(Socket connectionSocket) {
@@ -39,7 +39,7 @@ public class RequestHandler implements Runnable {
             DataOutputStream dos = new DataOutputStream(out);
             httpResponseParser.parseResponse(dos, httpRequest);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
     }

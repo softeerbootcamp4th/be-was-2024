@@ -1,17 +1,19 @@
 package webserver.mapping.mapper;
 
-import webserver.FileContentReader;
+import webserver.enums.HttpStatus;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.util.FileContentReader;
 
 import java.io.IOException;
 
-public class GETRegistrationFormMapper implements HttpMapper {
+public class NotFoundMapper implements HttpMapper {
     private final FileContentReader fileContentReader = FileContentReader.getInstance();
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
-        MyHttpResponse response = fileContentReader.readStaticResource(httpRequest.getPath() + "/index.html");
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.NOT_FOUND);
+        fileContentReader.readStaticResource("/404.html", response);
         return response;
     }
 }

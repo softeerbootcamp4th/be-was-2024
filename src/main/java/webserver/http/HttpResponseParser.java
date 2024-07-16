@@ -2,8 +2,9 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.FileContentReader;
+import webserver.enums.HttpStatus;
 import webserver.mapping.MappingHandler;
+import webserver.util.FileContentReader;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,8 +24,11 @@ public class HttpResponseParser {
     public void parseResponse(DataOutputStream dos, MyHttpRequest httpRequest) throws IOException {
         MyHttpResponse httpResponse;
 
+
         if (fileContentReader.isStaticResource(httpRequest.getPath())) {
-            httpResponse = fileContentReader.readStaticResource(httpRequest.getPath());
+            httpResponse = new MyHttpResponse(HttpStatus.OK);
+
+            fileContentReader.readStaticResource(httpRequest.getPath(), httpResponse);
         } else {
             httpResponse = mappingHandler.mapping(httpRequest);
         }
@@ -34,7 +38,7 @@ public class HttpResponseParser {
 
     public void sendResponse(DataOutputStream dos, MyHttpResponse httpResponse) {
         try {
-            dos.writeBytes(httpResponse.getVersion() + " " + httpResponse.getStatusCode() + " " + httpResponse.getStatusMessage() + " \r\n");
+            dos.writeBytes(httpResponse.getVersion() + " " + httpResponse.getHttpStatus().value() + " " + httpResponse.getHttpStatus().getReasonPhrase() + " \r\n");
             for (String key : httpResponse.getHeaders().keySet()) {
                 dos.writeBytes(key + ": " + httpResponse.getHeaders().get(key) + "\r\n");
             }
