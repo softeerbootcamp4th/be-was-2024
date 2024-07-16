@@ -19,7 +19,6 @@ class ResponseTest {
             //given
             Response response1 = new Response.Builder(Status.OK)
                     .addHeader("Content-Type", "text/html; charset=UTF-8")
-                    .addHeader("Connection", "keep-alive")
                     .body(("<!DOCTYPE html>\r\n" +
                             "<html>\r\n" +
                             "<head>\r\n" +
@@ -34,7 +33,6 @@ class ResponseTest {
 
             Response response2 = new Response.Builder(Status.OK)
                     .addHeader("Content-Type", "text/html; charset=UTF-8")
-                    .addHeader("Connection", "keep-alive")
                     .body(("<!DOCTYPE html>\r\n" +
                             "<html>\r\n" +
                             "<head>\r\n" +

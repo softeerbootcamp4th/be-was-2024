@@ -1,8 +1,6 @@
 package webserver.http.request;
 
-import java.net.http.HttpResponse;
-
-public enum Method {
+public enum HttpMethod {
 
     GET("GET"),
     POST("POST"),
@@ -16,7 +14,7 @@ public enum Method {
 
     private final String methodName;
 
-    Method(String methodName){
+    HttpMethod(String methodName){
         this.methodName = methodName;
     }
 
@@ -24,10 +22,10 @@ public enum Method {
         return methodName;
     }
 
-    public static Method fromMethodName(String methodName) {
-        for (Method method : Method.values()) {
-            if (method.getMethodName().equalsIgnoreCase(methodName)) {
-                return method;
+    public static HttpMethod fromMethodName(String methodName) {
+        for (HttpMethod httpMethod : HttpMethod.values()) {
+            if (httpMethod.getMethodName().equalsIgnoreCase(methodName)) {
+                return httpMethod;
             }
         }
 

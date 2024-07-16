@@ -7,16 +7,20 @@ import java.io.*;
 
 public class RequestReader {
 
-    private static final String CRLF = "\r\n";
-    private static final byte[] END_HEADER = {'\r', '\n', '\r', '\n'};
-    private static final int MAX_REQUEST_LENGTH = 3000;
+    private final String CRLF = "\r\n";
+    private final byte[] END_HEADER = {'\r', '\n', '\r', '\n'};
+    private final int MAX_REQUEST_LENGTH = 3000;
+    private final InputStream inputStream;
+    private final Logger logger = LoggerFactory.getLogger(RequestReader.class);
 
-    public static final Logger logger = LoggerFactory.getLogger(RequestReader.class);
+    public RequestReader(InputStream inputStream){
+        this.inputStream = inputStream;
+    }
 
-    public static Request readRequest(InputStream in) throws IOException {
+    public Request readRequest() throws IOException {
 
         byte[] bytes = new byte[MAX_REQUEST_LENGTH];
-        int length = readRequestHeader(in, bytes);
+        int length = readRequestHeader(inputStream, bytes);
         String request = new String(bytes).substring(0, length);
 
         Request httpRequest = Request.parseRequestWithoutBody(request);
@@ -29,7 +33,7 @@ public class RequestReader {
         if(contentLengthString!=null){
             int contentLength = Integer.parseInt(contentLengthString);
             byte[] buf = new byte[contentLength];
-            readRequestBody(in, buf, contentLength);
+            readRequestBody(inputStream, buf, contentLength);
             requestBuilder.body(buf);
             StringBuilder sb = new StringBuilder(request);
             sb.append(new String(buf));
@@ -41,7 +45,7 @@ public class RequestReader {
         return requestBuilder.build();
     }
 
-    private static int readRequestHeader(InputStream bufferedInputStream, byte[] buf) throws IOException {
+    private int readRequestHeader(InputStream bufferedInputStream, byte[] buf) throws IOException {
         int count=0;
         int length=0;
         for(int i=0; count<END_HEADER.length&&i<buf.length; i++){
@@ -53,7 +57,7 @@ public class RequestReader {
         return length;
     }
 
-    private static void readRequestBody(InputStream bufferedInputStream, byte[] buf, int contentLength) throws IOException {
+    private void readRequestBody(InputStream bufferedInputStream, byte[] buf, int contentLength) throws IOException {
         bufferedInputStream.read(buf, 0, contentLength);
     }
 
