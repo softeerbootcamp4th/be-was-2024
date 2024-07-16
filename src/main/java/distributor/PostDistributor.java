@@ -18,7 +18,7 @@ public class PostDistributor extends Distributor {
     }
 
     @Override
-    public void process() throws IOException {
+    public void process() {
         processQuery();
     }
 

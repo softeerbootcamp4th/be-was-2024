@@ -16,7 +16,7 @@ public class GetDistributor extends Distributor {
     }
 
     @Override
-    public void process() throws IOException {
+    public void process() {
         if (request.isQueryString()) {
             processQuery();
         } else {
@@ -24,7 +24,7 @@ public class GetDistributor extends Distributor {
         }
     }
 
-    private void processQuery() throws IOException {
+    private void processQuery() {
         String path = request.getPath();
         if (path.equals("/user/create")) {
             ResponseProcessor responseProcessor = new ResponseProcessor();
@@ -32,7 +32,7 @@ public class GetDistributor extends Distributor {
         }
     }
 
-    private void processNonQuery() throws IOException {
+    private void processNonQuery() {
         String path = request.getPath();
         if (path.equals("/logout")) {
             processLogout();
@@ -43,13 +43,13 @@ public class GetDistributor extends Distributor {
         }
     }
 
-    private void processDefault(String path) throws IOException {
+    private void processDefault(String path) {
         System.out.println("default process");
         ResponseProcessor responseProcessor = new ResponseProcessor();
         this.viewData = responseProcessor.defaultResponse(path);
     }
 
-    private void processLogout() throws IOException {
+    private void processLogout() {
         // 세션 삭제
         String userId = request.getSessionId();
         SessionHandler.deleteSession(userId);
@@ -58,7 +58,7 @@ public class GetDistributor extends Distributor {
         this.viewData = responseProcessor.logoutResponse();
     }
 
-    private void processLogin(String path) throws IOException {
+    private void processLogin(String path) {
         String sessionId = request.getSessionId();
 
         // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
