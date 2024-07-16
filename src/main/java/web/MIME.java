@@ -1,6 +1,6 @@
 package web;
 
-public enum ContentType {
+public enum MIME {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
     JS("js", "application/javascript"),
@@ -8,12 +8,14 @@ public enum ContentType {
     PNG("png", "image/png"),
     JPG("jpg", "image/jpeg"),
     SVG("svg", "image/svg+xml"),
+    JSON("json", "application/json"),
+    FORM("form", "application/x-www-form-urlencoded"),
     UNKNOWN("default", "*/*");
 
     private final String key;
     private final String type;
 
-    ContentType(String key, String type) {
+    MIME(String key, String type) {
         this.key = key;
         this.type = type;
     }
@@ -26,12 +28,12 @@ public enum ContentType {
         return type;
     }
 
-    public static ContentType findByKey(String key) {
-        for (ContentType contentType : ContentType.values()) {
-            if (contentType.key.equals(key)) {
-                return contentType;
+    public static MIME findByKey(String key) {
+        for (MIME mime : MIME.values()) {
+            if (mime.key.equals(key)) {
+                return mime;
             }
         }
-        return ContentType.UNKNOWN;
+        return MIME.UNKNOWN;
     }
 }

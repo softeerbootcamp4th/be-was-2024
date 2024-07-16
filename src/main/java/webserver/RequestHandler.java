@@ -1,10 +1,12 @@
 package webserver;
 
-import file.ViewFile;
-import web.HttpRequest;
+import common.ResponseUtils;
 import common.WebUtils;
+import exception.SizeNotMatchException;
+import file.ViewFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HttpRequest;
 import web.HttpResponse;
 import web.ResponseCode;
 
@@ -13,7 +15,9 @@ import java.net.Socket;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    private final String dirPath = "./src/main/resources/static";
+    private final String STATIC_DIR_PATH = "./src/main/resources/static";
+    private final String DYNAMIC_DIR_PATH = "./src/main/resources/template";
+    private final int BUFFER_SIZE = 4096;
 
     private Socket connection;
 
@@ -38,18 +42,14 @@ public class RequestHandler implements Runnable {
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
-            StringBuilder requestString = readHttpRequest(in);
-
             // 요청 헤더를 파싱하여 Request객체 생성
-            HttpRequest httpRequest = WebAdapter.parseRequest(requestString.toString());
+            HttpRequest httpRequest = parseHttpRequest(in);
             // Request객체의 정보를 바탕으로 적절한 응답 뷰 파일 탐색
-            ViewFile viewFile = ViewResolver.getProperFileFromPath(httpRequest.getPath(), out);
+            ViewFile viewFile = ViewResolver.getProperFileFromRequest(httpRequest, out);
             // 뷰 파일에 맞게 적절한 Response객체 생성
-            HttpResponse httpResponse = WebAdapter.createResponse(ResponseCode.SUCCESS, WebUtils.getProperContentType(viewFile.getExtension()));
+            HttpResponse httpResponse = ResponseUtils.createResponse(ResponseCode.OK, WebUtils.getProperContentType(viewFile.getExtension()));
             // Stream을 이용하여 HTTP 응답
-            readAndResponseFromPath(out, dirPath+ viewFile.getPath(), httpResponse.getContentType());
-
-            logger.debug("{}", requestString);
+            readAndResponseFromPath(out, STATIC_DIR_PATH+viewFile.getPath(), httpResponse.getContentType());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,20 +58,65 @@ public class RequestHandler implements Runnable {
                 connection.close();
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                e.printStackTrace();
             }
         }
     }
 
-    private StringBuilder readHttpRequest(InputStream in) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        String str;
+    /**
+     * InputStream에서 Request를 String형태로 읽어온 후, HttpRequest를 만들어 반환한다.
+     * body는 byte[]형태로 받아온다.
+     */
+    private HttpRequest parseHttpRequest(InputStream in) throws IOException {
+        int ch;
         StringBuilder sb = new StringBuilder();
+        int contentLength = 0;
+        byte[] body = null;
 
-        while(!(str = br.readLine()).isEmpty()) {
-            sb.append(str).append("\n");
+        // Request Line부터 Body 전까지 읽는다
+        // Request Line과 Body 사이에는 '\r\n'이 두번 오게 된다.
+        boolean lastWasCR = false;
+        boolean lastWasLF = false;
+        while((ch = in.read())!=-1) {
+            sb.append((char) ch);
+
+            if(ch=='\r') {
+                lastWasCR = true;
+            } else if (ch=='\n') {
+                if(lastWasCR && lastWasLF) {
+                    break;
+                }
+                lastWasLF = true;
+            } else {
+                lastWasCR = false;
+                lastWasLF = false;
+            }
         }
 
-        return sb;
+        // Content-Length 헤더 찾기
+        String header = sb.toString();
+        String[] headerLines = header.split("\r\n");
+        for (String line : headerLines) {
+            if (line.startsWith("Content-Length")) {
+                contentLength = Integer.parseInt(line.split(":")[1].trim());
+                break;
+            }
+        }
+
+        // Content-Length가 0보다 크다면 body를 읽는다.
+        if(contentLength>0) {
+            body = new byte[contentLength];
+            int readSize = in.read(body, 0, contentLength);
+            if(readSize!=contentLength) {
+                throw new SizeNotMatchException("Content-Length 크기와 읽은 body 사이즈가 다릅니다");
+            }
+            sb.append(new String(body));
+            sb.append("\n");
+        }
+
+        logger.debug("{}", sb);
+
+        return WebAdapter.parseRequest(sb.toString(), body);
     }
 
     /**
@@ -84,32 +129,22 @@ public class RequestHandler implements Runnable {
 
         try(FileInputStream fis = new FileInputStream(file)) {
             fis.read(body);
-            responseHeader(ResponseCode.SUCCESS, dos, body.length, contentType);
-            responseBody(dos, body);
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.OK)
+                    .contentType(contentType)
+                    .contentLength(body.length)
+                    .body(body)
+                    .build();
+            response.writeInBytes(dos);
         } catch (Exception e) {
-            responseHeader(ResponseCode.INTERNAL_SERVER_ERROR, dos, body.length, contentType);
-            responseBody(dos, body);
+            HttpResponse response = new HttpResponse.HttpResponseBuilder()
+                    .code(ResponseCode.INTERNAL_SERVER_ERROR)
+                    .contentType(contentType)
+                    .contentLength(body.length)
+                    .body(body)
+                    .build();
+            response.writeInBytes(dos);
             e.printStackTrace();
-        }
-    }
-
-    private void responseHeader(ResponseCode code, DataOutputStream dos, int lengthOfBodyContent, String contentType) {
-        try {
-            dos.writeBytes("HTTP/1.1 "+code.getCode()+" OK \r\n");
-            dos.writeBytes("Content-Type: "+contentType+";charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
-            dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
         }
     }
 }

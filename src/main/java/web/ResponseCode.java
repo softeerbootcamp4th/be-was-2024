@@ -2,7 +2,10 @@ package web;
 
 public enum ResponseCode {
     // 2xx
-    SUCCESS("200", "Success"),
+    OK("200", "OK"),
+
+    // 3xx
+    FOUND("302", "Found"),
 
     // 4xx
     BAD_REQUEST("400", "Bad Request"),

@@ -3,17 +3,19 @@ package webserver;
 import common.FileUtils;
 import common.WebUtils;
 import file.ViewFile;
+import web.HttpRequest;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 public class ViewResolver {
 
-    public static ViewFile getProperFileFromPath(String path, OutputStream out) throws IOException {
-        String filePath = path, extension;
+    public static ViewFile getProperFileFromRequest(HttpRequest request, OutputStream out) throws IOException {
+        String filePath = request.getPath(), extension;
 
-        if(WebUtils.isRESTRequest(path)) {
-            filePath = WebAdapter.resolveRequestUri(path, out);
+        // REST 요청일 경우에는 filePath를 구해야 함
+        if(WebUtils.isRESTRequest(filePath)) {
+            filePath = WebAdapter.resolveRequestUri(request, out);
         }
         extension = FileUtils.getExtensionFromPath(filePath);
 

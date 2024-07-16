@@ -1,7 +1,7 @@
 package common;
 
-import web.ContentType;
 import web.HttpMethod;
+import web.MIME;
 
 /**
  * Web 요청을 처리할 때 공통으로 사용할 로직을 정리한 유틸리티 클래스
@@ -17,24 +17,8 @@ public class WebUtils {
         }
     }
 
-    public static boolean isGetRequest(String method) {
-        try {
-            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.GET);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
-    public static boolean isPostRequest(String method) {
-        try {
-            return HttpMethod.valueOf(method.toUpperCase()).equals(HttpMethod.POST);
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
-
     public static String getProperContentType(String extension) {
-        return ContentType.findByKey(extension).getType();
+        return MIME.findByKey(extension).getType();
     }
 
     /**

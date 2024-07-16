@@ -33,7 +33,7 @@ public class WebServer {
             // 클라이언트가 연결될 때까지 대기한다.
             Socket connection;
             RequestHandler requestHandler = RequestHandler.getInstance();
-            while ((connection = listenSocket.accept()) != null) {
+            while((connection = listenSocket.accept()) != null) {
                 executeRequestHandlerThread(threadPool, connection, requestHandler);
             }
         } catch (IOException e) {
@@ -50,7 +50,6 @@ public class WebServer {
 
     // execute하기 전에 다른 스레드가 다른 connection을 주입하는 것을 방지하기 위해 동기화
     private static synchronized void setConnAndExecute(ExecutorService threadPool, Socket connection, RequestHandler handler) {
-        logger.debug("connection = " + connection);
         handler.setConnection(connection);
 
         Future<?> future = threadPool.submit(handler);
