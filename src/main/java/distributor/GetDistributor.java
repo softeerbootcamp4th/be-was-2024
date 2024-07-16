@@ -42,9 +42,8 @@ public class GetDistributor extends Distributor {
     }
 
     private void processDefault(String path) {
-        System.out.println("default process");
         ResponseProcessor responseProcessor = new ResponseProcessor();
-        this.viewData = responseProcessor.defaultResponse(path);
+        this.viewData = responseProcessor.defaultResponse(path, request.getSessionId());
     }
 
     private void processLogout() {
@@ -59,14 +58,20 @@ public class GetDistributor extends Distributor {
     private void processLogin(String path) {
         String sessionId = request.getSessionId();
 
-        // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
-        if (SessionHandler.verifySessionId(sessionId)) {
-            ResponseProcessor responseProcessor = new ResponseProcessor();
-            this.viewData = responseProcessor.loginSuccessWithSessionId();
+        if (sessionId != null) {
+            // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
+            if (SessionHandler.verifySessionId(sessionId)) {
+                ResponseProcessor responseProcessor = new ResponseProcessor();
+                this.viewData = responseProcessor.loginSuccessWithSessionId(sessionId);
+            } else {
+                // 세션아이디가 존재하지 않는다면 그대로
+                ResponseProcessor responseProcessor = new ResponseProcessor();
+                this.viewData = responseProcessor.loginResponse(path, sessionId);
+            }
         } else {
             // 세션아이디가 존재하지 않는다면 그대로
             ResponseProcessor responseProcessor = new ResponseProcessor();
-            this.viewData = responseProcessor.loginResponse(path);
+            this.viewData = responseProcessor.loginResponse(path, sessionId);
         }
     }
 
