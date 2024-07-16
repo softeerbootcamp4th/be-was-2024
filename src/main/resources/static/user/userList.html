@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="../reset.css" rel="stylesheet"/>
+    <link href="../global.css" rel="stylesheet"/>
+    <link href="../main.css" rel="stylesheet"/>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="../img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <div class="btn btn_ghost btn_size_s">
+                    {{userName}}님 반갑습니다.
+                </div>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/logout">
+                    로그아웃
+                </a>
+            </li>
+        </ul>
+    </header>
+    <div class="wrapper">
+        <table>
+            <tr>
+                <th>User Id</th>
+                <th>User Name</th>
+                <th>User Email</th>
+            </tr>
+            {{userList}}
+        </table>
+    </div>
+</div>
+</body>
+</html>

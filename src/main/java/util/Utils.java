@@ -1,32 +1,15 @@
 package util;
 
 import http.HttpStatus;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.HashMap;
-import java.util.Properties;
+
+import static util.Constants.REG_EQ;
+import static util.Constants.REG_SMCLN;
+import static util.TemplateEngine.getNotFoundPage;
 
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
-    private static final Properties properties = new Properties();
-
-    static {
-        try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) {
-                logger.error("Unable to find config.properties");
-            }
-            properties.load(input);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    public static String getStaticPath() {
-        return properties.getProperty("staticPath");
-    }
-
     public static class ResponseWithStatus {
         public HttpStatus status;
         public byte[] body;
@@ -48,8 +31,7 @@ public class Utils {
             }
             return new ResponseWithStatus(HttpStatus.OK, content.toString().getBytes());
         } catch (FileNotFoundException e) {
-            String notFound = "<h1>Page Not Found</h1>";
-            return new ResponseWithStatus(HttpStatus.NOT_FOUND, notFound.getBytes());
+            return new ResponseWithStatus(HttpStatus.NOT_FOUND, getNotFoundPage());
         }
     }
 
@@ -68,16 +50,20 @@ public class Utils {
 
     public static HashMap<String, String> cookieParsing(String cookies) {
         HashMap<String, String> parsedCookies = new HashMap<>();
-        String[] splitCookies = cookies.split(";");
+
+        if(cookies == null) return parsedCookies;
+        String[] splitCookies = cookies.split(REG_SMCLN);
         for (String cookie : splitCookies) {
             cookie = cookie.strip();
-            String[] nameAndValue = cookie.split("=");
+            String[] nameAndValue = cookie.split(REG_EQ);
 
             String name = nameAndValue[0];
             String value = nameAndValue[1];
 
             parsedCookies.put(name, value);
         }
+
         return parsedCookies;
     }
+
 }

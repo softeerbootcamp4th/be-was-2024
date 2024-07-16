@@ -41,18 +41,4 @@ public class HttpRequest {
         return body;
     }
 
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append(httpMethod).append(" ").append(requestUrl).append(" ").append(version).append("\n");
-        for (String s : headers.keySet()) {
-            sb.append(s).append(": ").append(headers.get(s)).append("\n");
-        }
-        if (body != null) {
-            sb.append("body : ");
-            for (byte b : body) {
-                sb.append((char) b);
-            }
-        }
-        return sb.toString();
-    }
 }

@@ -9,6 +9,7 @@ import java.io.IOException;
 import static handler.GetHandler.*;
 import static handler.PostHandler.createUser;
 import static handler.PostHandler.loginUser;
+import static util.Constants.*;
 
 public class Router {
     public static HttpResponse requestMapping(HttpRequest httpRequest) throws IOException {
@@ -28,10 +29,12 @@ public class Router {
         String requestTarget = splitUrl[0];
 
         return switch (requestTarget) {
-            case "/", "/registration", "/login" -> sendResponse(requestTarget + "/index.html");
-            case "/loginCheck" -> loginCheck(httpRequest);
-            case "/logout" -> logout(httpRequest);
-            default -> sendResponse(requestTarget);
+            case PATH_ROOT -> serveRootPage(httpRequest);
+            case PATH_REGISTRATION, PATH_LOGIN, PATH_ARTICLE, PATH_COMMENT ->
+                    serveStaticFile(requestTarget + FILE_INDEX);
+            case PATH_LOGOUT -> logout(httpRequest);
+            case PATH_USER + PATH_LIST -> getUserList(httpRequest);
+            default -> serveStaticFile(requestTarget);
         };
     }
 
@@ -39,8 +42,8 @@ public class Router {
         String requestUrl = httpRequest.getRequestUrl();
 
         return switch (requestUrl) {
-            case "/user/create" -> createUser(httpRequest);
-            case "/user/login" -> loginUser(httpRequest);
+            case PATH_USER + PATH_CREATE -> createUser(httpRequest);
+            case PATH_USER + PATH_LOGIN -> loginUser(httpRequest);
             default -> throw new IllegalStateException("Unexpected value: " + requestUrl);
         };
     }

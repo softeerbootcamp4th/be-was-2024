@@ -1,32 +1,50 @@
 package test;
 
-import http.HttpStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import util.Utils;
+import util.Utils.ResponseWithStatus;
 
 import java.io.IOException;
 
-import static util.Utils.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static util.Constants.FILE_INDEX;
+import static util.Constants.STATIC_PATH;
+import static util.Utils.getContentType;
 import static util.Utils.getFileContent;
 
 public class UtilTest {
 
     @Test
-    @DisplayName("staticPath가 올바르게 로딩되었는지 확인하는 테스트입니다.")
-    void isStaticPathLoaded() {
-        String staticPath = getStaticPath();
+    @DisplayName("컨텐츠 타입 반환 테스트")
+    void 컨텐츠_타입_반환_테스트() {
+        String html = getContentType("html");
+        String css = getContentType("css");
+        String js = getContentType("js");
 
-        Assertions.assertEquals(staticPath, "./src/main/resources/static");
+        assertEquals(html, "text/html");
+        assertEquals(css, "text/css");
+        assertEquals(js, "text/javascript");
     }
 
     @Test
-    @DisplayName("올바르지 않은 경로가 들어왔을 때 404에러가 반환되는지 확인하는 테스트입니다.")
-    void is404returned() throws IOException {
-        String path = "/nothing";
+    @DisplayName("정적 파일 반환 테스트")
+    void 정적_파일_반환_테스트() throws IOException {
+        String path = STATIC_PATH + FILE_INDEX;
         ResponseWithStatus fileContent = getFileContent(path);
 
-        Assertions.assertEquals(fileContent.status, HttpStatus.NOT_FOUND);
+        assertEquals(fileContent.status.getStatus(), 200);
+        assertEquals(fileContent.status.getMessage(), "Ok");
+        assertTrue(fileContent.body.length > 0);
+    }
+
+    @Test
+    @DisplayName("정적 파일 반환 실패 테스트")
+    void 정적_파일_반환_실패_테스트() throws IOException {
+        String path = STATIC_PATH + "NOT_EXIST";
+        ResponseWithStatus fileContent = getFileContent(path);
+
+        assertEquals(fileContent.status.getStatus(), 404);
+        assertEquals(fileContent.status.getMessage(), "Not found");
     }
 }

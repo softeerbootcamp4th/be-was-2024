@@ -4,14 +4,19 @@ import java.util.HashMap;
 
 public class HttpResponse {
 
+    private static final String HTTP_VERSION = "HTTP/1.1 ";
     HttpStatus httpStatus;
     HashMap<String, String> headers = new HashMap<>();
     byte[] body;
 
+
     public String getStatusLine(){
-        return "HTTP/1.1 " + httpStatus.getStatus() + " " + httpStatus.getMessage() + "\r\n";
+        return HTTP_VERSION + httpStatus.getStatus() + " " + httpStatus.getMessage() + "\r\n";
     }
 
+    public String getHeader(String key){
+        return headers.get(key);
+    }
     public String getHeaders(){
         StringBuilder header = new StringBuilder();
         for (String key : headers.keySet()) {

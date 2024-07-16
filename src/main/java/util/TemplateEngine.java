@@ -1,21 +1,42 @@
 package util;
 
-import java.nio.charset.StandardCharsets;
+import java.io.*;
+import java.util.Map;
+
+import static util.Constants.*;
 
 public class TemplateEngine {
 
     public static byte[] showAlert(String msg, String redirectUrl) {
-        StringBuilder alert = new StringBuilder();
 
-        alert.append("<html>");
-        alert.append("<head>");
-        alert.append("<script type=\"text/javascript\">");
-        alert.append("alert('").append(msg).append("');");
-        alert.append("window.location.replace('").append(redirectUrl).append("');");
-        alert.append("</script>");
-        alert.append("</head>");
-        alert.append("</html>");
+        String alert = "<html>" +
+                "<head>" +
+                "<script type=\"text/javascript\">" +
+                "alert('" + msg + "');" +
+                "window.location.replace('" + redirectUrl + "');" +
+                "</script>" +
+                "</head>" +
+                "</html>";
 
-        return alert.toString().getBytes(StandardCharsets.UTF_8);
+        return alert.getBytes();
+    }
+
+    public static byte[] getNotFoundPage() throws IOException {
+        StringBuilder content = new StringBuilder();
+        File file = new File(STATIC_PATH + PATH_ERROR + FILE_NOT_FOUND);
+        BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        return content.toString().getBytes();
+    }
+
+    public static byte[] renderTemplate(byte[] template, Map<String, String> data) {
+        String rawTemplate = new String(template);
+        for (String key : data.keySet()) {
+            rawTemplate = rawTemplate.replace("{{" + key + "}}", data.get(key));
+        }
+        return rawTemplate.getBytes();
     }
 }

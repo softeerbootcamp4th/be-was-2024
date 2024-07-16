@@ -29,11 +29,8 @@ public class RequestHandler implements Runnable {
             dos.writeBytes(response.getHeaders());
             dos.write(response.getBody(), 0, response.getBody().length);
             dos.flush();
-
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
-
-
 }
