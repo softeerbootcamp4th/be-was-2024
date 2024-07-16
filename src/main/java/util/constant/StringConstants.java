@@ -35,6 +35,50 @@ public class StringConstants {
     public static final String DYNAMIC_CONTENT_IS_LOGIN = "<!-- DYNAMIC_CONTENT_IS_LOGIN -->";
     public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN = "<!-- DYNAMIC_CONTENT_IS_NOT_LOGIN -->";
 
-    public static final String DYNAMIC_CONTENT_IS_LOGIN_CONTENT = "<li class=\"header__menu__item\" id=\"login_success\"><div>로그인완료!</div></li>";
-    public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT = "<li class=\"header__menu__item\" id=\"login_success\"><div>로그인미완료!!</div></li>";
+    public static final String DYNAMIC_CONTENT_IS_LOGIN_CONTENT = """
+            <form class="form" action="/logout" method="post">
+                        <li class="header__menu__item">
+                          <input
+                                  type="submit"
+                                  id="login-btn"
+                                  class="btn btn_contained btn_size_s"
+                                  value="로그아웃!"
+                          />
+                        </li>
+                      </form>
+                      <li class="header__menu__item">
+                          <span>안녕하세요 ${님}</span>
+                      </li>
+            """;
+
+    public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT = """
+            <li class="header__menu__item">
+                             <a class="btn btn_contained btn_size_s" href="/login.html">로그인</a>
+                           </li>
+                           <li class="header__menu__item">
+                             <a class="btn btn_ghost btn_size_s" href="/register.html">
+                               회원 가입
+                             </a>
+            </li>
+            """;
+    public static final String makeDynamicContentIsLoginContentWithName(String userName){
+        return  """
+            <form class="form" action="/logout" method="post">
+                        <li class="header__menu__item">
+                          <input
+                                  type="submit"
+                                  id="login-btn"
+                                  class="btn btn_contained btn_size_s"
+                                  value="로그아웃!"
+                          />
+                        </li>
+                      </form>
+                      <li class="header__menu__item">
+                          <span>안녕하세요!  """ + " "+userName+
+                """
+                      님</span>
+                      
+                      </li>
+                """;
+    }
 }

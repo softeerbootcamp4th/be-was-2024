@@ -22,7 +22,7 @@ public class FileMapper {
 
         // Insert dynamic content. 유저가 널이아닌ㄹ떄
         if (user!=null) {
-            htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, DYNAMIC_CONTENT_IS_LOGIN_CONTENT);
+            htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));
         }
         else{
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_NOT_LOGIN, DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT);
