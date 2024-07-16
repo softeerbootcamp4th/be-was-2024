@@ -1,5 +1,7 @@
 package plugin;
 
+import db.PostDatabase;
+import model.Post;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,6 +112,21 @@ class IndexPluginTest {
         //then
         assertTrue(response.getBody().contains("/login"));
 
+    }
+
+    @Test
+    @DisplayName("작성한 글의 제목을 index.html에서 보여준다.")
+    public void testIndexWithoutLoginAndWrite() throws IOException {
+
+        //given
+        PostDatabase.addPost(new Post("testContent1", "testTitle1", "testAuthorName1"));
+        Request request = new Request.Builder(HttpMethod.GET, "/index.html").build();
+
+        //when
+        Response response = indexPlugin.index(request);
+
+        //then
+        assertTrue(response.getBody().contains("testTitle1"));
     }
 
     private Request createLoginedRequest(User user){
