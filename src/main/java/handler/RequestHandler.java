@@ -51,7 +51,7 @@ public class RequestHandler implements Runnable {
                     Distributor distributor = Distributor.of(request, dos);
                     distributor.process();
 
-                    ViewData viewData = distributor.getViewDate();
+                    ViewData viewData = distributor.getViewData();
 
                     System.out.println(viewData.getUrl());
                     System.out.println(viewData.getStatusCode());
