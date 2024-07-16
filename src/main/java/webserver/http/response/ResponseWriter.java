@@ -12,6 +12,11 @@ public class ResponseWriter {
     }
 
     public void write(Response response) throws IOException {
+        if(response.getStatus().equals(Status.NOT_FOUND)) {
+            response = new Response.Builder(Status.SEE_OTHER)
+                    .redirect("/error/404.html")
+                    .build();
+        }
         outputStream.write(response.toByte());
     }
 

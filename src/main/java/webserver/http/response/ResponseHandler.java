@@ -38,6 +38,8 @@ public class ResponseHandler {
                         .body(getFile(request.getPath()))
                         .build();
             }
+        }catch (NotExistException e) {
+            response = new Response.Builder(Status.NOT_FOUND).build();
         }catch (Exception e){
             response = new Response.Builder(Status.INTERNAL_SERVER_ERROR)
                     .build();
