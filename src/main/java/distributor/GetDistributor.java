@@ -5,29 +5,26 @@ import model.ViewData;
 import processor.ResponseProcessor;
 import webserver.Request;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class GetDistributor extends Distributor {
     Request request;
-    DataOutputStream dos;
     ViewData viewData;
 
-    protected GetDistributor(Request request, DataOutputStream dos) {
+    protected GetDistributor(Request request) {
         this.request = request;
-        this.dos = dos;
     }
 
     @Override
     public void process() throws IOException {
         if (request.isQueryString()) {
-            processQuery(this.dos);
+            processQuery();
         } else {
-            processNonQuery(this.dos);
+            processNonQuery();
         }
     }
 
-    private void processQuery(DataOutputStream dos) throws IOException {
+    private void processQuery() throws IOException {
         String path = request.getPath();
         if (path.equals("/user/create")) {
             ResponseProcessor responseProcessor = new ResponseProcessor();
@@ -35,24 +32,24 @@ public class GetDistributor extends Distributor {
         }
     }
 
-    private void processNonQuery(DataOutputStream dos) throws IOException {
+    private void processNonQuery() throws IOException {
         String path = request.getPath();
         if (path.equals("/logout")) {
-            processLogout(dos);
+            processLogout();
         } else if (path.equals("/login/index.html")) {
-            processLogin(dos, path);
+            processLogin(path);
         } else {
-            processDefault(dos, path);
+            processDefault(path);
         }
     }
 
-    private void processDefault(DataOutputStream dos, String path) throws IOException {
+    private void processDefault(String path) throws IOException {
         System.out.println("default process");
         ResponseProcessor responseProcessor = new ResponseProcessor();
         this.viewData = responseProcessor.defaultResponse(path);
     }
 
-    private void processLogout(DataOutputStream dos) throws IOException {
+    private void processLogout() throws IOException {
         // 세션 삭제
         String userId = request.getSessionId();
         SessionHandler.deleteSession(userId);
@@ -61,7 +58,7 @@ public class GetDistributor extends Distributor {
         this.viewData = responseProcessor.logoutResponse();
     }
 
-    private void processLogin(DataOutputStream dos, String path) throws IOException {
+    private void processLogin(String path) throws IOException {
         String sessionId = request.getSessionId();
 
         // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동

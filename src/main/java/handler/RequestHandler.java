@@ -36,7 +36,7 @@ public class RequestHandler implements Runnable {
 
                 if (isStaticResource(path)) {
                     ResponseProcessor responseProcessor = new ResponseProcessor();
-                    ViewData viewData =  responseProcessor.defaultResponse(path);
+                    ViewData viewData = responseProcessor.defaultResponse(path);
 
                     Response response = new Response.Builder()
                             .url(viewData.getUrl())
@@ -48,7 +48,7 @@ public class RequestHandler implements Runnable {
 
                     response.sendResponse();
                 } else {
-                    Distributor distributor = Distributor.of(request, dos);
+                    Distributor distributor = Distributor.of(request);
                     distributor.process();
 
                     ViewData viewData = distributor.getViewData();

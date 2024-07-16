@@ -3,16 +3,15 @@ package distributor;
 import model.ViewData;
 import webserver.Request;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
 
 public abstract class Distributor {
-    public static Distributor of(Request request, DataOutputStream dos) {
+    public static Distributor of(Request request) {
         String method = request.getHttpMethod();
         if (method.equals("GET")) {
-            return new GetDistributor(request, dos);
+            return new GetDistributor(request);
         } else if (method.equals("POST")) {
-            return new PostDistributor(request, dos);
+            return new PostDistributor(request);
         }
         return null;
     }
