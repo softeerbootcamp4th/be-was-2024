@@ -3,22 +3,25 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
-    <link href="../main.css" rel="stylesheet" />
+    <link href="/resource/reset.css" rel="stylesheet" />
+    <link href="/resource/global.css" rel="stylesheet" />
+    <link href="/resource/main.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <a href="/main"><img src="../img/signiture.svg" /></a>
+        <a href="/main"><img src="/resource/img/signiture.svg" /></a>
         <ul class="header__menu">
+          <p class = "user__name">{USERNAME}님</p>
           <li class="header__menu__item">
             <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
           </li>
           <li class="header__menu__item">
-            <button id="logout-btn" class="btn btn_ghost btn_size_s">
-              로그아웃
-            </button>
+            <a href="http://localhost:8080/logout">
+              <button id="logout-btn" class="btn btn_ghost btn_size_s" >
+                로그아웃
+              </button>
+            </a>
           </li>
         </ul>
       </header>
@@ -33,17 +36,17 @@
             <ul class="post__menu__personal">
               <li>
                 <button class="post__menu__btn">
-                  <img src="../img/like.svg" />
+                  <img src="/resource/img/like.svg" />
                 </button>
               </li>
               <li>
                 <button class="post__menu__btn">
-                  <img src="../img/sendLink.svg" />
+                  <img src="/resource/img/sendLink.svg" />
                 </button>
               </li>
             </ul>
             <button class="post__menu__btn">
-              <img src="../img/bookMark.svg" />
+              <img src="/resource/img/bookMark.svg" />
             </button>
           </div>
           <p class="post__article">
@@ -124,7 +127,7 @@
               <a class="nav__menu__item__btn" href="">
                 <img
                   class="nav__menu__item__img"
-                  src="../img/ci_chevron-left.svg"
+                  src="/resource/img/ci_chevron-left.svg"
                 />
                 이전 글
               </a>
@@ -137,7 +140,7 @@
                 다음 글
                 <img
                   class="nav__menu__item__img"
-                  src="../img/ci_chevron-right.svg"
+                  src="/resource/img/ci_chevron-right.svg"
                 />
               </a>
             </li>

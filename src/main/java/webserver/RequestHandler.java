@@ -2,17 +2,27 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.api.FunctionHandler;
+import webserver.http.HttpRequest;
+import webserver.http.HttpResponse;
+import webserver.http.path.PathMap;
+import webserver.http.response.ResponseLibrary;
+import webserver.util.StreamByteReader;
 
+
+/*
+* Request들에 대해서 hanldling하는 class
+* socket을 통한 모든 IO는 이 class가 관장한다
+* */
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
-    private Socket connection;
+    private final Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
@@ -23,97 +33,49 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
             DataOutputStream dos = new DataOutputStream(out);
-            InputStreamReader dis = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(dis);
+            BufferedInputStream bif = new BufferedInputStream(in);
 
-            Map<String, String> header = new HashMap<>();
+            String startline = StreamByteReader.readLine(bif); // http request의 첫번째줄
+            HttpRequest.ReqeustBuilder reqeustBuilder = new HttpRequest.ReqeustBuilder(startline);
 
-
-            logger.info("////// request header start //////");
-            String line = br.readLine();
-            String[] tokens = line.split(" ");
-            logger.info(line);
-            while(!line.isEmpty()){
-                line = br.readLine();
-                String[] parsedline = line.split(". ");
-                if((parsedline.length) ==2) header.put(parsedline[0], parsedline[1]);
+            String headers = startline;
+            int contentLength = 0;
+            while(!headers.isEmpty()){ //header들을 한줄씩 순회하면서 request에 header를 하나씩 추가함
+                headers = StreamByteReader.readLine(bif);
+                logger.info(headers);
+                String[] parsedline = headers.split(":");
+                if((parsedline.length) ==2) {
+                    reqeustBuilder.addHeader(parsedline[0].trim(), parsedline[1].trim());
+                    if(parsedline[0].trim().equals("Content-Length")) contentLength = Integer.parseInt(parsedline[1].trim());
+                }
             }
-            logger.info(header.toString());
-            logger.info("////// request header end //////");
+            if(contentLength != 0) {
+                byte[] body = new byte[contentLength];
 
-
-            String pathname = "./src/main/resources/static" + tokens[1];
-            logger.info("pathname : {}", pathname);
-            byte[] body = Files.readAllBytes(new File(pathname).toPath());
-
-            switch (tokens[1].split("\\.")[1]) { //content type에 따른 response
-                case "html":
-                    response200Header(dos, body.length,"text/html;charset=utf-8");
-                    responseBody(dos, body);
-                    break;
-                case "css":
-                    response200Header(dos, body.length,"text/css;charset=utf-8");
-                    responseBody(dos, body);
-                    break;
-                case "js":
-                    response200Header(dos, body.length,"text/javascript;charset=utf-8");
-                    responseBody(dos, body);
-                    break;
-                case "ico":
-                    response200Header(dos, body.length,"image/x-icon");
-                    responseBody(dos, body);
-                    break;
-                case "png":
-                    response200Header(dos, body.length,"image/png");
-                    responseBody(dos, body);
-                    break;
-                case "jpg":
-                    response200Header(dos, body.length,"image/jpeg");
-                    responseBody(dos, body);
-                    break;
-                case "svg":
-                    response200Header(dos, body.length,"image/svg+xml");
-                    responseBody(dos,body);
-                    break;
-                default:
-                    response405Header(dos);
-                    break;
+                if(bif.read(body, 0, contentLength) == contentLength) {
+                    reqeustBuilder.setBody(body);
+                }
             }
+            HttpRequest request = reqeustBuilder.build();
 
+            logger.info(request.printRequest());
+            if(request.getBody() != null && request.getBody().length > 0)
+                logger.info(URLDecoder.decode("body: " + new String(request.getBody()), StandardCharsets.UTF_8));
 
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
+            FunctionHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath(), request.getSessionid()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            HttpResponse response =
+                    (api == null)
+                            ? ResponseLibrary.notFound
+                            : api.function(request); // 해당 function을 실행
 
-    private void response200Header(DataOutputStream dos, int lengthOfBodyContent, String ContentType) {
-
-        try {
-            dos.writeBytes("HTTP/1.1 200 OK \r\n");
-            dos.writeBytes("Content-Type: " + ContentType + "\r\n");
-            dos.writeBytes("Content-Length: " + lengthOfBodyContent + "\r\n");
-            dos.writeBytes("\r\n");
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void response405Header(DataOutputStream dos) {
-        try{
-            dos.writeBytes("HTTP/1.1 405 Unsupported content type\r\n");
-        } catch (IOException e){
-            logger.error(e.getMessage());
-        }
-    }
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
-        try {
-            dos.write(body, 0, body.length);
+            // response 출력
+            dos.writeBytes(response.getHeader());
+            dos.write(response.getBody());
             dos.flush();
-        } catch (IOException e) {
-            logger.error(e.getMessage());
+        } catch (IOException | NumberFormatException | NullPointerException e) {
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         }
     }
 }

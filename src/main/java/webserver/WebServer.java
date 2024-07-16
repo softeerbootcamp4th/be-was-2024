@@ -10,12 +10,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class WebServer {
+    private static final int MAX_THREAD = 10;
+    private static ExecutorService executor = Executors.newFixedThreadPool(MAX_THREAD); // thread 갯수 제한을 위한 thread pool
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
 
     public static void main(String args[]) throws Exception {
         int port = 0;
-        ExecutorService executor = Executors.newFixedThreadPool(10); // thread 갯수 제한을 위한 thread pool
 
         if (args == null || args.length == 0) {
             port = DEFAULT_PORT;
@@ -30,8 +31,10 @@ public class WebServer {
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
             while ((connection = listenSocket.accept()) != null) {
-                executor.submit(new RequestHandler(connection)); // 요청이 올 시에 executor queue에 작업 추가
+                executor.submit(new RequestHandler(connection)); // 요청이 올 시에 executor queue 작업 추가
             }
+            executor.shutdown();
         }
     }
+
 }
