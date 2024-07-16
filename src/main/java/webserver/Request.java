@@ -148,7 +148,11 @@ public class Request {
 
     public String getSessionId() {
         String cookie = headers.get("Cookie");
-        return cookie.split("=")[1];
+        if (cookie == null) {
+            return null;
+        } else {
+            return cookie.split("=")[1];
+        }
     }
 
     public HashMap<String, String> parseQueryString() {
