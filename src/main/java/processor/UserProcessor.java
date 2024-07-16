@@ -1,10 +1,7 @@
 package processor;
 
 import db.Database;
-import jdk.jfr.DataAmount;
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import util.RequestObject;
 
 import java.util.HashMap;
@@ -12,7 +9,6 @@ import java.util.Map;
 
 public class UserProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserProcessor.class);
 
     private UserProcessor() {}
 
@@ -34,14 +30,7 @@ public class UserProcessor {
         for (String pair : pairs) {
             String[] keyValue = pair.split("=");
             String key = keyValue[0];
-            String value ="";
-            try{
-                 value = keyValue[1];
-            }
-            catch(IndexOutOfBoundsException e)
-            {
-                logger.debug(key +" 값이 비어 있습니다");
-            }
+            String value = keyValue.length>1 ? keyValue[1] : "";
             map.put(key, value);
         }
 
@@ -49,7 +38,7 @@ public class UserProcessor {
         Database.addUser(user);
     }
 
-    public User findUser(RequestObject requestObject) throws Exception {
+    public User userFind(RequestObject requestObject) throws Exception {
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
         String[] idLine = pairs[0].split("=");

@@ -1,13 +1,14 @@
 package util;
 
-import handler.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RequestObject {
@@ -47,9 +48,10 @@ public class RequestObject {
         String[] headerLines = headerBuffer.toString("UTF-8").split("\r\n");
 
 
-        this.method=headerLines[0].split(" ")[0];
-        this.path=headerLines[0].split(" ")[1];
-        this.version=headerLines[0].split(" ")[2];
+        String[] temp = headerLines[0].split("\\s+");
+        this.method= temp[0];
+        this.path = temp[1];
+        this.version= temp[2];
 
         for(int i=1;i<headerLines.length;i++)
         {
@@ -102,6 +104,7 @@ public class RequestObject {
         this.body = body;
     }
 
+    //헤더에서 쿠키를 파싱한다
     public Map<String, String> getCookies() {
         Map<String, String> cookies = new HashMap<>();
         if (headers.containsKey("Cookie")) {

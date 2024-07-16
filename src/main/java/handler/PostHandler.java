@@ -31,23 +31,30 @@ public class PostHandler
 
     public void handlePostRequest(DataOutputStream dos, RequestObject requestObject) {
 
-        if(requestObject.getPath().equals("/user/create"))
-        {
-            userProcessor.userCreate(requestObject);
-            response302Header(dos,"/index.html");
+        String path = requestObject.getPath();
+
+        //switch로 리팩토링 , 메소드 빼놓기
+        switch(path){
+            case "/user/create" -> userCreate(dos,requestObject);
+            case "/user/login" -> userLogin(dos,requestObject);
         }
-        else if(requestObject.getPath().equals("/user/login"))
+    }
+
+    private void userLogin(DataOutputStream dos, RequestObject requestObject) {
+        try
         {
-            try
-            {
-                User user = userProcessor.findUser(requestObject);
-                loginSuccess(dos,user);//로그인 성공 시
-            }
-            catch(Exception e)//해당하는 예외 메세지를 출력한다
-            {
-                responseAlert(dos,e.getMessage(),"/login/index.html");
-            }
+            User user = userProcessor.userFind(requestObject);
+            loginSuccess(dos,user);//로그인 성공 시
         }
+        catch(Exception e)//해당하는 예외 메세지를 출력한다
+        {
+            responseAlert(dos,e.getMessage(),"/login/index.html");
+        }
+    }
+
+    private void userCreate(DataOutputStream dos, RequestObject requestObject) {
+        userProcessor.userCreate(requestObject);
+        response302Header(dos,"/index.html");
     }
 
     private void response302Header(DataOutputStream dos, String loc)
@@ -91,6 +98,5 @@ public class PostHandler
         {
             logger.error(e.getMessage());
         }
-
     }
 }

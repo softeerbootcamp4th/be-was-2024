@@ -11,6 +11,11 @@
 <div class="container">
   <header class="header">
     <a href="/"><img src="./img/signiture.svg" /></a>
+    <ul class = "header_menu">
+      <li class ="header__menu__item">
+        <a class="btn btn_contained btn_size_s" href="/user/list" >회원 목록</a>
+      </li>
+    </ul>
     <ul class="header__menu" id="header-menu">
       <!-- 동적으로 버튼을 생성할 영역 -->
     </ul>
@@ -168,7 +173,6 @@
             <button class="btn btn_contained btn_size_s" id="logout-button">로그아웃</button>
           </li>
         `;
-
         document.getElementById("logout-button").addEventListener("click", () => {
           document.cookie = "SID=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
           location.reload();
