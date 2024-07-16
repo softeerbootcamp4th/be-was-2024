@@ -3,10 +3,11 @@ package processor;
 import model.ViewData;
 
 public class ResponseProcessor {
-    public ViewData defaultResponse(String path) {
+    public ViewData defaultResponse(String path, String sessionId) {
         ViewData viewData = new ViewData.Builder()
                 .url(path)
                 .statusCode(200)
+                .cookie(sessionId)
                 .build();
 
         return viewData;
@@ -15,7 +16,7 @@ public class ResponseProcessor {
     public ViewData notFoundResponse() {
         ViewData viewData = new ViewData.Builder()
                 .url("/not_found.html")
-                .redirectCode(404)
+                .statusCode(404)
                 .build();
 
         return viewData;
@@ -43,7 +44,7 @@ public class ResponseProcessor {
     public ViewData loginFailedResponse() {
         ViewData viewData = new ViewData.Builder()
                 .url("/login/login_failed.html")
-                .redirectCode(404)
+                .statusCode(404)
                 .build();
 
         return viewData;
@@ -58,19 +59,21 @@ public class ResponseProcessor {
         return viewData;
     }
 
-    public ViewData loginSuccessWithSessionId() {
+    public ViewData loginSuccessWithSessionId(String sessionId) {
         ViewData viewData = new ViewData.Builder()
                 .url("/main/index.html")
                 .statusCode(200)
+                .cookie(sessionId)
                 .build();
 
         return viewData;
     }
 
-    public ViewData loginResponse(String path) {
+    public ViewData loginResponse(String path, String sessionId) {
         ViewData viewData = new ViewData.Builder()
                 .url(path)
                 .statusCode(200)
+                .cookie(sessionId)
                 .build();
 
         return viewData;
