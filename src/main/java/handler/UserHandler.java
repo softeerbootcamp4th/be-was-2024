@@ -42,6 +42,6 @@ public class UserHandler implements ModelHandler<User>{
 
     @Override
     public List<User> findAll() {
-        return Database.findAll().stream().toList();
+        return Database.findAllUser().stream().toList();
     }
 }
