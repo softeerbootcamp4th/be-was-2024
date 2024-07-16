@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RequestObject {
 
@@ -20,6 +22,8 @@ public class RequestObject {
     private byte[] body;
 
     private int contentLength;
+
+    private final Map<String,String> headers = new HashMap<>();
 
     public RequestObject(InputStream inputStream) throws IOException
     {
@@ -47,17 +51,18 @@ public class RequestObject {
         this.path=headerLines[0].split(" ")[1];
         this.version=headerLines[0].split(" ")[2];
 
-
         for(int i=1;i<headerLines.length;i++)
         {
+            if (headerLines[i].contains(":")) {
+                String[] headerParts = headerLines[i].split(":", 2);
+                headers.put(headerParts[0].trim(), headerParts[1].trim());
+            }
             if(headerLines[i].startsWith("Content-Length"))
             {
                 this.contentLength=Integer.parseInt(headerLines[i].split(":")[1].trim());
                 break;
             }
         }
-
-
         if(contentLength>0)
         {
             body = new byte[contentLength];
@@ -71,7 +76,6 @@ public class RequestObject {
         {
             body =null;
         }
-
 
 
     }
@@ -96,5 +100,20 @@ public class RequestObject {
     public void setBody(byte[] body)
     {
         this.body = body;
+    }
+
+    public Map<String, String> getCookies() {
+        Map<String, String> cookies = new HashMap<>();
+        if (headers.containsKey("Cookie")) {
+            String cookieHeader = headers.get("Cookie");
+            String[] cookiePairs = cookieHeader.split("; ");
+            for (String cookie : cookiePairs) {
+                String[] cookieParts = cookie.split("=", 2);
+                if (cookieParts.length == 2) {
+                    cookies.put(cookieParts[0], cookieParts[1]);
+                }
+            }
+        }
+        return cookies;
     }
 }
