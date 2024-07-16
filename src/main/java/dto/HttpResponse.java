@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static util.constant.StringConstants.PROTOCOL_VERSION;
+
 public class HttpResponse {
     public String getProtocolVersion() {
         return protocolVersion;
@@ -37,6 +39,13 @@ public class HttpResponse {
 
     public static HttpResponse of(String protocolVersion, HttpStatus httpStatus, Map<String,String> headers, byte[] body) {
         return new HttpResponse(protocolVersion, httpStatus, headers, body);
+    }
+
+    public static HttpResponse redirectToMain() {
+        Map<String, String> headers = new HashMap<>();
+        headers.put("Location", "/index.html");
+        return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
+
     }
 
 

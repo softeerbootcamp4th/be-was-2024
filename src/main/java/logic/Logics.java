@@ -13,10 +13,8 @@ import org.slf4j.LoggerFactory;
 import util.HttpRequestConverter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 import static util.constant.StringConstants.*;
 
@@ -33,8 +31,7 @@ public class Logics {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
         }
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Location", "/index.html");
+
 
         // body
         Map<String, String> bodyToMap = HttpRequestConverter.bodyToMap(httpRequest.getBody());
@@ -46,7 +43,8 @@ public class Logics {
 
         User user = new User(userId, password, name, email);
         UserDatabase.addUser(user);
-        return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
+
+        return  HttpResponse.redirectToMain();
         //TODO : body를 리턴하지 않아도 되는가
     }
 
@@ -78,8 +76,8 @@ public class Logics {
             headers.put("Location", "/login_failed.html");
             logger.info("userId : "+userId+"Login failed");
         }
-
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
+
     }
     public static HttpResponse logout(HttpRequest httpRequest) throws IOException {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
@@ -98,5 +96,32 @@ public class Logics {
         headers.put("Location", "/index.html");
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
+    }
+    public static HttpResponse getUserList(HttpRequest httpRequest,String userId) throws IOException {
+        if(userId==null) {
+            return  HttpResponse.redirectToMain();
+        }else{
+            List<Byte> body = new ArrayList<>();
+            List<User> list = UserDatabase.findAll().stream().toList();
+
+            list.forEach(user -> {
+                byte[] userBytes = user.toString().getBytes(StandardCharsets.UTF_8); // Use UTF-8 encoding
+                for (byte b : userBytes) {
+                    body.add(b);
+                }
+            });
+
+            byte[] bodyArray = new byte[body.size()];
+            for (int i = 0; i < body.size(); i++) {
+                bodyArray[i] = body.get(i);
+            }
+
+            // Prepare headers
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Content-Length", String.valueOf(bodyArray.length));
+            headers.put("Content-Type", "text/plain; charset=UTF-8");
+
+            return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, bodyArray);
+        }
     }
 }

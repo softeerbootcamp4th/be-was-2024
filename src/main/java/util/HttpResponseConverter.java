@@ -42,7 +42,7 @@ public class HttpResponseConverter {
 
     private HttpResponse createDynamicHttpResponse(HttpRequest httpRequest, String userId) throws IOException {
         HttpPathMapper httpPathMapper = new HttpPathMapper();
-        return httpPathMapper.map(httpRequest);
+        return httpPathMapper.map(httpRequest,userId);
 
     }
 

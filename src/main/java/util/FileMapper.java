@@ -20,7 +20,7 @@ public class FileMapper {
 
         String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
 
-        // Insert dynamic content. 유저가 널이아닌ㄹ떄
+        // 유저가 로그인 된 상태인 경우와 안된 상태 분리
         if (user!=null) {
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));
         }

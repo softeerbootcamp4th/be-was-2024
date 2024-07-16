@@ -32,7 +32,7 @@ public class HttpRequest {
 
     public Optional<String> getSessionOrNull(){
         String cookie = this.getHeaders().get("Cookie");
-        if(cookie.startsWith("sid=")){
+        if(cookie!=null && cookie.startsWith("sid=")){
             String sessionId = cookie.substring("sid=".length());
             return Optional.of(sessionId);
         }
@@ -40,7 +40,8 @@ public class HttpRequest {
 
     }
 
-    public HttpMethod getHttpMethod() {
+    public HttpMethod getHttpMethod()
+    {
         return httpMethod;
     }
 
