@@ -2,6 +2,7 @@ package webserver;
 
 import data.HttpRequestMessage;
 import data.HttpResponseMessage;
+import exception.BadUrlException;
 import util.FileUtil;
 
 import java.io.File;
@@ -11,30 +12,40 @@ import java.util.HashMap;
 public class UriMapper {
     public static HttpResponseMessage mapUri(HttpRequestMessage httpRequestMessage) throws RuntimeException, IOException {
         //Exact Matching
-        if (httpRequestMessage.getMethod().equals("GET")){
-            return switch (httpRequestMessage.getUri()){
+        String method = httpRequestMessage.getMethod();
+        String uri = httpRequestMessage.getUri();
+        return switch (uri) {
                 case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
+                case "/article" -> staticRequestProcess("src/main/resources/static/article/index.html");
                 case "/user/list" -> DynamicRequestProcess.userList(httpRequestMessage);
                 case "/registration.html" -> staticRequestProcess("src/main/resources/static/registration/index.html");
                 case "/login" -> staticRequestProcess("src/main/resources/static/login/index.html");
-                default -> staticRequestProcess("src/main/resources/static" + httpRequestMessage.getUri());
-            };
-        }
-        else if (httpRequestMessage.getMethod().equals("POST")){
-            return switch (httpRequestMessage.getUri()){
                 case "/logout" -> DynamicRequestProcess.logout(httpRequestMessage);
                 case "/create" -> DynamicRequestProcess.registration(httpRequestMessage);
                 case "/user/login" -> DynamicRequestProcess.login(httpRequestMessage);
-                default -> throw new RuntimeException();
-            };
-        }
-        throw new RuntimeException();
+                default -> staticRequestProcess("src/main/resources/static" + uri);
+        };
+    }
+
+    public static HttpResponseMessage errorResponseProcess(String code) throws IOException {
+        HashMap<String, String> headers = new HashMap<>();
+        String path = "src/main/resources/static/error/" + code + ".html";
+        headers.put("Content-Type", findContentType("html") + ";charset=utf-8");
+        byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
+        headers.put("Content-Length", String.valueOf(bytes.length));
+        return new HttpResponseMessage(code,headers,bytes);
     }
 
     public static HttpResponseMessage staticRequestProcess(String path) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", findContentType(path.substring(path.lastIndexOf('.') + 1)));
-        byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
+        byte[] bytes;
+        try {
+             bytes = FileUtil.readAllBytesFromFile(new File(path));
+        }
+        catch (Exception e) {
+            throw new BadUrlException("Not Found");
+        }
         return new HttpResponseMessage("200",headers,bytes);
     }
 

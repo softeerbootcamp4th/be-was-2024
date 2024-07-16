@@ -6,9 +6,10 @@ import java.util.Map;
 
 import data.HttpRequestMessage;
 import data.HttpResponseMessage;
+import exception.BadMethodException;
+import exception.BadUrlException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import util.FileUtil;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,15 +31,24 @@ public class RequestHandler implements Runnable {
             logger.debug("Request Message: {}", httpRequestMessage);
             try {
                 HttpResponseMessage response = UriMapper.mapUri(httpRequestMessage);
-                if (response.getStatusCode().startsWith("3")) redirect(dos, response.getHeaders());
+                if (isRedirect(response)) redirect(dos, response.getHeaders());
                 else response(response, dos);
             }
-            catch (Exception e) {
-                response404(dos);
+            catch (BadUrlException e) {
+                HttpResponseMessage httpResponseMessage = UriMapper.errorResponseProcess("404");
+                responseError(dos,httpResponseMessage);
+            }
+            catch (BadMethodException ex) {
+                HttpResponseMessage httpResponseMessage = UriMapper.errorResponseProcess("405");
+                responseError(dos,httpResponseMessage);
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private static boolean isRedirect(HttpResponseMessage response) {
+        return response.getStatusCode().startsWith("3");
     }
 
     private void redirect(DataOutputStream dos, Map<String,String> map) throws IOException {
@@ -47,8 +57,6 @@ public class RequestHandler implements Runnable {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 dos.writeBytes(entry.getKey() + ": " + entry.getValue() + "\r\n");
             }
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: 0" + "\r\n");
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
@@ -72,23 +80,24 @@ public class RequestHandler implements Runnable {
         }
     }
 
-    private void response404(DataOutputStream dos) {
+    private void responseBody(DataOutputStream dos, byte[] body) {
         try {
-            dos.writeBytes("HTTP/1.1 404 NOT FOUND \r\n");
-            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
-            dos.writeBytes("Content-Length: 0 \r\n");
-            dos.writeBytes("\r\n");
+            dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());
         }
     }
 
-
-
-    private void responseBody(DataOutputStream dos, byte[] body) {
+    private void responseError(DataOutputStream dos, HttpResponseMessage httpResponseMessage) throws IOException {
         try {
-            dos.write(body, 0, body.length);
+            Map<String, String> headers = httpResponseMessage.getHeaders();
+            dos.writeBytes("HTTP/1.1 " + httpResponseMessage.getStatusCode() + " \r\n");
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                dos.writeBytes(entry.getKey() + ": " + entry.getValue() + "\r\n");
+            }
+            dos.writeBytes("\r\n");
+            dos.write(httpResponseMessage.getBody());
             dos.flush();
         } catch (IOException e) {
             logger.error(e.getMessage());

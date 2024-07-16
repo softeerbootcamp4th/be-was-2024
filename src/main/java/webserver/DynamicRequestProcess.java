@@ -4,6 +4,7 @@ import data.HttpRequestMessage;
 import data.HttpResponseMessage;
 import db.Database;
 import db.Session;
+import exception.BadMethodException;
 import handler.ViewHandler;
 import model.User;
 
@@ -14,6 +15,7 @@ import java.util.*;
 
 public class DynamicRequestProcess {
     public static HttpResponseMessage registration(HttpRequestMessage httpRequestMessage){
+        if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> map = new HashMap<>();
         String body = new String(httpRequestMessage.getBody());
         String[] bodySplit = body.split("&");
@@ -27,6 +29,7 @@ public class DynamicRequestProcess {
         return new HttpResponseMessage("303",map,null);
     }
     public static HttpResponseMessage login(HttpRequestMessage httpRequestMessage){
+        if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> map = new HashMap<>();
         String requestBody = new String(httpRequestMessage.getBody());
         String[] bodySplit = requestBody.split("&");
@@ -49,6 +52,7 @@ public class DynamicRequestProcess {
     }
 
     public static HttpResponseMessage home(HttpRequestMessage httpRequestMessage) throws IOException {
+        if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
         Map<String, String> cookies = httpRequestMessage.getCookies();
         HashMap<String, String> headers = new HashMap<>();
         String sid = cookies.get("SID");
@@ -64,6 +68,7 @@ public class DynamicRequestProcess {
     }
 
     public static HttpResponseMessage userList(HttpRequestMessage httpRequestMessage) throws IOException {
+        if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
         Map<String, String> cookies = httpRequestMessage.getCookies();
         Map<String,String> headers = new HashMap<>();
         List<String> list = Database.findAll();
@@ -76,6 +81,7 @@ public class DynamicRequestProcess {
     }
 
     public static HttpResponseMessage logout(HttpRequestMessage httpRequestMessage) throws IOException {
+        if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> headers = new HashMap<>();
         headers.put("Location","/index.html");
         headers.put("Set-Cookie","SID=null;MAX-AGE=0");
