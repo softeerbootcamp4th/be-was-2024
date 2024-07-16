@@ -4,6 +4,7 @@ import annotations.Get;
 import annotations.Plugin;
 import annotations.Post;
 import db.UserDatabase;
+import db.UserH2Database;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,7 @@ public class UserPlugin{
                 parameterMap.get("email")
         );
         logger.debug(user.toString());
-        UserDatabase.addUser(user);
+        UserH2Database.addUser(user);
         //logger.debug(user.toString());
 
         return new Response.Builder(Status.SEE_OTHER)
@@ -62,7 +63,7 @@ public class UserPlugin{
         String userId = map.get("userId");
         String password = map.get("password");
 
-        User user = UserDatabase.findUserById(userId);
+        User user = UserH2Database.findUserById(userId).orElse(null);
 
         if(user==null) {
             logger.debug("user null");
@@ -107,7 +108,7 @@ public class UserPlugin{
 
         StringBuilder sb = new StringBuilder();
 
-        for(User user: UserDatabase.findAll()){
+        for(User user: UserH2Database.findAll()){
             sb.append(user.toString()).append("\n");
         }
 

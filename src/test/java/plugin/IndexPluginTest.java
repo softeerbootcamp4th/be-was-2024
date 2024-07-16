@@ -115,6 +115,7 @@ class IndexPluginTest {
     }
 
     //@Test
+    //TODO 실제 DB와 독립적으로 테스트 가능해야 함.
     @DisplayName("작성한 글의 제목을 index.html에서 보여준다.")
     public void testIndexWithoutLoginAndWrite() throws IOException {
 
