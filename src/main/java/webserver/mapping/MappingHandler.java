@@ -6,10 +6,8 @@ import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
 import webserver.mapping.mapper.HttpMapper;
 import webserver.mapping.mapper.NotFoundMapper;
-import webserver.mapping.mapper.get.HomeMapper;
-import webserver.mapping.mapper.get.LoginFormMapper;
-import webserver.mapping.mapper.get.RegistrationFormMapper;
-import webserver.mapping.mapper.get.UserListMapper;
+import webserver.mapping.mapper.get.*;
+import webserver.mapping.mapper.post.CreateArticleMapper;
 import webserver.mapping.mapper.post.CreateUserMapper;
 import webserver.mapping.mapper.post.LoginUserMapper;
 import webserver.mapping.mapper.post.LogoutUserMapper;
@@ -33,13 +31,16 @@ public class MappingHandler {
 
     static {
         getHandlers.put("/", new HomeMapper());
+        getHandlers.put("/main", new HomeMapper());
         getHandlers.put("/registration", new RegistrationFormMapper());
         getHandlers.put("/login", new LoginFormMapper());
+        getHandlers.put("/article", new ArticleFormMapper());
         getHandlers.put("/user/list", new UserListMapper());
 
         postHandlers.put("/user/create", new CreateUserMapper());
         postHandlers.put("/user/login", new LoginUserMapper());
         postHandlers.put("/user/logout", new LogoutUserMapper());
+        postHandlers.put("/article/create", new CreateArticleMapper());
     }
 
     public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
