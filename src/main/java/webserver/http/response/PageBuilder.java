@@ -23,35 +23,20 @@ public class PageBuilder {
             userlist.append("</li>\r\n");
         }
 
-        String page = Files.readString(new File(HtmlFiles.user_list).toPath());
+        String page = HtmlFiles.readHtmlString(HtmlFiles.USER_LIST);
         page = page.replace("{Userlist}", userlist );
 
         return page.getBytes("UTF-8");
     }
 
     public static byte[] buildRegistrationFailedPage(String errorMessage) throws IOException {
-        String page = Files.readString(new File(HtmlFiles.register_failed).toPath());
+        String page = HtmlFiles.readHtmlString(HtmlFiles.REGISTER_FAILED);
         page = page.replace("{ErrorMessage}", errorMessage );
         return page.getBytes("UTF-8");
     }
 
-    public static byte[] buildRegistrationPage() throws IOException{
-        return Files.readAllBytes(new File(HtmlFiles.register).toPath());
-    }
-
-    public static byte[] buildFailedLoginPage() throws IOException {
-        return Files.readAllBytes(new File(HtmlFiles.login_failed).toPath());
-    }
-
-    public static byte[] buildLoginPage() throws IOException {
-        return Files.readAllBytes(new File(HtmlFiles.login).toPath());
-    }
-    public static byte[] buildMainPage() throws IOException {
-        return Files.readAllBytes(new File(HtmlFiles.main_page).toPath());
-    }
-
     public static byte[] buildLoggedinPage(String username) throws IOException {
-        String page = Files.readString(new File(HtmlFiles.login_success).toPath());
+        String page = HtmlFiles.readHtmlString(HtmlFiles.LOGIN_SUCCESS);
         page = page.replace("{USERNAME}", username );
         return page.getBytes(StandardCharsets.UTF_8);
     }

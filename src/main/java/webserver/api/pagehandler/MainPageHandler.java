@@ -2,15 +2,13 @@ package webserver.api.pagehandler;
 
 import model.User;
 import webserver.api.FunctionHandler;
-import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.http.response.HtmlFiles;
 import webserver.http.response.PageBuilder;
 import webserver.session.Session;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class MainPageHandler implements FunctionHandler {
     //singleton pattern
@@ -36,7 +34,7 @@ public class MainPageHandler implements FunctionHandler {
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(PageBuilder.buildMainPage())
+                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.MAIN_PAGE))
                 .build();
     }
 }

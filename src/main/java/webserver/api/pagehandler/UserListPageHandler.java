@@ -21,21 +21,6 @@ public class UserListPageHandler implements FunctionHandler {
     }
 
 
-    private static final String userlistFormat1 =
-            "<!DOCTYPE html>"
-            + "<html>"
-            + "<head>"
-            + "<meta charset=\"UTF-8\">"
-            + "</head>"
-            + "<body>"
-            + "<ul>";
-
-    private static final String getUserlistFormat2 =
-            "</ul>"
-            + "</body>"
-            +"</html>";
-
-
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         return new HttpResponse.ResponseBuilder(200)
