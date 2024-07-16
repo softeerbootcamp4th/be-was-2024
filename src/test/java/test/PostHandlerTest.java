@@ -1,7 +1,7 @@
 package test;
 
-import db.Database;
-import db.Session;
+import db.UserDatabase;
+import db.SessionDatabase;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static handler.Router.requestMapping;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -18,6 +19,7 @@ import static util.Constants.*;
 import static util.Utils.cookieParsing;
 
 public class PostHandlerTest {
+    private static final UserDatabase userDatabase = new UserDatabase();
 
     @Test
     @DisplayName("회원가입 테스트")
@@ -30,11 +32,12 @@ public class PostHandlerTest {
 
         requestMapping(httpRequest);
 
-        User user = Database.findUserById("testId");
-        assertEquals(user.getUserId(), "testId");
-        assertEquals(user.getName(), "testName");
-        assertEquals(user.getPassword(), "testPassword");
-        assertEquals(user.getEmail(), "testEmail");
+        Optional<User> user = userDatabase.findUserById("testId");
+
+        assertEquals(user.get().getUserId(), "testId");
+        assertEquals(user.get().getName(), "testName");
+        assertEquals(user.get().getPassword(), "testPassword");
+        assertEquals(user.get().getEmail(), "testEmail");
     }
 
 
@@ -63,10 +66,10 @@ public class PostHandlerTest {
 
         String sid = parsedCookie.get("sid");
 
-        String userId = Session.getUser(sid);
-        User user = Database.findUserById(userId);
+        String userId = SessionDatabase.getUser(sid);
+        Optional<User> user = userDatabase.findUserById(userId);
 
-        assertEquals(user.getUserId(), "testId");
+        assertEquals(user.get().getUserId(), "testId");
     }
 
     @Test
@@ -92,7 +95,6 @@ public class PostHandlerTest {
         registrationRequest.setBody(registrationParams.getBytes());
 
         requestMapping(registrationRequest);
-
 
         HttpRequest loginRequest = new HttpRequest();
         loginRequest.setStartLine(HttpMethod.POST, PATH_USER + PATH_LOGIN, "HTTP/1.1");

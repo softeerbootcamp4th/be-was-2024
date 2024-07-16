@@ -3,7 +3,7 @@ package db;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Session {
+public class SessionDatabase {
     private static final ConcurrentHashMap<String, String> sessionDatabase = new ConcurrentHashMap<>();
 
     public static String createSession(String userId){

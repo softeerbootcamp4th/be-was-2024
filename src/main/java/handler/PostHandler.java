@@ -1,7 +1,7 @@
 package handler;
 
 import db.ArticleDatabase;
-import db.Session;
+import db.SessionDatabase;
 import http.HttpResponse;
 import processer.UserProcessor;
 import util.exception.CustomException;
@@ -15,6 +15,9 @@ import static util.TemplateEngine.showAlert;
 import static util.Utils.cookieParsing;
 
 public class PostHandler {
+    private static final ArticleDatabase articleDatabase = new ArticleDatabase();
+
+
     static HttpResponse createUser(HttpRequest httpRequest) {
         String body = new String(httpRequest.getBody());
 
@@ -61,7 +64,7 @@ public class PostHandler {
             String password = bodyTokens[1].split(REG_EQ)[1];
 
             UserProcessor.loginUser(userId, password);
-            String sid = Session.createSession(userId);
+            String sid = SessionDatabase.createSession(userId);
 
             response.addStatus(HttpStatus.FOUND)
                     .addHeader(LOCATION, PATH_ROOT)
@@ -86,12 +89,12 @@ public class PostHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        String userId = Session.getUser(sid);
+        String userId = SessionDatabase.getUser(sid);
 
         String body = new String(httpRequest.getBody());
         String text = body.split("=")[1].trim();
 
-        ArticleDatabase.createArticle(userId, text, "");
+        articleDatabase.createArticle(userId, text, "");
 
         return new HttpResponse()
                 .addStatus(HttpStatus.FOUND)
