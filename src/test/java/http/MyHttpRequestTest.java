@@ -21,7 +21,7 @@ class MyHttpRequestTest {
         String expectedVersion = "HTTP/1.1";
         String expectedAcceptType = "text/html";
 
-        MyHttpRequest request = new MyHttpRequest(startLine, headers);
+        MyHttpRequest request = new MyHttpRequest(startLine, headers, new byte[0]);
 
         Assertions.assertThat(request.getMethod()).isEqualTo(expectedMethod);
         Assertions.assertThat(request.getUrl().getPathname()).isEqualTo(expectedPathname);
@@ -37,7 +37,7 @@ class MyHttpRequestTest {
 
         List<String> headers = List.of("Accept: text/html");
 
-        Assertions.assertThatThrownBy(() -> new MyHttpRequest(startLine1, headers));
-        Assertions.assertThatThrownBy(() -> new MyHttpRequest(startLine2, headers));
+        Assertions.assertThatThrownBy(() -> new MyHttpRequest(startLine1, headers, new byte[0]));
+        Assertions.assertThatThrownBy(() -> new MyHttpRequest(startLine2, headers, new byte[0]));
     }
 }

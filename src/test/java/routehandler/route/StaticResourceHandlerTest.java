@@ -23,7 +23,7 @@ class StaticResourceHandlerTest {
     @Test
     @DisplayName("존재하는 + 지원하는 파일 요청 시 OK")
     void handle_StatusOK_IfFileExistAndSupported() {
-        MyHttpRequest req = new MyHttpRequest("GET /index.html HTTP/1.1", new ArrayList<>());
+        MyHttpRequest req = new MyHttpRequest("GET /index.html HTTP/1.1", new ArrayList<>(), new byte[0]);
         MyHttpResponse res = new MyHttpResponse("HTTP/1.1");
 
         staticResourceHandler.handle(req, res);
@@ -38,7 +38,7 @@ class StaticResourceHandlerTest {
     @Test
     @DisplayName("존재하지 않는 파일 요청 시 NOT_FOUND")
     void handle_StatusOK_IfFileNotExist() {
-        MyHttpRequest req = new MyHttpRequest("GET /NotExist.html HTTP/1.1", new ArrayList<>());
+        MyHttpRequest req = new MyHttpRequest("GET /NotExist.html HTTP/1.1", new ArrayList<>(), new byte[0]);
         MyHttpResponse res = new MyHttpResponse("HTTP/1.1");
 
         staticResourceHandler.handle(req, res);
@@ -52,7 +52,7 @@ class StaticResourceHandlerTest {
     @Test
     @DisplayName("지원되지 않는 확장 요청 시 UNSURPPORTED_MEDIA_TYPE")
     void handle_StatusUnSupported_IfFileNotSupported() {
-        MyHttpRequest req = new MyHttpRequest("GET /test/main.rs HTTP/1.1", new ArrayList<>());
+        MyHttpRequest req = new MyHttpRequest("GET /test/main.rs HTTP/1.1", new ArrayList<>(), new byte[0]);
         MyHttpResponse res = new MyHttpResponse("HTTP/1.1");
 
         staticResourceHandler.handle(req, res);

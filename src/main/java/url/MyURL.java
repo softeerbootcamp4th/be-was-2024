@@ -2,6 +2,8 @@ package url;
 
 import url.exception.IllegalUrlException;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,15 +30,17 @@ public class MyURL {
 
     /**
      * 입력받은 문자열의 각 파트( protocol, domain, port, pathname, parameters )를 분리한다. anchor의 경우 서버에 전달되지 않는다.
-     * @param url url 문자열
+     * @param rawurl url 문자열
      * @return 각 파트를 담은 String[5]. 파트가 없는 자리는 null
      */
-    public static String[] getUrlEachPart(String url) {
+    public static String[] getUrlEachPart(String rawurl) {
         String protocol = null;
         String domain = null;
         String port = null;
         String pathname = null;
         String parameters = null;
+
+        String url = URLDecoder.decode(rawurl, StandardCharsets.UTF_8);
 
         // 프로토콜 검사
         String[] arrWithProtocol = url.split("://", 2);
@@ -77,12 +81,15 @@ public class MyURL {
 
     /**
      * 파라미터 목록을 Map 자료구조로 파싱한다.
-     * @param parameterString 파라미터 목록이 포함되어 있는 문자열
+     * @param rawparameterString 파라미터 목록이 포함되어 있는 문자열
      * @return 파라미터들을 파싱한 Map
      */
-    public static Map<String, String> parseParameter(String parameterString) {
-        Map<String, String> parameters = new HashMap<String, String>();
-        if (parameterString == null || parameterString.isEmpty()) return parameters;
+    public static Map<String, String> parseParameter(String rawparameterString) {
+        Map<String, String> parameters = new HashMap<>();
+        if (rawparameterString == null || rawparameterString.isEmpty()) return parameters;
+
+        // query param이 전달되는 과정에서 %인코딩되므로, 이걸 디코딩해줘야 함. 자바 라이브러리 사용.
+        String parameterString = URLDecoder.decode(rawparameterString, StandardCharsets.UTF_8);
 
         String[] paramLines = parameterString.split("&");
         for (String paramLine : paramLines) {

@@ -3,37 +3,50 @@ package chain;
 import chain.core.MiddlewareChain;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
+import http.enums.HttpMethodType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import routehandler.core.trie.RouteTrie;
+import routehandler.utils.Route;
+import routehandler.utils.RouteRecord;
 
 public class RouteHandleChain extends MiddlewareChain {
-    private final List<IRouteHandler> routeHandlers;
+    private static Logger logger = LoggerFactory.getLogger(RouteHandleChain.class);
+    private final RouteTrie trie;
 
     public RouteHandleChain() {
         super();
-        this.routeHandlers = new ArrayList<>();
+        this.trie = new RouteTrie();
     }
 
-    public RouteHandleChain(IRouteHandler... routeHandlers) {
+    public RouteHandleChain(Route... routes) {
         this();
-        this.routeHandlers.addAll(Arrays.asList(routeHandlers));
+        for (Route route : routes) {
+            for (RouteRecord routeInfo : route.getAllRouteHandlerRecords(null)) {
+                String pathname = routeInfo.pathname();
+                HttpMethodType method = routeInfo.method();
+                IRouteHandler handler = routeInfo.handler();
+                this.trie.insert(pathname, method, handler);
+            }
+        }
     }
 
-    public void addRouteHandler(IRouteHandler routeHandler) {
-        this.routeHandlers.add(routeHandler);
+    public void addRouteHandler(String url, IRouteHandler routeHandler) {
+        trie.insert(url, HttpMethodType.GET, routeHandler);
     }
 
     @Override
     public void act(MyHttpRequest req, MyHttpResponse res) {
         String pathname = req.getUrl().getPathname();
-        for(IRouteHandler routeHandler : routeHandlers) {
-            if(!routeHandler.canMatch(pathname)) continue;
+        HttpMethodType method = req.getMethod();
 
-            routeHandler.handle(req, res);
-            if(res.getStatusInfo() != null) break;
+        try {
+            IRouteHandler handler = trie.search(pathname,method);
+            handler.handle(req, res);
+        } catch (Exception e) {
+            // 핸들러에 의해 처리될 수 없는 상황 다음으로 넘긴다.
+            logger.error(e.getMessage());
         }
 
         next(req, res);

@@ -23,15 +23,10 @@ public class StaticResourceHandler implements IRouteHandler {
     private static final Logger logger = LoggerFactory.getLogger(StaticResourceHandler.class);
 
     @Override
-    public boolean canMatch(Object... args) {
-        return true;
-    }
-
-    @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         String fileName = req.getUrl().getPathname();
-        String filePath = AppConfig.STATIC_RESOURCES_PATH + fileName;
-        logger.debug(filePath);
+//        String filePath = AppConfig.STATIC_RESOURCES_PATH + fileName;
+        String filePath = fileName;
 
         // 헤더 작성
         try {
