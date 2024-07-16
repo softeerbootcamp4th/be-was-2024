@@ -33,6 +33,10 @@ public class ConstantUtil {
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
+    public static final String ARTICLE_ID = "articleId";
+    public static final String TITLE = "title";
+    public static final String CONTENT = "contents";
+    public static final String AUTHOR_NAME = "authorName";
 
     public static final String INVALID_LOGIN = "Invalid Login";
     public static final String INVALID_SIGNUP = "Invalid Signup";
@@ -40,6 +44,8 @@ public class ConstantUtil {
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
     public static final String INVALID_SESSION = "Invalid Session";
+
+    public static final String USER_NOT_FOUND = "User Not Found";
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";
