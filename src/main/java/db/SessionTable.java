@@ -7,7 +7,7 @@ import java.util.UUID;
 public class SessionTable {
     private static Map<UUID, String> sessions = new HashMap<>();
 
-    public static void addSession(UUID sessionId, String userId) {
+    public static synchronized void addSession(UUID sessionId, String userId) {
         sessions.put(sessionId, userId);
     }
 
