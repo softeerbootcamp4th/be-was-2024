@@ -8,6 +8,7 @@ import java.util.*;
 public class Database {
     private static Map<String, User> users = new HashMap<>();
 
+    private static List<Board> boards = new ArrayList<>();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
@@ -20,6 +21,16 @@ public class Database {
 
     public static Collection<User> findAll() {
         return users.values();
+    }
+
+
+    public static void addBoard(Board board)
+    {
+        boards.add(board);
+    }
+
+    public static List<Board> getBoards(){
+        return boards;
     }
 
 }

@@ -9,6 +9,7 @@ import util.FileDetection;
 import util.RequestObject;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -130,7 +131,7 @@ public class GetHandler
             User user = SessionHandler.getUserBySessionId(sessionId);
             if (user != null)//해당 쿠키 값의 세션 Id랑 일치하는 회원이 존재한다면
             {
-                String body = "{ \"username\" : \"" + user.getUserId() +"\" }";
+                String body = "{ \"username\" : \"" + URLDecoder.decode(user.getUserId(),StandardCharsets.UTF_8) +"\" }";
                 //JSON은 key 랑 value가 쌍 따옴표 " 로 둘러 싸져있어야한다.
                 byte[] bodyBytes = body.getBytes("UTF-8");
                 dos.writeBytes("HTTP/1.1 200 OK \r\n");
@@ -161,14 +162,13 @@ public class GetHandler
 
     private void sendBoardList(DataOutputStream dos) {
         try {
-            List<Board> boards = PostHandler.getBoards();
+            List<Board> boards = Database.getBoards();
             StringBuilder json = new StringBuilder();
             json.append("{ \"boards\": [");
             for (int i = 0; i < boards.size(); i++) {
                 Board board = boards.get(i);
                 json.append("{");
-                json.append("\"title\": \"").append(board.getTitle()).append("\",");
-                json.append("\"content\": \"").append(board.getContent()).append("\"");
+                json.append("\"title\": \"").append(URLDecoder.decode(board.getTitle(),StandardCharsets.UTF_8)).append("\"");
                 json.append("}");
                 if (i < boards.size() - 1) {
                     json.append(",");

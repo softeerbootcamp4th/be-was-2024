@@ -1,5 +1,6 @@
 package handler;
 
+import db.Database;
 import model.Board;
 import model.User;
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ public class PostHandler
 
 
     private static final Logger logger = LoggerFactory.getLogger(PostHandler.class);
-    private static final List<Board> boards = new ArrayList<>();
 
     private final UserProcessor userProcessor;
 
@@ -80,14 +80,12 @@ public class PostHandler
         }
         if (title != null && content != null) {
 
-            boards.add(new Board(title, content));
+            Database.addBoard(new Board(title,content));
         }
         response302Header(dos, "/index.html");
     }//작성 후 메인페이지로 넘어감
 
-    public static List<Board> getBoards(){
-        return boards;
-    }
+
 
     private void response302Header(DataOutputStream dos, String loc)
     {
