@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="../reset.css" rel="stylesheet" />
+    <link href="../global.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <form method="POST" action="/user/logout">
+                    <button class="btn btn_contained btn_size_s" type="submit">로그아웃</button>
+                </form>
+            </li>
+        </ul>
+    </header>
+    <div class="page">
+        <h2 class="page-title">유저 목록</h2>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <style>
+                .user-list-content {
+                    display: flex;
+                    flex-direction: column;
+                    width: 300px;
+                    border: 1px solid grey;
+                    background-color: #f9f9f9;
+                    border-radius: 8px;
+                    padding: 12px 8px;
+                    gap: 4px;
+                }
+            </style>
+            {% userList %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

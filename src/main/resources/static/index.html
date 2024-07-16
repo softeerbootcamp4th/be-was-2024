@@ -12,14 +12,26 @@
       <header class="header">
         <a href="/"><img src="./img/signiture.svg" /></a>
         <ul class="header__menu">
+          {% hasSID ?
+          <li class="header__menu__item">{{ userName }} 님</li>
           <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            <a class="btn btn_contained btn_size_s" href="/user/list">유저 리스트</a>
+          </li>
+          <li class="header__menu__item">
+            <form method="POST" action="/user/logout">
+              <button class="btn btn_contained btn_size_s" type="submit">로그아웃</button>
+            </form>
+          </li>
+          :
+          <li class="header__menu__item">
+            <a class="btn btn_contained btn_size_s" href="/user/login.html">로그인</a>
           </li>
           <li class="header__menu__item">
             <a class="btn btn_ghost btn_size_s" href="/registration">
               회원 가입
             </a>
           </li>
+          %}
         </ul>
       </header>
       <div class="wrapper">

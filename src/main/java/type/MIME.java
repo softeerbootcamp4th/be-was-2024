@@ -2,7 +2,7 @@ package type;
 
 import java.util.Arrays;
 
-public enum MIMEType {
+public enum MIME {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
     JS("js", "application/javascript"),
@@ -15,13 +15,13 @@ public enum MIMEType {
     private final String value;
     private final String contentType;
 
-    MIMEType(String value, String contentType) {
+    MIME(String value, String contentType) {
         this.value = value;
         this.contentType = contentType;
     }
 
-    public static MIMEType findByContentType(String contentType) {
-        return Arrays.stream(MIMEType.values())
+    public static MIME findByContentType(String contentType) {
+        return Arrays.stream(MIME.values())
                 .filter(type -> type.getValue().equals(contentType.toLowerCase()))
                 .findAny()
                 .orElse(DEFAULT);
