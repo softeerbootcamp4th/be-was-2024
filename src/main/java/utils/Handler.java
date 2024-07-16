@@ -4,5 +4,5 @@ import java.io.IOException;
 
 @FunctionalInterface
 public interface Handler {
-    void handle(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) throws IOException;
+    String handle(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler, Model model) throws IOException;
 }
