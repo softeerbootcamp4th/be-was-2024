@@ -13,12 +13,17 @@ import static util.Constants.*;
 
 public class ArticleDatabase {
     private static final Logger logger = LoggerFactory.getLogger(ArticleDatabase.class);
+    private DatabaseConnectionPool connectionPool;
 
-    public static Connection connect() throws SQLException {
-        return DriverManager.getConnection(JDBC_URL, H2_USERNAME, H2_PASSWORD);
+    public ArticleDatabase() {
+        connectionPool = new DatabaseConnectionPool(JDBC_URL_ARTICLE);
     }
 
-    public static void createArticleTable() {
+    public Connection connect() throws SQLException {
+        return connectionPool.getConnection();
+    }
+
+    public void createArticleTable() {
         String sql = "CREATE TABLE IF NOT EXISTS ARTICLE(" +
                 "ARTICLE_ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "USER_ID VARCHAR(255)," +
@@ -34,7 +39,7 @@ public class ArticleDatabase {
         }
     }
 
-    public static void createArticle(String userId, String text, String pic) {
+    public void createArticle(String userId, String text, String pic) {
         String sql = "INSERT INTO ARTICLE (ARTICLE_ID, USER_ID, TEXT, PIC) VALUES (DEFAULT, ?,?,?)";
         try (Connection conn = connect(); PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, userId);
@@ -47,21 +52,25 @@ public class ArticleDatabase {
         }
     }
 
-    public static List<Integer> getAllArticles() {
-        List<Integer> articleIds = new ArrayList<>();
+    public List<Article> getAllArticles() {
+        List<Article> articles = new ArrayList<>();
         String sql = "SELECT * FROM ARTICLE";
         try (Connection connection = connect(); Statement statement = connection.createStatement(); ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
-                int id = rs.getInt("ARTICLE_ID");
-                articleIds.add(id);
+                int articleId = rs.getInt("ARTICLE_ID");
+                String userId = rs.getString("USER_ID");
+                String text = rs.getString("TEXT");
+                String pic = rs.getString("PIC");
+
+                articles.add(new Article(articleId, userId, text, pic));
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
         }
-        return articleIds;
+        return articles;
     }
 
-    public static Optional<Article> getArticle(Integer articleId) {
+    public Optional<Article> getArticle(Integer articleId) {
         String sql = "SELECT * FROM ARTICLE WHERE ARTICLE_ID = ?";
 
         try (Connection connection = connect(); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
@@ -73,7 +82,7 @@ public class ArticleDatabase {
                 String text = rs.getString("TEXT");
                 String pic = rs.getString("PIC");
 
-                Article article = new Article(userId, text, pic);
+                Article article = new Article(articleId, userId, text, pic);
                 return Optional.of(article);
             }
         } catch (SQLException e) {
