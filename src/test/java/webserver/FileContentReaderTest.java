@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import webserver.enums.HttpStatus;
 import webserver.http.MyHttpResponse;
+import webserver.util.FileContentReader;
 
 import java.io.IOException;
 
@@ -18,7 +20,8 @@ public class FileContentReaderTest {
     void readStaticResourceFile(String uri) throws IOException {
         // When
         boolean isStaticResource = fileContentReader.isStaticResource(uri);
-        MyHttpResponse response = fileContentReader.readStaticResource(uri);
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.OK);
+        fileContentReader.readStaticResource(uri, response);
 
         // Then
         Assertions.assertTrue(isStaticResource);

@@ -56,7 +56,7 @@ class HttpResponseParserTest {
         MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         when(fileContentReader.isStaticResource(anyString())).thenReturn(true);
-        when(fileContentReader.readStaticResource(anyString())).thenReturn(httpResponse);
+        when(fileContentReader.readStaticResource(anyString(), any())).thenReturn(httpResponse);
 
         // When
 

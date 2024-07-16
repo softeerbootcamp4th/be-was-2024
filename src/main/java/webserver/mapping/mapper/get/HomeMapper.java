@@ -1,5 +1,6 @@
 package webserver.mapping.mapper.get;
 
+import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
@@ -14,10 +15,13 @@ public class HomeMapper implements HttpMapper {
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
+        MyHttpResponse response = new MyHttpResponse(HttpStatus.OK);
         if (httpRequestParser.isLogin(httpRequest)) {
-            return fileContentReader.readStaticResource("/main/index.html");
+            fileContentReader.readStaticResource("/main/index.html", response);
+            return response;
         }
-        return fileContentReader.readStaticResource("/index.html");
+        fileContentReader.readStaticResource("/index.html", response);
+        return response;
     }
 
 }

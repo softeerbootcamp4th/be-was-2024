@@ -2,6 +2,7 @@ package webserver.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.enums.HttpStatus;
 import webserver.mapping.MappingHandler;
 import webserver.util.FileContentReader;
 
@@ -23,8 +24,11 @@ public class HttpResponseParser {
     public void parseResponse(DataOutputStream dos, MyHttpRequest httpRequest) throws IOException {
         MyHttpResponse httpResponse;
 
+
         if (fileContentReader.isStaticResource(httpRequest.getPath())) {
-            httpResponse = fileContentReader.readStaticResource(httpRequest.getPath());
+            httpResponse = new MyHttpResponse(HttpStatus.OK);
+
+            fileContentReader.readStaticResource(httpRequest.getPath(), httpResponse);
         } else {
             httpResponse = mappingHandler.mapping(httpRequest);
         }

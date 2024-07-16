@@ -21,7 +21,7 @@ public class LoginUserMapper implements HttpMapper {
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override
-    public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
+    public synchronized MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
         Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));
 
         String userId = body.get("userId");

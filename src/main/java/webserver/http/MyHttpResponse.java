@@ -1,7 +1,9 @@
 package webserver.http;
 
+import webserver.enums.ContentType;
 import webserver.enums.HttpStatus;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class MyHttpResponse {
@@ -33,7 +35,11 @@ public class MyHttpResponse {
     }
 
     public MyHttpResponse(HttpStatus httpStatus, Map<String, String> headers) {
-        this(httpStatus, headers, null);
+        this(httpStatus, headers, new byte[0]);
+    }
+
+    public MyHttpResponse(HttpStatus httpStatus) {
+        this(httpStatus, new HashMap<>(), new byte[0]);
     }
 
     public String getVersion() {
@@ -53,7 +59,17 @@ public class MyHttpResponse {
     }
 
     public void setBody(byte[] body) {
+        this.headers.put("Content-Length", String.valueOf(body.length));
         this.body = body;
+    }
+
+    public void addContentType(String contentType) {
+        int extensionIndex = contentType.lastIndexOf(".");
+
+        if (extensionIndex != -1) {
+            String extension = contentType.substring(extensionIndex + 1);
+            headers.put("Content-Type", ContentType.valueOf(extension).getContentType());
+        }
     }
 
     @Override

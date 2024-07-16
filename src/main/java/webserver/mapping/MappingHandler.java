@@ -47,8 +47,8 @@ public class MappingHandler {
         String path = httpRequest.getPath();
 
         HttpMapper mapper = switch (method) {
-            case "GET" -> getHandlers.get(path);
-            case "POST" -> postHandlers.get(path);
+            case "GET" -> getHandlers.get(path) == null ? new NotFoundMapper() : getHandlers.get(path);
+            case "POST" -> postHandlers.get(path) == null ? new NotFoundMapper() : postHandlers.get(path);
             default -> new NotFoundMapper();
         };
 
