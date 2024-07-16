@@ -1,14 +1,16 @@
 package processor;
 
 import db.Database;
+import handler.PostHandler;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.RequestObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class UserProcessor {
-
 
     private UserProcessor() {}
 
@@ -35,7 +37,14 @@ public class UserProcessor {
         }
 
         User user = new User(map.get("userId"),map.get("password"), map.get("name"),map.get("email"));
-        Database.addUser(user);
+        try{
+            Database.addUser(user);
+
+        }catch(Exception e)
+        {
+
+        }
+
     }
 
     public User userFind(RequestObject requestObject) throws Exception {

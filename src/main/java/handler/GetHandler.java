@@ -146,7 +146,14 @@ public class GetHandler
     //사용자 목록을 출력한다
     private void handleUserListRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
         StringBuilder sb = new StringBuilder();
-        Collection<User> list = Database.findAll();
+        Collection<User> list = new ArrayList<>();
+        try{
+            list = Database.findAll();
+        } catch(Exception e)
+        {
+            logger.debug(e.getMessage());
+        }
+
         for(User temp : list)//list에 담겨있는 모든 유저 정보를 StringBuilder에 담아준다
         {
             sb.append(temp).append("<br>");
@@ -184,7 +191,7 @@ public class GetHandler
             dos.writeBytes("\r\n");
             dos.write(bodyBytes);
             dos.flush();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error("Error sending board list: {}", e.getMessage());
         }
     }

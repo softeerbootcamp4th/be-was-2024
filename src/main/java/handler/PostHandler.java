@@ -79,8 +79,12 @@ public class PostHandler
             }
         }
         if (title != null && content != null) {
-
-            Database.addBoard(new Board(title,content));
+            try{
+                Database.addBoard(new Board(title,content));
+            } catch(Exception e)
+            {
+                logger.debug(e.getMessage());
+            }
         }
         response302Header(dos, "/index.html");
     }//작성 후 메인페이지로 넘어감
