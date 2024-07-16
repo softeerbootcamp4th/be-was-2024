@@ -22,8 +22,9 @@ public enum HttpRequestMapper {
     ARTICLE_CREATE("/article/create", "POST"),
 
     // Error
-    MESSAGE_NOT_ALLOWED("/notallow", "GET"),
-    NOT_FOUND("/error", "GET");
+    METHOD_NOT_ALLOWED("/notAllow", "GET"),
+    NOT_FOUND("/notFound", "GET"),
+    SERVER_ERROR("/error", "GET");
 
     private final String path;
     private final String method;
@@ -39,10 +40,10 @@ public enum HttpRequestMapper {
                 if(mapper.method.equals(method)){
                     return mapper;
                 }
-                return MESSAGE_NOT_ALLOWED; // 요청 경로는 찾았으나 메서드가 없는 경우
+                return METHOD_NOT_ALLOWED; // 요청 경로는 찾았으나 메서드가 없는 경우
             }
         }
-        return NOT_FOUND;
+        return SERVER_ERROR; // 요청 경로가 없는 경우
     }
 
     public static boolean isAuthRequest(String path, String method) {

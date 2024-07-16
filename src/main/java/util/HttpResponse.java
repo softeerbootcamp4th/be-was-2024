@@ -43,11 +43,30 @@ public class HttpResponse {
         return response;
     }
 
-    public static HttpResponse error(String statusCode, String httpVersion) {
+    public static HttpResponse notFound(String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.FAULT;
-        response.statusCode = statusCode;
+        response.statusCode = HttpCode.NOT_FOUND.getStatus();
         response.httpVersion = httpVersion;
+        response.putBody(HttpCode.NOT_FOUND.toString());
+        return response;
+    }
+
+    public static HttpResponse methodNotAllowed(String httpVersion) {
+        HttpResponse response = new HttpResponse();
+        response.type = ConstantUtil.FAULT;
+        response.statusCode = HttpCode.METHOD_NOT_ALLOWED.getStatus();
+        response.httpVersion = httpVersion;
+        response.putBody(HttpCode.METHOD_NOT_ALLOWED.toString());
+        return response;
+    }
+
+    public static HttpResponse error(String body, String httpVersion) {
+        HttpResponse response = new HttpResponse();
+        response.type = ConstantUtil.FAULT;
+        response.statusCode = HttpCode.INTERNAL_SERVER_ERROR.getStatus();
+        response.httpVersion = httpVersion;
+        response.putBody(body);
         return response;
     }
 
