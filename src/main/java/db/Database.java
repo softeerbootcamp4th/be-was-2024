@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Database {
     private static ConcurrentHashMap<String, User> users = new ConcurrentHashMap<>();
 
+    static{
+        addUser(new User("a", "a", "a", "a"));
+    }
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
     }

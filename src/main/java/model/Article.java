@@ -1,9 +1,9 @@
 package model;
 
 public class Article {
-    private String userId;
-    private String text;
-    private String pic;
+    private final String userId;
+    private final String text;
+    private final String pic;
 
     public Article(String userId, String text, String pic) {
         this.userId = userId;

@@ -1,5 +1,6 @@
 package handler;
 
+import db.ArticleDatabase;
 import db.Session;
 import http.HttpResponse;
 import processer.UserProcessor;
@@ -7,8 +8,11 @@ import util.exception.CustomException;
 import http.HttpRequest;
 import http.HttpStatus;
 
+import java.util.HashMap;
+
 import static util.Constants.*;
 import static util.TemplateEngine.showAlert;
+import static util.Utils.cookieParsing;
 
 public class PostHandler {
     static HttpResponse createUser(HttpRequest httpRequest) {
@@ -76,4 +80,23 @@ public class PostHandler {
                 .addHeader(CONTENT_TYPE, TEXT_HTML);
         return response;
     }
+
+    static HttpResponse postArticle(HttpRequest httpRequest) {
+        String cookie = httpRequest.getHeaders(COOKIE);
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get(SID);
+
+        String userId = Session.getUser(sid);
+
+        String body = new String(httpRequest.getBody());
+        String text = body.split("=")[1].trim();
+
+        ArticleDatabase.createArticle(userId, text, "");
+
+        return new HttpResponse()
+                .addStatus(HttpStatus.FOUND)
+                .addHeader(LOCATION, PATH_ROOT)
+                .addBody(new byte[0]);
+    }
+
 }
