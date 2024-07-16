@@ -6,7 +6,7 @@ import webserver.Request;
 import java.io.IOException;
 
 public abstract class Distributor {
-    public static Distributor of(Request request) {
+    public static Distributor from(Request request) {
         String method = request.getHttpMethod();
         if (method.equals("GET")) {
             return new GetDistributor(request);
