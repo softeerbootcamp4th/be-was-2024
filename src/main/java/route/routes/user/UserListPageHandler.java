@@ -15,11 +15,6 @@ import java.util.Map;
 public class UserListPageHandler implements IRouteHandler {
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
-        if(req.getStoreData("user") == null) {
-            res.redirect("/login");
-            return;
-        }
-
         res.setStatusInfo(HttpStatusType.OK);
         Map<String, Object> items = new HashMap<>();
 

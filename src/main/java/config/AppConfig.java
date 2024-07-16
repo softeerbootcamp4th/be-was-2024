@@ -7,4 +7,5 @@ public class AppConfig {
     public static final int THREAD_POOL_SIZE = 10;
 
     public static final String SESSION_NAME = "SID";
+    public static final String USER = "user";
 }

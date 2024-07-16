@@ -29,7 +29,7 @@ public class UserSessionChain extends MiddlewareChain {
         }
 
         User user = Database.findUserById(userId);
-        req.setStoreData("user", user);
+        req.setStoreData(AppConfig.USER, user);
         logger.debug("user is {}", user);
 
         next(req,res);

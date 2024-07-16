@@ -5,6 +5,7 @@ import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import chain.AuthRedirectToLoginChain;
 import chain.NotFoundHandleChain;
 import chain.StaticResourceChain;
 import chain.UserSessionChain;
@@ -27,6 +28,11 @@ public class WebServer {
 
         ChainManager chainManager = new ChainManager(
             new UserSessionChain(),
+            new AuthRedirectToLoginChain(
+                    "/user/list",
+                    "/posts/write",
+                    "/posts/edit"
+            ),
             new StaticResourceChain(),
             RouteConfig.routeHandleChain(),
             new NotFoundHandleChain()
