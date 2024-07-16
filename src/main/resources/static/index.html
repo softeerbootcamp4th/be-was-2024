@@ -93,14 +93,18 @@
       // 받아온 데이터를 로그로 확인
       console.log("Board data:", data);
 
-      // 게시글 목록을 HTML에 추가
-      postsContainer.innerHTML = data.boards.map(board => `
-        <div class="post">
-          <h3 >${board.title}</h3>
-          <p class="post__article">${board.content}</p>
-        </div>
-      `).join("");
-
+      // data가 존재하고 boards 속성이 존재하는지 확인
+      if (data && data.boards) {
+        // 게시글 목록을 HTML에 추가
+        postsContainer.innerHTML = data.boards.map(board => `
+          <div class="post">
+            <h3 >${board.title}</h3>
+          </div>
+        `).join("");
+      } else {
+        console.error("No boards found in the response data.");
+        postsContainer.innerHTML = "<p>게시글이 없습니다.</p>";
+      }
     })
     .catch(error => console.error("Error fetching boards:", error));
 

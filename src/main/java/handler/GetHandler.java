@@ -161,22 +161,23 @@ public class GetHandler
 
     private void sendBoardList(DataOutputStream dos) {
         try {
-            List<Board> list = new ArrayList<>(PostHandler.getBoards());
+            List<Board> boards = PostHandler.getBoards();
             StringBuilder json = new StringBuilder();
-            json.append("[");
-            for (int i = 0; i < list.size(); i++) {
-                Board temp = list.get(i);
+            json.append("{ \"boards\": [");
+            for (int i = 0; i < boards.size(); i++) {
+                Board board = boards.get(i);
                 json.append("{");
-                json.append("\"title\":\"").append(temp.getTitle()).append("\",");
-                json.append("\"content\":\"").append(temp.getContent()).append("\"");
+                json.append("\"title\": \"").append(board.getTitle()).append("\",");
+                json.append("\"content\": \"").append(board.getContent()).append("\"");
                 json.append("}");
-                if (i < list.size() - 1) {
+                if (i < boards.size() - 1) {
                     json.append(",");
                 }
             }
-            json.append("]");
+            json.append("]}");
 
-            byte[] bodyBytes = json.toString().getBytes("UTF-8");
+            String jsonResponse = json.toString();
+            byte[] bodyBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");
             dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
@@ -184,7 +185,7 @@ public class GetHandler
             dos.write(bodyBytes);
             dos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Error sending board list: {}", e.getMessage());
         }
     }
 
