@@ -5,10 +5,9 @@ import enums.Status;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import utils.Cookie;
-import utils.Handler;
-import utils.HttpRequestParser;
-import utils.HttpResponseHandler;
+import utils.*;
+import view.View;
+import view.ViewResolver;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RequestHandlerTest {
 
     private static final String CRLF = "\r\n";
+    private static final String STATIC_RESOURCE_PATH = "src/main/resources/static";
 
     @Test
     @DisplayName("GET 유저 생성 테스트")
@@ -41,9 +41,7 @@ public class RequestHandlerTest {
         HttpRequestParser httpRequestParser = new HttpRequestParser(in);
         HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
-        Router router = new Router();
-        Handler handler = router.getHandler(httpRequestParser);
-        handler.handle(httpRequestParser, httpResponseHandler);
+        request(httpRequestParser, httpResponseHandler);
 
         // then
         Status status = httpResponseHandler.getStatus();
@@ -73,9 +71,7 @@ public class RequestHandlerTest {
         HttpRequestParser httpRequestParser = new HttpRequestParser(in);
         HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
-        Router router = new Router();
-        Handler handler = router.getHandler(httpRequestParser);
-        handler.handle(httpRequestParser, httpResponseHandler);
+        request(httpRequestParser, httpResponseHandler);
 
         // then
         User user = Database.findUserById("123");
@@ -111,9 +107,7 @@ public class RequestHandlerTest {
         HttpRequestParser httpRequestParser = new HttpRequestParser(in);
         HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
-        Router router = new Router();
-        Handler handler = router.getHandler(httpRequestParser);
-        handler.handle(httpRequestParser, httpResponseHandler);
+        request(httpRequestParser, httpResponseHandler);
 
         // then
         Map<String, String> responseHeadersMap = httpResponseHandler.getResponseHeadersMap();
@@ -161,9 +155,8 @@ public class RequestHandlerTest {
         HttpRequestParser httpRequestParser = new HttpRequestParser(in);
         HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
-        Router router = new Router();
-        Handler handler = router.getHandler(httpRequestParser);
-        handler.handle(httpRequestParser, httpResponseHandler);
+        request(httpRequestParser, httpResponseHandler);
+
 
         // then
         Status status = httpResponseHandler.getStatus();
@@ -171,7 +164,7 @@ public class RequestHandlerTest {
     }
 
     @Test
-    @DisplayName("로그인 실패 테스트")
+    @DisplayName("로그아웃")
     public void logoutTest() throws IOException {
         // given
         User user = new User("123", "123", "123", "123@gmail.com");
@@ -199,9 +192,7 @@ public class RequestHandlerTest {
         HttpRequestParser httpRequestParser = new HttpRequestParser(in);
         HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
-        Router router = new Router();
-        Handler handler = router.getHandler(httpRequestParser);
-        handler.handle(httpRequestParser, httpResponseHandler);
+        request(httpRequestParser, httpResponseHandler);
 
         // then
         Status status = httpResponseHandler.getStatus();
@@ -230,8 +221,26 @@ public class RequestHandlerTest {
         return new ByteArrayInputStream(httpRequestBytes);
     }
 
-    private void request() {
+    private static void request(HttpRequestParser httpRequestParser, HttpResponseHandler httpResponseHandler) throws IOException {
+        Model model = new Model();
+        ViewResolver viewResolver = new ViewResolver(STATIC_RESOURCE_PATH, ".html");
 
+        Router router = new Router();
+        Handler handler = router.getHandler(httpRequestParser);
+        String viewName = handler.handle(httpRequestParser, httpResponseHandler, model);
+
+        if (viewName.startsWith("redirect:")) {
+            String redirectUrl = viewName.substring("redirect:".length());
+            httpResponseHandler
+                    .addHeader("Location", redirectUrl)
+                    .respond();
+        } else {
+            View view = viewResolver.resolve(viewName);
+            String content = view.render(model.getAttributes());
+            httpResponseHandler
+                    .setBody(content.getBytes())
+                    .addHeader("Content-Type", "text/html")
+                    .respond();
+        }
     }
-
 }
