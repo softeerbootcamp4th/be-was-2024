@@ -40,13 +40,11 @@ public class ConstantUtil {
     public static final String TITLE = "title";
     public static final String CONTENT = "contents";
     public static final String AUTHOR_NAME = "authorName";
-
-    public static final String INVALID_LOGIN = "Invalid Login";
+    
     public static final String INVALID_SIGNUP = "Invalid Signup";
     public static final String INVALID_PATH = "Invalid Path: ";
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
-    public static final String INVALID_SESSION = "Invalid Session";
 
     public static final String USER_NOT_FOUND = "User Not Found";
 

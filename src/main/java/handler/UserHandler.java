@@ -37,6 +37,9 @@ public class UserHandler implements ModelHandler<User>{
         if(!fields.get(ConstantUtil.EMAIL).matches(ConstantUtil.EMAIL_REGEX)){
             throw new ModelException(ConstantUtil.INVALID_SIGNUP);
         }
+        if(fields.get(ConstantUtil.USER_ID) == null || fields.get(ConstantUtil.PASSWORD) == null || fields.get(ConstantUtil.NAME) == null || fields.get(ConstantUtil.EMAIL) == null){
+            throw new ModelException(ConstantUtil.INVALID_SIGNUP);
+        }
 
         User user = User.from(fields);
         Database.addUser(user);

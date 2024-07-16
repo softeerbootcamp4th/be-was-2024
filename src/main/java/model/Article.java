@@ -51,7 +51,7 @@ public class Article {
         return new Article(id, title, content, authorName);
     }
 
-    public String getArticleId() {
+    public String getId() {
         return id;
     }
 

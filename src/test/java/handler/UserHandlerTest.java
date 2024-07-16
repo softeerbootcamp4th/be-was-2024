@@ -85,6 +85,19 @@ class UserHandlerTest {
                 .hasMessage(ConstantUtil.INVALID_SIGNUP);
     }
 
+    @DisplayName("create: 약속된 4개의 키가 아닐 경우 예외가 발생해야 한다.")
+    @Test
+    void createWithInvalidFields() {
+        // given
+        Map<String, String> fields = new HashMap<>
+                (Map.of(ConstantUtil.USER_ID, "userId", ConstantUtil.PASSWORD, "pw", "wrong", "name", ConstantUtil.EMAIL, "email"));
+
+        // when & then
+        assertThatThrownBy(() -> userHandler.create(fields))
+                .isInstanceOf(ModelException.class)
+                .hasMessage(ConstantUtil.INVALID_SIGNUP);
+    }
+
     @DisplayName("create: 키 중 빈 값이 존재할 때 예외가 발생해야 한다.")
     @Test
     void createWithEmptyFields() {

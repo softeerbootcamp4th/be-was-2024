@@ -1,6 +1,7 @@
 package util;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import session.Session;
@@ -56,19 +57,47 @@ class HttpResponseTest {
         assertThat(response.getBody()).isNull();
     }
 
-    @DisplayName("error: 에러 응답을 생성한다.")
-    @ParameterizedTest(name = "statusCode: {0}, httpVersion: {1}")
-    @CsvSource(value = {"400, HTTP/1.1", "404, HTTP/1.1", "500, HTTP/1.1"})
-    void error(String statusCode, String httpVersion) {
+    @DisplayName("notFound: 404 응답을 생성한다.")
+    @Test
+    void notFound() {
         // when
-        HttpResponse response = HttpResponse.error(statusCode, httpVersion);
+        String httpVersion = "HTTP/1.1";
+        HttpResponse response = HttpResponse.notFound(httpVersion);
 
         // then
         assertThat(response.getType()).isEqualTo(ConstantUtil.FAULT);
-        assertThat(response.getPath()).isNull();
-        assertThat(response.getStatusCode()).isEqualTo(statusCode);
+        assertThat(response.getStatusCode()).isEqualTo(HttpCode.NOT_FOUND.getStatus());
         assertThat(response.getHttpVersion()).isEqualTo(httpVersion);
-        assertThat(response.getBody()).isNull();
+        assertThat(response.getBody()).isEqualTo(HttpCode.NOT_FOUND.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    @DisplayName("methodNotAllowed: 405 응답을 생성한다.")
+    @Test
+    void methodNotAllowed() {
+        // when
+        String httpVersion = "HTTP/1.1";
+        HttpResponse response = HttpResponse.methodNotAllowed(httpVersion);
+
+        // then
+        assertThat(response.getType()).isEqualTo(ConstantUtil.FAULT);
+        assertThat(response.getStatusCode()).isEqualTo(HttpCode.METHOD_NOT_ALLOWED.getStatus());
+        assertThat(response.getHttpVersion()).isEqualTo(httpVersion);
+        assertThat(response.getBody()).isEqualTo(HttpCode.METHOD_NOT_ALLOWED.toString().getBytes(StandardCharsets.UTF_8));
+    }
+
+    @DisplayName("error: 500 응답을 생성한다.")
+    @ParameterizedTest(name = "body: {0}")
+    @CsvSource(value = {"Internal Server Error", "Server Error", "Error"})
+    void error(String body) {
+        // when
+        String httpVersion = "HTTP/1.1";
+        HttpResponse response = HttpResponse.error(body, httpVersion);
+
+        // then
+        assertThat(response.getType()).isEqualTo(ConstantUtil.FAULT);
+        assertThat(response.getStatusCode()).isEqualTo(HttpCode.INTERNAL_SERVER_ERROR.getStatus());
+        assertThat(response.getHttpVersion()).isEqualTo(httpVersion);
+        assertThat(response.getBody()).isEqualTo(body.getBytes(StandardCharsets.UTF_8));
     }
 
     @DisplayName("redirect: 리다이렉트 응답을 생성한다.")

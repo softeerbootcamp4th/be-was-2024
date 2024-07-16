@@ -4,8 +4,8 @@ import db.Database;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import util.HttpRequestObject;
-import util.HttpResponseObject;
+import util.HttpRequest;
+import util.HttpResponse;
 
 import java.io.IOException;
 
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class FrontRequestProcessTest {
 
     FrontRequestProcess frontRequestProcess;
-    HttpRequestObject httpRequestObject;
+    HttpRequest httpRequest;
 
     @BeforeEach
     void setUp() {
@@ -25,10 +25,10 @@ class FrontRequestProcessTest {
     @Test
     void staticResourceTest() throws IOException {
         // given
-        httpRequestObject = HttpRequestObject.from("GET /index.html HTTP/1.1");
+        httpRequest = HttpRequest.from("GET /index.html HTTP/1.1");
 
         // when
-        HttpResponseObject httpResponseObject = frontRequestProcess.handleRequest(httpRequestObject);
+        HttpResponse httpResponseObject = frontRequestProcess.handleRequest(httpRequest);
 
         // then
         assertThat(httpResponseObject.getType()).isEqualTo("static");
@@ -40,16 +40,16 @@ class FrontRequestProcessTest {
     @Test
     void signUpTest() throws IOException {
         // given
-        httpRequestObject = HttpRequestObject.from("POST /user/create HTTP/1.1");
-        httpRequestObject.putBody("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
+        httpRequest = HttpRequest.from("POST /user/create HTTP/1.1");
+        //httpRequest.putBody("userId=javajigi&password=password&name=%EB%B0%95%EC%9E%AC%EC%84%B1&email=javajigi%40slipp.net");
 
         // when
-        HttpResponseObject httpResponseObject = frontRequestProcess.handleRequest(httpRequestObject);
+        HttpResponse httpResponseObject = frontRequestProcess.handleRequest(httpRequest);
 
         // then
         assertThat(httpResponseObject.getType()).isEqualTo("dynamic");
         assertThat(httpResponseObject.getPath()).isEqualTo("/index.html");
         assertThat(httpResponseObject.getStatusCode()).isEqualTo("302");
-        assertThat(Database.findUserById("javajigi").getUserId()).isEqualTo("javajigi");
+        assertThat(Database.findUserById("javajigi").get().getUserId()).isEqualTo("javajigi");
     }
 }

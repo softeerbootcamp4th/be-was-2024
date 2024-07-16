@@ -79,24 +79,32 @@ public class Database {
     /**
      * Article 객체를 DB에 추가하는 메서드
      * @param article
+     * @return articleId
      */
-    public static void addArticle(Article article) {
+    public static Article addArticle(Article article) {
         String sql = "INSERT INTO \"Article\" (title, contents, authorName) VALUES (?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+             PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             pstmt.setString(1, article.getTitle());
             pstmt.setString(2, article.getContent());
             pstmt.setString(3, article.getAuthorName());
             pstmt.execute();
 
+            try (ResultSet rs = pstmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    int id = rs.getInt(1);
+                    return Article.of(id + "", article.getTitle(), article.getContent(), article.getAuthorName());
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return article;
     }
 
-    /**
+        /**
      * userId로 User 객체를 조회하는 메서드
      * @param userId
      * @return User
