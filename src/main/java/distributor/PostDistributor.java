@@ -6,8 +6,6 @@ import processor.ResponseProcessor;
 import processor.UserProcessor;
 import webserver.Request;
 
-import java.io.IOException;
-
 public class PostDistributor extends Distributor {
     Request request;
     UserProcessor userProcessor = new UserProcessor();

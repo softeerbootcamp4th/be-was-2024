@@ -5,8 +5,6 @@ import model.ViewData;
 import processor.ResponseProcessor;
 import webserver.Request;
 
-import java.io.IOException;
-
 public class GetDistributor extends Distributor {
     Request request;
     ViewData viewData;
