@@ -3,12 +3,21 @@ package util;
 import java.io.*;
 import java.util.Properties;
 
+/**
+ * 파일 입출력 전용 유틸리티 클래스
+ */
 public class IOUtil {
 
     // to prevent instantiation
     private IOUtil() {
     }
 
+    /**
+     * 경로가 디렉토리인지 판정
+     * @param isStatic
+     * @param path
+     * @return boolean
+     */
     public static boolean isDirectory(boolean isStatic, String path) {
         try(InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(ConstantUtil.PROPERTIES)){
             if(input == null){
@@ -26,6 +35,12 @@ public class IOUtil {
         return false;
     }
 
+    /**
+     * 파일을 읽어 바이트 배열로 반환하며, 정적과 동적 파일을 구분하여 읽음
+     * @param isStatic
+     * @param path
+     * @return byte[]
+     */
     public static byte[] readBytesFromFile(boolean isStatic, String path) throws IOException {
         try (InputStream input = IOUtil.class.getClassLoader().getResourceAsStream(ConstantUtil.PROPERTIES)){
             if(input == null){

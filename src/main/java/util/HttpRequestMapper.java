@@ -34,6 +34,12 @@ public enum HttpRequestMapper {
         this.method = method;
     }
 
+    /**
+     * 요청 경로와 메서드에 대한 HttpRequestMapper를 반환하는 메서드
+     * @param path
+     * @param method
+     * @return HttpRequestMapper
+     */
     public static HttpRequestMapper of(String path, String method) {
         for (HttpRequestMapper mapper : values()) {
             if(mapper.path.equals(path)){
@@ -46,6 +52,12 @@ public enum HttpRequestMapper {
         return SERVER_ERROR; // 요청 경로가 없는 경우
     }
 
+    /**
+     * 로그인/로그아웃 요청인지 확인하는 메서드
+     * @param path
+     * @param method
+     * @return boolean
+     */
     public static boolean isAuthRequest(String path, String method) {
         return LOGIN_REQUEST.equals(of(path, method)) || LOGOUT_REQUEST.equals(of(path, method));
     }

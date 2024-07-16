@@ -19,6 +19,9 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 요청을 처리하고 그에 맞는 응답을 생성하는 클래스
+ */
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
@@ -40,48 +43,70 @@ public class FrontRequestProcess {
         private static final FrontRequestProcess INSTANCE = new FrontRequestProcess();
     }
 
+    /**
+     * path와 method를 추출해 이를 기반으로 요청을 처리하고 응답을 생성하는 메서드
+     * @param request
+     * @return HttpResponse
+     */
     public HttpResponse handleRequest(HttpRequest request) throws IOException {
-        String path = request.getRequestPath();
-        String method = request.getRequestMethod();
+        try {
+            String path = request.getRequestPath();
+            String method = request.getRequestMethod();
 
-        // css, img 등 html이 아닌 정적 자원인 경우 즉시 반환
-        if (path.contains(ConstantUtil.DOT)) {
-            int idx = path.lastIndexOf(ConstantUtil.DOT);
-            if(idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
-            String extension = path.substring(idx + 1);
-            if (!extension.equals(ContentType.HTML.getExtension())) {
-                return HttpResponse.okStatic(path, request.getHttpVersion());
+            // css, img 등 html이 아닌 정적 자원인 경우 즉시 반환
+            if (path.contains(ConstantUtil.DOT)) {
+                int idx = path.lastIndexOf(ConstantUtil.DOT);
+                if (idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
+                String extension = path.substring(idx + 1);
+                if (!extension.equals(ContentType.HTML.getExtension())) {
+                    return HttpResponse.okStatic(path, request.getHttpVersion());
+                }
             }
+
+            // 로그인 및 로그아웃 요청은 별도로 처리
+            if (HttpRequestMapper.isAuthRequest(path, method)) {
+                return handleAuthRequest(request);
+            }
+
+            // 세션이 유효한지 검사하고 세션 객체 반환
+            Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+                    .flatMap(sessionHandler::findSessionById)
+                    .orElse(null);
+
+            // 세션이 존재하나 유효하지 않은 경우 세션 삭제하고 로그인 페이지로 리다이렉트
+            if (session != null && !sessionHandler.validateSession(session)) {
+                return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+            }
+
+            return switch (HttpRequestMapper.of(path, method)) {
+                case ROOT -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+                case DEFAULT_PAGE -> handleIndexRequest(path, request, session);
+                case ARTICLE, ARTICLE_CREATE -> handleArticleRequest(path, request, session);
+                case USER_LIST -> handleUserListRequest(path, request, session);
+                case SIGNUP_REQUEST -> handleSignUpRequest(request);
+                case SIGNUP, LOGIN, LOGIN_FAIL ->
+                        HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
+                case METHOD_NOT_ALLOWED -> HttpResponse.methodNotAllowed(request.getHttpVersion());
+                case NOT_FOUND -> HttpResponse.notFound(request.getHttpVersion());
+                default ->
+                        HttpResponse.redirect(HttpRequestMapper.NOT_FOUND.getPath(), request.getHttpVersion()); // 요청 경로가 없는 경우
+            };
+        } catch (ModelException e){
+            logger.debug(e.getMessage());
+            return HttpResponse.error(e.getMessage(), request.getHttpVersion());
+        } catch (RequestException e){
+            logger.debug(e.getMessage());
+            return HttpResponse.error(e.getMessage(), request.getHttpVersion());
         }
-
-        // 로그인 및 로그아웃 요청은 별도로 처리
-        if(HttpRequestMapper.isAuthRequest(path, method)){
-            return handleAuthRequest(request);
-        }
-
-        // 세션이 유효한지 검사하고 세션 객체 반환
-        Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
-                .flatMap(sessionHandler::findSessionById)
-                .orElse(null);
-
-        // 세션이 존재하나 유효하지 않은 경우 세션 삭제하고 로그인 페이지로 리다이렉트
-        if(session != null && !sessionHandler.validateSession(session)) {
-            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
-        }
-
-        return switch (HttpRequestMapper.of(path, method)) {
-            case ROOT -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
-            case DEFAULT_PAGE -> handleIndexRequest(path, request, session);
-            case ARTICLE, ARTICLE_CREATE -> handleArticleRequest(path, request, session);
-            case USER_LIST -> handleUserListRequest(path, request, session);
-            case SIGNUP_REQUEST -> handleSignUpRequest(request);
-            case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
-            case MESSAGE_NOT_ALLOWED -> HttpResponse.error(HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
-            case NOT_FOUND -> HttpResponse.error(HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
-            default -> HttpResponse.okStatic(path, request.getHttpVersion());
-        };
     }
 
+    /**
+     * 게시물에 대한 요청을 처리하며 세션이 없으면 로그인 페이지로 리다이렉트
+     * @param path
+     * @param request
+     * @param session
+     * @return HttpResponse
+     */
     private HttpResponse handleArticleRequest(String path, HttpRequest request, Session session) {
         if(session == null)
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
@@ -99,6 +124,11 @@ public class FrontRequestProcess {
         };
     }
 
+    /**
+     * 회원가입 요청을 처리하며 회원가입 성공 시 로그인 페이지로 리다이렉트, 실패 시 회원가입 페이지로 리다이렉트
+     * @param request
+     * @return HttpResponse
+     */
     private HttpResponse handleSignUpRequest(HttpRequest request){
         try {
             userHandler.create(request.getBodyMap());
@@ -108,7 +138,13 @@ public class FrontRequestProcess {
         }
     }
 
-    // 로그인 및 로그아웃 요청 처리 및 세션 관리
+    /**
+     * 로그인 및 로그아웃 요청 처리 및 세션 관리,
+     * 로그인 성공 시 세션 ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
+     * 로그아웃 시 세션 ID를 추출하여 세션 삭제, 세션이 없는데 로그아웃 요청이 들어온 경우 리다이렉트
+     * @param request
+     * @return HttpResponse
+     */
     private HttpResponse handleAuthRequest(HttpRequest request){
         HttpRequestMapper mapper = HttpRequestMapper.of(request.getRequestPath(), request.getRequestMethod());
         if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인 성공 시 세션ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
@@ -131,7 +167,13 @@ public class FrontRequestProcess {
         }
     }
 
-    // 세션ID가 있는 경우 [총 사용자 목록 출력], 없다면 [로그인 페이지로 이동]
+    /**
+     * 사용자 목록 조회 요청을 처리, 세션ID가 있는 경우에만 총 사용자 목록을 출력하며 없다면 로그인 페이지로 이동
+     * @param path
+     * @param request
+     * @param session
+     * @return HttpResponse
+     */
     private HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
         if(session == null)
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
@@ -143,7 +185,13 @@ public class FrontRequestProcess {
         return HttpResponse.ok(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
     }
 
-    // 세션ID가 있는 경우 로그인 상태로 간주하여 [사용자 ID] 표시, 없다면 [로그인 버튼] 표시
+    /**
+     * index.html 요청을 처리, 세션ID가 있는 경우 로그인 상태로 간주하여 사용자 ID 표시, 없다면 로그인 버튼 표시
+     * @param path
+     * @param request
+     * @param session
+     * @return HttpResponse
+     */
     private HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
         String body = readBytesFromFile(path);
         if(session == null)
@@ -155,6 +203,11 @@ public class FrontRequestProcess {
         return HttpResponse.ok(path, request.getHttpVersion(), bodyWithData);
     }
 
+    /**
+     * 응답을 실제로 처리하는 메서드, 완성된 응답을 클라이언트에 DataOutputStream을 통해 전송
+     * @param out
+     * @param response
+     */
     public void handleResponse(OutputStream out, HttpResponse response) throws IOException {
         DataOutputStream dos = new DataOutputStream(out);
 
@@ -172,6 +225,11 @@ public class FrontRequestProcess {
         }
     }
 
+    /**
+     * 정적인 응답을 처리하는 메서드
+     * @param dos
+     * @param path
+     */
     private void staticResponse(DataOutputStream dos, String path) throws IOException {
         byte[] body = IOUtil.readBytesFromFile(true, path);
         boolean isDir = IOUtil.isDirectory(true, path);
@@ -189,6 +247,11 @@ public class FrontRequestProcess {
         }
     }
 
+    /**
+     * 파일을 읽어 String으로 반환하는 메서드 (중복 제거용)
+     * @param path
+     * @return String
+     */
     private String readBytesFromFile(String path) throws IOException {
         return new String(IOUtil.readBytesFromFile(false, path));
     }

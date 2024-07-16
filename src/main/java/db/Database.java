@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * Database에 접근하여 데이터를 처리하는 클래스
+ */
 public class Database {
 
     private Database() {
@@ -18,6 +21,9 @@ public class Database {
     private static final String DB_USER = "sa";
     private static final String DB_PASSWORD = "";
 
+    /**
+     * h2 DB 테이블 생성
+     */
     static {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              Statement statement = connection.createStatement()) {
@@ -49,6 +55,10 @@ public class Database {
         }
     }
 
+    /**
+     * User 객체를 DB에 추가하는 메서드
+     * @param user
+     */
     public static void addUser(User user) {
         String sql = "INSERT INTO \"User\" (userId, password, name, email) VALUES (?, ?, ?, ?)";
 
@@ -66,6 +76,10 @@ public class Database {
         }
     }
 
+    /**
+     * Article 객체를 DB에 추가하는 메서드
+     * @param article
+     */
     public static void addArticle(Article article) {
         String sql = "INSERT INTO \"Article\" (title, contents, authorName) VALUES (?, ?, ?)";
 
@@ -82,6 +96,11 @@ public class Database {
         }
     }
 
+    /**
+     * userId로 User 객체를 조회하는 메서드
+     * @param userId
+     * @return User
+     */
     public static Optional<User> findUserById(String userId) {
         String sql = "SELECT * FROM \"User\" WHERE userId = ?";
 
@@ -108,6 +127,11 @@ public class Database {
         return Optional.empty();
     }
 
+    /**
+     * articleId로 Article 객체를 조회하는 메서드
+     * @param articleId
+     * @return Article
+     */
     public static Optional<Article> findArticleById(int articleId) {
         String sql = "SELECT * FROM \"Article\" WHERE articleId = ?";
 
@@ -134,6 +158,12 @@ public class Database {
         return Optional.empty();
     }
 
+    /**
+     * 로그인 요청 처리 후 User 객체를 반환하는 메서드
+     * @param userId
+     * @param password
+     * @return User
+     */
     public static Optional<User> login(String userId, String password) {
         String sql = "SELECT * FROM \"User\" WHERE userId = ? AND password = ?";
 
@@ -161,6 +191,10 @@ public class Database {
         return Optional.empty();
     }
 
+    /**
+     * 모든 User 객체를 조회하는 메서드
+     * @return Collection
+     */
     public static Collection<User> findAllUser() {
         String sql = "SELECT * FROM \"User\"";
         Collection<User> users = new ArrayList<>();
@@ -186,6 +220,10 @@ public class Database {
         return users;
     }
 
+    /**
+     * 모든 Article 객체를 조회하는 메서드
+     * @return Collection
+     */
     public static Collection<Article> findAllArticles(){
         String sql = "SELECT * FROM \"Article\"";
         Collection<Article> articles = new ArrayList<>();
@@ -209,7 +247,9 @@ public class Database {
         return articles;
     }
 
-    // for test
+    /**
+     * User 테이블을 초기화하는 메서드
+     */
     public static void clearUsers() {
         String sql = "DELETE FROM \"User\"";
 
@@ -223,6 +263,9 @@ public class Database {
         }
     }
 
+    /**
+     * Article 테이블을 초기화하는 메서드
+     */
     public static void clearArticles() {
         String sql = "DELETE FROM \"Article\"";
 

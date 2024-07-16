@@ -1,5 +1,8 @@
 package util;
 
+/**
+ * MIME 타입을 정의한 enum 클래스
+ */
 public enum ContentType {
     // https://developer.mozilla.org/ko/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
     HTML("html", "text/html;charset=utf-8"),
@@ -19,6 +22,11 @@ public enum ContentType {
         this.type = contentType;
     }
 
+    /**
+     * 확장자에 해당하는 MIME 타입을 반환하는 메서드
+     * @param extension
+     * @return String
+     */
     public static String getType(String extension) {
         for (ContentType contentType : values()) {
             if (contentType.extension.equals(extension)) {

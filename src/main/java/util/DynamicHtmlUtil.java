@@ -16,6 +16,11 @@ public class DynamicHtmlUtil {
     public static final String LOGIN_BUTTON_TAG = "<li><a id=\"optional_login_button\"";
     public static final String LOGIN_BUTTON_INVISIBLE = "<li><a id=\"optional_login_button\" style=\"display:none;\"";
 
+    /**
+     * 유저 목록 조회 후 HTML로 변환
+     * @param users
+     * @return String
+     */
     public static String generateUserListHtml(List<User> users) {
         StringBuilder sb = new StringBuilder();
         for (User user : users) {
@@ -30,6 +35,11 @@ public class DynamicHtmlUtil {
         return sb.toString();
     }
 
+    /**
+     * 게시글 목록 조회 후 HTML로 변환
+     * @param articles
+     * @return String
+     */
     public static String generateArticlesHtml(List<Article> articles){
         StringBuilder sb = new StringBuilder();
         for(Article article : articles){
@@ -42,6 +52,11 @@ public class DynamicHtmlUtil {
         return sb.toString();
     }
 
+    /**
+     * 로그인된 사용자에게 제공되는 HTML 반환
+     * @param userId
+     * @return String
+     */
     public static String generateUserIdHtml(String userId){
         return "<li>" + userId + "님, 환영합니다.</a></li>";
     }

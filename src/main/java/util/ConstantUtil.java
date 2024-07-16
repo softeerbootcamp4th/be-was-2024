@@ -1,5 +1,8 @@
 package util;
 
+/**
+ * 상수를 보관하는 클래스
+ */
 public class ConstantUtil {
 
     private ConstantUtil() {
