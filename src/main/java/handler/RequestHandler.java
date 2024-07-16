@@ -48,13 +48,10 @@ public class RequestHandler implements Runnable {
 
                     response.sendResponse();
                 } else {
-                    Distributor distributor = Distributor.of(request);
+                    Distributor distributor = Distributor.from(request);
                     distributor.process();
 
                     ViewData viewData = distributor.getViewData();
-
-                    System.out.println(viewData.getUrl());
-                    System.out.println(viewData.getStatusCode());
 
                     Response response = new Response.Builder()
                             .url(viewData.getUrl())
@@ -66,8 +63,6 @@ public class RequestHandler implements Runnable {
 
                     response.sendResponse();
                 }
-
-
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
