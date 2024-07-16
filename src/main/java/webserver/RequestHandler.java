@@ -47,21 +47,19 @@ public class RequestHandler implements Runnable {
                 String[] parsedline = headers.split(":");
                 if((parsedline.length) ==2) {
                     reqeustBuilder.addHeader(parsedline[0].trim(), parsedline[1].trim());
-                    if(parsedline[0].trim().equals("Content-Length")) contentLength = Integer.parseInt(parsedline[1].trim());
+                    if(parsedline[0].trim().equalsIgnoreCase("content-length")) contentLength = Integer.parseInt(parsedline[1].trim());
                 }
             }
             if(contentLength != 0) {
                 byte[] body = new byte[contentLength];
-
-                if(bif.read(body, 0, contentLength) == contentLength) {
-                    reqeustBuilder.setBody(body);
-                }
+                logger.info("bytes_read : {}\n",bif.read(body, 0, contentLength));
+                reqeustBuilder.setBody(body);
             }
             HttpRequest request = reqeustBuilder.build();
 
             logger.info(request.printRequest());
             if(request.getBody() != null && request.getBody().length > 0)
-                logger.info(URLDecoder.decode("body: " + new String(), StandardCharsets.UTF_8));
+                logger.info("body: {}", new String(request.getBody()));
 
             FunctionHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath(), request.getSessionid()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
