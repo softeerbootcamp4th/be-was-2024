@@ -2,6 +2,8 @@ package routehandler.core.trie;
 
 import http.enums.HttpMethodType;
 import routehandler.core.IRouteHandler;
+import routehandler.core.exception.NoMatchedMethodException;
+import routehandler.core.exception.NoMatchedRouteException;
 import routehandler.utils.RouteUtil;
 
 import java.util.HashMap;
@@ -60,7 +62,7 @@ public class RouteTrieNode {
     public IRouteHandler getHandler(HttpMethodType method) {
         IRouteHandler handler = handlers.get(method);
         // 핸들러가 없다면 예외 상황
-        if(handler == null) throw new RuntimeException("No handler for method " + method);
+        if(handler == null) throw new NoMatchedMethodException("No handler for method " + method);
 
         return handler;
     }
