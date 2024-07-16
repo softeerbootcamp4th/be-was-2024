@@ -24,7 +24,6 @@ public class Request {
 
     private void parseRequestAsByte(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
-        int contentLength = 0;
         int prev = -1, curr;
 
         // 헤더 부분 읽기
@@ -51,29 +50,20 @@ public class Request {
         parseRequestLine(requestLine);
 
         //읽어들인 InputStream 모두 출력
-        for (int i = 1; i < splittedHeader.length; i++) {
-            String currentLine = splittedHeader[i];
-            logger.debug(currentLine); // 읽어들인 라인 출력
+        printAllRequestHeader(splittedHeader);
 
-            // header의 내용 headers hash map에 저장
-            int colonIndex = currentLine.indexOf(':');
-            String key = currentLine.substring(0, colonIndex).trim();
-            String value = currentLine.substring(colonIndex + 1).trim();
-            this.headers.put(key, value);
-        }
+        // header의 내용 hash map에 저장
+        makeHeaderHashMap(splittedHeader);
 
         // Content-Length 값 추출하기
-        String contentLengthValue = headers.get("Content-Length");
-        if (contentLengthValue != null) {
-            contentLength = Integer.parseInt(contentLengthValue);
-        }
+        int contentLength = getContentLength();
 
         // body 읽어서 byte array로 저장
         this.byteBody = new byte[contentLength];
         int bytesRead = 0;
         while (bytesRead < contentLength) {
             int result = inputStream.read(byteBody, bytesRead, contentLength - bytesRead);
-            if (result == -1) break; // End of stream
+            if (result == -1) break; // 스트림 끝
             bytesRead += result;
         }
 
@@ -92,6 +82,34 @@ public class Request {
         }
     }
 
+    private void printAllRequestHeader(String[] splittedHeader) {
+        //읽어들인 InputStream 모두 출력
+        for (int i = 1; i < splittedHeader.length; i++) {
+            logger.debug(splittedHeader[i]); // 읽어들인 라인 출력
+        }
+    }
+
+    private void makeHeaderHashMap(String[] splittedHeader) {
+        for (int i = 1; i < splittedHeader.length; i++) {
+            String currentLine = splittedHeader[i];
+
+            // header의 내용 headers hash map에 저장
+            int colonIndex = currentLine.indexOf(':');
+            String key = currentLine.substring(0, colonIndex).trim();
+            String value = currentLine.substring(colonIndex + 1).trim();
+            this.headers.put(key, value);
+        }
+    }
+
+    private int getContentLength() {
+        int contentLength = 0;
+        String contentLengthValue = headers.get("Content-Length");
+        if (contentLengthValue != null) {
+            contentLength = Integer.parseInt(contentLengthValue);
+        }
+        return contentLength;
+    }
+
     public static Request from(InputStream inputStream) throws IOException {
         return new Request(inputStream);
     }
@@ -105,8 +123,12 @@ public class Request {
     private String getStaticPath() {
         File testFile = new File("src/main/resources/static" + path);
 
-        if (testFile.isDirectory()) {
-            return path + "/index.html";
+        if (testFile.exists()) {
+            if (testFile.isDirectory()) {
+                return path + "/index.html";
+            } else {
+                return path;
+            }
         } else {
             return path;
         }
@@ -122,6 +144,11 @@ public class Request {
 
     public String getQueryString() {
         return this.queryString;
+    }
+
+    public String getSessionId() {
+        String cookie = headers.get("Cookie");
+        return cookie.split("=")[1];
     }
 
     public HashMap<String, String> parseQueryString() {
@@ -146,11 +173,11 @@ public class Request {
     }
 
     // Test를 위한 메소드
-    public Map<String, String> getHeaders() {
+    public Map<String, String> getHeadersForTest() {
         return this.headers;
     }
 
-    public int getContentLength() {
+    public int getContentLengthForTest() {
         return Integer.parseInt(headers.get("Content-Length"));
     }
 }

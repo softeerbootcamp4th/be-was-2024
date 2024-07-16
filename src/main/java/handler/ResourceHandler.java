@@ -9,8 +9,9 @@ import java.io.IOException;
 
 public class ResourceHandler {
     public byte[] getByteArray(String url) throws IOException {
+        String path = "src/main/resources/static" + url;
         // 파일
-        File file = new File("src/main/resources/static" + url);
+        File file = new File(path);
         byte[] body = new byte[(int) file.length()];
 
         // 얘는 한글자씩 가져오는 방법임

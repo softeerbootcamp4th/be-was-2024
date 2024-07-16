@@ -7,12 +7,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class Distributor {
-    public static Distributor from(Request request, Response response) {
+    public static Distributor from(Request request) {
         String method = request.getHttpMethod();
         if (method.equals("GET")) {
-            return new GetDistributor(request, response);
+            return new GetDistributor(request);
         } else if (method.equals("POST")) {
-            return new PostDistributor(request, response);
+            return new PostDistributor(request);
         }
         return null;
     }
