@@ -19,6 +19,7 @@ public enum HttpRequestMapper {
     SIGNUP_REQUEST("/user/create", "POST"),
     LOGIN_REQUEST("/user/login", "POST"),
     LOGOUT_REQUEST("/user/logout", "POST"),
+    ARTICLE_CREATE("/article/create", "POST"),
 
     // Error
     MESSAGE_NOT_ALLOWED("/notallow", "GET"),

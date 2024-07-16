@@ -1,5 +1,6 @@
 package util;
 
+import model.Article;
 import model.User;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public class DynamicHtmlUtil {
 
     public static final String USER_NAME_TAG = "<!--USER-ID-->";
     public static final String USER_LIST_TAG = "<!--USER-LIST-->";
+    public static final String ARTICLES_TAG =  "<!--ARTICLES-->";
     public static final String LOGIN_BUTTON_TAG = "<li><a id=\"optional_login_button\"";
     public static final String LOGIN_BUTTON_INVISIBLE = "<li><a id=\"optional_login_button\" style=\"display:none;\"";
 
@@ -23,6 +25,18 @@ public class DynamicHtmlUtil {
                     .append("<td>").append(user.getName()).append("</td>")
                     .append("<td>").append(user.getEmail()).append("</td>")
                     .append("<td><a href=\"#\" class=\"btn btn-success\" role=\"button\">수정</a></td>")
+                    .append("</tr>");
+        }
+        return sb.toString();
+    }
+
+    public static String generateArticlesHtml(List<Article> articles){
+        StringBuilder sb = new StringBuilder();
+        for(Article article : articles){
+            sb.append("<tr>")
+                    .append("<th scope=\"row\">").append(articles.indexOf(article) + 1).append("</th>")
+                    .append("<td>").append(article.getTitle()).append("</td>")
+                    .append("<td>").append(article.getContent()).append("</td>")
                     .append("</tr>");
         }
         return sb.toString();

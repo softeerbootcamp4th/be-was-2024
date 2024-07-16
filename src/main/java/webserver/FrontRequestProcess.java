@@ -2,6 +2,8 @@ package webserver;
 
 import exception.ModelException;
 import exception.RequestException;
+import handler.ArticleHandler;
+import model.Article;
 import session.SessionHandler;
 import handler.ModelHandler;
 import handler.UserHandler;
@@ -15,16 +17,19 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.Map;
 
 public class FrontRequestProcess {
 
     private static final Logger logger = LoggerFactory.getLogger(FrontRequestProcess.class);
     private final ModelHandler<User> userHandler;
+    private final ModelHandler<Article> articleHandler;
     private final SessionHandler sessionHandler;
 
     private FrontRequestProcess() {
         this.userHandler = UserHandler.getInstance();
         this.sessionHandler = SessionHandler.getInstance();
+        this.articleHandler = ArticleHandler.getInstance();
     }
 
     public static FrontRequestProcess getInstance() {
@@ -64,16 +69,33 @@ public class FrontRequestProcess {
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
         }
 
-        // TODO: 추후 Article, Comment 관련 동작은 별도로 분리하여 매핑테이블 크기 조절 필요
         return switch (HttpRequestMapper.of(path, method)) {
             case ROOT -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
             case DEFAULT_PAGE -> handleIndexRequest(path, request, session);
+            case ARTICLE, ARTICLE_CREATE -> handleArticleRequest(path, request, session);
             case USER_LIST -> handleUserListRequest(path, request, session);
             case SIGNUP_REQUEST -> handleSignUpRequest(request);
             case SIGNUP, LOGIN, LOGIN_FAIL -> HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
             case MESSAGE_NOT_ALLOWED -> HttpResponse.error(HttpCode.METHOD_NOT_ALLOWED.getStatus(), request.getHttpVersion());
             case NOT_FOUND -> HttpResponse.error(HttpCode.NOT_FOUND.getStatus(), request.getHttpVersion());
             default -> HttpResponse.okStatic(path, request.getHttpVersion());
+        };
+    }
+
+    private HttpResponse handleArticleRequest(String path, HttpRequest request, Session session) {
+        if(session == null)
+            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+
+        return switch (HttpRequestMapper.of(path, request.getRequestMethod())) {
+            case ARTICLE -> HttpResponse.okStatic(path, request.getHttpVersion());
+            case ARTICLE_CREATE -> {
+                User user = userHandler.findById(session.getUserId()).orElseThrow(() -> new ModelException(ConstantUtil.USER_NOT_FOUND));
+                Map<String, String> fields = request.getBodyMap();
+                fields.put(ConstantUtil.AUTHOR_NAME,  user.getName()); // authorName 추가
+                articleHandler.create(fields);
+                yield HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+            }
+            default -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         };
     }
 
@@ -111,11 +133,11 @@ public class FrontRequestProcess {
 
     // 세션ID가 있는 경우 [총 사용자 목록 출력], 없다면 [로그인 페이지로 이동]
     private HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
-        String pathWithHtml = path + ConstantUtil.DOT_HTML;
-        String body = readBytesFromFile(pathWithHtml);
         if(session == null)
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
 
+        String pathWithHtml = path + ConstantUtil.DOT_HTML;
+        String body = readBytesFromFile(pathWithHtml);
         List<User> users = userHandler.findAll();
         String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
         return HttpResponse.ok(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
@@ -127,10 +149,10 @@ public class FrontRequestProcess {
         if(session == null)
             return HttpResponse.ok(path, request.getHttpVersion(), body);
 
-        String userId = session.getUserId();
-        String bodyWithUser = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(userId)); // 사용자 ID 표시
-        bodyWithUser = bodyWithUser.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
-        return HttpResponse.ok(path, request.getHttpVersion(), bodyWithUser);
+        String bodyWithData = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(session.getUserId())); // 사용자 ID 표시
+        bodyWithData = bodyWithData.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
+        bodyWithData = bodyWithData.replace(DynamicHtmlUtil.ARTICLES_TAG, DynamicHtmlUtil.generateArticlesHtml(articleHandler.findAll())); // 게시글 목록 표시
+        return HttpResponse.ok(path, request.getHttpVersion(), bodyWithData);
     }
 
     public void handleResponse(OutputStream out, HttpResponse response) throws IOException {
