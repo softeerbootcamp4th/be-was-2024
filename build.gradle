@@ -18,6 +18,10 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     implementation 'org.junit.jupiter:junit-jupiter-params:5.8.1'
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+
+    implementation 'com.h2database:h2:2.3.230'
+
+    runtimeOnly 'com.h2database:h2'
 }
 
 test {
