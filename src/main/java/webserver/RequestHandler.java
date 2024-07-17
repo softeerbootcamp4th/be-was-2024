@@ -41,6 +41,7 @@ public class RequestHandler implements Runnable {
 
             String headers = startline;
             int contentLength = 0;
+            int readbyte = 0;
             while(!headers.isEmpty()){ //header들을 한줄씩 순회하면서 request에 header를 하나씩 추가함
                 headers = StreamByteReader.readLine(bif);
                 logger.info(headers);
@@ -52,12 +53,13 @@ public class RequestHandler implements Runnable {
             }
             if(contentLength != 0) {
                 byte[] body = new byte[contentLength];
-                logger.info("bytes_read : {}\n",bif.read(body, 0, contentLength));
+                for(readbyte=0;readbyte<contentLength;readbyte+=bif.read(body,readbyte,contentLength-readbyte));
                 reqeustBuilder.setBody(body);
             }
             HttpRequest request = reqeustBuilder.build();
 
             logger.info(request.printRequest());
+            logger.info("bytes read: {}", readbyte);
 
             FunctionHandler api = PathMap.getPathMethod(request); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
@@ -67,7 +69,8 @@ public class RequestHandler implements Runnable {
 
             // response 출력
             dos.writeBytes(response.getHeader());
-            dos.write(response.getBody());
+            if(response.getBody() !=null)
+                dos.write(response.getBody());
             dos.flush();
         } catch (IOException | NumberFormatException | NullPointerException e) {
             logger.error("error{}", e.getMessage());
