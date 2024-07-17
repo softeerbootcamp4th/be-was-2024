@@ -2,7 +2,6 @@ package handler;
 
 import db.ArticleDatabase;
 import db.UserDatabase;
-import db.SessionDatabase;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
@@ -15,15 +14,13 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.*;
 
-import static db.SessionDatabase.getUser;
-import static db.SessionDatabase.isLogin;
+import static db.SessionDatabase.*;
 import static util.Constants.*;
 import static util.Utils.*;
 
 public class GetHandler {
     private static final ArticleDatabase articleDatabase = new ArticleDatabase();
     private static final UserDatabase userDatabase = new UserDatabase();
-    private static final SessionDatabase sessionDatabase = new SessionDatabase();
 
     public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
         String[] tokens = requestUrl.split(REG_DOT);
@@ -86,7 +83,7 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        sessionDatabase.deleteSession(sid);
+        deleteSession(sid);
 
         byte[] body = new byte[0];
 

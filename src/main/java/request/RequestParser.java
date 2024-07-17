@@ -3,6 +3,7 @@ package request;
 import http.HttpMethod;
 import http.HttpRequest;
 import http.HttpResponse;
+import http.StartLine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,22 +18,24 @@ public class RequestParser {
 
     public HttpResponse ParsingRequest(InputStream in) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(in);
-        BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
         StringBuilder log = new StringBuilder().append("\n\n****** REQUEST ******\n");
 
-        HttpRequest request = new HttpRequest();
-
-        String startLine = bufferedReader.readLine();
-        setStartLine(startLine, request, log);
-        setHeaders(bufferedReader, request, log);
-        setBody(bufferedReader, request, log);
+        StartLine startLine = getStartLine(in, log);
+        HashMap<String, String> headers = getHeaders(in, log);
+        byte[] body = getBody(in, log, headers.get(CONTENT_LENGTH));
 
         logger.debug(log.toString());
+
+        HttpRequest request = new HttpRequest()
+                .setStartLine(startLine)
+                .setHeaders(headers)
+                .setBody(body);
 
         return requestMapping(request);
     }
 
-    private void setStartLine(String startLine, HttpRequest request, StringBuilder log) {
+    private StartLine getStartLine(InputStream in, StringBuilder log) {
+        String startLine = byteReader(in, 2);
 
         log.append(startLine).append("\n");
         String[] splitStartLine = startLine.split(REG_SPC, 3);
@@ -41,14 +44,14 @@ public class RequestParser {
         String requestUrl = splitStartLine[1];
         String version = splitStartLine[2];
 
-        request.setStartLine(method, requestUrl, version);
+        return new StartLine(method, requestUrl, version);
     }
 
-    private void setHeaders(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
+    private HashMap<String, String> getHeaders(InputStream in, StringBuilder log) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         String headerLine;
 
-        while (!(headerLine = bufferedReader.readLine()).isEmpty()) {
+        while (!(headerLine = byteReader(in, 2)).isEmpty()) {
             log.append(headerLine).append("\n");
 
             String[] headerParts = headerLine.split(REG_CLN, 2);
@@ -58,24 +61,41 @@ public class RequestParser {
 
             headers.put(key, value);
         }
-        log.append("\n");
-        request.setHeaders(headers);
+
+
+        return headers;
     }
 
-    private void setBody(BufferedReader bufferedReader, HttpRequest request, StringBuilder log) throws IOException {
-        String contentLengthValue = request.getHeaders(CONTENT_LENGTH);
-        if (contentLengthValue == null) return;
+    private byte[] getBody(InputStream in, StringBuilder log, String contentLengthValue) throws IOException {
+        if (contentLengthValue == null) return new byte[0];
 
         int contentLength = Integer.parseInt(contentLengthValue);
         byte[] body = new byte[contentLength];
 
         for (int i = 0; i < contentLength; i++) {
-            byte read = (byte) bufferedReader.read();
+            byte read = (byte) in.read();
             body[i] = read;
             log.append((char) read);
         }
+        return body;
+    }
 
-        log.append("\n");
-        request.setBody(body);
+    private String byteReader(InputStream in, int CRLF) {
+        StringBuilder line = new StringBuilder();
+
+        int character;
+        int flag = 0;
+        try {
+            while (flag < CRLF && (character = in.read()) != -1) {
+                if (character == '\r' || character == '\n') flag++;
+                else {
+                    flag = 0;
+                    line.append((char) character);
+                }
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+        return line.toString();
     }
 }

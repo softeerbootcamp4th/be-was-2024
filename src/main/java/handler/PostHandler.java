@@ -80,7 +80,8 @@ public class PostHandler {
         }
 
         response.addHeader(CONTENT_LENGTH, String.valueOf(responseBody.length))
-                .addHeader(CONTENT_TYPE, TEXT_HTML);
+                .addHeader(CONTENT_TYPE, TEXT_HTML)
+                .addBody(new byte[0]);
         return response;
     }
 
