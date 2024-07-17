@@ -20,10 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * TODO(키워드 프로퍼티 파일로 관리)
  */
 public class WebAdapter {
-    static final String ACCEPT = "Accept";
-    static final String CONTENT_TYPE = "Content-Type";
-    static final String CONTENT_LENGTH = "Content-Length";
-    static final String COOKIE = "Cookie";
     static final String SESSION_ID = "SID";
 
     /**
@@ -53,21 +49,20 @@ public class WebAdapter {
             String value = line_N[1].trim();
 
             // Accept헤더 MimeType 설정
-            switch (key) {
-                case ACCEPT -> {
-                    String[] acceptLine = value.split(";");
-                    String[] mimeType = acceptLine[0].split(",");
-                    accept.addAll(Arrays.asList(mimeType));
-                }
-                case CONTENT_LENGTH -> contentLength = Integer.parseInt(value);
-                case CONTENT_TYPE -> contentType = value;
-                case COOKIE -> {
-                    String[] cookies = value.split(";");
-                    for(String c: cookies) {
-                        String cookieName = c.split("=")[0].trim();
-                        String cookieId = c.split("=")[1].trim();
-                        cookie.put(cookieName, cookieId);
-                    }
+            if(key.equalsIgnoreCase(HeaderKey.ACCEPT.getKey())) {
+                String[] acceptLine = value.split(";");
+                String[] mimeType = acceptLine[0].split(",");
+                accept.addAll(Arrays.asList(mimeType));
+            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_LENGTH.getKey())) {
+                contentLength = Integer.parseInt(value);
+            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_TYPE.getKey())) {
+                contentType = value;
+            } else if(key.equalsIgnoreCase(HeaderKey.COOKIE.getKey())) {
+                String[] cookies = value.split(";");
+                for(String c: cookies) {
+                    String cookieName = c.split("=")[0].trim();
+                    String cookieId = c.split("=")[1].trim();
+                    cookie.put(cookieName, cookieId);
                 }
             }
         }

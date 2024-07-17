@@ -40,9 +40,8 @@ public class ViewResolver {
             HttpResponse response = ResponseUtils.responseSuccessWithFile(contentType, body);
             response.writeInBytes(dos);
         } catch (Exception e) {
-            HttpResponse response = ResponseUtils.responseServerError();
+            HttpResponse response = ResponseUtils.responseBadRequest();
             response.writeInBytes(dos);
-            e.printStackTrace();
         }
     }
 }

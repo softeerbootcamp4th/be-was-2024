@@ -59,6 +59,12 @@ public class ResponseUtils {
                 .build();
     }
 
+    public static HttpResponse responseNotFound() {
+        return new HttpResponse.HttpResponseBuilder()
+                .code(ResponseCode.NOT_FOUND)
+                .build();
+    }
+
     public static HttpResponse createResponse(ResponseCode code, String contentType) {
         return new HttpResponse.HttpResponseBuilder().code(code).contentType(contentType).build();
     }
