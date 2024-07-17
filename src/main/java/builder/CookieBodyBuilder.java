@@ -2,6 +2,7 @@ package builder;
 
 import handler.ResourceHandler;
 import handler.SessionHandler;
+import model.User;
 import model.ViewData;
 
 import java.io.IOException;
@@ -17,7 +18,7 @@ public class CookieBodyBuilder extends BodyBuilder {
 
     @Override
     public byte[] getBody() throws IOException {
-        if (viewData.getUrl().equals("//index.html")) {
+        if (viewData.getUrl().equals("//index.html") || viewData.getUrl().equals("/index.html")) {
             return getIndexHtmlBody();
         } else {
             return getDefaultBody();
@@ -26,12 +27,19 @@ public class CookieBodyBuilder extends BodyBuilder {
 
     private byte[] getIndexHtmlBody() throws IOException {
         String sessionId = viewData.getCookie();
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
         if (SessionHandler.verifySessionId(sessionId)) {
             // 사용자 아이디로 동적 html 생성
-            return getDefaultBody();
+            User user = SessionHandler.getUser(sessionId);
+            String userId = user.getUserId();
+
+            String body = htmlBuilder.generateHtml(true, userId);
+
+            return body.getBytes();
         } else {
             // 그냥 html
-            return getDefaultBody();
+            String body = htmlBuilder.generateHtml(false, "");
+            return body.getBytes();
         }
     }
 
