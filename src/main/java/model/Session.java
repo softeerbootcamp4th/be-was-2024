@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import static util.StringUtil.*;
 
 public class Session {
-    private final Long sessionId;
+    private final String sessionId;
     private final String userId;
     private final LocalDateTime sessionStart;
     private final LocalDateTime expiryTime;
@@ -13,11 +13,15 @@ public class Session {
     //private LocalDateTime lastActivity;
     //private String userAgent;
 
-    public Session(Long sessionId, String userId, LocalDateTime sessionStart, LocalDateTime expiryTime) {
+    public Session(String sessionId, String userId, LocalDateTime sessionStart, LocalDateTime expiryTime) {
         this.sessionId = sessionId;
         this.userId = userId;
         this.sessionStart = sessionStart;
         this.expiryTime = expiryTime;
+    }
+
+    public String getUserId(){
+        return userId;
     }
 
     @Override
