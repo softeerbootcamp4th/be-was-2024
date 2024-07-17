@@ -47,7 +47,6 @@ public class Logics {
         return  HttpResponse.redirectToMain();
         //TODO : body를 리턴하지 않아도 되는가
     }
-
     public static HttpResponse login(HttpRequest httpRequest) throws IOException {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
