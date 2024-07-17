@@ -71,13 +71,11 @@ public class PostDAO {
                 String imgpath = rs.getString("imgpath");
                 String userid = rs.getString("userid");
                 post = new Post(text, imgpath, userid);
-            } else {
-                System.out.println("등록된 회원이 없습니다.");
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
-
+            return null;
         } finally {
             JDBC.close(rs, stmt, conn);
         }

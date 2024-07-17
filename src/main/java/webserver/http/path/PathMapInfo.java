@@ -13,6 +13,11 @@ public class PathMapInfo {
             = new PathMap.PathNode("/")
             .Get(MainPageHandler.getInstance())
             .addChild(
+                    new PathMap.PathNode("post")
+                            .setPathVariable("postid")
+                            .Get(MainPageHandler.getInstance())
+            )
+            .addChild(
                     new PathMap.PathNode("registration")
                             .Get(RegistrationPageHandler.getInstance())
             )

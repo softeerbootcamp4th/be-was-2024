@@ -27,6 +27,7 @@ public class HttpRequest {
     private String protocol;
     private Map<String, String> headers;
     private Map<String, String> cookies;
+    private Map<String, String> pathVariables;
     private String sessionid;
 
     public Methods getMethod() {
@@ -53,6 +54,14 @@ public class HttpRequest {
 
     public String getSessionid() {return sessionid;}
 
+    public Map<String, String> getPathVariables() {
+        return pathVariables;
+    }
+
+    public void addPathVariable(String key, String value) {
+        this.pathVariables.put(key, value);
+    }
+
     public String printRequest(){
         return "method: " + method.getMethod() + "\n" +
                 "url: " + url.getPath() + "\n" +
@@ -70,6 +79,7 @@ public class HttpRequest {
         this.headers = builder.headers;
         this.cookies = builder.cookies;
         this.sessionid = builder.sessionid;
+        this.pathVariables = new HashMap<>();
     }
 
     public static class ReqeustBuilder{

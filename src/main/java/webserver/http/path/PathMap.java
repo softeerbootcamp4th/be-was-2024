@@ -1,6 +1,7 @@
 package webserver.http.path;
 
 import webserver.api.*;
+import webserver.http.HttpRequest;
 import webserver.http.enums.Methods;
 import webserver.session.SessionDAO;
 
@@ -14,6 +15,7 @@ public class PathMap {
         private final Map<String, PathNode> children;
         private final Map<Methods, FunctionHandler> methods;
         private final String path;
+        private String pathvariable;
         private boolean secured;
 
 
@@ -22,10 +24,16 @@ public class PathMap {
             this.children = new HashMap<>();
             this.path = path;
             this.secured = false;
+            this.pathvariable = null;
         }
 
         PathNode secured(){
             this.secured = true;
+            return this;
+        }
+
+        PathNode setPathVariable(String pathvariable){
+            this.pathvariable = pathvariable;
             return this;
         }
 
@@ -59,16 +67,26 @@ public class PathMap {
 
         public String getPath() { return path; }
 
+        public String getPathvariable() {
+            return pathvariable;
+        }
+
         public PathNode findChild(String pathname) {
             return children.get(pathname);
         }
     }
 
-    public static FunctionHandler getPathMethod(Methods method, String path , String sessionid) {
-        String[] routes = path.split("/");
+    public static FunctionHandler getPathMethod(HttpRequest request) {
+        String[] routes = request.getUrl().getPath().split("/");
         PathNode current = root;
         if(routes.length > 1){
             for(int i = 1; i < routes.length; i++){
+                if(current.getPathvariable()!=null ){
+                    request.addPathVariable(current.getPathvariable(), routes[i]);
+                    if(++i >= routes.length){
+                        break;
+                    }
+                }
                 PathNode next = current.findChild(routes[i]);
                 if(next == null) {
                     break;
@@ -80,10 +98,10 @@ public class PathMap {
         //secured but no session
         SessionDAO sessionDAO = new SessionDAO();
         if(current.secured){
-            if(sessionid == null || sessionDAO.findSession(sessionid) == null)
+            if(request.getSessionid() == null || sessionDAO.findSession(request.getSessionid()) == null)
                 return Unauthorized.getInstance();
         }
 
-        return current.getMethod(method);
+        return current.getMethod(request.getMethod());
     }
 }

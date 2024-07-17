@@ -61,7 +61,7 @@ public class RequestHandler implements Runnable {
             if(request.getBody() != null && request.getBody().length > 0)
                 logger.info("body: {}", new String(request.getBody()));
 
-            FunctionHandler api = PathMap.getPathMethod(request.getMethod(), request.getUrl().getPath(), request.getSessionid()); //해당 path에 대한 function을 request정보를 이용하여 받아온다
+            FunctionHandler api = PathMap.getPathMethod(request); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
                     (api == null)
                             ? ResponseLibrary.notFound
