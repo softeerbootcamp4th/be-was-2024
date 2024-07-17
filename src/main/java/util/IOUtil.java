@@ -64,4 +64,25 @@ public class IOUtil {
             throw new FileNotFoundException();
         }
     }
+
+    /**
+     * 파일을 저장하고 그 경로를 반환
+     * @param fileData
+     * @param fileName
+     * @return String
+     * @throws IOException
+     */
+    public static String saveFile(byte[] fileData, String fileName) throws IOException {
+        // uploads라는 디렉토리 생성
+        File dir = new File("uploads");
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String filePath = "uploads/" + fileName;
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(fileData);
+        }
+        return filePath;
+    }
 }

@@ -91,10 +91,7 @@ public class FrontRequestProcess {
                 default ->
                         HttpResponse.redirect(HttpRequestMapper.NOT_FOUND.getPath(), request.getHttpVersion()); // 요청 경로가 없는 경우
             };
-        } catch (ModelException e){
-            logger.debug(e.getMessage());
-            return HttpResponse.error(e.getMessage(), request.getHttpVersion());
-        } catch (RequestException e){
+        } catch (ModelException | RequestException e){
             logger.debug(e.getMessage());
             return HttpResponse.error(e.getMessage(), request.getHttpVersion());
         }
@@ -107,7 +104,7 @@ public class FrontRequestProcess {
      * @param session
      * @return HttpResponse
      */
-    private HttpResponse handleArticleRequest(String path, HttpRequest request, Session session) {
+    private HttpResponse handleArticleRequest(String path, HttpRequest request, Session session) throws IOException {
         if(session == null)
             return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
 
@@ -115,9 +112,18 @@ public class FrontRequestProcess {
             case ARTICLE -> HttpResponse.okStatic(path, request.getHttpVersion());
             case ARTICLE_CREATE -> {
                 User user = userHandler.findById(session.getUserId()).orElseThrow(() -> new ModelException(ConstantUtil.USER_NOT_FOUND));
-                Map<String, String> fields = request.getBodyMap();
-                fields.put(ConstantUtil.AUTHOR_NAME,  user.getName()); // authorName 추가
-                articleHandler.create(fields);
+                Map<String, String> formData = request.getFormData();
+                Map<String, byte[]> files = request.getFileData();
+
+                for(Map.Entry<String, byte[]> entry : files.entrySet()){
+                    String fileName = entry.getKey();
+                    byte[] fileData = entry.getValue();
+                    String savedPath = IOUtil.saveFile(fileData, fileName);
+                    formData.put(ConstantUtil.IMAGE_PATH, savedPath);
+                }
+
+                formData.put(ConstantUtil.AUTHOR_NAME, user.getName()); // authorName 추가
+                articleHandler.create(formData);
                 yield HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
             }
             default -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
