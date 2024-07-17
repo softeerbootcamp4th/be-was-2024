@@ -1,7 +1,10 @@
 package logic;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import db.SessionDatabase;
 import db.UserDatabase;
+import dto.UserDTO;
 import http.HttpRequest;
 import http.HttpResponse;
 import model.Session;
@@ -15,10 +18,7 @@ import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 import static util.HttpStatus.*;
 import static util.StringUtil.*;
@@ -27,11 +27,12 @@ import static util.StringUtil.Method.*;
 
 public class Logic {
     private static final Logger logger = LoggerFactory.getLogger(Logic.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String staticResourcePath = "src/main/resources/static";
     private static final String dynamicResourcePath = "src/main/resources/templates";
 
-    public HttpResponse serve(HttpRequest request){
+    public HttpResponse serve(HttpRequest request) throws JsonProcessingException {
         switch (request.getPath()) {
             case "/create":
                 return registration(request);
@@ -39,12 +40,48 @@ public class Logic {
                 return login(request);
             case "/login_fail":
                 return loginFail(request);
+            case "/user":
+                return responseUser(request);
+            case "/user/list/all":
+                return responseAllUser(request);
             default:
                 return serveResource(request, staticResourcePath+request.getViewPath());
         }
     }
+
+    private HttpResponse responseAllUser(HttpRequest request) throws JsonProcessingException {
+        HttpResponse response = new HttpResponse();
+        response.setStatusCode(SC_OK);
+        Collection<User> all = UserDatabase.findAll();
+        byte[] body = objectMapper.writeValueAsBytes(all);
+        response.setBody(body);
+        response.addHeader(CONTENT_TYPE, "application/json");
+        response.addHeader(CONTENT_LENGTH, String.valueOf(body.length));
+        return response;
+    }
+
+    private HttpResponse responseUser(HttpRequest request) throws JsonProcessingException {
+        String sessionId = request.getQueryParameterValue("sid");
+        Optional<Session> session = SessionDatabase.getSession(sessionId);
+        if (session.isPresent()) {
+            Optional<User> userById = UserDatabase.findUserById(session.get().getUserId());
+            if (userById.isPresent()) {
+                HttpResponse response = new HttpResponse();
+                User user = userById.get();
+                UserDTO dto = new UserDTO(user, true);
+                byte[] body = objectMapper.writeValueAsString(dto).getBytes();
+                response.setBody(body);
+                response.setStatusCode(SC_OK);
+                response.addHeader(CONTENT_TYPE, "application/json");
+                response.addHeader(CONTENT_LENGTH, String.valueOf(body.length));
+                return response;
+            }
+        }
+        return HttpResponse.error(SC_NOT_FOUND, "sid not found");
+    }
+
     private HttpResponse loginFail(HttpRequest request){
-        return serveResource(request, dynamicResourcePath + "/user/login_failed.html");
+        return serveResource(request, staticResourcePath + "/user/login_failed.html");
     }
 
     private HttpResponse serveResource(HttpRequest request, String resourcePath) {
@@ -157,11 +194,9 @@ public class Logic {
         }
 
         //create Session
-        Random random = new Random();
-
-        Long newSessionId;
+        String newSessionId;
         do{
-            newSessionId = random.nextLong();
+            newSessionId = UUID.randomUUID().toString();
         } while(SessionDatabase.getSession(newSessionId).isPresent());
 
         LocalDateTime sessionStartTime = LocalDateTime.now();
