@@ -46,7 +46,7 @@ public class HttpRequestParser {
         String[] headerSplit = requestMessage.split("\n",2);
         String startLine = headerSplit[0];
 
-        String[] startLineSplit = startLine.split(" ");
+        String[] startLineSplit = startLine.trim().split("\\s+");
         String method = startLineSplit[0];
         String uri = startLineSplit[1];
         String version = startLineSplit[2];
