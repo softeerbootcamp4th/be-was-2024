@@ -30,7 +30,7 @@ public class PostDatabase {
     }
 
     public static Post getPost(Long postId){
-        String query = "SELECT * FROM POST WHERE AUTHOR_ID = ?";
+        String query = "SELECT * FROM POST WHERE ID = ?";
         try (Connection connection = JdbcDatabase.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setLong(1,postId);

@@ -53,7 +53,7 @@
         <nav class="nav">
           <ul class="nav__menu">
             <li class="nav__menu__item">
-              <a class="nav__menu__item__btn" href="">
+              <a class="nav__menu__item__btn" id="prev">
                 <img
                   class="nav__menu__item__img"
                   src="./img/ci_chevron-left.svg"
@@ -65,7 +65,7 @@
               <a class="btn btn_ghost btn_size_m" href="/article">글 쓰기</a>
             </li>
             <li class="nav__menu__item">
-              <a class="nav__menu__item__btn" href="">
+              <a class="nav__menu__item__btn" id="next">
                 다음 글
                 <img
                   class="nav__menu__item__img"
@@ -77,5 +77,30 @@
         </nav>
       </div>
     </div>
+  <script>
+    document.getElementById("next").addEventListener("click", function() {
+      const currentUrl = new URL(window.location.href);
+      const params = new URLSearchParams(currentUrl.search);
+      let num = parseInt(params.get("page"), 10);
+      params.set("page", num + 1);
+
+      currentUrl.search = params.toString();
+
+      // 새 URL로 리디렉션합니다.
+      window.location.href = currentUrl.toString();
+    });
+
+    document.getElementById("prev").addEventListener("click", function() {
+      const currentUrl = new URL(window.location.href);
+      const params = new URLSearchParams(currentUrl.search);
+      let num = parseInt(params.get("page"), 10);
+      if (num !== 1) params.set("page", num - 1);
+
+      currentUrl.search = params.toString();
+
+      // 새 URL로 리디렉션합니다.
+      window.location.href = currentUrl.toString();
+    });
+  </script>
   </body>
 </html>
