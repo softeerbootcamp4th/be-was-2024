@@ -107,13 +107,10 @@ public class WebAdapter {
             response.writeInBytes(out);
 
         } else if(request.getPath().equals(RestUri.SIGN_IN.getUri())) {
-            System.out.println("1 = " + 1);
             Map<String, String> map = StringUtils.parseBodyInForm(request.getBody()); // userId, password
             HttpResponse response;
 
-            System.out.println("2 = " + 2);
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
-                System.out.println("3 = " + 3);
                 Session newSession = SessionFacade.createSession(map.get("userId"));
 
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
@@ -122,11 +119,9 @@ public class WebAdapter {
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
             } else { // id, pwd 불일치
-                System.out.println("4 = " + 4);
                 response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             }
 
-            System.out.println("5 = " + 5);
             response.writeInBytes(out);
 
         } else if(request.getPath().equals(RestUri.LOGOUT.getUri())) {
@@ -136,13 +131,9 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
-            HttpResponse response;
-            if(SessionFacade.isAuthenticatedRequest(request)) {
-                response = ResponseUtils.redirectToView(ViewPath.ARTICLE);
-            } else {
-                response = ResponseUtils.redirectToView(ViewPath.LOGIN);
-            }
-            response.writeInBytes(out);
+            // TODO("게시글 파싱")
+        } else {
+            resolveGetRequest(ViewPath.NOT_FOUND.getRequestUri());
         }
     }
 
@@ -156,6 +147,7 @@ public class WebAdapter {
         if(request.getPathWithoutQueryParam().equals(RestUri.SIGN_UP.getUri())) {
             HttpResponse response = ResponseUtils.responseBadRequest();
             response.writeInBytes(out);
+            return;
         }
         // 유저 리스트 찾아서 json으로 반환
         else if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
@@ -170,6 +162,7 @@ public class WebAdapter {
                 response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             }
             response.writeInBytes(out);
+            return;
         }
         // 데이터베이스 초기화
         else if(request.getPathWithoutQueryParam().equals(RestUri.DATABASE_INIT.getUri())) {
@@ -177,6 +170,18 @@ public class WebAdapter {
 
             HttpResponse response = ResponseUtils.responseSuccess();
             response.writeInBytes(out);
+            return;
+        }
+        // 글쓰기 창 이동
+        else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
+            HttpResponse response;
+            if(SessionFacade.isAuthenticatedRequest(request)) {
+                response = ResponseUtils.redirectToView(ViewPath.ARTICLE);
+            } else {
+                response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+            }
+            response.writeInBytes(out);
+            return;
         }
 
         // 별도 GET 처리 로직이 없는경우 뷰를 찾아 반환
