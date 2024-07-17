@@ -93,7 +93,7 @@ public class HttpRequest {
         }
 
         public ReqeustBuilder addHeader(String key, String value){
-            headers.put(key, value);
+            headers.put(key.toLowerCase(), value);
             return this;
         }
 
@@ -103,8 +103,8 @@ public class HttpRequest {
         }
 
         private void setCookies (){
-            if(headers.containsKey("Cookie")){
-                String[] split = headers.get("Cookie").trim().split(";");
+            if(headers.containsKey("cookie")){
+                String[] split = headers.get("cookie").trim().split(";");
                 for(String cookie : split){
                     String[] keyValue = cookie.trim().split("=");
                     cookies.put(keyValue[0].trim(), keyValue[1].trim());

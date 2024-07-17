@@ -33,7 +33,7 @@ public class WritePost implements FunctionHandler {
 
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
-        String contentType = request.getHeaders().get("Content-Type");
+        String contentType = request.getHeaders().get("content-type");
         String boundaryPrefix = "boundary=";
         int boundaryIndex = contentType.indexOf(boundaryPrefix);
         if (boundaryIndex != -1) {

@@ -40,10 +40,9 @@ class LogoutTest {
         HttpResponse response = new LogoutHandler().function(request);
 
         //then
-        userDAO.deleteUser(user.getUserId());
         assertEquals(StatusCode.CODE302, response.getStatusCode());
         assertNull(sessionDAO.findSession(sessionId));
-        sessionDAO.deleteSession(sessionId);
+        userDAO.deleteUser(userid);
     }
 
 }
