@@ -55,15 +55,38 @@ public class DynamicRequestProcess {
 
     public static HttpResponseMessage home(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
+        Map<String,String> param = new HashMap<>();
+        String page = httpRequestMessage.getQueryParam().get("page");
+        if (page == null){
+            Long minimumPostId = PostDatabase.getMinimumPostId();
+            if (minimumPostId == 0){
+                param.put("writer","아직 게시글이 없어요");
+                param.put("content", "아직 게시글이 없어요");
+            }
+            else {
+                page = String.valueOf(minimumPostId);
+                param.put("Location", "/?page=" + page);
+                return new HttpResponseMessage("303", param, null);
+            }
+        }
+        else{
+            Post post = PostDatabase.getPost(Long.parseLong(page));
+            param.put("writer", post.getAuthorName());
+            param.put("content", post.getContent());
+        }
         Map<String, String> cookies = httpRequestMessage.getCookies();
         HashMap<String, String> headers = new HashMap<>();
         String sid = cookies.get("SID");
+        String unLoginedHomeView = null;
         if (sid == null){
-            return UriMapper.staticRequestProcess("src/main/resources/static/index.html");
+            unLoginedHomeView = ViewHandler.viewParamProcess("src/main/resources/static/index.html",param);
+            return new HttpResponseMessage("200",headers,unLoginedHomeView.getBytes());
         }
         User user = Session.getUser(sid);
-        if (user == null) return UriMapper.staticRequestProcess("src/main/resources/static/index.html");
-        Map<String,String> param = new HashMap<>();
+        if (user == null) {
+            unLoginedHomeView = ViewHandler.viewParamProcess("src/main/resources/static/index.html",param);
+            return new HttpResponseMessage("200",headers,unLoginedHomeView.getBytes());
+        }
         param.put("userName", user.getName());
         String loginedHomeView = ViewHandler.viewParamProcess("src/main/resources/static/main/index.html",param);
         return new HttpResponseMessage("200",headers,loginedHomeView.getBytes());
@@ -120,7 +143,7 @@ public class DynamicRequestProcess {
             String[] keyValue = entry.split("=");
             bodyMap.put(keyValue[0],keyValue[1]);
         }
-        Post post = new Post(user.getId(), URLDecoder.decode(bodyMap.get("content"), StandardCharsets.UTF_8));
+        Post post = new Post(user.getId(), user.getName(),URLDecoder.decode(bodyMap.get("content"), StandardCharsets.UTF_8));
         PostDatabase.addPost(post);
         headers.put("Location","/");
         return new HttpResponseMessage("303",headers,null);
