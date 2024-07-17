@@ -15,11 +15,19 @@ import webserver.http.response.Status;
 
 import java.util.Map;
 
+/**
+ * 회원과 관련된 처리를 하는 클래스
+ */
 @Plugin
 public class UserPlugin{
 
     public static final Logger logger = LoggerFactory.getLogger(UserPlugin.class);
 
+    /**
+     * /create 로 요청이 들어왔을 때 회원 생성을 처리하는 메소드
+     * @param request
+     * @return
+     */
     @Post(path = "/create")
     public Response create(Request request) {
         byte[] body = request.getBody();
@@ -40,6 +48,11 @@ public class UserPlugin{
 
     }
 
+    /**
+     * /registration 으로 요청이 들어왔을 때 적절한 html 리소스로 리다이렉션하는 메소드
+     * @param request
+     * @return
+     */
     @Get(path = "/registration")
     public Response registration(Request request){
         return new Response.Builder(Status.SEE_OTHER)
@@ -47,6 +60,11 @@ public class UserPlugin{
                 .build();
     }
 
+    /**
+     * /login 으로 요청이 들어왔을 때 적절한 html 리소스로 리다이렉션하는 메소드
+     * @param request
+     * @return
+     */
     @Get(path = "/login")
     public Response redirect(Request request) {
         return new Response.Builder(Status.SEE_OTHER)
@@ -54,6 +72,11 @@ public class UserPlugin{
                 .build();
     }
 
+    /**
+     * /login 으로 요청이 들어왔을 때 회원을 인증하는 메소드
+     * @param request
+     * @return
+     */
     @Post(path = "/login")
     public Response login(Request request){
 
@@ -86,6 +109,11 @@ public class UserPlugin{
 
     }
 
+    /**
+     * 로그아웃을 처리하는 메소드
+     * @param request
+     * @return
+     */
     @Post(path = "/logout")
     public Response logout(Request request){
 
@@ -99,6 +127,11 @@ public class UserPlugin{
 
     }
 
+    /**
+     * 유저 리스트를 출력하는 메소드
+     * @param request
+     * @return
+     */
     @Get(path = "/user/list")
     public Response userList(Request request){
 
