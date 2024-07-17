@@ -20,6 +20,8 @@ public class HttpRequest {
     private String httpVersion;
     private Map<String, String> requestHeaders = new HashMap<>();
     private byte[] requestBody;
+    private Map<String, String> formData = new HashMap<>();
+    private Map<String, byte[]> fileData = new HashMap<>();
 
     private HttpRequest(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
         this.requestMethod = requestMethod;
@@ -78,6 +80,22 @@ public class HttpRequest {
         return new String(requestBody, StandardCharsets.UTF_8);
     }
 
+    public Map<String, String> getFormData() {
+        return formData;
+    }
+
+    public Map<String, byte[]> getFileData() {
+        return fileData;
+    }
+
+    public int getContentLength(){
+        return Integer.parseInt(requestHeaders.getOrDefault(ConstantUtil.CONTENT_LENGTH, "0"));
+    }
+
+    public String getContentType(){
+        return requestHeaders.getOrDefault(ConstantUtil.CONTENT_TYPE, "");
+    }
+
     /**
      * Request Body를 Map으로 변환하는 메서드
      * @return
@@ -94,6 +112,7 @@ public class HttpRequest {
         // 디코딩한 후 "="으로 split하여 Map에 저장
         for (String pair : pairs) {
             String[] keyValue = pair.split(ConstantUtil.EQUAL);
+            if(keyValue.length != 2) throw new RequestException(ConstantUtil.INVALID_BODY);
             String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
             String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
             bodyMap.put(key.trim(), value.trim());
@@ -125,7 +144,7 @@ public class HttpRequest {
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
-        requestHeaders.put(header[0].toLowerCase().trim(), header[1].toLowerCase().trim());
+        requestHeaders.put(header[0].toLowerCase().trim(), header[1].trim());
     }
 
     /**
@@ -140,5 +159,17 @@ public class HttpRequest {
         }
         // byte[] to String 후 디코딩하여 다시 byte[]로 변환
         this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes();
+    }
+
+    public void putBody(byte[] body){
+        this.requestBody = body;
+    }
+
+    public void putFormData(String key, String value) {
+        formData.put(key, value);
+    }
+
+    public void putFileData(String key, byte[] value) {
+        fileData.put(key, value);
     }
 }
