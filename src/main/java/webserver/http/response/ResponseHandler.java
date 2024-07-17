@@ -7,7 +7,7 @@ import webserver.PluginMapper;
 import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
@@ -40,7 +40,12 @@ public class ResponseHandler {
         }catch (NotExistException e) {
             return new Response.Builder(Status.NOT_FOUND).build();
         }catch (Exception e){
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTraceString = sw.toString();
             return new Response.Builder(Status.INTERNAL_SERVER_ERROR)
+                    .body(stackTraceString)
                     .build();
         }
         return new Response.Builder(Status.OK).build();
@@ -74,10 +79,10 @@ public class ResponseHandler {
                 return Optional.ofNullable(returnValue);
             } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
                      NoSuchMethodException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
-        throw new NotExistException();
+        else throw new NotExistException();
     }
 
 }
