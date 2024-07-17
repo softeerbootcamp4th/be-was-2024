@@ -45,11 +45,11 @@ public class LoginHandler implements FunctionHandler {
                     .addheader("Content-Type", Extension.HTML.getContentType())
                     .setBody(HtmlFiles.readHtmlByte(HtmlFiles.LOGIN_FAILED))
                     .build();
-
         }
 
         // if user information is valid
         SessionDAO sessionDAO = new SessionDAO();
+        sessionDAO.deleteSessionByUserid(user.getUserId());
         String sessionString = sessionDAO.insertSession(user.getUserId());
 
         //go to logined main page

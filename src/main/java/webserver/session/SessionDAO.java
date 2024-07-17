@@ -1,13 +1,11 @@
 package webserver.session;
 
 import db.JDBC;
-import model.user.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.UUID;
 
 public class SessionDAO {
@@ -16,8 +14,9 @@ public class SessionDAO {
     private ResultSet rs = null;
 
     private final String SESSION_INSERT = "insert into session(USERID, SESSIONID) values(?, ?)";
-    private String SESSION_DELETE = "delete session where sessionid = ?";
-    private String SESSION_FIND = "select * from session where sessionid = ?";
+    private final String SESSION_DELETE = "delete session where sessionid = ?";
+    private final String USER_DELETE = "delete session where userid = ?";
+    private final String SESSION_FIND = "select * from session where sessionid = ?";
 
     // 세션 삭제
     public void deleteSession(String sessionid) {
@@ -26,6 +25,21 @@ public class SessionDAO {
             stmt = conn.prepareStatement(SESSION_DELETE);
 
             stmt.setString(1, sessionid);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            JDBC.close(stmt, conn);
+        }
+    }
+
+    public void deleteSessionByUserid(String userid) {
+        try {
+            conn = JDBC.getConnection();
+            stmt = conn.prepareStatement(USER_DELETE);
+
+            stmt.setString(1, userid);
             stmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -65,7 +79,7 @@ public class SessionDAO {
         return sessionId;
     }
 
-    // 회원 검색
+    // 세션 검색
     public String findSession (String sessionId) {
         String userid = null;
         try {
@@ -87,4 +101,6 @@ public class SessionDAO {
         }
         return userid;
     }
+
+
 }
