@@ -1,5 +1,6 @@
 package webserver.api.pagehandler;
 
+import model.post.PostDAO;
 import model.user.User;
 import model.user.UserDAO;
 import webserver.api.FunctionHandler;
@@ -31,7 +32,7 @@ public class MainPageHandler implements FunctionHandler {
             User user = userDAO.getUser(sessionDAO.findSession(sessionid));
             return new HttpResponse.ResponseBuilder(200)
                     .addheader("Content-Type", "text/html; charset=utf-8")
-                    .setBody(PageBuilder.buildLoggedinPage(user.getName()))
+                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
                     .build();
         }
 

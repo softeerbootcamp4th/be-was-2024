@@ -1,5 +1,7 @@
 package webserver.http.response;
 
+import model.post.Post;
+import model.post.PostDAO;
 import model.user.User;
 import model.user.UserDAO;
 import webserver.http.enums.StatusCode;
@@ -34,9 +36,15 @@ public class PageBuilder {
         return page.getBytes("UTF-8");
     }
 
-    public static byte[] buildLoggedinPage(String username) throws IOException {
+    public static byte[] buildLoggedinPage(String username, String postid) throws IOException {
         String page = HtmlFiles.readHtmlString(HtmlFiles.LOGIN_SUCCESS);
         page = page.replace("{USERNAME}", username );
+
+        PostDAO postDAO = new PostDAO();
+        int id = isNumeric(postid) ? Integer.parseInt(postid) : postDAO.getLastIndex();
+        Post post = postDAO.getPost(id);
+
+
         return page.getBytes(StandardCharsets.UTF_8);
     }
 
@@ -52,5 +60,14 @@ public class PageBuilder {
                 "</body>" +
                 "</html>";
        return body.getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static boolean isNumeric(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch(NumberFormatException e){
+            return false;
+        }
     }
 }

@@ -1,5 +1,6 @@
 package webserver.api.login;
 
+import model.post.PostDAO;
 import model.user.User;
 import model.user.UserDAO;
 import webserver.api.FunctionHandler;
@@ -56,7 +57,7 @@ public class LoginHandler implements FunctionHandler {
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
                 .addheader("Set-Cookie","sid="+sessionString +"; Max-Age=3600; Path=/") //set cookie
-                .setBody(PageBuilder.buildLoggedinPage(user.getName()))
+                .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
                 .build();
     }
 }
