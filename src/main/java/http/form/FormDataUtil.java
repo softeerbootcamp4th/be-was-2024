@@ -1,10 +1,8 @@
-package http.utils;
+package http.form;
 
-import chain.record.FormItem;
 import config.AppConfig;
 import http.MyHttpRequest;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 

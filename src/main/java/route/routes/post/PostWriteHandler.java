@@ -1,10 +1,11 @@
 package route.routes.post;
 
-import chain.record.FormItem;
+import http.form.FormItem;
+import config.AppConfig;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
-import http.utils.FormDataUtil;
+import http.form.FormDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routehandler.core.IRouteHandler;
@@ -23,13 +24,13 @@ public class PostWriteHandler implements IRouteHandler {
         FormItem content = (FormItem) FormDataUtil.getFormData(req, "content");
         List<FormItem> images = (List<FormItem>) FormDataUtil.getFormData(req, "image[]");
 
-        logger.debug("title: {}", title);
-        logger.debug("content: {}", content);
+        logger.debug("title: {}", title.dataAsText());
+        logger.debug("content: {}", title.dataAsText());
         logger.debug("images: {}", images);
 
         for(var image : images) {
-            try(FileOutputStream fos = new FileOutputStream("/Users/admin/Desktop/" + image.filename())) {
-                fos.write(image.data().getBytes(StandardCharsets.ISO_8859_1));
+            try(FileOutputStream fos = new FileOutputStream(AppConfig.FILE_SRC + image.filename())) {
+                fos.write(image.data());
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }

@@ -1,16 +1,15 @@
 package chain;
 
 import chain.core.MiddlewareChain;
-import chain.record.FormItem;
+import http.form.FormItem;
 import http.HeaderConst;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.MIMEType;
-import http.utils.FormDataUtil;
+import http.form.FormDataUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -85,7 +84,7 @@ public class MultipartHandleChain extends MiddlewareChain {
                     partBodyStr.append(bodyBuffer);
                 }
 
-                String partBody = partBodyStr.toString();
+                byte[] partBody = partBodyStr.toString().getBytes(StandardCharsets.ISO_8859_1);
                 FormDataUtil.addFormData(req, partName, new FormItem(filename, partBody));
             }
         } catch (Exception e) {
