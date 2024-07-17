@@ -23,7 +23,7 @@
       </header>
       <div class="page">
         <h2 class="page-title">게시글 작성</h2>
-        <form class="form" method="post" action="/article/create">
+        <form class="form" method="post" action="/article/create" enctype="multipart/form-data">
           <div class="textfield textfield_size_mm">
             <input
               class="input_textfield"
@@ -34,7 +34,17 @@
               name="title"
               style="font-size: 30px"
             />
-            </div>
+          </div>
+          <div class="textfield textfield_size_mm">
+            <p class="title_textfield">이미지 업로드</p>
+            <input
+                    class="input_file"
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+            />
+          </div>
           <div class="textfield textfield_size_m">
             <p class="title_textfield">내용</p>
             <textarea

@@ -13,18 +13,21 @@ public class Article {
     private String title;
     private String content;
     private String authorName;
+    private String imagePath;
 
-    protected Article(String title, String content, String authorName){
+    protected Article(String title, String content, String authorName, String imagePath){
         this.title = title;
         this.content = content;
         this.authorName = authorName;
+        this.imagePath = imagePath;
     }
 
-    protected Article(String id, String title, String content, String authorName){
+    protected Article(String id, String title, String content, String authorName, String imagePath){
         this.id = id;
         this.title = title;
         this.content = content;
         this.authorName = authorName;
+        this.imagePath = imagePath;
     }
 
     /**
@@ -36,7 +39,8 @@ public class Article {
         String title = params.get(ConstantUtil.TITLE);
         String content = params.get(ConstantUtil.CONTENT);
         String authorName = params.get(ConstantUtil.AUTHOR_NAME);
-        return new Article(title, content, authorName);
+        String imagePath = params.get(ConstantUtil.IMAGE_PATH);
+        return new Article(title, content, authorName, imagePath);
     }
 
     /**
@@ -47,8 +51,8 @@ public class Article {
      * @param authorName
      * @return
      */
-    public static Article of(String id, String title, String content, String authorName){
-        return new Article(id, title, content, authorName);
+    public static Article of(String id, String title, String content, String authorName, String imagePath){
+        return new Article(id, title, content, authorName, imagePath);
     }
 
     public String getId() {
@@ -65,5 +69,19 @@ public class Article {
 
     public String getAuthorName() {
         return authorName;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    @Override
+    public String toString() {
+        return "Article{" +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", authorName='" + authorName + '\'' +
+                ", imagePath='" + imagePath + '\'' +
+                '}';
     }
 }

@@ -31,7 +31,7 @@ public class ArticleHandler implements ModelHandler<Article> {
      */
     @Override
     public Optional<Article> create(Map<String, String> fields) {
-        if (fields.size() != 3 || fields.values().stream().anyMatch(String::isBlank)) {
+        if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
             throw new ModelException(ConstantUtil.INVALID_BODY);
         }
         if(fields.get(ConstantUtil.TITLE) == null || fields.get(ConstantUtil.CONTENT) == null || fields.get(ConstantUtil.AUTHOR_NAME) == null){

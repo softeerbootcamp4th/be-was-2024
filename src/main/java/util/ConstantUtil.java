@@ -40,6 +40,8 @@ public class ConstantUtil {
     public static final String TITLE = "title";
     public static final String CONTENT = "contents";
     public static final String AUTHOR_NAME = "authorName";
+    public static final String IMAGE_PATH = "imagePath";
+    public static final String IMAGE = "image";
     
     public static final String INVALID_SIGNUP = "Invalid Signup";
     public static final String INVALID_PATH = "Invalid Path: ";
