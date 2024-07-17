@@ -27,7 +27,7 @@ public class ArticleDatabase {
         String sql = "CREATE TABLE IF NOT EXISTS ARTICLE(" +
                 "ARTICLE_ID INT AUTO_INCREMENT PRIMARY KEY," +
                 "USER_ID VARCHAR(255)," +
-                "TEXT VARCHAR(255)," +
+                "TEXT TEXT," +
                 "PIC VARCHAR(255)" +
                 ");";
 

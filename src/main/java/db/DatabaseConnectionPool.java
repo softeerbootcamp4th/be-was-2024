@@ -15,8 +15,8 @@ public class DatabaseConnectionPool {
 
     private static String JDBC_URL;
 
-    DatabaseConnectionPool(String JDBC_URL){
-        this.JDBC_URL = JDBC_URL;
+    DatabaseConnectionPool(String jdbc_url){
+        JDBC_URL = jdbc_url;
     }
 
     public DatabaseConnectionPool() throws SQLException {

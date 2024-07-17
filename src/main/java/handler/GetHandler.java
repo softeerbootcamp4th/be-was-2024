@@ -12,6 +12,7 @@ import util.TemplateEngine;
 import util.Utils.ResponseWithStatus;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.*;
 
 import static db.SessionDatabase.getUser;
@@ -22,6 +23,7 @@ import static util.Utils.*;
 public class GetHandler {
     private static final ArticleDatabase articleDatabase = new ArticleDatabase();
     private static final UserDatabase userDatabase = new UserDatabase();
+    private static final SessionDatabase sessionDatabase = new SessionDatabase();
 
     public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
         String[] tokens = requestUrl.split(REG_DOT);
@@ -84,7 +86,7 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        SessionDatabase.deleteSession(sid);
+        sessionDatabase.deleteSession(sid);
 
         byte[] body = new byte[0];
 
@@ -121,7 +123,7 @@ public class GetHandler {
 
             Map<String, String> data = new HashMap<>();
             data.put(USER_LIST, userList.toString());
-            data.put(USER_NAME, userDatabase.findUserById(SessionDatabase.getUser(sid)).get().getName());
+            data.put(USER_NAME, userDatabase.findUserById(getUser(sid)).get().getName());
             return serveDynamicFile(PATH_USER + FILE_USER_LIST, data);
         }
     }
@@ -171,10 +173,12 @@ public class GetHandler {
         StringBuilder articleList = new StringBuilder();
 
         for (Article article : articles) {
+            String decodedText = URLDecoder.decode(article.getText(), "UTF-8");
+
             articleList.append(TABLE_ROW_START);
             articleList.append(TABLE_DATA_START).append(article.getArticleId()).append(TABLE_DATA_END);
             articleList.append(TABLE_DATA_START).append(userDatabase.findUserById(article.getUserId()).get().getName()).append(TABLE_DATA_END);
-            articleList.append(TABLE_DATA_START).append(article.getText()).append(TABLE_DATA_END);
+            articleList.append(TABLE_DATA_START).append(decodedText).append(TABLE_DATA_END);
             articleList.append(TABLE_ROW_END);
         }
 

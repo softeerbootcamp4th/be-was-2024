@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="../reset.css" rel="stylesheet"/>
+    <link href="../global.css" rel="stylesheet"/>
     <style>
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* Ensure fixed table layout */
         }
 
         table, th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
+            word-wrap: break-word; /* Allow words to break and wrap */
+            overflow-wrap: break-word; /* Ensure words break within the cell */
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #f1f1f1;
+        }
+
+        tr:hover td {
+            background-color: #f5f5f5; /* Change this color as needed */
         }
     </style>
 </head>
 <body>
 <div class="container">
     <header class="header">
-        <a href="/"><img src="../img/signiture.svg" /></a>
+        <a href="/"><img src="../img/signiture.svg"/></a>
         <ul class="header__menu">
             <div class="btn_size_s">
                 {{userName}}{{msg}}
@@ -42,12 +49,14 @@
     </header>
     <div class="article-list">
         <table>
+            <thead>
             <tr>
                 <th>Article ID</th>
                 <th>Writer</th>
                 <th>Content</th>
             </tr>
-            {{articleList}}
+            </thead>
+            <tbody>{{articleList}}</tbody>
         </table>
     </div>
 </div>
