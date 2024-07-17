@@ -162,6 +162,10 @@ public class HttpResponse {
         responseErrorPage(errorPage);
     }
 
+    public void multipartParseTest(byte[] body) throws IOException {
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, ContentType.PNG.getMimeType(), "Content-Length: " + body.length + "\r\n", body);
+    }
+
     private void responseBody(byte[] body) throws IOException {
         if (body != null) {
             dos.write(body, 0, body.length);
