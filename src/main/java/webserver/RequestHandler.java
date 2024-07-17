@@ -2,8 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -15,11 +13,10 @@ import webserver.http.path.PathMap;
 import webserver.http.response.ResponseLibrary;
 import webserver.util.StreamByteReader;
 
-
-/*
-* Request들에 대해서 hanldling하는 class
-* socket을 통한 모든 IO는 이 class가 관장한다
-* */
+/**
+ *  request에 대해 처리한다
+ *  모든 client로부터 input과 output은 이곳에서 처리한다
+ */
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
@@ -37,7 +34,7 @@ public class RequestHandler implements Runnable {
             BufferedInputStream bif = new BufferedInputStream(in);
 
             String startline = StreamByteReader.readLine(bif); // http request의 첫번째줄
-            HttpRequest.ReqeustBuilder reqeustBuilder = new HttpRequest.ReqeustBuilder(startline);
+            HttpRequest.RequestBuilder reqeustBuilder = new HttpRequest.RequestBuilder(startline);
 
             String headers = startline;
             int contentLength = 0;

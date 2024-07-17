@@ -32,7 +32,7 @@ class LogoutTest {
         assertNotNull(sessionDAO.findSession(sessionId));
 
         HttpRequest request;
-        request = new HttpRequest.ReqeustBuilder("GET /logout HTTP/1.1")
+        request = new HttpRequest.RequestBuilder("GET /logout HTTP/1.1")
                 .addHeader("Cookie", "sid=" + sessionId)
                 .build();
 

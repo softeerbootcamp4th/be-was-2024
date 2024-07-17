@@ -31,7 +31,7 @@ class RegistrationTest {
         //given
         UserDAO userDAO = new UserDAO();
         String body = "id=" + id + "&username=" + username + "&email=" + email + "&password=" + password;
-        HttpRequest request = new HttpRequest.ReqeustBuilder("POST /registration HTTP/1.1")
+        HttpRequest request = new HttpRequest.RequestBuilder("POST /registration HTTP/1.1")
                 .addHeader("Content-Length", "34")
                 .setBody(body.getBytes())
                 .build();

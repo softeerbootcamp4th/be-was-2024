@@ -39,7 +39,7 @@ class LoginTest {
         userDAO.insertUser(userid,name, email, password);
         byte[] body = ("id=" + userid + "&password=" + password).getBytes("UTF-8");
         HttpRequest request;
-        request = new HttpRequest.ReqeustBuilder("POST /login HTTP/1.1")
+        request = new HttpRequest.RequestBuilder("POST /login HTTP/1.1")
                 .addHeader("Content-Length", String.valueOf(body.length))
                 .setBody(body)
                 .build();

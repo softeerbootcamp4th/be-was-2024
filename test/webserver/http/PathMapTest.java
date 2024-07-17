@@ -28,7 +28,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -44,7 +44,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -60,7 +60,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -76,7 +76,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -93,7 +93,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -109,7 +109,7 @@ class PathMapTest {
 
         //when
         FunctionHandler function = PathMap.getPathMethod(
-                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+                new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
         );
 
         //then
@@ -123,7 +123,7 @@ class PathMapTest {
         Methods method = Methods.GET;
         String path = "/post/3";
 
-        HttpRequest request = new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build();
+        HttpRequest request = new HttpRequest.RequestBuilder(method.getMethod() + " "+path+" HTTP/1.1").build();
         //when
         FunctionHandler function = PathMap.getPathMethod(request);
 

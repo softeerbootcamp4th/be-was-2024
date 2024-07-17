@@ -24,7 +24,7 @@ class ReadFileTest {
     void readFile() throws IOException {
         //given
         String fileroute = "/global.css";
-        request = new HttpRequest.ReqeustBuilder("GET " + fileroute + " HTTP/1.1").build();
+        request = new HttpRequest.RequestBuilder("GET " + fileroute + " HTTP/1.1").build();
 
         //when
         HttpResponse response = readFile.function(request);
