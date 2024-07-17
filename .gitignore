@@ -206,5 +206,6 @@ gradle-app.setting
 bootstrap.*
 *.css*
 *.js
+uploads/
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle,intellij,java,macos

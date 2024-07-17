@@ -50,8 +50,9 @@ public class ConstantUtil {
 
     public static final String USER_NOT_FOUND = "User Not Found";
 
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String CONTENT_TYPE = "content-type";
+    public static final String CONTENT_LENGTH = "content-length";
+    public static final String FORM_DATA = "multipart/form-data";
     public static final String LOCATION = "Location";
     public static final String SET_COOKIE = "Set-Cookie";
 }
