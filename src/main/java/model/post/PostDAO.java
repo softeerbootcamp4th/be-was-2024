@@ -5,16 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import db.JDBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PostDAO {
     private Connection conn = null;
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
 
-
-
+    private static final Logger logger = LoggerFactory.getLogger(PostDAO.class);
     private final String LAST_INDEX = "SELECT ID FROM POST ORDER BY id DESC LIMIT 1";
     private final String POST_INSERT = "insert into POST(TEXT, IMGPATH, USERID) values(?, ?, ?)"; //userid, username, email, password
     private String POST_FIND = "select * from post where id= ?";
@@ -31,7 +33,9 @@ public class PostDAO {
                 id = rs.getInt("id");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return -1;
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -50,7 +54,8 @@ public class PostDAO {
             stmt.setString(3, userid);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -74,7 +79,8 @@ public class PostDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
             return null;
         } finally {
             JDBC.close(rs, stmt, conn);

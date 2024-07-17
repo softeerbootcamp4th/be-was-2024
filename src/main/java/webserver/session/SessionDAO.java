@@ -1,11 +1,15 @@
 package webserver.session;
 
 import db.JDBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import webserver.RequestHandler;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class SessionDAO {
@@ -13,6 +17,7 @@ public class SessionDAO {
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
 
+    private static final Logger logger = LoggerFactory.getLogger(SessionDAO.class);
     private final String SESSION_INSERT = "insert into session(USERID, SESSIONID) values(?, ?)";
     private final String SESSION_DELETE = "delete session where sessionid = ?";
     private final String USER_DELETE = "delete session where userid = ?";
@@ -28,7 +33,8 @@ public class SessionDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -43,7 +49,8 @@ public class SessionDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -72,7 +79,9 @@ public class SessionDAO {
             stmt.setString(2, sessionId);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return null;
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -94,8 +103,9 @@ public class SessionDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return null;
         } finally {
             JDBC.close(rs, stmt, conn);
         }

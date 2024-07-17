@@ -5,14 +5,18 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import db.JDBC;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UserDAO {
     private Connection conn = null;
     private PreparedStatement stmt = null;
     private ResultSet rs = null;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
     private final String MEMBER_LIST = "select * from usertable";
     private final String MEMBER_INSERT = "insert into usertable(USERID, USERNAME, EMAIL, PASSWORD) values(?, ?, ?, ?)"; //userid, username, email, password
     private String MEMBER_DELETE = "delete usertable where userid = ?";
@@ -28,7 +32,8 @@ public class UserDAO {
             stmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -47,7 +52,9 @@ public class UserDAO {
             stmt.setString(4, password);
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return null;
         } finally {
             JDBC.close(stmt, conn);
         }
@@ -69,13 +76,12 @@ public class UserDAO {
                 String email = rs.getString("email");
                 String password = rs.getString("password");
                 user = new User(userid, password, name, email);
-            } else {
-                System.out.println("등록된 회원이 없습니다.");
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return null;
         } finally {
             JDBC.close(rs, stmt, conn);
         }
@@ -98,13 +104,12 @@ public class UserDAO {
                     String password = rs.getString("password");
                     userlist.add(new User(userid, password, name, email));
                 } while (rs.next());
-            } else {
-                System.out.println("등록된 회원이 없습니다.");
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
-
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return null;
         } finally {
             JDBC.close(rs, stmt, conn);
         }
