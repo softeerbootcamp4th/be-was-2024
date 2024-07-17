@@ -11,6 +11,7 @@ import webserver.http.response.Status;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import static util.Utils.getFile;
 import static webserver.http.response.ResponseHandler.getContentType;
@@ -23,7 +24,13 @@ public class IndexPlugin {
 
         String body = new String(getFile(request.getPath()));
         String replacedBody;
-        int postId = 0;
+
+        int postId = 1;
+
+        Optional<Post> lastPost = PostH2Database.getLastPost();
+        if(lastPost.isPresent()) {
+            postId = lastPost.get().getId();
+        }
 
         Map<String, String> parameterMap = request.getParameter();
         if(parameterMap != null) {

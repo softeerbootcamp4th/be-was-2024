@@ -12,8 +12,9 @@ public class PostH2Database {
     public static final Logger logger = LoggerFactory.getLogger(PostH2Database.class);
 
     public static void addPost(Post post) throws SQLException {
-        H2Database.insert("insert into post (title, content, author_name) values (\'"+post.getTitle()+"\', \'"+post.getContent()+"\', \'"+post.getAuthorName()+"\')");
-        logger.debug(post.toString());
+        String sql = "insert into post (title, content, author_name) values (\'"+post.getTitle()+"\', \'"+post.getContent()+"\', \'"+post.getAuthorName()+"\')";
+        H2Database.insert(sql);
+        logger.debug("sql:{}, post:{}", sql, post);
     }
 
     public static Optional<Post> findById(int id) {
@@ -26,6 +27,7 @@ public class PostH2Database {
                 return Optional.of(new Post(content, title, authorName));
             }
         }catch (SQLException e){
+            logger.debug(e.getMessage());
             throw new RuntimeException(e);
         }
         return Optional.empty();
@@ -33,6 +35,23 @@ public class PostH2Database {
 
     public static boolean isExist(int id) {
         return findById(id).isPresent();
+    }
+
+    public static Optional<Post> getLastPost(){
+        try {
+            ResultSet rs = H2Database.select("select * from post order by id desc limit 1");
+            if (rs.next()) {
+                int id = rs.getInt("id");
+                String title = rs.getString("title");
+                String authorName = rs.getString("author_name");
+                String content = rs.getString("content");
+                return Optional.of(new Post(id, content, title, authorName));
+            }
+        }catch (SQLException e){
+            logger.debug(e.getMessage());
+            return Optional.empty();
+        }
+        return Optional.empty();
     }
 
 }

@@ -2,6 +2,7 @@ package model;
 
 public class Post {
 
+    private int id;
     private String authorName;
     private String title;
     private String content;
@@ -10,6 +11,11 @@ public class Post {
         this.authorName = authorName;
         this.title = title;
         this.content = content;
+    }
+
+    public Post(int id, String authorName, String title, String content) {
+        this(authorName, title, content);
+        this.id = id;
     }
 
     public String getAuthorName() {
@@ -22,6 +28,10 @@ public class Post {
 
     public String getTitle(){
         return title;
+    }
+
+    public int getId(){
+        return id;
     }
 
     @Override

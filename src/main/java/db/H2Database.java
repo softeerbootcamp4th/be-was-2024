@@ -22,4 +22,8 @@ public class H2Database {
         connection.createStatement().execute(sql);
     }
 
+    public static void deleteAll(String table) throws SQLException {
+        connection.createStatement().execute("truncate table "+table);
+    }
+
 }

@@ -1,6 +1,8 @@
 package plugin;
 
+import db.H2Database;
 import db.UserDatabase;
+import db.UserH2Database;
 import model.User;
 import org.junit.jupiter.api.*;
 import webserver.http.Session;
@@ -9,21 +11,22 @@ import webserver.http.request.Request;
 import webserver.http.response.Response;
 import webserver.http.response.Status;
 
+import java.sql.SQLException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserPluginTest {
 
     private UserPlugin userPlugin = new UserPlugin();
 
-    @BeforeEach
-    void after(){
-        UserDatabase.deleteAll();
-        Session.deleteAll();
-    }
-
     @Nested
     @DisplayName("회원가입 테스트")
     class RegistrationTest {
+
+        @BeforeEach
+        void beforeEach() throws SQLException {
+            H2Database.deleteAll("member");
+        }
 
         @Test
         @DisplayName("POST 회원가입이 정상 동작")
@@ -38,7 +41,7 @@ public class UserPluginTest {
 
             //when
             userPlugin.create(request);
-            User actual = UserDatabase.findUserById("javajigi");
+            User actual = UserH2Database.findUserById("javajigi").get();
 
             //then
             assertEquals(expected, actual);
@@ -113,6 +116,11 @@ public class UserPluginTest {
     @DisplayName("로그인 테스트")
     class LoginTest {
 
+        @BeforeEach
+        void beforeEach() throws SQLException {
+            H2Database.deleteAll("member");
+        }
+
         @Test
         @DisplayName("로그인 메뉴를 클릭하면 로그인 화면으로 이동")
         public void testAccessLoginPage(){
@@ -135,7 +143,7 @@ public class UserPluginTest {
         public void testLoginSuccessRedirection(){
 
             //given
-            UserDatabase.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
+            UserH2Database.addUser(new User("testUserId", "testPassword", "testName", "testEmail"));
 
             Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))
@@ -171,7 +179,7 @@ public class UserPluginTest {
         public void testLoginSuccessCookie(){
 
             //given
-            UserDatabase.addUser(createTestUser());
+            UserH2Database.addUser(createTestUser());
 
             Request request = new Request.Builder(HttpMethod.POST, "/login")
                     .addHeader("Content-Length", String.valueOf("userId=testUserId&password=testPassword".length()))

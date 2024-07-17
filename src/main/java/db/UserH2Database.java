@@ -1,7 +1,9 @@
 package db;
 
-import model.Post;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import plugin.UserPlugin;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,9 +17,13 @@ public class UserH2Database {
     private final static String EMAIL = "email";
     private final static String NAME = "name";
 
+    public static final Logger logger = LoggerFactory.getLogger(UserPlugin.class);
+
     public static void addUser(User user) {
         try {
-            H2Database.insert("insert into "+TABLE+" ("+ID+", "+PASSWORD+", "+EMAIL+", "+NAME+") values (\'"+user.getUserId()+"\', \'" + user.getPassword() + "\', \'" + user.getEmail() + "\', \'" + user.getName() + "\')");
+            String sql = "insert into "+TABLE+" ("+ID+", "+PASSWORD+", "+EMAIL+", "+NAME+") values (\'"+user.getUserId()+"\', \'" + user.getPassword() + "\', \'" + user.getEmail() + "\', \'" + user.getName() + "\')";
+            logger.debug("sql:{}", sql);
+            H2Database.insert(sql);
         }catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -25,15 +31,16 @@ public class UserH2Database {
 
     public static Optional<User> findUserById(String userId) {
         try {
-            ResultSet rs = H2Database.select("select * from "+TABLE+" where "+ID+" = " + userId);
+            ResultSet rs = H2Database.select("select * from "+TABLE+" where "+ID+" = \'" + userId+"\'");
             if (rs.next()) {
                 String password = rs.getString(PASSWORD);
                 String email = rs.getString(EMAIL);
                 String name = rs.getString(NAME);
-                return Optional.of(new User(userId, password, email, name));
+                return Optional.of(new User(userId, password, name, email));
             }
         }catch (SQLException e){
-            throw new RuntimeException(e);
+            logger.debug(e.getMessage());
+            return Optional.empty();
         }
         return Optional.empty();
     }
@@ -48,7 +55,7 @@ public class UserH2Database {
                 String password = rs.getString(PASSWORD);
                 String email = rs.getString(EMAIL);
                 String name = rs.getString(NAME);
-                users.add(new User(userId, password, email, name));
+                users.add(new User(userId, password, name, email));
             }
         }catch (SQLException e){
             throw new RuntimeException(e);

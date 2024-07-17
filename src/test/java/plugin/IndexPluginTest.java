@@ -1,8 +1,10 @@
 package plugin;
 
-import db.PostDatabase;
+import db.H2Database;
+import db.PostH2Database;
 import model.Post;
 import model.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import webserver.http.Session;
@@ -11,6 +13,7 @@ import webserver.http.request.Request;
 import webserver.http.response.Response;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static plugin.UserPluginTest.createTestUser;
@@ -18,6 +21,11 @@ import static plugin.UserPluginTest.createTestUser;
 class IndexPluginTest {
 
     private IndexPlugin indexPlugin = new IndexPlugin();
+
+    @BeforeEach
+    void beforeEach() throws SQLException {
+        H2Database.deleteAll("post");
+    }
 
     @Test
     @DisplayName("사용자가 로그인 상태일 경우 /index.html 에서 사용자 이름을 표시해준다.")
@@ -114,13 +122,12 @@ class IndexPluginTest {
 
     }
 
-    //@Test
-    //TODO 실제 DB와 독립적으로 테스트 가능해야 함.
+    @Test
     @DisplayName("작성한 글의 제목을 index.html에서 보여준다.")
-    public void testIndexWithoutLoginAndWrite() throws IOException {
+    public void testIndexWithoutLoginAndWrite() throws IOException, SQLException {
 
         //given
-        PostDatabase.addPost(new Post("testContent1", "testTitle1", "testAuthorName1"));
+        PostH2Database.addPost(new Post("testContent1", "testTitle1", "testAuthorName1"));
         Request request = new Request.Builder(HttpMethod.GET, "/index.html").build();
 
         //when
