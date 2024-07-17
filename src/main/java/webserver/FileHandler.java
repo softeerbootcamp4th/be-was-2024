@@ -1,10 +1,12 @@
 package webserver;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import webserver.enumPackage.ContentType;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+
+import java.io.*;
+import java.util.List;
 
 public class FileHandler {
 
@@ -28,4 +30,6 @@ public class FileHandler {
         String extension = fileName.substring(dotIndex + 1).toLowerCase();
         return ContentType.fromExtension(extension);
     }
+
+
 }

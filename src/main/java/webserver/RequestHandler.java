@@ -19,19 +19,20 @@ public class RequestHandler implements Runnable {
 
     @Override
     public void run() {
-        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
+//        logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
 
             HttpRequestParser requestParser = new HttpRequestParser();
             HttpRequest httpRequest = requestParser.parse(in);
 
-            logger.debug("request line : {} {}", httpRequest.getMethod(), httpRequest.getUrl());
+//            logger.debug("request line : {} {}", httpRequest.getMethod(), httpRequest.getUrl());
+//
+//            // Use headers as needed
+//            for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
+//                logger.debug("header : {}={}", entry.getKey(), entry.getValue());
+//            }
 
-            // Use headers as needed
-            for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
-                logger.debug("header : {}={}", entry.getKey(), entry.getValue());
-            }
 
             DataOutputStream dos = new DataOutputStream(out);
             RequestResponse requestResponse = new RequestResponse(httpRequest, dos);
