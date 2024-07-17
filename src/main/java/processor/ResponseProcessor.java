@@ -22,10 +22,11 @@ public class ResponseProcessor {
         return viewData;
     }
 
-    public ViewData createUserResponse() {
+    public ViewData createUserResponse(String sessionId) {
         ViewData viewData = new ViewData.Builder()
                 .url("/index.html")
                 .redirectCode(302)
+                .cookie(sessionId)
                 .build();
 
         return viewData;
@@ -33,7 +34,7 @@ public class ResponseProcessor {
 
     public ViewData loginSuccessResponse(String sessionId) {
         ViewData viewData = new ViewData.Builder()
-                .url("/main/index.html")
+                .url("/index.html")
                 .cookie(sessionId)
                 .redirectCode(302)
                 .build();
@@ -61,7 +62,7 @@ public class ResponseProcessor {
 
     public ViewData loginSuccessWithSessionId(String sessionId) {
         ViewData viewData = new ViewData.Builder()
-                .url("/main/index.html")
+                .url("/index.html")
                 .statusCode(200)
                 .cookie(sessionId)
                 .build();
