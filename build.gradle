@@ -29,7 +29,7 @@ test {
 
 task writeProperties{
     doLast{
-        file('src/main/resources/config.properties').text = "staticPath = ./src/main/resources/static\njdbc_url_article = jdbc:h2:~/was-articleDB\njdbc_url_user = jdbc:h2:~/was-userDB\ndatabase_username = sa\ndatabase_password = "
+        file('src/main/resources/config.properties').text = "staticPath = ./src/main/resources/static\njdbc_url_article = jdbc:h2:~/was-articleDB\njdbc_url_user = jdbc:h2:~/was-userDB\njdbc_url_session = jdbc:h2:~/was-sessionDB\ndatabase_username = sa\ndatabase_password = "
     }
 }
 
