@@ -16,9 +16,18 @@ import java.util.Optional;
 import static util.Utils.getFile;
 import static webserver.http.response.ResponseHandler.getContentType;
 
+/**
+ * 인덱스와 관련된 처리를 하는 클래스
+ */
 @Plugin
 public class IndexPlugin {
 
+    /**
+     * index.html 로 요청이 들어왔을 때 처리하는 메소드
+     * @param request
+     * @return
+     * @throws IOException
+     */
     @Get(path = "/index.html")
     public Response index(Request request) throws IOException {
 
