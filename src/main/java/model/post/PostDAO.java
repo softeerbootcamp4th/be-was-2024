@@ -57,7 +57,7 @@ public class PostDAO {
     }
 
     // 글 검색
-    public Post getUser(int postid) {
+    public Post getPost(int postid) {
         Post post = null;
         try {
             conn = JDBC.getConnection();
