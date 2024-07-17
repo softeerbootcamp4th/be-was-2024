@@ -10,6 +10,7 @@ import webserver.session.SessionDAO;
 import webserver.util.BodyContentDecomposision;
 import webserver.util.FileData;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +51,16 @@ public class WritePost implements FunctionHandler {
                 FileData fileData = part.getValue();
                 if (partName.equals("image")) {
                     imgpath = root + fileData.getFileName();
+                    int instantnum = 1;
+                    int lastDotIndex = imgpath.lastIndexOf('.');
+
+                    String namePart = imgpath.substring(0, lastDotIndex);
+                    String extensionPart = imgpath.substring(lastDotIndex);
+
+                    while(new File(namePart +"("+ instantnum +")" + extensionPart).exists()){
+                        instantnum++;
+                    }
+                    imgpath = namePart +"("+ instantnum +")" + extensionPart;
                     Files.write(Paths.get(imgpath), fileData.getData());
                 }else if(partName.equals("text")){
                     text = new String(fileData.getData());
