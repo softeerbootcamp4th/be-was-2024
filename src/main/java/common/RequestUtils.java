@@ -1,8 +1,8 @@
 package common;
 
-import exception.SizeNotMatchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.HeaderKey;
 import web.HttpRequest;
 import webserver.WebAdapter;
 
@@ -47,7 +47,7 @@ public class RequestUtils {
         String header = sb.toString();
         String[] headerLines = header.split("\r\n");
         for (String line : headerLines) {
-            if (line.startsWith("Content-Length")) {
+            if (line.toLowerCase().startsWith(HeaderKey.CONTENT_LENGTH.getKey())) {
                 contentLength = Integer.parseInt(line.split(":")[1].trim());
                 break;
             }
@@ -56,10 +56,7 @@ public class RequestUtils {
         // Content-Length가 0보다 크다면 body를 읽는다.
         if(contentLength>0) {
             body = new byte[contentLength];
-            int readSize = in.read(body, 0, contentLength);
-            if(readSize!=contentLength) {
-                throw new SizeNotMatchException("Content-Length 크기와 읽은 body 사이즈가 다릅니다");
-            }
+            in.read(body, 0, contentLength);
             sb.append(new String(body));
             sb.append("\n");
         }
