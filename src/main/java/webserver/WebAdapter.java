@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 요청 헤더에서 필요한 정보를 추출하는 클래스
- * TODO(키워드 프로퍼티 파일로 관리)
  */
 public class WebAdapter {
     static final String SESSION_ID = "SID";
@@ -123,10 +122,11 @@ public class WebAdapter {
             // 세션 저장소의 정보 삭제
             SessionFacade.invalidateAndRemoveSession(request);
 
-            HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+            HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
-            // TODO("게시글 파싱")
+            HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+            response.writeInBytes(out);
         } else {
             resolveGetRequest(ViewPath.NOT_FOUND.getRequestUri());
         }

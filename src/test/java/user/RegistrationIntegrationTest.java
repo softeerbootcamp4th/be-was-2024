@@ -26,7 +26,6 @@ public class RegistrationIntegrationTest {
         URL registerUrl = new URL("http://localhost:8080/database/init");
         connection = (HttpURLConnection) registerUrl.openConnection();
         connection.setRequestMethod("GET");
-        System.out.println("******** DATABASE INITIALIZED ********");
     }
 
     /**
