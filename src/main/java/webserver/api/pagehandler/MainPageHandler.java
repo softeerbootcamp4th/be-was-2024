@@ -26,19 +26,21 @@ public class MainPageHandler implements FunctionHandler {
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();
         SessionDAO sessionDAO = new SessionDAO();
-        UserDAO userDAO = new UserDAO();
+
+        String postid = request.getPathVariables().get("postid");
 
         if(sessionid !=null && sessionDAO.findSession(sessionid) != null){
+            UserDAO userDAO = new UserDAO();
             User user = userDAO.getUser(sessionDAO.findSession(sessionid));
             return new HttpResponse.ResponseBuilder(200)
                     .addheader("Content-Type", "text/html; charset=utf-8")
-                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
+                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),postid))
                     .build();
         }
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.MAIN_PAGE))
+                .setBody(PageBuilder.buildLoggedoutPage(postid) )
                 .build();
     }
 }

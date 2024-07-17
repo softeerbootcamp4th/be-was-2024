@@ -20,6 +20,9 @@ public class PostDAO {
     private final String LAST_INDEX = "SELECT ID FROM POST ORDER BY id DESC LIMIT 1";
     private final String POST_INSERT = "insert into POST(TEXT, IMGPATH, USERID) values(?, ?, ?)"; //userid, username, email, password
     private String POST_FIND = "select * from post where id= ?";
+    private String PREV_POST = "SELECT MAX(id) AS prev_id FROM post WHERE id < ?";
+    private String NEXT_POST = "SELECT MIN(id) AS next_id FROM post WHERE id > ?";
+
 
     // 마지막 게시글 번호
     public int getLastIndex() {
@@ -32,6 +35,52 @@ public class PostDAO {
             if (rs.next()) {
                 id = rs.getInt("id");
             }
+        } catch (SQLException e) {
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return -1;
+        } finally {
+            JDBC.close(stmt, conn);
+        }
+        return id;
+    }
+
+    // 다음 글 찾기
+    public int getNextPostIndex(int postid){
+        int id = 0;
+        try {
+            conn = JDBC.getConnection();
+            stmt = conn.prepareStatement(NEXT_POST);
+            stmt.setInt(1, postid);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                id = rs.getInt("next_id");
+            }
+
+        } catch (SQLException e) {
+            logger.error("error{}", e.getMessage());
+            logger.error(Arrays.toString(e.getStackTrace()));
+            return -1;
+        } finally {
+            JDBC.close(stmt, conn);
+        }
+        return id;
+    }
+
+    // 이전 글 찾기
+    public int getPrevPostIndex(int postid){
+        int id = 0;
+        try {
+            conn = JDBC.getConnection();
+            stmt = conn.prepareStatement(PREV_POST);
+            stmt.setInt(1, postid);
+            rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                id = rs.getInt("prev_id");
+            }
+
         } catch (SQLException e) {
             logger.error("error{}", e.getMessage());
             logger.error(Arrays.toString(e.getStackTrace()));

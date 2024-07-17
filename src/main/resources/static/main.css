@@ -39,6 +39,7 @@
   height: 664px;
   border-radius: 8px;
   background: #d9d9d9;
+  object-fit: cover;
 }
 
 .post__article {

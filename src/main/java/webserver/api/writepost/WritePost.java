@@ -29,7 +29,7 @@ public class WritePost implements FunctionHandler {
         return single_instance;
     }
 
-    static String root = "./src/main/resources/post/images/";
+    static String root = "./src/main/resources/static/post/images/";
 
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
