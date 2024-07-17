@@ -1,7 +1,7 @@
 package route.routes.auth;
 
 import config.AppConfig;
-import db.Database;
+import db.UserTable;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
@@ -28,7 +28,7 @@ public class SignInHandler implements IRouteHandler {
         var userId = formParams.get("userId");
         var password = formParams.get("password");
 
-        User user = Database.findUserById(userId);
+        User user = UserTable.findUserById(userId);
         // 유저가 없거나, 비밀번호가 일치하지 않는 경우
         if(user == null || !user.getPassword().equals(password)) {
             res.setStatusInfo(HttpStatusType.UNAUTHORIZED);

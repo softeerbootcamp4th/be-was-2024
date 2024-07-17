@@ -2,7 +2,7 @@ package chain;
 
 import chain.core.MiddlewareChain;
 import config.AppConfig;
-import db.Database;
+import db.UserTable;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import model.User;
@@ -28,7 +28,7 @@ public class UserSessionChain extends MiddlewareChain {
             return;
         }
 
-        User user = Database.findUserById(userId);
+        User user = UserTable.findUserById(userId);
         req.setStoreData(AppConfig.USER, user);
         logger.debug("user is {}", user);
 

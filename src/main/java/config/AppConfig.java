@@ -9,4 +9,5 @@ public class AppConfig {
     public static final String SESSION_NAME = "SID";
     public static final String USER = "user";
     public static final String MULTIPART_PREFIX = "@multipart/";
+    public static final String FILE_SRC = "./img/";
 }
