@@ -25,8 +25,8 @@ public class ApiProcessManager {
         apiProcessStore = new ArrayList<>();
         apiProcessStore.add(new ApiInfo("/", HttpMethod.GET, new HomepageApiProcess()));
         apiProcessStore.add(new ApiInfo("/registration", HttpMethod.GET, new RegisterpageApiProcess()));
-        apiProcessStore.add(new ApiInfo("/user/create", HttpMethod.POST, new RegisterApiProcess()));
-        apiProcessStore.add(new ApiInfo("/user/login", HttpMethod.POST, new LoginApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/create", HttpMethod.POST, new RegisterH2ApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/login", HttpMethod.POST, new LoginH2ApiProcess()));
         apiProcessStore.add(new ApiInfo("/login", HttpMethod.GET, new LoginPageApiProcess()));
         apiProcessStore.add(new ApiInfo("/user/logout", HttpMethod.POST, new LogoutApiProcess()));
         apiProcessStore.add(new ApiInfo("/user/list", HttpMethod.GET, new UserlistPageApiProcess()));
