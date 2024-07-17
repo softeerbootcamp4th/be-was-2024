@@ -32,8 +32,10 @@ public class PostDistributor extends Distributor {
     private void processUserCreate() {
         userProcessor.createUser(request);
 
+        String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
+
         ResponseProcessor responseProcessor = new ResponseProcessor();
-        this.viewData = responseProcessor.createUserResponse();
+        this.viewData = responseProcessor.createUserResponse(sessionId);
     }
 
     private void processUserLogin() {
