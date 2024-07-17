@@ -1,15 +1,20 @@
 package webserver;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import webserver.enumPackage.ContentType;
 
 import java.io.*;
-import java.util.List;
 
+/**
+ * 파일 정보를 처리해주는 클래스
+ */
 public class FileHandler {
 
+    /**
+     * 읽어온 파일 정보를 바이트 어레이로 변환해주는 메서드
+     * @param file 읽어온 파일 정보
+     * @return 파일 정보를 바이트 어레이로 변환한 것
+     * @throws IOException
+     */
     public static byte[] readFileToByteArray(File file) throws IOException {
         try (FileInputStream fis = new FileInputStream(file);
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) { //BufferedInputStream
@@ -22,6 +27,11 @@ public class FileHandler {
         }
     }
 
+    /**
+     * 파일의 Content-Type를 지정해주는 메서드
+     * @param fileName 읽어온 파일의 이름
+     * @return String형태의 File Content-Type
+     */
     public static String determineContentType(String fileName) {
         int dotIndex = fileName.lastIndexOf('.');
         if (dotIndex == -1) {

@@ -9,8 +9,15 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * h2 Database에 직접 User 정보 접근을 위한 DB
+ */
 public class Database {
 
+    /**
+     * User 정보를 Database에 저장하는 메서드
+     * @param user 저장하고자 하는 User 객체
+     */
     public static void addUser(User user) {
         String sql = "INSERT INTO USERS (userId, password, name, email) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -25,6 +32,11 @@ public class Database {
         }
     }
 
+    /**
+     * User 정보를 Database에서 탐색하는 메서드
+     * @param userId 탐색하고자 하는 유저 정보
+     * @return 탐색된 User 객체
+     */
     public static User findUserById(String userId) {
         String sql = "SELECT * FROM USERS WHERE userId = ?";
         try (Connection connection = DatabaseConnection.getConnection();
@@ -46,6 +58,10 @@ public class Database {
         return null;
     }
 
+    /**
+     * 모든 유저 정보를 Database에서 탐색하는 메서드
+     * @return 모든 유저의 정보가 담긴 Map
+     */
     public static Map<String, User> findAll() {
         Map<String, User> users = new HashMap<>();
         String sql = "SELECT * FROM USERS";

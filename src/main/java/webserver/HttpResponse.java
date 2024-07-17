@@ -14,31 +14,61 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public class RequestResponse {
+/**
+ * Http의 응답을 담당하는 클래스
+ * 해당되는 응답 형식에 맞는 데이터 반환
+ */
+public class HttpResponse {
 
-    private static final Logger logger = LoggerFactory.getLogger(RequestResponse.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private HttpRequest httpRequest;
     private DataOutputStream dos;
 
-    public RequestResponse(HttpRequest httpRequest, DataOutputStream dos) {
+    /**
+     * 객체 생성 메서드
+     * @param httpRequest Http 요청에 대한 정보
+     * @param dos DataOutputStream에 대한 지정
+     */
+    public HttpResponse(HttpRequest httpRequest, DataOutputStream dos) {
         this.httpRequest = httpRequest;
         this.dos = dos;
     }
 
+    /**
+     * 정해진 경로를 받아 리다이렉션 해주는 메서드
+     * @param redirectPath 리다이렉트 해줘야 되는 경로 정보
+     * @throws IOException
+     */
     public void redirectPath(String redirectPath) throws IOException {
         sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(), "Location: " + redirectPath + "\r\n", null);
     }
 
+    /**
+     * 리다이렉트와 세션 설정을 해주는 메서드
+     * @param sessionId 난수로 설정된 세션 id 설정
+     * @param redirectPath 리다이렉트 해줘야 되는 경로 정보
+     * @throws IOException
+     */
     public void setCookieAndRedirectPath(String sessionId, String redirectPath) throws IOException {
         sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(),
                 "Location: " + redirectPath + "\r\nSet-Cookie: sid=" + sessionId + "; Path=/\r\n", null);
     }
 
+    /**
+     * 리다이렉트와 세션 초기화 설정을 해주는 메서드
+     * @param redirectPath 리다이렉트 해줘야 되는 경로 정보
+     * @throws IOException
+     */
     public void resetCookieAndRedirectPath(String redirectPath) throws IOException {
         sendResponse(HttpVersion.HTTP_1_1, HttpStatus.FOUND, ContentType.HTML.getMimeType(),
                 "Location: " + redirectPath + "\r\nSet-Cookie: sid=; Path=/; Max-Age=0\r\n", null);
     }
 
+    /**
+     * 지정된 경로를 열어주는 메서드
+     * @param url 오픈해줘야 하는 경로 정보
+     * @throws IOException
+     */
     public void openPath(String url) throws IOException {
         if (url != null) {
             File file = new File(url);
@@ -55,6 +85,12 @@ public class RequestResponse {
         }
     }
 
+    /**
+     * 지정된 경로를 유저 리스트와 같이 열어주는 메서드
+     * @param url 오픈해줘야 하는 경로 정보
+     * @param username 사용자 정보 검사를 위한 매개변수
+     * @throws IOException
+     */
     public void openPathWithUsername(String url, String username) throws IOException {
         if (url != null) {
             File file = new File(url);
@@ -75,6 +111,10 @@ public class RequestResponse {
         }
     }
 
+    /**
+     * 유저 리스트를 보여주는 메서드
+     * @throws IOException
+     */
     public void openUserList() throws IOException {
         Map<String, User> users = Database.findAll();
 
@@ -91,12 +131,35 @@ public class RequestResponse {
         responseBody(fileBody);
     }
 
-    private void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
-        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, contentType, "Content-Length: " + lengthOfBodyContent + "\r\n", null);
-    }
-
+    /**
+     * 404 에러 페이지를 띄워즈는 메서드
+     * @throws IOException
+     */
     public void response404Header() throws IOException {
         sendResponse(HttpVersion.HTTP_1_1, HttpStatus.NOT_FOUND, ContentType.HTML.getMimeType(), null, "<h1>404 Not Found</h1>".getBytes("UTF-8"));
+    }
+
+    /**
+     * 에러 페이지를 열어주는 메서드
+     * @param html 에러 페이지에 대한 정보가 포함된 html
+     * @throws IOException
+     */
+    public void responseErrorPage(String html) throws IOException {
+        byte[] responseBytes = html.getBytes("UTF-8");
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, ContentType.HTML.getMimeType(), "Content-Length: " + responseBytes.length + "\r\n", responseBytes);
+    }
+
+    /**
+     * 잘못된 요청이 들어왔을 때 에러메세지 경고창과 함께 리다이렉트 해주는 메서드
+     * @param errorMessage 클라이언트에게 표시해주고자 하는 에러 메세지
+     * @param redirectUrl 리다이렉트 해줘야 되는 경로 정보
+     * @throws IOException
+     */
+    public void sendErrorPage(String errorMessage, String redirectUrl) throws IOException {
+        String errorPage = HtmlTemplate.ERROR_PAGE.getTemplate()
+                .replace("{{errorMessage}}", errorMessage)
+                .replace("{{redirectUrl}}", redirectUrl);
+        responseErrorPage(errorPage);
     }
 
     private void responseBody(byte[] body) throws IOException {
@@ -106,16 +169,8 @@ public class RequestResponse {
         dos.flush();
     }
 
-    public void responseErrorPage(String html) throws IOException {
-        byte[] responseBytes = html.getBytes("UTF-8");
-        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, ContentType.HTML.getMimeType(), "Content-Length: " + responseBytes.length + "\r\n", responseBytes);
-    }
-
-    public void sendErrorPage(String errorMessage, String redirectUrl) throws IOException {
-        String errorPage = HtmlTemplate.ERROR_PAGE.getTemplate()
-                .replace("{{errorMessage}}", errorMessage)
-                .replace("{{redirectUrl}}", redirectUrl);
-        responseErrorPage(errorPage);
+    private void response200Header(int lengthOfBodyContent, String contentType) throws IOException {
+        sendResponse(HttpVersion.HTTP_1_1, HttpStatus.OK, contentType, "Content-Length: " + lengthOfBodyContent + "\r\n", null);
     }
 
     private void sendResponse(HttpVersion version, HttpStatus status, String contentType, String headers, byte[] body) throws IOException {

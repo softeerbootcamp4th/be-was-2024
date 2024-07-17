@@ -1,5 +1,8 @@
 package webserver.enumPackage;
 
+/**
+ * Http 상태에 대한 정보를 담은 이넘타입
+ */
 public enum HttpStatus {
     OK(200, "OK"),
     FOUND(302, "Found"),

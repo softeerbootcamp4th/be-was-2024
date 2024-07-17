@@ -1,5 +1,8 @@
 package webserver.enumPackage;
 
+/**
+ * Http 응답 형식 대한 정보를 담은 이넘타입
+ */
 public enum HtmlTemplate {
     USER_LIST("<html><head><title>User List</title></head><body>" +
             "<h1>User List</h1><ul>{{userList}}</ul></body></html>"),

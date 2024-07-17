@@ -2,15 +2,15 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.mapper.MappingHandler;
 
+/**
+ * 들어온 request에 대한 정보를 처리하는 메서드
+ */
 public class RequestHandler implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-
     private Socket connection;
 
     public RequestHandler(Socket connectionSocket) {
@@ -35,10 +35,10 @@ public class RequestHandler implements Runnable {
 
 
             DataOutputStream dos = new DataOutputStream(out);
-            RequestResponse requestResponse = new RequestResponse(httpRequest, dos);
-            MappingHandler.mapRequest(httpRequest, requestResponse);
+            HttpResponse httpResponse = new HttpResponse(httpRequest, dos);
+            MappingHandler.mapRequest(httpRequest, httpResponse);
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 }

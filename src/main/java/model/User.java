@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * User 형식을 담고 있는 클래스
+ */
 public class User {
     private String userId;
     private String password;
