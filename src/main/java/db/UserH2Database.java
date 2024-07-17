@@ -9,6 +9,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * H2 를 활용하여 User 데이터를 저장하는 클래스
+ */
 public class UserH2Database {
 
     private final static String TABLE = "member";
@@ -19,6 +22,10 @@ public class UserH2Database {
 
     public static final Logger logger = LoggerFactory.getLogger(UserPlugin.class);
 
+    /**
+     * user를 추가하는 메소드
+     * @param user
+     */
     public static void addUser(User user) {
         try {
             String sql = "insert into "+TABLE+" ("+ID+", "+PASSWORD+", "+EMAIL+", "+NAME+") values (\'"+user.getUserId()+"\', \'" + user.getPassword() + "\', \'" + user.getEmail() + "\', \'" + user.getName() + "\')";
@@ -29,6 +36,11 @@ public class UserH2Database {
         }
     }
 
+    /**
+     * id 를 기반으로 유저를 반환하는 메소드
+     * @param userId
+     * @return
+     */
     public static Optional<User> findUserById(String userId) {
         try {
             ResultSet rs = H2Database.select("select * from "+TABLE+" where "+ID+" = \'" + userId+"\'");
@@ -45,6 +57,10 @@ public class UserH2Database {
         return Optional.empty();
     }
 
+    /**
+     * 저장되어 있는 모든 유저를 반환하는 메소드
+     * @return
+     */
     public static Collection<User> findAll() {
 
         Collection<User> users = new ArrayList<>();
