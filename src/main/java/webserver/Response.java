@@ -84,20 +84,28 @@ public class Response {
             response404Header(dos, this.body.length);
             responseBody(dos, this.body);
         } else {
-            if (cookie.isEmpty()) {
-                response200Header(dos, this.body.length, resourceHandler.getContentType(url));
+            if (cookie != null) {
+                if (cookie.isEmpty()) {
+                    response200Header(dos, this.body.length, resourceHandler.getContentType(url));
+                } else {
+                    response200HeaderWithCookie(dos, this.body.length, resourceHandler.getContentType(url));
+                }
             } else {
-                response200HeaderWithCookie(dos, this.body.length, resourceHandler.getContentType(url));
+                response200Header(dos, this.body.length, resourceHandler.getContentType(url));
             }
             responseBody(dos, this.body);
         }
     }
 
     public void redirect(String url, DataOutputStream dos, int redirectionCode) throws IOException {
-        if (cookie.isEmpty()) {
-            redirectWithoutCookie(url, dos, redirectionCode);
+        if (cookie != null) {
+            if (cookie.isEmpty()) {
+                redirectWithoutCookie(url, dos, redirectionCode);
+            } else {
+                redirectWithCookie(url, dos, redirectionCode);
+            }
         } else {
-            redirectWithCookie(url, dos, redirectionCode);
+            redirectWithoutCookie(url, dos, redirectionCode);
         }
     }
 
