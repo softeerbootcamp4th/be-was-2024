@@ -7,13 +7,16 @@ import webserver.PluginMapper;
 import webserver.http.request.HttpMethod;
 import webserver.http.request.Request;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static util.Utils.getFile;
 
+/**
+ * Request 를 기반으로 적절한 Response 를 만드는 클래스
+ */
 public class ResponseHandler {
     public final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
@@ -23,29 +26,45 @@ public class ResponseHandler {
         this.pluginMapper = pluginMapper;
     }
 
+    /**
+     * 요청에 대한 응답을 반환하는 메소드
+     * @param request
+     * @return
+     * @throws IOException
+     */
     public Response response(Request request) throws IOException {
-        Response response = new Response.Builder(Status.NOT_FOUND).build();
-
         try {
+            if (pluginMapper.isExistOnlyPath(request.getMethod(), request.getPath())) return new Response.Builder(Status.METHOD_NOT_ALLOWED).build();
             if (pluginMapper.isExist(request.getMethod(), request.getPath())) {
                 Optional<Object> returnValue = runPlugin(request.getMethod(), request.getPath(), request);
                 if (returnValue.isPresent()) {
-                    if (returnValue.get() instanceof Response) response = (Response) returnValue.get();
+                    if (returnValue.get() instanceof Response) return (Response) returnValue.get();
                 }
             } else {
-                response = new Response.Builder(Status.OK)
+                return new Response.Builder(Status.OK)
                         .addHeader("Content-Type", getContentType(request.getExtension()) + ";charset=utf-8")
                         .body(getFile(request.getPath()))
                         .build();
             }
+        }catch (NotExistException e) {
+            return new Response.Builder(Status.NOT_FOUND).build();
         }catch (Exception e){
-            response = new Response.Builder(Status.INTERNAL_SERVER_ERROR)
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String stackTraceString = sw.toString();
+            return new Response.Builder(Status.INTERNAL_SERVER_ERROR)
+                    .body(stackTraceString)
                     .build();
         }
-
-        return response;
+        return new Response.Builder(Status.OK).build();
     }
 
+    /**
+     * 확장자에 대한 콘텐츠타입을 반환하는 메소드
+     * @param extension
+     * @return
+     */
     public static String getContentType(String extension){
         return switch (extension){
             case "html" -> "text/html";
@@ -58,8 +77,10 @@ public class ResponseHandler {
         };
     }
 
-    // 플러그인 실행 메소드
-    public Optional<Object> runPlugin(HttpMethod httpMethod, String path, Object... args) {
+    /**
+     *요청에 대한 메소드를 실행하는 메소드
+      */
+    private Optional<Object> runPlugin(HttpMethod httpMethod, String path, Object... args) {
         Method method = pluginMapper.get(httpMethod, path);
         logger.debug(path);
         if (method != null) {
@@ -74,10 +95,10 @@ public class ResponseHandler {
                 return Optional.ofNullable(returnValue);
             } catch (IllegalAccessException | InvocationTargetException | InstantiationException |
                      NoSuchMethodException e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
         }
-        throw new NotExistException();
+        else throw new NotExistException();
     }
 
 }

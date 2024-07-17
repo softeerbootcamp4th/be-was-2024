@@ -1,6 +1,7 @@
 package webserver.http.request;
 
 import exception.NotExistException;
+import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.http.Session;
@@ -8,11 +9,11 @@ import webserver.http.Session;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Request 정보를 담는 클래스
+ */
 public class Request {
 
     private static final String CRLF = "\r\n";
@@ -96,42 +97,89 @@ public class Request {
 
     }
 
+    /**
+     * key 를 통해 쿠키 값을 찾을 수 있는 메소드
+     * @param key
+     * @return
+     */
     public String getCookieValue(String key){
         return this.cookie.get(key);
     }
 
+    /**
+     * http메소드를 반환하는 메소드
+     * @return
+     */
     public HttpMethod getMethod(){
         return this.httpMethod;
     }
 
+    /**
+     * 맵형 파라미터를 반환하는 메소드
+     * @return
+     */
     public Map<String, String> getParameter(){
         return this.parameter;
     }
 
+    /**
+     * body 를 반환하는 메소드
+     * @return
+     */
     public byte[] getBody(){
         return this.body;
     }
 
+    /**
+     * 요청 path 를 반환하는 메소드
+     * @return
+     */
     public String getPath(){
         return this.path;
     }
 
+    /**
+     * 요청 헤더를 반환하는 메소드
+     * @return
+     */
     public Map<String, String> getHeader(){
         return this.header;
     }
 
+    /**
+     * 확장자를 반환하는 메소드
+     * @return
+     */
     public String getExtension(){
         return parseExtension(path);
     }
 
-    public String getParameterValue(String key){
-        return this.parameter.get(key);
-    }
-
+    /**
+     * key 에 대한 헤더 값을 반환하는 메소드
+     * @param key
+     * @return
+     */
     public String getHeadValue(String key){
         return this.header.get(key);
     }
 
+    /**
+     * 로그인된 유저를 반환하는 메소드
+     * @return
+     */
+    public Optional<User> getUser(){
+        String sessionId = getSessionId();
+        logger.debug(sessionId);
+        if(!Session.isExist(sessionId)) return Optional.empty();
+        return Optional.of(Session.get(getSessionId()));
+    }
+
+    /**
+     * body를 제외한 request 부분을 파싱하는 메소드
+     * @param request
+     * @return
+     * @throws IOException
+     */
     public static Request parseRequestWithoutBody(String request) throws IOException {
 
         String[] inputLines = request.split("\n");
@@ -142,17 +190,6 @@ public class Request {
                 .header(parseHeaderMap(request))
                 .build();
     }
-
-    private static String parsePath(String path){
-        return path.split("\\?")[0];
-    }
-
-    private static String parseParameter(String path){
-        String[] split = path.split("\\?");
-        if(split.length>1) return path.split("\\?")[1];
-        return "";
-    }
-
     public static Map<String, String> parseParameterMap(String parameterString){
 
         Map<String, String> parameterMap = new HashMap<>();
@@ -165,6 +202,36 @@ public class Request {
         }
         return parameterMap;
     }
+
+    /**
+     * 로그인 상태인지 확인하는 메소드
+     * @return
+     */
+    public boolean isLogin(){
+        String sessionValue = getCookieValue("sid");
+        if(sessionValue==null) return false;
+        if(!Session.isExist(sessionValue)) return false;
+        return true;
+    }
+
+    /**
+     * 세션 ID 를 반환하는 메소드
+     * @return
+     */
+    public String getSessionId(){
+        return getCookieValue("sid");
+    }
+
+    private static String parsePath(String path){
+        return path.split("\\?")[0];
+    }
+
+    private static String parseParameter(String path){
+        String[] split = path.split("\\?");
+        if(split.length>1) return path.split("\\?")[1];
+        return "";
+    }
+
 
     private static Map<String, String> parseCookie(String parameterCookieValue){
         Map<String, String> cookie = new HashMap<>();
@@ -180,16 +247,6 @@ public class Request {
         return cookie;
     }
 
-    public boolean isLogin(){
-        String sessionValue = getCookieValue("sid");
-        if(sessionValue==null) return false;
-        if(!Session.isExist(sessionValue)) return false;
-        return true;
-    }
-
-    public String getSessionId(){
-        return getCookieValue("sid");
-    }
 
     private static String removeSpace(String str){
         StringBuilder sb = new StringBuilder();
