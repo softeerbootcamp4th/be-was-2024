@@ -47,10 +47,9 @@ public class RequestHandler implements Runnable {
             logger.debug(httpRequest.toString());
 
             HttpResponse httpResponse = logic.serve(httpRequest);
-
             response(out, httpResponse);
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage());
         }
 
