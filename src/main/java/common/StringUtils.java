@@ -1,8 +1,6 @@
 package common;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class StringUtils {
 
@@ -24,5 +22,43 @@ public class StringUtils {
             map.put(key, value);
         }
         return map;
+    }
+
+    public static List<byte[]> splitBytes(byte[] bytes, byte[] delimiterBytes) {
+        List<byte[]> resultList = new ArrayList<>();
+        int index = indexOf(bytes, delimiterBytes, 0);
+        int start = 0;
+
+        while (index!=-1) {
+            byte[] sliced = new byte[index-start];
+            System.arraycopy(bytes, start, sliced, 0, index-start);
+            resultList.add(sliced);
+
+            start = index+delimiterBytes.length;
+            index = indexOf(bytes, delimiterBytes, start);
+        }
+
+        // Add the remaining bytes after the last delimiter
+        byte[] lastSlice = new byte[bytes.length-start];
+        System.arraycopy(bytes, start, lastSlice, 0, bytes.length-start);
+        resultList.add(lastSlice);
+
+        return resultList;
+    }
+
+    public static int indexOf(byte[] source, byte[] target, int fromIndex) {
+        for (int i=fromIndex; i<=source.length-target.length; i++) {
+            boolean found = true;
+            for (int j=0; j<target.length; j++) {
+                if(source[i+j]!=target[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if(found) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

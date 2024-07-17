@@ -21,62 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebAdapter {
     static final String SESSION_ID = "SID";
 
-    /**
-     * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
-     * @param request 요청 전문
-     * @return HttpRequest
-     */
-    public static HttpRequest parseRequest(String request, byte[] body) {
-        HttpMethod method;
-        String path, contentType = MIME.UNKNOWN.getType();
-        LinkedList<String> accept = new LinkedList<>();
-        int contentLength = 0;
-        Map<String, String> cookie = new HashMap<>();
-
-        String[] requestLine = request.split("\n");
-
-        // Request Line
-        String[] line_1 = requestLine[0].split(" ");
-        method = HttpMethod.valueOf(line_1[0]);
-        path = line_1[1];
-
-        // Header
-        for(int i=1; i<requestLine.length; i++) {
-            if(requestLine[i].split(":").length==1) continue;
-            String[] line_N = requestLine[i].split(":");
-            String key = line_N[0].trim();
-            String value = line_N[1].trim();
-
-            // Accept헤더 MimeType 설정
-            if(key.equalsIgnoreCase(HeaderKey.ACCEPT.getKey())) {
-                String[] acceptLine = value.split(";");
-                String[] mimeType = acceptLine[0].split(",");
-                accept.addAll(Arrays.asList(mimeType));
-            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_LENGTH.getKey())) {
-                contentLength = Integer.parseInt(value);
-            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_TYPE.getKey())) {
-                contentType = value;
-            } else if(key.equalsIgnoreCase(HeaderKey.COOKIE.getKey())) {
-                String[] cookies = value.split(";");
-                for(String c: cookies) {
-                    String cookieName = c.split("=")[0].trim();
-                    String cookieId = c.split("=")[1].trim();
-                    cookie.put(cookieName, cookieId);
-                }
-            }
-        }
-
-        return new HttpRequest.HttpRequestBuilder()
-                .method(method)
-                .path(path)
-                .accept(accept)
-                .contentLength(contentLength)
-                .contentType(contentType)
-                .cookie(cookie)
-                .body(body)
-                .build();
-    }
-
     public static void resolveRequest(HttpRequest request, OutputStream out) throws IOException {
         if(request.isGetRequest()) {
             resolveGetRequest(request, out);
@@ -125,14 +69,33 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
+            // content(string)과 image(byte[])를 파싱하여 데이터베이스에 저장
+            String boundaryKey = "--"+RequestUtils.getBoundaryKey(request.getContentType());
+            byte[] delimiter = boundaryKey.getBytes();
+            byte[] body = request.getBody();
+
+            List<byte[]> parts = StringUtils.splitBytes(body, delimiter);
+            byte[] image = null;
+            String content = null;
+
+            image = parts.get(1);
+            content = new String(parts.get(2));
+
+            List<byte[]> imageParts = StringUtils.splitBytes(image, "\r\n\r\n".getBytes());
+            byte[] pureImage = imageParts.get(1);
+            pureImage = Arrays.copyOf(pureImage, pureImage.length-2);
+            String pureContent = content.split("\r\n\r\n")[1];
+            pureContent = pureContent.substring(0, pureContent.length()-2);
+
+
+
+            // 화면 리다이렉트
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             response.writeInBytes(out);
         } else {
             resolveGetRequest(ViewPath.NOT_FOUND.getRequestUri());
         }
     }
-
-
 
     /**
      * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답

@@ -3,11 +3,16 @@ package common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.HeaderKey;
+import web.HttpMethod;
 import web.HttpRequest;
-import webserver.WebAdapter;
+import web.MIME;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
 
 public class RequestUtils {
 
@@ -53,17 +58,78 @@ public class RequestUtils {
             }
         }
 
-        // Content-Length가 0보다 크다면 body를 읽는다.
+        StringBuilder sbb = new StringBuilder();
+        // Content-Length가 0보다 크다면 body까지 읽어서 로그에 출력한다.
         if(contentLength>0) {
             body = new byte[contentLength];
             in.read(body, 0, contentLength);
-            sb.append(new String(body));
-            sb.append("\n");
+            sbb.append("==========================\n").append(new String(body)).append("\n");
         }
 
         logger.debug("{}", sb);
+        logger.debug("{}", sbb);
 
-        return WebAdapter.parseRequest(sb.toString(), body);
+        return parseRequest(sb.toString(), body);
+    }
+
+    /**
+     * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
+     * @param request 요청 전문
+     * @return HttpRequest
+     */
+    private static HttpRequest parseRequest(String request, byte[] body) {
+        HttpMethod method;
+        String path, contentType = MIME.UNKNOWN.getType();
+        LinkedList<String> accept = new LinkedList<>();
+        int contentLength = 0;
+        Map<String, String> cookie = new HashMap<>();
+
+        String[] requestLine = request.split("\n");
+
+        // Request Line
+        String[] line_1 = requestLine[0].split(" ");
+        method = HttpMethod.valueOf(line_1[0]);
+        path = line_1[1];
+
+        // Header
+        for(int i=1; i<requestLine.length; i++) {
+            if(requestLine[i].split(":").length==1) continue;
+            String[] line_N = requestLine[i].split(":");
+            String key = line_N[0].trim();
+            String value = line_N[1].trim();
+
+            // Accept헤더 MimeType 설정
+            if(key.equalsIgnoreCase(HeaderKey.ACCEPT.getKey())) {
+                String[] acceptLine = value.split(";");
+                String[] mimeType = acceptLine[0].split(",");
+                accept.addAll(Arrays.asList(mimeType));
+            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_LENGTH.getKey())) {
+                contentLength = Integer.parseInt(value);
+            } else if(key.equalsIgnoreCase(HeaderKey.CONTENT_TYPE.getKey())) {
+                contentType = value;
+            } else if(key.equalsIgnoreCase(HeaderKey.COOKIE.getKey())) {
+                String[] cookies = value.split(";");
+                for(String c: cookies) {
+                    String cookieName = c.split("=")[0].trim();
+                    String cookieId = c.split("=")[1].trim();
+                    cookie.put(cookieName, cookieId);
+                }
+            }
+        }
+
+        return new HttpRequest.HttpRequestBuilder()
+                .method(method)
+                .path(path)
+                .accept(accept)
+                .contentLength(contentLength)
+                .contentType(contentType)
+                .cookie(cookie)
+                .body(body)
+                .build();
+    }
+
+    public static String getBoundaryKey(String contentType) {
+        return contentType.split("boundary=")[1];
     }
 }
 

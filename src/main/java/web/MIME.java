@@ -10,6 +10,7 @@ public enum MIME {
     SVG("svg", "image/svg+xml"),
     JSON("json", "application/json"),
     FORM("form", "application/x-www-form-urlencoded"),
+    MULTIPART("multipart", "multipart/form-data"),
     UNKNOWN("default", "*/*");
 
     private final String key;
