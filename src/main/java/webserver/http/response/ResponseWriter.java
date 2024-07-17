@@ -5,6 +5,9 @@ import util.Utils;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * 응답을 출력 스트림에 쓰는 클래스
+ */
 public class ResponseWriter {
 
     private final OutputStream outputStream;
@@ -13,6 +16,11 @@ public class ResponseWriter {
         this.outputStream = outputStream;
     }
 
+    /**
+     * 응답을 출력 스트림에 쓰는 메소드
+     * @param response
+     * @throws IOException
+     */
     public void write(Response response) throws IOException {
         if(response.getStatus().equals(Status.NOT_FOUND)) {
             response = new Response.Builder(Status.SEE_OTHER)

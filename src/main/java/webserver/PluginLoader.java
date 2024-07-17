@@ -9,12 +9,14 @@ import webserver.http.request.HttpMethod;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * 어노테이션을 기반으로 메소드들를 플러그인 매퍼에 담는 클래스
+ */
 public class PluginLoader {
     public static final Logger logger = LoggerFactory.getLogger(PluginLoader.class);
 
@@ -24,7 +26,12 @@ public class PluginLoader {
         this.pluginMapper = pluginMapper;
     }
 
-    // 특정 패키지에서 플러그인 클래스를 동적으로 로드하는 메소드
+    /**
+     * 특정 패키지에서 플러그인 클래스를 동적으로 로드하는 메소드
+     * @throws ClassNotFoundException
+     * @throws IOException
+     * @throws URISyntaxException
+     */
     public void loadPlugins() throws ClassNotFoundException, IOException, URISyntaxException {
         // 패키지 내 모든 클래스를 가져옴
         for (Class<?> cls : getAllClasses()) {

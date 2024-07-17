@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Response 정보를 담는 클래스
+ */
 public class Response {
 
     public final String CRLF = "\r\n";
@@ -65,10 +68,19 @@ public class Response {
 
     }
 
+    /**
+     * HTTP Status 를 반환하는 메소드
+     * @return
+     */
     public Status getStatus() {
         return status;
     }
 
+    /**
+     * 키에 대한 헤더 값을 반환하는 메소드
+     * @param key
+     * @return
+     */
     public String getHeaderValue(String key){
         return headers.get(key);
     }
@@ -88,6 +100,10 @@ public class Response {
         return sb.toString();
     }
 
+    /**
+     * byte 형태로 반환하는 메소드
+     * @return
+     */
     public byte[] toByte(){
         return this.toString().getBytes();
     }
@@ -104,6 +120,10 @@ public class Response {
         return true;
     }
 
+    /**
+     * body 를 반환하는 메소드
+     * @return
+     */
     public String getBody(){
         return new String(body);
     }

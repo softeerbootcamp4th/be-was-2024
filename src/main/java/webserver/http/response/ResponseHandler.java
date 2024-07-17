@@ -14,6 +14,9 @@ import java.util.Optional;
 
 import static util.Utils.getFile;
 
+/**
+ * Request 를 기반으로 적절한 Response 를 만드는 클래스
+ */
 public class ResponseHandler {
     public final Logger logger = LoggerFactory.getLogger(ResponseHandler.class);
 
@@ -23,6 +26,12 @@ public class ResponseHandler {
         this.pluginMapper = pluginMapper;
     }
 
+    /**
+     * 요청에 대한 응답을 반환하는 메소드
+     * @param request
+     * @return
+     * @throws IOException
+     */
     public Response response(Request request) throws IOException {
         try {
             if (pluginMapper.isExistOnlyPath(request.getMethod(), request.getPath())) return new Response.Builder(Status.METHOD_NOT_ALLOWED).build();
@@ -51,6 +60,11 @@ public class ResponseHandler {
         return new Response.Builder(Status.OK).build();
     }
 
+    /**
+     * 확장자에 대한 콘텐츠타입을 반환하는 메소드
+     * @param extension
+     * @return
+     */
     public static String getContentType(String extension){
         return switch (extension){
             case "html" -> "text/html";
@@ -63,8 +77,10 @@ public class ResponseHandler {
         };
     }
 
-    // 플러그인 실행 메소드
-    public Optional<Object> runPlugin(HttpMethod httpMethod, String path, Object... args) {
+    /**
+     *요청에 대한 메소드를 실행하는 메소드
+      */
+    private Optional<Object> runPlugin(HttpMethod httpMethod, String path, Object... args) {
         Method method = pluginMapper.get(httpMethod, path);
         logger.debug(path);
         if (method != null) {

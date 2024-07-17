@@ -7,6 +7,9 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 요청을 읽어서 객체로 만드는 클래스
+ */
 public class RequestReader {
 
     private final String CRLF = "\r\n";
@@ -19,6 +22,11 @@ public class RequestReader {
         this.inputStream = inputStream;
     }
 
+    /**
+     * 요청을 읽고 객체로 반환하는 메소드
+     * @return
+     * @throws IOException
+     */
     public Request readRequest() throws IOException {
 
         byte[] bytes = new byte[MAX_REQUEST_LENGTH];
