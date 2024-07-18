@@ -53,6 +53,8 @@
         </div>
       </my-template>
 
+
+
       <div class="wrapper">
         <div class="post">
           <div class="post__account">
@@ -149,6 +151,9 @@
             모든 댓글 보기(3개)
           </button>
         </ul>
+        <my-template mt::each="allPost">
+          <p>{idx}번째글의 제목은 {title}입니다. </p>
+        </my-template>
         <nav class="nav">
           <ul class="nav__menu">
             <li class="nav__menu__item">
@@ -165,13 +170,13 @@
               <a class="btn btn_contained btn_size_m" href="/user/write">글쓰기</a>
             </li>
             <li class="nav__menu__item">
-              <a class="nav__menu__item__btn" href="">
-                다음 글
-                <img
-                  class="nav__menu__item__img"
-                  src="/img/ci_chevron-right.svg"
-                />
-              </a>
+                <a class="nav__menu__item__btn" href="/post/{postId}">
+                  다음 글
+                  <img
+                          class="nav__menu__item__img"
+                          src="/img/ci_chevron-right.svg"
+                  />
+                </a>
             </li>
           </ul>
         </nav>
