@@ -6,6 +6,25 @@
     <link href="/reset.css" rel="stylesheet"/>
     <link href="/global.css" rel="stylesheet"/>
     <link href="/main.css" rel="stylesheet"/>
+    <style>
+        .slider-container {
+            position: relative;
+            overflow: hidden;
+            width: 664px;
+            /*height: 664px;*/
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slider img {
+            min-width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -40,13 +59,15 @@
                     <p class="post__account__nickname">{authorName}</p>
                 </div>
             </my-template>
-            <div class="img_section">
-                <my-template if="imageLinks" foreach="imageLink: imageLinks">
-                    <img class="post__img" src="{imageLink.link}"/>
-                </my-template>
-                <my-template if-not="imageLinks">
-                    <img class="post__img"/>
-                </my-template>
+            <div class="slider-container">
+                <div class="slider img_section">
+                    <my-template if="imageLinks" foreach="imageLink: imageLinks">
+                        <img class="post__img" src="{imageLink.link}"/>
+                    </my-template>
+                    <my-template if-not="imageLinks">
+                        <img class="post__img"/>
+                    </my-template>
+                </div>
             </div>
             <div style="display: flex; flex-flow: row; justify-content: center; align-items: center; width: 100%; gap: 2rem;">
                 <button class="leftImage" style="font-size: large; font-weight: bolder; padding: 1rem;"> <</button>
@@ -132,37 +153,33 @@
         <a href="/posts/write">글쓰기</a>
         <script>
             function initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay) {
-
-
                 if (imgSection == null) return;
 
-                const imageTagList = [];
-                imgSection.querySelectorAll('img').forEach((it) => {
-                    imageTagList.push(it);
-                    it.style.display = 'none';
-                });
+                const imageTagList = Array.from(imgSection.querySelectorAll('img'));
 
                 let currentIdx = 0;
-                let imgListLength = imageTagList.length;
+                const imgListLength = imageTagList.length;
 
-                imageTagList[0].style.display = 'block';
-
-                function leftImage() {
-                    imageTagList[currentIdx].style.display = 'none';
-                    currentIdx = (currentIdx - 1 + imgListLength) % imgListLength;
-                    imageTagList[currentIdx].style.display = 'block';
+                function updateSlider() {
+                    imgSection.style.transform = `translateX(${-currentIdx * 100}%)`;
                     imageIdxDisplay.textContent = currentIdx;
                 }
 
+                function leftImage() {
+                    currentIdx = (currentIdx - 1 + imgListLength) % imgListLength;
+                    updateSlider();
+                }
+
                 function rightImage() {
-                    imageTagList[currentIdx].style.display = 'none';
                     currentIdx = (currentIdx + 1) % imgListLength;
-                    imageTagList[currentIdx].style.display = 'block';
-                    imageIdxDisplay.textContent = currentIdx;
+                    updateSlider();
                 }
 
                 leftImageButton.onclick = leftImage;
                 rightImageButton.onclick = rightImage;
+
+                // 초기 슬라이더 위치 설정
+                updateSlider();
 
                 return {
                     leftImage,
@@ -170,17 +187,15 @@
                 };
             }
 
-            const imgSection = document.querySelector('.img_section');
-            const leftImageButton = document.querySelector('button.leftImage');
-            const rightImageButton = document.querySelector('button.rightImage');
-            const imageIdxDisplay = document.querySelector('div.imageNumber');
+            // 슬라이더 초기화
+            document.addEventListener("DOMContentLoaded", function() {
+                const imgSection = document.querySelector('.img_section');
+                const leftImageButton = document.querySelector('button.leftImage');
+                const rightImageButton = document.querySelector('button.rightImage');
+                const imageIdxDisplay = document.querySelector('div.imageNumber');
 
-            const {leftImage, rightImage} = initSlider(
-                imgSection,
-                leftImageButton,
-                rightImageButton,
-                imageIdxDisplay
-            );
+                initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay);
+            });
         </script>
     </div>
 </div>
