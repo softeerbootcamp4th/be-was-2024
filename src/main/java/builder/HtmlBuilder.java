@@ -10,27 +10,28 @@ public class HtmlBuilder {
         ResourceUtil resourceUtil = new ResourceUtil();
         String template = new String(resourceUtil.getByteArray(templateFilePath));
 
-        String loginButtonText, loginButtonHref, registrationButtonText, registrationButtonHref, userName;
+        String loginButtonHtml, registrationButtonText, registrationButtonHref, userNameHtml, postButtonHtml;
 
         if (isLoggedIn) {
-            loginButtonText = "글쓰기";
-            loginButtonHref = "/article";
+            loginButtonHtml = ""; // 로그인된 상태에서는 로그인 버튼을 숨김
             registrationButtonText = "로그아웃";
             registrationButtonHref = "/logout";
-            userName = username;
+            userNameHtml = "<p class=\"user-name\">" + username + "</p>";
+            postButtonHtml = "<li class=\"nav__menu__item\"><a class=\"btn btn_ghost btn_size_m\" href=\"/article\">글쓰기</a></li>";
         } else {
-            loginButtonText = "로그인";
-            loginButtonHref = "/login";
+            loginButtonHtml = "<li class=\"header__menu__item\"><a class=\"btn btn_contained btn_size_s\" href=\"/login\">로그인</a></li>";
             registrationButtonText = "회원가입";
             registrationButtonHref = "/registration";
-            userName = "";
+            userNameHtml = "";
+            postButtonHtml = "";
         }
 
-        template = template.replace("login_button_text", loginButtonText)
-                .replace("login_button_href", loginButtonHref)
-                .replace("registration_button_text", registrationButtonText)
-                .replace("registration_button_href", registrationButtonHref)
-                .replace("username", userName);
+        // 문자열 대체
+        template = template.replace("{username_placeholder}", userNameHtml)
+                .replace("{login_button_placeholder}", loginButtonHtml)
+                .replace("{registration_button_text}", registrationButtonText)
+                .replace("{registration_button_href}", registrationButtonHref)
+                .replace("{post_button_placeholder}", postButtonHtml);
 
         return template;
     }
