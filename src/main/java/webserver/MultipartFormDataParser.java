@@ -3,8 +3,17 @@ package webserver;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+/**
+ * 멀티파트 형식으로 들어온 바디의 파싱 담당하는 클래스
+ */
 public class MultipartFormDataParser {
 
+    /**
+     * 이미지 파싱을 담당하는 메서드
+     * @param headers 요청 받은 헤더
+     * @param body 멀티파트 형식의 바디
+     * @return 파싱된 이미지 배열
+     */
     public static byte[] imageParser(Map<String, String> headers, byte[] body){
         String boundary = headers.get("content-type").split("boundary=")[1]; // boundary정보 분리
         String byteStr = new String(body, StandardCharsets.ISO_8859_1); // body->String 변경
@@ -19,6 +28,12 @@ public class MultipartFormDataParser {
 
     }
 
+    /**
+     * 컨텐트 파싱을 담당하는 메서드
+     * @param headers 요청 받은 헤더
+     * @param body 멀티파트 형식의 바디
+     * @return 파싱된 컨텐트
+     */
     public static String contentParser(Map<String, String> headers, byte[] body){
         String boundary = headers.get("content-type").split("boundary=")[1]; // boundary정보 분리
         String byteStr = new String(body, StandardCharsets.UTF_8); // body->String 변경

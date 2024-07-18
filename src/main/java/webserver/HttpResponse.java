@@ -153,6 +153,38 @@ public class HttpResponse {
     }
 
     /**
+     * 게시판 정보가 포함된 페이지를 열어주는 메서드(로그인 상태 구분 포함)
+     * @param user 로그인 상태 정보 파악을 위한 유저 객체
+     * @throws IOException
+     */
+    public void showBoard(User user) throws IOException {
+        List<Board> boards = BoardDatabase.findAllBoards();
+
+        StringBuilder allBoardsHtml = new StringBuilder();
+        if(user == null){
+            allBoardsHtml.append(HtmlTemplate.BOARD_NOT_LOGIN_HEADER.getTemplate());
+        }else{
+            allBoardsHtml.append(HtmlTemplate.BOARD_LOGIN_HEADER.getTemplate().replace("{{username}}", user.getName()));
+        }
+
+
+        for (Board board : boards) {
+            String postHtml = HtmlTemplate.BOARD_BODY.getTemplate()
+                    .replace("{{userId}}", board.getUserId())
+                    .replace("{{content}}", board.getContent())
+                    .replace("{{imagePath}}", "/" + board.getFilePath());
+
+            allBoardsHtml.append(postHtml);
+        }
+
+        allBoardsHtml.append(HtmlTemplate.BOARD_FINAL);
+
+        byte[] fileBody = allBoardsHtml.toString().getBytes("UTF-8");
+        response200Header(fileBody.length, ContentType.HTML.getMimeType());
+        responseBody(fileBody);
+    }
+
+    /**
      * 잘못된 요청이 들어왔을 때 에러메세지 경고창과 함께 리다이렉트 해주는 메서드
      * @param errorMessage 클라이언트에게 표시해주고자 하는 에러 메세지
      * @param redirectUrl 리다이렉트 해줘야 되는 경로 정보
@@ -195,31 +227,5 @@ public class HttpResponse {
         return lastIndex == -1 ? "" : name.substring(lastIndex + 1);
     }
 
-    public void showBoard(User user) throws IOException {
-        List<Board> boards = BoardDatabase.findAllBoards();
-
-        StringBuilder allBoardsHtml = new StringBuilder();
-        if(user == null){
-            allBoardsHtml.append(HtmlTemplate.BOARD_NOT_LOGIN_HEADER.getTemplate());
-        }else{
-            allBoardsHtml.append(HtmlTemplate.BOARD_LOGIN_HEADER.getTemplate().replace("{{username}}", user.getName()));
-        }
-
-
-        for (Board board : boards) {
-            String postHtml = HtmlTemplate.BOARD_BODY.getTemplate()
-                    .replace("{{userId}}", board.getUserId())
-                    .replace("{{content}}", board.getContent())
-                    .replace("{{imagePath}}", "/" + board.getFilePath());
-
-            allBoardsHtml.append(postHtml);
-        }
-
-        allBoardsHtml.append(HtmlTemplate.BOARD_FINAL);
-
-        byte[] fileBody = allBoardsHtml.toString().getBytes("UTF-8");
-        response200Header(fileBody.length, ContentType.HTML.getMimeType());
-        responseBody(fileBody);
-    }
 
 }
