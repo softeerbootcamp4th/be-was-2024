@@ -91,4 +91,11 @@ public class ResponseProcessor {
                 .redirectCode(302)
                 .build();
     }
+
+    public ViewData writePostResponse() {
+        return new ViewData.Builder()
+                .url("/index.html")
+                .redirectCode(302)
+                .build();
+    }
 }
