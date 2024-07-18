@@ -15,7 +15,8 @@ public class DynamicHtmlGenerator {
 
         String htmlTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+ViewPath.DEFAULT.getFilePath());
 
-        String loginHtml, imgHtml;
+        // 로그인 정보 동적 세팅
+        String loginHtml;
         String userId = SessionFacade.getUserIdFromSession(request);
         if (SessionFacade.isAuthenticatedRequest(request)) {
             loginHtml = "<li class=\"header__menu__item\"><form id=\"logout\" action=\"/logout\" method=\"POST\"><button type=\"submit\">로그아웃</button></form></li>" +
@@ -25,15 +26,20 @@ public class DynamicHtmlGenerator {
                     "<li class=\"header__menu__item\"><a class=\"btn btn_ghost btn_size_s\" href=\"/registration\">회원 가입</a></li>";
         }
 
-        String imagePath = "";
+        // Article 정보 동적으로 세팅
         Collection<Article> articleList = ArticleH2Database.getArticleList();
+
         for (Article article : articleList) {
-            imagePath = "./eckrin/"+article.getImagePath();
+            String postTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+"/partial/post.html");
+            String imagePath = "./eckrin/"+article.getImagePath();
+            String imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
+            String contentHtml = article.getContent();
+            postTemplate = postTemplate.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);
+            postTemplate = postTemplate.replace("<!-- CONTENT_PLACEHOLDER -->", contentHtml);
+            htmlTemplate = htmlTemplate.replace("<!-- POST_PLACEHOLDER -->", postTemplate + "\n<!-- POST_PLACEHOLDER -->");
         }
-        imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
 
         String finalHtml = htmlTemplate.replace("<!-- LOGIN_PLACEHOLDER -->", loginHtml);
-        finalHtml = finalHtml.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);
         byte[] body = finalHtml.getBytes();
         HttpResponse response = ResponseUtils.responseSuccessWithFile(contentType, body);
         response.writeInBytes(dos);
