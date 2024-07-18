@@ -187,6 +187,23 @@
                 };
             }
 
+            function useSlideEffect(rightPageAction, timeInterval) {
+                let t;
+
+                function startSlide() {
+                    t = setInterval(rightPageAction, timeInterval);
+                }
+
+                function stopSlide() {
+                    clearInterval(t);
+                }
+
+                return {
+                    startSlide,
+                    stopSlide
+                }
+            }
+
             // 슬라이더 초기화
             document.addEventListener("DOMContentLoaded", function() {
                 const imgSection = document.querySelector('.img_section');
@@ -194,7 +211,10 @@
                 const rightImageButton = document.querySelector('button.rightImage');
                 const imageIdxDisplay = document.querySelector('div.imageNumber');
 
-                initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay);
+                const {leftImage, rightImage} = initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay);
+                const {startSlide, stopSlide} = useSlideEffect(rightImage, 3000);
+
+                startSlide();
             });
         </script>
     </div>
