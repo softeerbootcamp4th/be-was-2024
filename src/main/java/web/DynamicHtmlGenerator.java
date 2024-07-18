@@ -31,9 +31,11 @@ public class DynamicHtmlGenerator {
 
         for (Article article : articleList) {
             String postTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+"/partial/post.html");
+            String articleUserId = article.getUserId();
             String imagePath = "./eckrin/"+article.getImagePath();
             String imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
             String contentHtml = article.getContent();
+            postTemplate = postTemplate.replace("<!-- USERNAME_PLACEHOLDER -->", articleUserId);
             postTemplate = postTemplate.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);
             postTemplate = postTemplate.replace("<!-- CONTENT_PLACEHOLDER -->", contentHtml);
             htmlTemplate = htmlTemplate.replace("<!-- POST_PLACEHOLDER -->", postTemplate + "\n<!-- POST_PLACEHOLDER -->");

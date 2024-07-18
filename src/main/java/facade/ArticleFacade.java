@@ -16,6 +16,7 @@ public class ArticleFacade {
      * byte 단위로 body 파싱
      */
     public static void saveArticleData(HttpRequest request) {
+        String userId = SessionFacade.getUserIdFromSession(request);
         // content(string), image(byte[])를 파싱
         String boundaryKey = "--"+ RequestUtils.getBoundaryKey(request.getContentType());
         byte[] delimiter = boundaryKey.getBytes();
@@ -35,6 +36,6 @@ public class ArticleFacade {
         pureContent = pureContent.substring(0, pureContent.length()-2);
 
         String fileName = FileUtils.saveFile(pureImage, imgExtension);
-        ArticleH2Database.createArticle(new Article(null, fileName, pureContent));
+        ArticleH2Database.createArticle(new Article(null, userId, fileName, pureContent), SessionFacade.getUserIdFromSession(request));
     }
 }

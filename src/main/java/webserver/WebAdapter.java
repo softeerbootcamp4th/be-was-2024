@@ -94,13 +94,7 @@ public class WebAdapter {
      */
     private static void resolveGetRequest(HttpRequest request, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
-        if(request.getPathWithoutQueryParam().equals(RestUri.REGISTRATION.getUri())) {
-            HttpResponse response = ResponseUtils.responseBadRequest();
-            response.writeInBytes(out);
-            return;
-        }
-        // 유저 리스트 찾아서 json으로 반환
-        else if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
+        if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
             HttpResponse response;
             // 인증된 요청일경우 표시
             if(SessionFacade.isAuthenticatedRequest(request)) {
