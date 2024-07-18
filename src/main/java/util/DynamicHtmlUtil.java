@@ -44,23 +44,26 @@ public class DynamicHtmlUtil {
      * @param articles
      * @return String
      */
-    public static String generateArticlesHtml(List<Article> articles) throws IOException {
+    public static String generateArticlesHtml(List<Article> articles) {
         StringBuilder sb = new StringBuilder();
+        try{
+            for(Article article : articles){
+                sb.append("<tr>")
+                        .append("<th scope=\"row\">").append(articles.indexOf(article) + 1).append("</th>")
+                        .append("<td>").append(article.getTitle()).append("</td>")
+                        .append("<td>").append(article.getContent()).append("</td>");
 
-        for(Article article : articles){
-            sb.append("<tr>")
-                    .append("<th scope=\"row\">").append(articles.indexOf(article) + 1).append("</th>")
-                    .append("<td>").append(article.getTitle()).append("</td>")
-                    .append("<td>").append(article.getContent()).append("</td>");
-
-            File file = new File(article.getImagePath());
-            if(file.exists()){
-                byte[] imageBytes = Files.readAllBytes(file.toPath());
-                String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
-                sb.append("<td>").append("<img src=\"data:image/png;base64,").append(imageBase64)
-                        .append("\" alt=\"Article Image\" style=\"width:100px; height:auto;\">").append("</td>");
+                File file = new File(article.getImagePath());
+                if(file.exists()){
+                    byte[] imageBytes = Files.readAllBytes(file.toPath());
+                    String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+                    sb.append("<td>").append("<img src=\"data:image/png;base64,").append(imageBase64)
+                            .append("\" alt=\"Article Image\" style=\"width:100px; height:auto;\">").append("</td>");
+                }
+                sb.append("</tr>");
             }
-            sb.append("</tr>");
+        } catch (IOException e){
+            e.printStackTrace();
         }
         return sb.toString();
     }
