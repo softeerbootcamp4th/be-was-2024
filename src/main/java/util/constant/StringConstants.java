@@ -29,6 +29,7 @@ public class StringConstants {
     public static final String PATH_LOGIN = "/login";
     public static final String PATH_LOGOUT = "/logout";
     public static final String USER_LIST = "/user/list";
+    public static final String CREATE_ARTICLE = "/article";
 
     public static final Long EXPIRE_TIME = 1000000L;
 

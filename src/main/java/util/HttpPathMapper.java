@@ -2,6 +2,7 @@ package util;
 
 import dto.HttpRequest;
 import dto.HttpResponse;
+import dto.enums.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 import static logic.Logics.*;
 import static util.constant.StringConstants.*;
+
 
 public class HttpPathMapper {
     private static final Logger logger = LoggerFactory.getLogger(HttpPathMapper.class);
@@ -28,8 +30,15 @@ public class HttpPathMapper {
             case PATH_LOGIN -> login(httpRequest);
             case PATH_LOGOUT -> logout(httpRequest);
             case USER_LIST -> getUserList(httpRequest,userId);
+            case CREATE_ARTICLE -> {
+                if (httpRequest.getHttpMethod() == HttpMethod.POST) {
+                    yield createArticle(httpRequest,userId);
+                }
+                else{
+                    throw new IllegalStateException("메서드가잘못되었습니다");
+                }
+            }
             default -> staticResponse(httpRequest, userId);
-
         };
 
     }
