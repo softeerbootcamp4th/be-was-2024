@@ -2,6 +2,7 @@ package distributor;
 
 import handler.SessionHandler;
 import model.ViewData;
+import processor.PostProcessor;
 import processor.ResponseProcessor;
 import processor.UserProcessor;
 import webserver.Request;
@@ -9,6 +10,7 @@ import webserver.Request;
 public class PostDistributor extends Distributor {
     Request request;
     UserProcessor userProcessor = new UserProcessor();
+    PostProcessor postProcessor = new PostProcessor();
     ViewData viewData;
 
     protected PostDistributor(Request request) {
@@ -24,6 +26,8 @@ public class PostDistributor extends Distributor {
         String path = request.getPath();
         if (path.equals("/user/create")) {
             processUserCreate();
+        } else if (path.equals("/user/write")) {
+            processUserWrite();
         } else if (path.equals("/user/login")) {
             processUserLogin();
         }
@@ -47,6 +51,14 @@ public class PostDistributor extends Distributor {
         } else {
             this.viewData = responseProcessor.loginFailedResponse();
         }
+    }
+
+    private void processUserWrite() {
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        postProcessor.addPost(request);
+
+        this.viewData = responseProcessor.writePostResponse();
     }
 
     @Override
