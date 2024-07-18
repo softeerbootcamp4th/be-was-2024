@@ -72,7 +72,7 @@ public class IOUtil {
      * @return String
      * @throws IOException
      */
-    public static String saveFile(byte[] fileData, String fileName) throws IOException {
+    public static String saveFile(byte[] fileData, String fileName) {
         // uploads라는 디렉토리 생성
         File dir = new File("uploads");
         if (!dir.exists()) {
@@ -82,6 +82,8 @@ public class IOUtil {
         String filePath = "uploads/" + fileName;
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             fos.write(fileData);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return filePath;
     }

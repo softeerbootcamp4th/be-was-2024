@@ -41,7 +41,6 @@ public class ConstantUtil {
     public static final String CONTENT = "contents";
     public static final String AUTHOR_NAME = "authorName";
     public static final String IMAGE_PATH = "imagePath";
-    public static final String IMAGE = "image";
     
     public static final String INVALID_SIGNUP = "Invalid Signup";
     public static final String INVALID_PATH = "Invalid Path: ";
@@ -55,4 +54,7 @@ public class ConstantUtil {
     public static final String FORM_DATA = "multipart/form-data";
     public static final String LOCATION = "Location";
     public static final String SET_COOKIE = "Set-Cookie";
+
+    public static final String GET = "GET";
+    public static final String POST = "POST";
 }
