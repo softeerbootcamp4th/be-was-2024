@@ -1,5 +1,7 @@
 package util;
 
+import controller.*;
+
 /**
  * 요청에 대한 매핑을 담당하는 enum 클래스
  */
@@ -40,26 +42,34 @@ public enum HttpRequestMapper {
      * @param method
      * @return HttpRequestMapper
      */
-    public static HttpRequestMapper of(String path, String method) {
+    public static Controller getController(String path, String method) {
         for (HttpRequestMapper mapper : values()) {
             if(mapper.path.equals(path)){
                 if(mapper.method.equals(method)){
-                    return mapper;
+                    return controllerMapper(mapper);
                 }
-                return METHOD_NOT_ALLOWED; // 요청 경로는 찾았으나 메서드가 없는 경우
+                return controllerMapper(METHOD_NOT_ALLOWED); // 요청 경로는 찾았으나 메서드가 없는 경우
             }
         }
-        return SERVER_ERROR; // 요청 경로가 없는 경우
+        return controllerMapper(SERVER_ERROR); // 요청 경로가 없는 경우
     }
 
     /**
-     * 로그인/로그아웃 요청인지 확인하는 메서드
-     * @param path
-     * @param method
-     * @return boolean
+     * HttpRequestMapper에 따라 Controller를 반환하는 메서드
+     * @param mapper
+     * @return Controller
      */
-    public static boolean isAuthRequest(String path, String method) {
-        return LOGIN_REQUEST.equals(of(path, method)) || LOGOUT_REQUEST.equals(of(path, method));
+    private static Controller controllerMapper(HttpRequestMapper mapper) {
+        return switch (mapper) {
+            case ROOT, DEFAULT_PAGE -> new DefaultController();
+            case ARTICLE, ARTICLE_CREATE -> new ArticleController();
+            case USER_LIST -> new UserListController();
+            case SIGNUP_REQUEST, REGISTER -> new SignUpController();
+            case LOGIN, LOGIN_REQUEST -> new LoginController();
+            case LOGIN_FAIL -> new LoginFailController();
+            case LOGOUT_REQUEST -> new LogoutController();
+            default -> new ErrorController(mapper);
+        };
     }
 
     public String getPath() {
