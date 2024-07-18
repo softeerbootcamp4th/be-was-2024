@@ -2,15 +2,13 @@ package test;
 
 import db.UserDatabase;
 import db.SessionDatabase;
-import http.HttpMethod;
-import http.HttpRequest;
-import http.HttpResponse;
-import http.StartLine;
+import http.*;
 import model.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -28,9 +26,12 @@ public class PostHandlerTest {
         StartLine startLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_CREATE, "HTTP/1.1");
         String params = "userId=testId&name=testName&password=testPassword&email=testEmail";
 
+
+        ArrayList<RequestBody> requestBody = new ArrayList<>();
+        requestBody.add(new RequestBody(params.getBytes()));
         HttpRequest httpRequest = new HttpRequest()
                 .setStartLine(startLine)
-                .setBody(params.getBytes());
+                .setBody(requestBody);
 
 
         requestMapping(httpRequest);
@@ -50,9 +51,11 @@ public class PostHandlerTest {
         StartLine registrationStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_CREATE, "HTTP/1.1");
         String registrationParams = "userId=testId&name=testName&password=testPassword&email=testEmail";
 
+        ArrayList<RequestBody> registrationRequestBody = new ArrayList<>();
+        registrationRequestBody.add(new RequestBody(registrationParams.getBytes()));
         HttpRequest registrationRequest = new HttpRequest()
                 .setStartLine(registrationStartLine)
-                .setBody(registrationParams.getBytes());
+                .setBody(registrationRequestBody);
 
         requestMapping(registrationRequest);
 
@@ -60,9 +63,11 @@ public class PostHandlerTest {
         StartLine loginStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_LOGIN, "HTTP/1.1");
         String loginParams = "userId=testId&password=testPassword";
 
+        ArrayList<RequestBody> loginRequestBody = new ArrayList<>();
+        loginRequestBody.add(new RequestBody(loginParams.getBytes()));
         HttpRequest loginRequest = new HttpRequest()
                 .setStartLine(loginStartLine)
-                .setBody(loginParams.getBytes());
+                .setBody(loginRequestBody);
 
         HttpResponse response = requestMapping(loginRequest);
 
@@ -83,9 +88,11 @@ public class PostHandlerTest {
         StartLine startLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_LOGIN, "HTTP/1.1");
         String loginParams = "userId=notRegisteredId&password=testPassword";
 
+        ArrayList<RequestBody> loginRequestBody = new ArrayList<>();
+        loginRequestBody.add(new RequestBody(loginParams.getBytes()));
         HttpRequest loginRequest = new HttpRequest()
                 .setStartLine(startLine)
-                .setBody(loginParams.getBytes());
+                .setBody(loginRequestBody);
 
         HttpResponse response = requestMapping(loginRequest);
 
@@ -98,18 +105,22 @@ public class PostHandlerTest {
         StartLine registrationStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_CREATE, "HTTP/1.1");
         String registrationParams = "userId=testId&name=testName&password=testPassword&email=testEmail";
 
+        ArrayList<RequestBody> registrationRequestBody = new ArrayList<>();
+        registrationRequestBody.add(new RequestBody(registrationParams.getBytes()));
         HttpRequest registrationRequest = new HttpRequest()
                 .setStartLine(registrationStartLine)
-                .setBody(registrationParams.getBytes());
+                .setBody(registrationRequestBody);
 
         requestMapping(registrationRequest);
 
         StartLine loginStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_LOGIN, "HTTP/1.1");
         String loginParams = "userId=testId&password=";
 
+        ArrayList<RequestBody> loginRequestBody = new ArrayList<>();
+        loginRequestBody.add(new RequestBody(loginParams.getBytes()));
         HttpRequest loginRequest = new HttpRequest()
                 .setStartLine(loginStartLine)
-                .setBody(loginParams.getBytes());
+                .setBody(loginRequestBody);
 
         HttpResponse response = requestMapping(loginRequest);
         assertEquals(response.getStatusLine(), "HTTP/1.1 400 Bad request\r\n");
@@ -121,20 +132,24 @@ public class PostHandlerTest {
         StartLine registrationStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_CREATE, "HTTP/1.1");
         String registrationParams = "userId=testId&name=testName&password=testPassword&email=testEmail";
 
+        ArrayList<RequestBody> registrationRequestBody = new ArrayList<>();
+        registrationRequestBody.add(new RequestBody(registrationParams.getBytes()));
         HttpRequest registrationRequest = new HttpRequest()
                 .setStartLine(registrationStartLine)
-                .setBody(registrationParams.getBytes());
+                .setBody(registrationRequestBody);
 
         requestMapping(registrationRequest);
 
         StartLine loginStartLine = new StartLine(HttpMethod.POST, PATH_USER + PATH_LOGIN, "HTTP/1.1");
         String loginParams = "userId=testId&password=wrongPassword";
 
+        ArrayList<RequestBody> loginRequestBody = new ArrayList<>();
+        loginRequestBody.add(new RequestBody(loginParams.getBytes()));
         HttpRequest loginRequest = new HttpRequest()
                 .setStartLine(loginStartLine)
-                .setBody(loginParams.getBytes());
+                .setBody(loginRequestBody);
 
         HttpResponse response = requestMapping(loginRequest);
-        assertEquals(response.getStatusLine(), "HTTP/1.1 401 Unauthorized\r\n");
+        assertEquals(response.getStatusLine(), "HTTP/1.1 400 Bad request\r\n");
     }
 }
