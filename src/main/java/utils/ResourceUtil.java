@@ -17,7 +17,7 @@ public class ResourceUtil {
         // 얘는 한글자씩 가져오는 방법임
         // 버퍼를 사용하면 빠르게 가져올 수 있음
         try (FileInputStream fileInputStream = new FileInputStream(file);
-             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);) {
+             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
             bufferedInputStream.read(body);
         }
 
@@ -36,13 +36,5 @@ public class ResourceUtil {
         }
 
         return "text/plain";
-    }
-
-    public boolean isStaticResource(String url) {
-        if (url.contains(".")) {
-            return !url.endsWith("html");
-        } else {
-            return false;
-        }
     }
 }
