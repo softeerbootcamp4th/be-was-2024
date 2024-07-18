@@ -1,8 +1,8 @@
 package auth;
 
 public class Cookie {
-  public static final String SET_COOKIE = "Set-Cookie";
-  public static final String MAX_AGE = "maxAge";
+  public static final String SET_COOKIE = "set-cookie";
+  public static final String MAX_AGE = "maxage";
   public static final String PATH = "path";
   private String key;
   private String value;
