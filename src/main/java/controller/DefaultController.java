@@ -21,7 +21,7 @@ public class DefaultController extends AbstractController{
             return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         }
 
-        String body = readBytesFromFile(request.getRequestPath());
+        String body = IOUtil.readBytesFromFile(request.getRequestPath());
         if(request.getSession() == null){
             return HttpResponse.forward(path, request.getHttpVersion(), body);
         }

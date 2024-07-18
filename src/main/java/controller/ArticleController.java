@@ -14,17 +14,6 @@ import java.util.Map;
 public class ArticleController extends AbstractController{
 
     /**
-     * 게시글 화면을 불러옴
-     * @param request
-     * @return HttpResponse
-     */
-    @Override
-    public HttpResponse doGet(HttpRequest request) {
-        String path = request.getRequestPath();
-        return HttpResponse.forward(path, request.getHttpVersion());
-    }
-
-    /**
      * 게시글 요청을 처리
      * @param request
      * @return HttpResponse

@@ -3,6 +3,7 @@ package controller;
 import util.HttpRequest;
 import util.HttpRequestMapper;
 import util.HttpResponse;
+import util.IOUtil;
 
 /**
  * 로그인 실패 관련 요청을 처리
@@ -17,6 +18,6 @@ public class LoginFailController extends AbstractController{
     @Override
     public HttpResponse doGet(HttpRequest request) {
         String path = HttpRequestMapper.LOGIN_FAIL.getPath();
-        return HttpResponse.forward(path, request.getHttpVersion(), readBytesFromFile(path));
+        return HttpResponse.forward(path, request.getHttpVersion(), IOUtil.readBytesFromFile(path));
     }
 }

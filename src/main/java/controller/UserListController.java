@@ -23,7 +23,7 @@ public class UserListController extends AbstractController{
         }
 
         String pathWithHtml = request.getRequestPath() + ConstantUtil.DOT_HTML;
-        String body = readBytesFromFile(pathWithHtml);
+        String body = IOUtil.readBytesFromFile(pathWithHtml);
         List<User> users = UserHandler.getInstance().findAll();
         String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
         return HttpResponse.forward(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
