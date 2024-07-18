@@ -18,7 +18,7 @@ public class GetDistributor extends Distributor {
         if (request.isQueryString()) {
             processQuery();
         } else {
-            processNonQuery();
+            processNoneQuery();
         }
     }
 
@@ -30,7 +30,7 @@ public class GetDistributor extends Distributor {
         }
     }
 
-    private void processNonQuery() {
+    private void processNoneQuery() {
         String path = request.getPath();
         if (path.equals("/logout")) {
             processLogout();
@@ -42,6 +42,7 @@ public class GetDistributor extends Distributor {
     }
 
     private void processDefault(String path) {
+        System.out.println("process default = " + path);
         ResponseProcessor responseProcessor = new ResponseProcessor();
         this.viewData = responseProcessor.defaultResponse(path, request.getSessionId());
     }
