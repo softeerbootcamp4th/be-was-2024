@@ -1,5 +1,6 @@
-package db;
+package db.tables;
 
+import db.DBUtil;
 import model.User;
 
 import java.sql.PreparedStatement;
@@ -7,23 +8,32 @@ import java.sql.ResultSet;
 import java.util.*;
 
 public class UserTable {
-    private final static String createSQL = "insert into member(userId, password, name, email) values(?, ?, ?, ?)";
-    private final static String findAllSQL = "select * from member";
-    private final static String findByIdSQL = "select * from member where userId = ?";
+    private final static String insertSQL = "insert into member(userId, password, name, email) values(?, ?, ?, ?)";
+    private final static String findAllSQL = "select userId, password, name, email from member";
+    private final static String findByIdSQL = "select userId, password, name, email from member where userId = ?";
 
     public static void addUser(User user) {
         DBUtil.statement(conn -> {
+            ResultSet keys = null;
             try(
-                    PreparedStatement pstmt = conn.prepareStatement(createSQL);
+                    PreparedStatement pstmt = conn.prepareStatement(insertSQL);
             ) {
                 pstmt.setString(1, user.getUserId());
                 pstmt.setString(2, user.getPassword());
                 pstmt.setString(3, user.getName());
                 pstmt.setString(4, user.getEmail());
 
-                pstmt.executeUpdate();;
+                pstmt.executeUpdate();
+                keys = pstmt.getGeneratedKeys();
+                if(keys.next()) user.setUserId(keys.getString(1));
             } catch(Exception e) {
                 throw new RuntimeException(e);
+            } finally {
+                try {
+                    if(keys != null) keys.close();
+                } catch(Exception e) {
+
+                }
             }
         });
     }
@@ -67,7 +77,6 @@ public class UserTable {
                                 rs.getString("email")
                         );
                     }
-
                 }
 
                 return user;
