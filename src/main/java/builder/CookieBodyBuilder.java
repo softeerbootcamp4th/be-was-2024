@@ -32,10 +32,7 @@ public class CookieBodyBuilder extends BodyBuilder {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         if (SessionHandler.verifySessionId(sessionId)) {
             // 사용자 아이디로 동적 html 생성
-            User user = SessionHandler.getUser(sessionId);
-            String username = user.getName();
-
-            String body = htmlBuilder.generateIndexHtml(true, username);
+            String body = htmlBuilder.generateIndexHtml(true, sessionId);
 
             return body.getBytes();
         } else {
