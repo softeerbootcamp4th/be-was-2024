@@ -97,7 +97,7 @@ public class Response {
         }
     }
 
-    public void redirect(String url, DataOutputStream dos, int redirectionCode) throws IOException {
+    public void redirect(String url, DataOutputStream dos, int redirectionCode) {
         if (cookie != null) {
             if (cookie.isEmpty()) {
                 redirectWithoutCookie(url, dos, redirectionCode);
@@ -109,7 +109,7 @@ public class Response {
         }
     }
 
-    private void redirectWithCookie(String url, DataOutputStream dos, int redirectionCode) throws IOException {
+    private void redirectWithCookie(String url, DataOutputStream dos, int redirectionCode) {
         if (redirectionCode == 301) {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
@@ -117,7 +117,7 @@ public class Response {
         }
     }
 
-    private void redirectWithoutCookie(String url, DataOutputStream dos, int redirectionCode) throws IOException {
+    private void redirectWithoutCookie(String url, DataOutputStream dos, int redirectionCode) {
         if (redirectionCode == 301) {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
