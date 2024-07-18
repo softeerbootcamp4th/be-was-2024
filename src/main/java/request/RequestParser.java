@@ -55,7 +55,7 @@ public class RequestParser {
 
             String[] headerParts = headerLine.split(REG_CLN, 2);
 
-            String key = headerParts[0].strip();
+            String key = headerParts[0].strip().toLowerCase();
             String value = headerParts[1].strip();
 
             headers.put(key, value);
@@ -64,7 +64,7 @@ public class RequestParser {
     }
 
     public ArrayList<RequestBody> getBody(InputStream in, HashMap<String, String> headers) throws IOException {
-        String contentLengthValue = headers.get(CONTENT_LENGTH);
+        String contentLengthValue = headers.get("content-length");
 
         ArrayList<RequestBody> bodies = new ArrayList<>();
         if (contentLengthValue == null) {
@@ -72,7 +72,7 @@ public class RequestParser {
             return bodies;
         }
 
-        String boundary = Utils.getBoundary(headers.get(CONTENT_TYPE));
+        String boundary = Utils.getBoundary(headers.get("content-type"));
         int contentLength = Integer.parseInt(contentLengthValue);
 
         if (boundary == null) {
@@ -137,7 +137,7 @@ public class RequestParser {
         for (String line : headerLines) {
             int index = line.indexOf(":");
             if (index != -1) {
-                String key = line.substring(0, index).trim();
+                String key = line.substring(0, index).trim().toLowerCase();
                 String value = line.substring(index + 1).trim();
                 headers.put(key, value);
             }

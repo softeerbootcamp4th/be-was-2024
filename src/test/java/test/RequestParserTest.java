@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test;
 import request.RequestParser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,10 +40,30 @@ public class RequestParserTest {
         StartLine actualStartLine_mixedCase = requestParser.getStartLine(getInputStream(getStartLine_mixedCase), new StringBuilder());
         StartLine actualStartLine_whiteSpace = requestParser.getStartLine(getInputStream(getStartLine_whiteSpace), new StringBuilder());
 
-        assertStartLine(actualStartLine, actualStartLine);
-        assertStartLine(actualStartLine, actualStartLine_lowerCase);
-        assertStartLine(actualStartLine, actualStartLine_mixedCase);
-        assertStartLine(actualStartLine, actualStartLine_whiteSpace);
+        assertStartLine(expectedStartline, actualStartLine);
+        assertStartLine(expectedStartline, actualStartLine_lowerCase);
+        assertStartLine(expectedStartline, actualStartLine_mixedCase);
+        assertStartLine(expectedStartline, actualStartLine_whiteSpace);
+    }
 
+    @Test
+    @DisplayName("Headers 파싱 테스트")
+    void testHeadersParser() throws IOException {
+        StringBuilder headerString = new StringBuilder();
+        headerString.append("lower-case: lower-case-value\r\n");
+        headerString.append("UPPER-CASE: UPPER-CASE-VALUE\r\n");
+        headerString.append("mIXeD-caSE: MixEd-CASe-VAlue\r\n");
+        headerString.append("optional-whitespace:OWS\r\n");
+        headerString.append("required-whitespace: RWS\r\n");
+        headerString.append("bad-whitespace   :    BWS\r\n\r\n");
+
+        HashMap<String, String> headers = requestParser.getHeaders(getInputStream(headerString.toString()), new StringBuilder());
+
+        assertEquals("lower-case-value", headers.get("lower-case"));
+        assertEquals("UPPER-CASE-VALUE", headers.get("upper-case"));
+        assertEquals("MixEd-CASe-VAlue", headers.get("mixed-case"));
+        assertEquals("OWS", headers.get("optional-whitespace"));
+        assertEquals("RWS", headers.get("required-whitespace"));
+        assertEquals("BWS", headers.get("bad-whitespace"));
     }
 }

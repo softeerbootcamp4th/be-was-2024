@@ -87,7 +87,6 @@ public class PostHandler {
         Optional<User> user = userDatabase.findUserById(userId);
 
         ArrayList<RequestBody> parts = httpRequest.getBody();
-
         byte[] image = new byte[0];
         String text = null;
         for (RequestBody part : parts) {
@@ -95,8 +94,14 @@ public class PostHandler {
             HashMap<String, String> headers = multipartBody.getHeaders();
             byte[] body = multipartBody.getBody();
 
-            String contentType = headers.get(CONTENT_TYPE);
-            System.out.println("contentType = " + contentType);
+            String contentType = headers.get("content-type");
+
+            for (String s : headers.keySet()) {
+                System.out.println("s = " + s);
+                System.out.println("headers.get(s) = " + headers.get(s));
+            }
+
+
             if (contentType == null) {
                 text = new String(body);
             } else image = body;

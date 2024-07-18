@@ -18,7 +18,7 @@ public class Constants {
     public static final String SET_COOKIE = "Set-Cookie";
 
     //Request
-    public static final String COOKIE = "Cookie";
+    public static final String COOKIE = "cookie";
     public static final String SID = "sid";
 
     // reg
@@ -50,7 +50,6 @@ public class Constants {
     // static file
     public static final String FILE_INDEX = "/index.html";
     public static final String FILE_USER_LIST = "/userList.html";
-    public static final String FILE_ARTICLE_LIST = "/articleList.html";
     public static final String FILE_NOT_FOUND = "/NOT_FOUND.html";
 
     //html

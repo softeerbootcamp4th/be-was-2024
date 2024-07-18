@@ -71,7 +71,7 @@ public class PostHandlerTest {
 
         HttpResponse response = requestMapping(loginRequest);
 
-        String cookie = response.getHeader("Set-Cookie");
+        String cookie = response.getHeader("set-cookie");
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
 
         String sid = parsedCookie.get("sid");
