@@ -97,4 +97,22 @@ public class ResponseProcessor {
 
         return viewData;
     }
+
+    public ViewData writeResponse() {
+        ViewData viewData = new ViewData.Builder()
+                .url("/write/index.html")
+                .statusCode(200)
+                .build();
+
+        return viewData;
+    }
+
+    public ViewData unauthorizedWriteResponse() {
+        ViewData viewData = new ViewData.Builder()
+                .url("/login/index.html")
+                .redirectCode(302)
+                .build();
+
+        return viewData;
+    }
 }
