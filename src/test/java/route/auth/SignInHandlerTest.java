@@ -1,6 +1,6 @@
 package route.auth;
 
-import db.UserTable;
+import db.tables.UserTable;
 import http.MyHttpHeaders;
 import http.MyHttpRequest;
 import http.MyHttpResponse;

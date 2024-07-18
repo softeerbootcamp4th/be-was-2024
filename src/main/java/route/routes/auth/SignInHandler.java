@@ -1,7 +1,7 @@
 package route.routes.auth;
 
 import config.AppConfig;
-import db.UserTable;
+import db.tables.UserTable;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;

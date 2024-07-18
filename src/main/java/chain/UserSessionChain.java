@@ -2,7 +2,7 @@ package chain;
 
 import chain.core.MiddlewareChain;
 import config.AppConfig;
-import db.UserTable;
+import db.tables.UserTable;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import model.User;
