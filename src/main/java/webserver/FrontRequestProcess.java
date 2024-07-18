@@ -59,7 +59,7 @@ public class FrontRequestProcess {
                 if (idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
                 String extension = path.substring(idx + 1);
                 if (!extension.equals(ContentType.HTML.getExtension())) {
-                    return HttpResponse.okStatic(path, request.getHttpVersion());
+                    return HttpResponse.forward(path, request.getHttpVersion());
                 }
             }
 
@@ -69,27 +69,27 @@ public class FrontRequestProcess {
             }
 
             // 세션이 유효한지 검사하고 세션 객체 반환
-            Session session = sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+            Session session = sessionHandler.parseSessionId(request.getHeader(ConstantUtil.COOKIE))
                     .flatMap(sessionHandler::findSessionById)
                     .orElse(null);
 
             // 세션이 존재하나 유효하지 않은 경우 세션 삭제하고 로그인 페이지로 리다이렉트
             if (session != null && !sessionHandler.validateSession(session)) {
-                return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+                return HttpResponse.sendRedirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
             }
 
             return switch (HttpRequestMapper.of(path, method)) {
-                case ROOT -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+                case ROOT -> HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                 case DEFAULT_PAGE -> handleIndexRequest(path, request, session);
                 case ARTICLE, ARTICLE_CREATE -> handleArticleRequest(path, request, session);
                 case USER_LIST -> handleUserListRequest(path, request, session);
                 case SIGNUP_REQUEST -> handleSignUpRequest(request);
                 case SIGNUP, LOGIN, LOGIN_FAIL ->
-                        HttpResponse.ok(path, request.getHttpVersion(), readBytesFromFile(path));
+                        HttpResponse.forward(path, request.getHttpVersion(), readBytesFromFile(path));
                 case METHOD_NOT_ALLOWED -> HttpResponse.methodNotAllowed(request.getHttpVersion());
                 case NOT_FOUND -> HttpResponse.notFound(request.getHttpVersion());
                 default ->
-                        HttpResponse.redirect(HttpRequestMapper.NOT_FOUND.getPath(), request.getHttpVersion()); // 요청 경로가 없는 경우
+                        HttpResponse.sendRedirect(HttpRequestMapper.NOT_FOUND.getPath(), request.getHttpVersion()); // 요청 경로가 없는 경우
             };
         } catch (ModelException | RequestException e){
             logger.debug(e.getMessage());
@@ -106,10 +106,10 @@ public class FrontRequestProcess {
      */
     private HttpResponse handleArticleRequest(String path, HttpRequest request, Session session) throws IOException {
         if(session == null)
-            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+            return HttpResponse.sendRedirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
 
         return switch (HttpRequestMapper.of(path, request.getRequestMethod())) {
-            case ARTICLE -> HttpResponse.okStatic(path, request.getHttpVersion());
+            case ARTICLE -> HttpResponse.forward(path, request.getHttpVersion());
             case ARTICLE_CREATE -> {
                 User user = userHandler.findById(session.getUserId()).orElseThrow(() -> new ModelException(ConstantUtil.USER_NOT_FOUND));
                 Map<String, String> formData = request.getFormData();
@@ -124,9 +124,9 @@ public class FrontRequestProcess {
 
                 formData.put(ConstantUtil.AUTHOR_NAME, user.getName()); // authorName 추가
                 articleHandler.create(formData);
-                yield HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+                yield HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
             }
-            default -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+            default -> HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         };
     }
 
@@ -138,9 +138,9 @@ public class FrontRequestProcess {
     private HttpResponse handleSignUpRequest(HttpRequest request){
         try {
             userHandler.create(request.getBodyMap());
-            return HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+            return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         } catch (ModelException e) {
-            return HttpResponse.redirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
+            return HttpResponse.sendRedirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
         }
     }
 
@@ -156,20 +156,20 @@ public class FrontRequestProcess {
         if(mapper.equals(HttpRequestMapper.LOGIN_REQUEST)){ // 로그인 성공 시 세션ID 반환, 실패 시 로그인 실패 페이지로 리다이렉트
             return sessionHandler.login(request.getBodyMap())
                     .map(session -> {
-                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+                        HttpResponse response = HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                         response.setSessionId(session.toString());
                         return response;
                     })
-                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.LOGIN_FAIL.getPath(), request.getHttpVersion()));
+                    .orElseGet(() -> HttpResponse.sendRedirect(HttpRequestMapper.LOGIN_FAIL.getPath(), request.getHttpVersion()));
         } else { // // 로그아웃 시 세션 ID를 추출하여 세션 삭제, 세션이 없는데 로그아웃 요청이 들어온 경우 리다이렉트
-            return sessionHandler.parseSessionId(request.getRequestHeaders().get(ConstantUtil.COOKIE))
+            return sessionHandler.parseSessionId(request.getHeader(ConstantUtil.COOKIE))
                     .map(sessionId -> {
                         sessionHandler.logout(sessionId);
-                        HttpResponse response = HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+                        HttpResponse response = HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                         response.deleteSessionId(sessionId);
                         return response;
                     })
-                    .orElseGet(() -> HttpResponse.redirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion()));
+                    .orElseGet(() -> HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion()));
         }
     }
 
@@ -182,13 +182,13 @@ public class FrontRequestProcess {
      */
     private HttpResponse handleUserListRequest(String path, HttpRequest request, Session session) throws IOException{
         if(session == null)
-            return HttpResponse.redirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+            return HttpResponse.sendRedirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
 
         String pathWithHtml = path + ConstantUtil.DOT_HTML;
         String body = readBytesFromFile(pathWithHtml);
         List<User> users = userHandler.findAll();
         String bodyWithUserList = body.replace(DynamicHtmlUtil.USER_LIST_TAG, DynamicHtmlUtil.generateUserListHtml(users));
-        return HttpResponse.ok(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
+        return HttpResponse.forward(pathWithHtml, request.getHttpVersion(), bodyWithUserList);
     }
 
     /**
@@ -201,12 +201,12 @@ public class FrontRequestProcess {
     private HttpResponse handleIndexRequest(String path, HttpRequest request, Session session) throws IOException {
         String body = readBytesFromFile(path);
         if(session == null)
-            return HttpResponse.ok(path, request.getHttpVersion(), body);
+            return HttpResponse.forward(path, request.getHttpVersion(), body);
 
         String bodyWithData = body.replace(DynamicHtmlUtil.USER_NAME_TAG, DynamicHtmlUtil.generateUserIdHtml(session.getUserId())); // 사용자 ID 표시
         bodyWithData = bodyWithData.replace(DynamicHtmlUtil.LOGIN_BUTTON_TAG, DynamicHtmlUtil.LOGIN_BUTTON_INVISIBLE); // 로그인 버튼 비활성화
         bodyWithData = bodyWithData.replace(DynamicHtmlUtil.ARTICLES_TAG, DynamicHtmlUtil.generateArticlesHtml(articleHandler.findAll())); // 게시글 목록 표시
-        return HttpResponse.ok(path, request.getHttpVersion(), bodyWithData);
+        return HttpResponse.forward(path, request.getHttpVersion(), bodyWithData);
     }
 
     /**

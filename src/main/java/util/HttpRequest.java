@@ -60,32 +60,12 @@ public class HttpRequest {
         return requestPath;
     }
 
-    public Map<String, String> getRequestParams() {
-        return requestParams;
+    public String getParameter(String key) {
+        return requestParams.getOrDefault(key, "");
     }
 
     public String getHttpVersion() {
         return httpVersion;
-    }
-
-    public Map<String, String> getRequestHeaders() {
-        return requestHeaders;
-    }
-
-    public byte[] getBody(){
-        return requestBody;
-    }
-
-    public String getBodyString() {
-        return new String(requestBody, StandardCharsets.UTF_8);
-    }
-
-    public Map<String, String> getFormData() {
-        return formData;
-    }
-
-    public Map<String, byte[]> getFileData() {
-        return fileData;
     }
 
     public int getContentLength(){
@@ -94,6 +74,22 @@ public class HttpRequest {
 
     public String getContentType(){
         return requestHeaders.getOrDefault(ConstantUtil.CONTENT_TYPE, "");
+    }
+
+    public String getHeader(String key) {
+        return requestHeaders.getOrDefault(key.toLowerCase(), "");
+    }
+
+    public byte[] getBody(){
+        return requestBody;
+    }
+
+    public Map<String, String> getFormData() {
+        return formData;
+    }
+
+    public Map<String, byte[]> getFileData() {
+        return fileData;
     }
 
     /**

@@ -26,7 +26,7 @@ public class HttpResponse {
      * @param body
      * @return HttpResponse
      */
-    public static HttpResponse ok(String path, String httpVersion, String body) {
+    public static HttpResponse forward(String path, String httpVersion, String body) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.DYNAMIC;
         response.path = path;
@@ -50,12 +50,28 @@ public class HttpResponse {
      * @param httpVersion
      * @return HttpResponse
      */
-    public static HttpResponse okStatic(String path, String httpVersion) {
+    public static HttpResponse forward(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.STATIC;
         response.path = path;
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
+        return response;
+    }
+
+    /**
+     * 302 Found 응답 생성하는 정적 팩토리 메서드
+     * @param path
+     * @param httpVersion
+     * @return HttpResponse
+     */
+    public static HttpResponse sendRedirect(String path, String httpVersion) {
+        HttpResponse response = new HttpResponse();
+        response.type = ConstantUtil.DYNAMIC;
+        response.path = path;
+        response.statusCode = HttpCode.FOUND.getStatus();
+        response.httpVersion = httpVersion;
+        response.putHeader(ConstantUtil.LOCATION, path);
         return response;
     }
 
@@ -99,22 +115,6 @@ public class HttpResponse {
         response.statusCode = HttpCode.INTERNAL_SERVER_ERROR.getStatus();
         response.httpVersion = httpVersion;
         response.putBody(body);
-        return response;
-    }
-
-    /**
-     * 302 Found 응답 생성하는 정적 팩토리 메서드
-     * @param path
-     * @param httpVersion
-     * @return HttpResponse
-     */
-    public static HttpResponse redirect(String path, String httpVersion) {
-        HttpResponse response = new HttpResponse();
-        response.type = ConstantUtil.DYNAMIC;
-        response.path = path;
-        response.statusCode = HttpCode.FOUND.getStatus();
-        response.httpVersion = httpVersion;
-        response.putHeader(ConstantUtil.LOCATION, path);
         return response;
     }
 
