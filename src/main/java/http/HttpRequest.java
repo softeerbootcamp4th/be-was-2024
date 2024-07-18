@@ -1,12 +1,13 @@
 package http;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class HttpRequest {
 
     StartLine startLine;
     HashMap<String, String> headers = new HashMap<>();
-    byte[] body;
+    ArrayList<RequestBody> body;
 
     public HttpRequest setStartLine(StartLine startLine) {
         this.startLine = startLine;
@@ -18,7 +19,7 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest setBody(byte[] body) {
+    public HttpRequest setBody(ArrayList<RequestBody> body) {
         this.body = body;
         return this;
     }
@@ -35,7 +36,7 @@ public class HttpRequest {
         return headers.get(key);
     }
 
-    public byte[] getBody() {
+    public ArrayList<RequestBody> getBody() {
         return body;
     }
 
