@@ -1,5 +1,6 @@
 package utils;
 
+import enums.HttpHeader;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,15 +14,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class HttpRequestParserTest {
+    private static final String CRLF = "\r\n";
     @Test
     @DisplayName("url 파싱 테스트")
     public void urlParsingTest() throws IOException {
         // given
-        String httpRequest = "GET /api/users?userId=123 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Connection: keep-alive\n";
+        String httpRequest = "GET /api/users?userId=123 HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" + CRLF +
+                "Accept: application/json" + CRLF +
+                "Connection: keep-alive"  + CRLF +
+                CRLF;
 
         // when
         HttpRequestParser httpRequestParser = new HttpRequestParser(stringToInputStream(httpRequest));
@@ -34,11 +37,12 @@ public class HttpRequestParserTest {
     @DisplayName("path 파싱 테스트")
     public void pathParsingTest() throws IOException {
         // given
-        String httpRequest = "GET /api/users?userId=123 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Connection: keep-alive\n";
+        String httpRequest = "GET /api/users?userId=123 HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" + CRLF +
+                "Accept: application/json" + CRLF +
+                "Connection: keep-alive" + CRLF +
+                CRLF;
         // when
         HttpRequestParser httpRequestParser = new HttpRequestParser(stringToInputStream(httpRequest));
 
@@ -50,28 +54,30 @@ public class HttpRequestParserTest {
     @DisplayName("header 파싱 테스트")
     public void headerParsingTest() throws IOException {
         // given
-        String httpRequest = "GET /api/users?userId=123 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Connection: keep-alive\n";
+        String httpRequest = "GET /api/users?userId=123 HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" + CRLF +
+                "Accept: application/json" + CRLF +
+                "Connection: keep-alive" + CRLF +
+                CRLF;
         // when
         HttpRequestParser httpRequestParser = new HttpRequestParser(stringToInputStream(httpRequest));
-        Map<String, String> headersMap = httpRequestParser.getRequestHeadersMap();
+        Map<HttpHeader, String> headersMap = httpRequestParser.getRequestHeadersMap();
 
         // then
-        assertThat(headersMap.get("Accept")).isEqualTo("application/json");
+        assertThat(headersMap.get(HttpHeader.ACCEPT)).isEqualTo("application/json");
     }
 
     @Test
     @DisplayName("queryParameter 파싱 테스트")
     public void queryParameterParsingTest() throws IOException {
         // given
-        String httpRequest = "GET /api/users?userId=123 HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Connection: keep-alive\n";
+        String httpRequest = "GET /api/users?userId=123 HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" + CRLF +
+                "Accept: application/json" + CRLF +
+                "Connection: keep-alive" + CRLF +
+                CRLF;
         // when
         HttpRequestParser httpRequestParser = new HttpRequestParser(stringToInputStream(httpRequest));
         Map<String, String> queryParametersMap = httpRequestParser.getQueryParametersMap();
@@ -84,11 +90,12 @@ public class HttpRequestParserTest {
     @DisplayName("extension 파싱 테스트")
     public void extensionParsingTest() throws IOException {
         // given
-        String httpRequest = "GET /index.html HTTP/1.1\n" +
-                "Host: localhost:8080\n" +
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\n" +
-                "Accept: application/json\n" +
-                "Connection: keep-alive\n";
+        String httpRequest = "GET /index.html HTTP/1.1" + CRLF +
+                "Host: localhost:8080" + CRLF +
+                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" + CRLF +
+                "Accept: application/json" + CRLF +
+                "Connection: keep-alive" + CRLF +
+                CRLF;
         // when
         HttpRequestParser httpRequestParser = new HttpRequestParser(stringToInputStream(httpRequest));
 
