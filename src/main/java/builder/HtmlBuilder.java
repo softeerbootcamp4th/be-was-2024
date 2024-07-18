@@ -5,12 +5,6 @@ import utils.ResourceUtil;
 import java.io.IOException;
 
 public class HtmlBuilder {
-    public String buildLoginSuccessHtml(String path) throws IOException {
-        ResourceUtil resourceUtil = new ResourceUtil();
-        String template = new String(resourceUtil.getByteArray(path));
-        return template;
-    }
-
     public String generateHtml(boolean isLoggedIn, String username) throws IOException {
         String templateFilePath = "/index.html"; // 템플릿 파일 경로
         ResourceUtil resourceUtil = new ResourceUtil();
