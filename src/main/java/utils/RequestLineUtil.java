@@ -1,11 +1,11 @@
-package webserver;
+package utils;
 
 import java.io.File;
 
-public class URLParser {
+public class RequestLineUtil {
     public String getURL(String line) {
         String url = line.split(" ")[1];
-        return getStaticUrl(url);
+        return getStaticPath(url);
     }
 
     public boolean isQueryString(String line) {
@@ -14,13 +14,17 @@ public class URLParser {
         return line.contains("?");
     }
 
-    private String getStaticUrl(String url) {
-        File testFile = new File("src/main/resources/static" + url);
+    public static String getStaticPath(String path) {
+        File testFile = new File("src/main/resources/static" + path);
 
-        if (testFile.isDirectory()) {
-            return url + "/index.html";
+        if (testFile.exists()) {
+            if (testFile.isDirectory()) {
+                return path + "/index.html";
+            } else {
+                return path;
+            }
         } else {
-            return url;
+            return path;
         }
     }
 
