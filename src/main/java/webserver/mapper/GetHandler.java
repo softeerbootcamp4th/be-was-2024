@@ -26,6 +26,7 @@ public class GetHandler {
         String url = httpRequest.getUrl();
         Map<String, String> headers = httpRequest.getHeaders();
         String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
+        User user = Session.findUserBySessionId(sessionId);
         switch (url) {
             case "/registration":
                 url = staticResourceDir + "/registration/index.html";
@@ -34,9 +35,7 @@ public class GetHandler {
                 url = staticResourceDir + "/login/index.html";
                 break;
             case "/main/index.html":
-                User user = Session.findUserBySessionId(sessionId);
-                url = staticResourceDir + "/main/index.html";
-                httpResponse.openPathWithUsername(url, user.getName());
+                httpResponse.showBoard(user);
                 return;
             case "/user/list":
                 if(Session.findUserBySessionId(sessionId) == null){
@@ -52,10 +51,15 @@ public class GetHandler {
                 }
                 url = staticResourceDir + "/article/index.html";
                 break;
+            case "/index.html":
+                httpResponse.showBoard(user);
+                return;
             default:
                 url = staticResourceDir + url;
                 break;
         }
+
         httpResponse.openPath(url);
+
     }
 }

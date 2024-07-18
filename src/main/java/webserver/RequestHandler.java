@@ -31,7 +31,7 @@ public class RequestHandler implements Runnable {
 
 //            logger.debug("request line : {} {}", httpRequest.getMethod(), httpRequest.getUrl());
 //
-            // Use headers as needed
+
             for (Map.Entry<String, String> entry : httpRequest.getHeaders().entrySet()) {
                 logger.debug("header : {}={}", entry.getKey(), entry.getValue());
             }
