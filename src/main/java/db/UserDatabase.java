@@ -2,17 +2,13 @@ package db;
 
 import model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.sql.*;
 
 public class UserDatabase {
-    private static Map<String, User> users = new HashMap<>();
-
-    private static String dbUrl = "jdbc:h2:~/test";
-    private static String dbUsername = "sa";
-    private static String dbPassword = "";
+    private static final String dbUrl = "jdbc:h2:~/test";
+    private static final String dbUsername = "sa";
+    private static final String dbPassword = "";
 
     public static void addUser(User user) {
         String sqlInsert = "INSERT INTO Users (userId, username, password, email) VALUES (?, ?, ?, ?)";
@@ -29,8 +25,6 @@ public class UserDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        // users.put(user.getUserId(), user);
     }
 
     public static User findUserById(String userId) {
@@ -68,10 +62,34 @@ public class UserDatabase {
         }
 
         return foundUser;
-        //return users.get(userId);
     }
 
     public static Collection<User> findAll() {
-        return users.values();
+        List<User> userList = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // SELECT 쿼리를 사용하여 모든 사용자 조회
+            String sqlSelectAll = "SELECT * FROM Users";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlSelectAll);
+                 ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User.Builder()
+                            .userId(rs.getString("userId"))
+                            .username(rs.getString("username"))
+                            .password(rs.getString("password"))
+                            .email(rs.getString("email"))
+                            .build();
+
+                    userList.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.out.println("H2 데이터베이스 연결 실패:");
+            e.printStackTrace();
+        }
+
+        return userList;
+        // return users.values();
     }
 }
