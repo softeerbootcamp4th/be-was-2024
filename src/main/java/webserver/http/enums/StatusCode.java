@@ -4,6 +4,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Http response에 대한 status code 및 message enum
+ */
 public enum StatusCode {
     CODE400(400, "Bad Request"),
     CODE401(401, "Unauthorized"),
@@ -43,6 +46,11 @@ public enum StatusCode {
     private static final Map<Integer, StatusCode> BY_CODE =
             Stream.of(values()).collect(Collectors.toMap(StatusCode::code, e -> e));
 
+    /**
+     * 해당 코드에 대한 enum을 넘겨준다
+     * @param code status code
+     * @return status code enum
+     */
     public static StatusCode valueOfCode(int code) {
         return BY_CODE.get(code);
     }
@@ -55,6 +63,10 @@ public enum StatusCode {
         return description;
     }
 
+    /**
+     * 해당 enum에 대한 response startline 생성
+     * @return response 의 첫번째 line
+     */
     public String getStartline() {
         return "HTTP/1.1 " +code + " " + description + "\r\n";
     }

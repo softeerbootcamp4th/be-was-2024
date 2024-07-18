@@ -1,5 +1,6 @@
 package webserver.api.pagehandler;
 
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -8,6 +9,9 @@ import webserver.util.HtmlFiles;
 
 import java.io.IOException;
 
+/**
+ * login page를 반환하는 class
+ */
 public class LoginPageHandler implements FunctionHandler {
     //singleton pattern
     private static FunctionHandler single_instance = null;
@@ -19,7 +23,15 @@ public class LoginPageHandler implements FunctionHandler {
         return single_instance;
     }
 
-
+    /**
+     * login page를 반환한다
+     * <p>
+     *     session을 확인하여 이미 로그인된 경우 main page로 redirect한다
+     * </p>
+     * @param request 해당 요청에 대한 Httprequest class
+     * @return 반환할 HttpResponse class
+     * @see SessionDAO
+     */
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();

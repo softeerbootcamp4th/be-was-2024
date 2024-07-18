@@ -7,6 +7,13 @@ import webserver.api.pagehandler.*;
 import webserver.api.registration.Registration;
 import webserver.api.writepost.WritePost;
 
+
+/**
+ * 초기 pathmap 생성을 위한 클래스
+ * <p>
+ *     path map에 대한 정보를 기입한다.
+ * </p>
+ */
 public class PathMapInfo {
 
     static PathMap.PathNode root

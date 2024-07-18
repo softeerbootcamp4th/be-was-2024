@@ -143,6 +143,7 @@ public class HttpRequest {
     /**
      * 생성자 클래스 <br>
      * builder를 이용하여 생성해야함
+     * @see HttpRequest.RequestBuilder
      */
     private HttpRequest(RequestBuilder builder) {
         this.method = builder.method;
@@ -155,6 +156,12 @@ public class HttpRequest {
         this.pathVariables = new HashMap<>();
     }
 
+    /**
+     * HttpRequest에 대한 builder
+     * <p>
+     *      path parameter는 여기서 설정하지 않는다
+     * </p>
+     */
     public static class RequestBuilder {
         private Methods method;
         private Url url;
@@ -164,6 +171,10 @@ public class HttpRequest {
         private Map<String, String> cookies= new HashMap<>();
         private String sessionid;
 
+        /**
+         * Request builder의 생성자
+         * @param startline http request의 첫번째 line
+         */
         public RequestBuilder(String startline) throws IOException {
             String[] split = startline.split(" ");
             if(split.length != 3){
@@ -175,16 +186,35 @@ public class HttpRequest {
             protocol = split[2];
         }
 
+        /**
+         * Request 에 header를 추가
+         * <p>
+         *     이때 key는 lower case로 바꿔서 저장한다
+         * </p>
+         * @param key header의 키
+         * @param value header의 value
+         */
         public RequestBuilder addHeader(String key, String value){
             headers.put(key.toLowerCase(), value);
             return this;
         }
 
+        /**
+         * Request body를 추가
+         * @param body request의 body byte
+         */
         public RequestBuilder setBody(byte[] body) {
             this.body = body;
             return this;
         }
 
+        /**
+         * Request의 header에서 cookie를 추출
+         * <p>
+         *     이때 세션 id를 확인해서 HttpRequest의 session id를 설정한다
+         * </p>
+         * @see HttpRequest#sessionid
+         */
         private void setCookies (){
             if(headers.containsKey("cookie")){
                 String[] split = headers.get("cookie").trim().split(";");
@@ -198,6 +228,9 @@ public class HttpRequest {
             }
         }
 
+        /**
+         * HttpRequest를 생성한다
+         */
         public HttpRequest build(){
             setCookies();
             return new HttpRequest(this);

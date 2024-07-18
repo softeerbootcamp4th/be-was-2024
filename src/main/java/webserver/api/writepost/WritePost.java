@@ -18,7 +18,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
-
+/**
+ * Post를 업로드하는 클래스
+ */
 public class WritePost implements FunctionHandler {
     //singleton pattern
     private static FunctionHandler single_instance = null;
@@ -32,6 +34,14 @@ public class WritePost implements FunctionHandler {
 
     static String root = "./src/main/resources/static/post/images/";
 
+    /**
+     * body에 있는 문자열, 사진을 파싱하여 db에 문자열은 그대로, 사진은 파일경로를 저장한다.
+     * <p>
+     *     사진파일명이 중복된 경우, 뒤에 (1) 등을 붙여서 저장한다.
+     * </p>
+     * @param request 해당 요청에 대한 Httprequest class
+     * @return 반환할 HttpResponse class
+     */
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String contentType = request.getHeaders().get("content-type");

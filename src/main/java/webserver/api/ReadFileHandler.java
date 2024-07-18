@@ -11,11 +11,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-
-
-/*
-* readfile function
-* */
+/**
+ * static resource 요청 처리하는 클래스
+ */
 public class ReadFileHandler implements FunctionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ReadFileHandler.class);
     private static final String root = "./src/main/resources/static";
@@ -32,6 +30,11 @@ public class ReadFileHandler implements FunctionHandler {
     }
 
 
+    /**
+     * request에 해당하는 file을 반환한다.
+     * @param request 해당 요청에 대한 Httprequest class
+     * @return 반환할 HttpResponse class
+     */
     @Override
     public HttpResponse function(HttpRequest request) {
         try{

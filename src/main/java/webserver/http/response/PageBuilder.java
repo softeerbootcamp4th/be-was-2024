@@ -12,7 +12,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 각 동적 페이지에 대한 builder
+ */
 public class PageBuilder {
+    /**
+     * User list page를 생성한다.
+     * <p>
+     *     이 과정에서 DB의 user list를 요청한다.
+     * </p>
+     * @return 해당 page에 대한 byte array
+     */
     public static byte[] buildUserList() throws IOException {
         UserDAO userDAO = new UserDAO();
         StringBuilder userlist = new StringBuilder();
@@ -32,12 +42,24 @@ public class PageBuilder {
         return page.getBytes("UTF-8");
     }
 
+    /**
+     * login 실패 화면을 띄운다
+     * @param errorMessage 표현할 에러 메시지
+     * @return 해당 page에 대한 byte array
+     */
     public static byte[] buildRegistrationFailedPage(String errorMessage) throws IOException {
         String page = HtmlFiles.readHtmlString(HtmlFiles.REGISTER_FAILED);
         page = page.replace("{ErrorMessage}", errorMessage );
         return page.getBytes("UTF-8");
     }
 
+    /**
+     * 로그인된 main page
+     * @param username 표시할 username
+     * @param postid 표시할 post id
+     * @return 해당 page에 대한 byte array
+     * @see PageBuilder#buildMainBody(String)
+     */
     public static byte[] buildLoggedinPage(String username, String postid) throws IOException {
         String page = HtmlFiles.readHtmlString(HtmlFiles.LOGIN_SUCCESS);
         page = page.replace("{USERNAME}", username );
@@ -47,6 +69,12 @@ public class PageBuilder {
         return page.getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 로그아웃된 main page
+     * @param postid 표시할 post id
+     * @return 해당 page에 대한 byte array
+     * @see PageBuilder#buildMainBody(String)
+     */
     public static byte[] buildLoggedoutPage(String postid) throws IOException {
         String page = HtmlFiles.readHtmlString(HtmlFiles.MAIN_PAGE);
 
@@ -55,6 +83,18 @@ public class PageBuilder {
         return page.getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 메인페이지의 main body에 대한 builder
+     * <p>
+     *     해당 posid를 확인하여 글을 표시한다.
+     * <p>
+     *     만약 글이 없다면 글이 존재하지 않는다는 글을 반환한다.
+     * </p>
+     * @param postid 표시할 post id
+     * @return body에 대한 문자열
+     * @see PageBuilder#buildPostBody(Post)
+     * @see PageBuilder#buildNav(int, int)
+     */
     public static String buildMainBody(String postid) throws IOException {
         PostDAO postDAO = new PostDAO();
         int id = isNumeric(postid) ? Integer.parseInt(postid) : postDAO.getLastIndex();
@@ -70,6 +110,12 @@ public class PageBuilder {
         return postbody + nav;
     }
 
+    /**
+     * 글에 대한 내용을 작성한다.
+     * @param post 표시할 post
+     * @return post에 대한 문자열
+     * @see PageBuilder#buildMainBody(String)
+     */
     public static String buildPostBody(Post post) throws IOException {
         UserDAO userDAO = new UserDAO();
         User user = userDAO.getUser(post.getUserid());
@@ -85,6 +131,17 @@ public class PageBuilder {
         return postbody;
     }
 
+    /**
+     * 메인 페이지 하단의 글 navigator를 생성한다
+     * <p>
+     *     해당 글에 대한 다음글 및 이전글을 찾아서 버튼에 링크한다.
+     * <p>
+     *     만약 글이 없다면 해당 화살표를 지운다.
+     * </p>
+     * @param previd 이전 글의 id
+     * @param nextid 다음 글의 id
+     * @return 하단 navigator 부분의 html
+     */
     public static String buildNav(int previd, int nextid) throws IOException {
         String nav = HtmlFiles.readHtmlString(HtmlFiles.NAV);
         if (previd ==0){
@@ -110,6 +167,11 @@ public class PageBuilder {
         return nav;
     }
 
+    /**
+     * 에러 코드에 대한 에러 페이지 생성기
+     * @param errorcode error code enum
+     * @return 해당 페이지에 대한 byte array
+     */
     public static byte[] buildErrorPage(StatusCode errorcode) {
         String body = "<!DOCTYPE html>" +
                 "<html>" +
@@ -124,6 +186,11 @@ public class PageBuilder {
        return body.getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 해당 문자열이 숫자인지 알아보기 위한 method
+     * @param str 확인할 문자열
+     * @return 숫자인지 여부
+     */
     private static boolean isNumeric(String str) {
         try {
             Integer.parseInt(str);
