@@ -27,39 +27,43 @@ public class GetHandler {
         Map<String, String> headers = httpRequest.getHeaders();
         String sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
         User user = Session.findUserBySessionId(sessionId);
-        switch (url) {
-            case "/registration":
-                url = staticResourceDir + "/registration/index.html";
-                break;
-            case "/login":
-                url = staticResourceDir + "/login/index.html";
-                break;
-            case "/main/index.html":
-                httpResponse.showBoard(user);
-                return;
-            case "/user/list":
-                if(Session.findUserBySessionId(sessionId) == null){
+        try {
+            switch (url){
+                case "/registration":
+                    url = staticResourceDir + "/registration/index.html";
+                    break;
+                case "/login":
                     url = staticResourceDir + "/login/index.html";
                     break;
-                }
-                httpResponse.openUserList();
-                return;
-            case "/write":
-                if(Session.findUserBySessionId(sessionId) == null){
-                    url = staticResourceDir + "/login/index.html";
+                case "/main/index.html":
+                    httpResponse.showBoard(user);
+                    return;
+                case "/user/list":
+                    if(Session.findUserBySessionId(sessionId) == null){
+                        url = staticResourceDir + "/login/index.html";
+                        break;
+                    }
+                    httpResponse.openUserList();
+                    return;
+                case "/write":
+                    if(Session.findUserBySessionId(sessionId) == null){
+                        url = staticResourceDir + "/login/index.html";
+                        break;
+                    }
+                    url = staticResourceDir + "/article/index.html";
                     break;
-                }
-                url = staticResourceDir + "/article/index.html";
-                break;
-            case "/index.html":
-                httpResponse.showBoard(user);
-                return;
-            default:
-                url = staticResourceDir + url;
-                break;
+                case "/index.html":
+                    httpResponse.showBoard(user);
+                    return;
+                default:
+                    url = staticResourceDir + url;
+                    break;
+            }
+
+            httpResponse.openPath(url);
+
+        }catch (Exception e){
+            httpResponse.sendErrorPage("Invalid information has been entered", "/index.html");
         }
-
-        httpResponse.openPath(url);
-
     }
 }
