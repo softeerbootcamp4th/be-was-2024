@@ -23,8 +23,10 @@ public class RequestUtils {
      * body는 byte[]형태로 받아온다.
      */
     public static HttpRequest parseHttpRequest(InputStream in) throws IOException {
+        final int TMP_BUFFER_SIZE = 1024;
+
         int ch;
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         int contentLength = 0;
         byte[] body = null;
 
@@ -51,23 +53,37 @@ public class RequestUtils {
         // Content-Length 헤더 찾기
         String header = sb.toString();
         String[] headerLines = header.split("\r\n");
-        for (String line : headerLines) {
-            if (line.toLowerCase().startsWith(HeaderKey.CONTENT_LENGTH.getKey())) {
+        for(String line: headerLines) {
+            if(line.toLowerCase().startsWith(HeaderKey.CONTENT_LENGTH.getKey())) {
                 contentLength = Integer.parseInt(line.split(":")[1].trim());
                 break;
             }
         }
+        logger.debug("{}", sb);
 
-        StringBuilder sbb = new StringBuilder();
+        StringBuffer sbb = new StringBuffer();
         // Content-Length가 0보다 크다면 body까지 읽어서 로그에 출력한다.
-        if(contentLength>0) {
+        if (contentLength > 0) {
             body = new byte[contentLength];
-            in.read(body, 0, contentLength);
+            int bytesRead = 0;
+            int offset = 0;
+
+            while (bytesRead < contentLength) {
+                int bytesToRead = Math.min(TMP_BUFFER_SIZE, contentLength - bytesRead);
+                int readSize = in.read(body, offset, bytesToRead);
+
+                if (readSize == -1) {
+                    throw new IOException("Unexpected end of input stream while reading body");
+                }
+
+                bytesRead += readSize;
+                offset += readSize;
+            }
+
             sbb.append("==========================\n").append(new String(body)).append("\n");
         }
 
-        logger.debug("{}", sb);
-        logger.debug("{}", sbb);
+//        logger.debug("{}", sbb);
 
         return parseRequest(sb.toString(), body);
     }
