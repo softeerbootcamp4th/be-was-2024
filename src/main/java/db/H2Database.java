@@ -5,7 +5,7 @@ import model.Post;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utils.Validation;
+import utils.DatabaseConfig;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,9 +13,6 @@ import java.util.Collection;
 import java.util.List;
 
 public class H2Database {
-  private static final String JDBC_URL = "jdbc:h2:tcp://localhost:9092/~/test";
-  private static final String JDBC_USER = "sa";
-  private static final String JDBC_PASSWORD = "";
   private static final Logger logger = LoggerFactory.getLogger(H2Database.class);
 
 
@@ -29,11 +26,11 @@ public class H2Database {
 
   private H2Database() {}
 
-  public void addUser(User user) throws SQLException, ClassNotFoundException {
+  public void addUser(User user) {
     Connection connection = null;
     PreparedStatement statement = null;
     try {
-      connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+      connection = DatabaseConfig.getConnection();
       String sql = "INSERT INTO USERS (name, user_id, email, password) VALUES (?, ?, ?, ?)";
       statement = connection.prepareStatement(sql);
       statement.setString(1, user.getName());
@@ -44,24 +41,28 @@ public class H2Database {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     } finally {
-      if(connection != null) {
-        connection.close();
-      }
+      try {
+        if(connection != null) {
+          connection.close();
+        }
 
-      if(statement != null) {
-        statement.close();
+        if(statement != null) {
+          statement.close();
+        }
+      } catch (SQLException e) {
+        throw new RuntimeException("db 오류", e);
       }
     }
   }
 
-  public User findUserById(String userId) throws SQLException {
+  public User findUserById(String userId) {
     Connection connection = null;
     PreparedStatement statement = null;
     ResultSet resultSet = null;
     User user = null;
     logger.debug("userId = {}", userId);
     try {
-      connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+      connection = DatabaseConfig.getConnection();
       String sql = "SELECT * FROM USERS WHERE user_id = ?";
       statement = connection.prepareStatement(sql);
       statement.setString(1, userId);
@@ -80,16 +81,20 @@ public class H2Database {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     } finally {
-      if(connection != null) {
-        connection.close();
-      }
+      try {
+        if(connection != null) {
+          connection.close();
+        }
 
-      if(statement != null) {
-        statement.close();
-      }
+        if(statement != null) {
+          statement.close();
+        }
 
-      if (resultSet != null) {
-        resultSet.close();
+        if (resultSet != null) {
+          resultSet.close();
+        }
+      } catch (SQLException e) {
+        throw new SQLRuntimeException("db 오류", e);
       }
     }
 
@@ -102,7 +107,7 @@ public class H2Database {
     ResultSet resultSet = null;
     List<User> users = new ArrayList<>();
     try {
-      connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+      connection = DatabaseConfig.getConnection();
       String sql = "SELECT * FROM USERS";
       statement = connection.prepareStatement(sql);
       resultSet = statement.executeQuery();
@@ -142,7 +147,7 @@ public class H2Database {
     Connection connection = null;
     PreparedStatement statement = null;
     try {
-      connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+      connection = DatabaseConfig.getConnection();
       String sql = "INSERT INTO POSTS (title, content) VALUES (?, ?)";
       statement = connection.prepareStatement(sql);
       statement.setString(1, post.getTitle());
@@ -167,7 +172,7 @@ public class H2Database {
     ResultSet resultSet = null;
     List<Post> posts = new ArrayList<>();
     try {
-      connection = DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
+      connection = DatabaseConfig.getConnection();
       String sql = "SELECT * FROM POSTS";
       statement = connection.prepareStatement(sql);
       resultSet = statement.executeQuery();
