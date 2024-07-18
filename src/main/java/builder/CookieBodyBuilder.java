@@ -20,6 +20,8 @@ public class CookieBodyBuilder extends BodyBuilder {
     public byte[] getBody() throws IOException {
         if (viewData.getUrl().equals("//index.html") || viewData.getUrl().equals("/index.html")) {
             return getIndexHtmlBody();
+        } else if (viewData.getUrl().equals("/user/list.html")) {
+            return getUserListHtmlBody();
         } else {
             return getDefaultBody();
         }
@@ -41,6 +43,12 @@ public class CookieBodyBuilder extends BodyBuilder {
             String body = htmlBuilder.generateHtml(false, "");
             return body.getBytes();
         }
+    }
+
+    private byte[] getUserListHtmlBody() throws IOException {
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        String body = htmlBuilder.generateUserListHtml();
+        return body.getBytes();
     }
 
     private byte[] getDefaultBody() throws IOException {
