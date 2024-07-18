@@ -1,5 +1,7 @@
 package model;
 
+import db.Database;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,9 @@ public class UserInfoExtract {
         String name = userInfo.get("name");
         String email = userInfo.get("email");
 
+        if(Database.findUserById(userId) != null){
+            throw new RuntimeException();
+        }
         User user = null;
         if (userId != null && password != null && name != null && email != null) {
             user = new User(userId, password, name, email);
