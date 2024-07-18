@@ -22,7 +22,7 @@ public enum HtmlTemplate {
             "  <body>\n" +
             "    <div class=\"container\">\n" +
             "      <header class=\"header\">\n" +
-            "        <a href=\"/main\"><img src=\"../img/signiture.svg\" /></a>\n" +
+            "        <a href=\"/main/index.html\"><img src=\"../img/signiture.svg\" /></a>\n" +
             "        <ul class=\"header__menu\">\n" +
             "          <li class=\"header__menu__item\">\n" +
             "            <span class=\"username\">{{username}}</span>\n" +
@@ -53,7 +53,7 @@ public enum HtmlTemplate {
             "  <body>\n" +
             "    <div class=\"container\">\n" +
             "      <header class=\"header\">\n" +
-            "        <a href=\"/\">\n" +
+            "        <a href=\"/index.html\">\n" +
             "          <img src=\"../img/signiture.svg\" />\n" +
             "        </a>\n" +
             "        <ul class=\"header__menu\">\n" +
