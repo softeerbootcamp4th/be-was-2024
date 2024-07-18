@@ -26,14 +26,14 @@ public class CookieBodyBuilder extends BodyBuilder {
     }
 
     private byte[] getIndexHtmlBody() throws IOException {
-        String sessionId = viewData.getCookie();
+        String sessionId = this.cookie;
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         if (SessionHandler.verifySessionId(sessionId)) {
             // 사용자 아이디로 동적 html 생성
             User user = SessionHandler.getUser(sessionId);
-            String userId = user.getUserId();
+            String username = user.getName();
 
-            String body = htmlBuilder.generateHtml(true, userId);
+            String body = htmlBuilder.generateHtml(true, username);
 
             return body.getBytes();
         } else {
