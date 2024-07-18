@@ -31,6 +31,7 @@ public class WebServer {
 //                    "/posts/edit"
 //            ),
                 new StaticResourceChain(),
+                new UploadResourceChain(),
                 new MultipartHandleChain(),
                 RouteConfig.routeHandleChain(),
                 new NotFoundHandleChain()
