@@ -79,4 +79,22 @@ public class ResponseProcessor {
 
         return viewData;
     }
+
+    public ViewData userListResponse() {
+        ViewData viewData = new ViewData.Builder()
+                .url("/user/list.html")
+                .statusCode(200)
+                .build();
+
+        return viewData;
+    }
+
+    public ViewData unauthorizedUserListResponse() {
+        ViewData viewData = new ViewData.Builder()
+                .url("/index.html")
+                .redirectCode(302)
+                .build();
+
+        return viewData;
+    }
 }
