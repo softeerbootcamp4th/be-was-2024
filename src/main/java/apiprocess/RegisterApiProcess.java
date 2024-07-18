@@ -1,4 +1,4 @@
-package ApiProcess;
+package apiprocess;
 
 import db.Database;
 import enums.HttpCode;
@@ -9,10 +9,12 @@ import utils.Validation;
 import webserver.Request;
 import webserver.Response;
 
+import java.util.Map;
+
 public class RegisterApiProcess implements ApiProcess {
     private static final Logger logger = LoggerFactory.getLogger(RegisterApiProcess.class);
     @Override
-    public String process(Request request, Response response) {
+    public String process(Request request, Response response, Map<String, Object> model) {
         String name = request.getParameter("name");
         String userId = request.getParameter("userId");
         String email = request.getParameter("email");
