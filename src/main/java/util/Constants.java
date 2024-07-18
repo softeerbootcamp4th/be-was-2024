@@ -25,7 +25,7 @@ public class Constants {
     public static final String REG_DOT = "\\.";
     public static final String REG_AMP = "&";
     public static final String REG_EQ = "=";
-    public static final String REG_SPC = " ";
+    public static final String REG_SPC = "\\s+";
     public static final String REG_CLN = ":";
     public static final String REG_SMCLN = ";";
 
@@ -60,9 +60,7 @@ public class Constants {
     public static final String TABLE_DATA_END = "</td>";
 
     //database
-    public static String JDBC_URL_ARTICLE;
-    public static String JDBC_URL_USER;
-    public static String JDBC_URL_SESSION;
+    public static String JDBC_URL;
     public static String H2_USERNAME;
     public static String H2_PASSWORD;
 
@@ -76,9 +74,8 @@ public class Constants {
             }
             properties.load(input);
             STATIC_PATH =  properties.getProperty("staticPath");
-            JDBC_URL_ARTICLE = properties.getProperty("jdbc_url_article");
-            JDBC_URL_USER = properties.getProperty("jdbc_url_user");
-            JDBC_URL_SESSION = properties.getProperty("jdbc_url_session");
+            JDBC_URL = properties.getProperty("jdbc_url");
+
             H2_USERNAME = properties.getProperty("database_username");
             H2_PASSWORD = properties.getProperty("database_password");
         } catch (IOException e) {

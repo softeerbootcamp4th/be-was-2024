@@ -16,19 +16,30 @@ public class ArticleDatabase {
     private DatabaseConnectionPool connectionPool;
 
     public ArticleDatabase() {
-        connectionPool = new DatabaseConnectionPool(JDBC_URL_ARTICLE);
+        connectionPool = new DatabaseConnectionPool(JDBC_URL);
     }
 
     public Connection connect() throws SQLException {
         return connectionPool.getConnection();
     }
 
+    public void dropArticleTable() {
+        String sql = "DROP ALL OBJECTS;";
+        try (Connection conn = connect(); Statement statement = conn.createStatement()) {
+            statement.execute(sql);
+            logger.info("Article 테이블 삭제 성공");
+        } catch (SQLException e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+
     public void createArticleTable() {
         String sql = "CREATE TABLE IF NOT EXISTS ARTICLE(" +
                 "ARTICLE_ID INT AUTO_INCREMENT PRIMARY KEY," +
-                "USER_ID VARCHAR(255)," +
-                "TEXT TEXT," +
-                "PIC VARCHAR(255)" +
+                "USER_NAME VARCHAR(255)," +
+                "TEXT TEXT NOT NULL," +
+                "PIC BLOB NOT NULL" +
                 ");";
 
         try (Connection conn = connect(); Statement statement = conn.createStatement()) {
@@ -39,12 +50,12 @@ public class ArticleDatabase {
         }
     }
 
-    public void createArticle(String userId, String text, String pic) {
-        String sql = "INSERT INTO ARTICLE (ARTICLE_ID, USER_ID, TEXT, PIC) VALUES (DEFAULT, ?,?,?)";
+    public void createArticle(String userName, String text, byte[] pic) {
+        String sql = "INSERT INTO ARTICLE (ARTICLE_ID, USER_NAME, TEXT, PIC) VALUES (DEFAULT, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
-            preparedStatement.setString(1, userId);
+            preparedStatement.setString(1, userName);
             preparedStatement.setString(2, text);
-            preparedStatement.setString(3, pic);
+            preparedStatement.setBytes(3, pic);
             preparedStatement.execute();
             logger.info("Article Inserted.");
         } catch (SQLException e) {
@@ -54,15 +65,15 @@ public class ArticleDatabase {
 
     public List<Article> getAllArticles() {
         List<Article> articles = new ArrayList<>();
-        String sql = "SELECT * FROM ARTICLE";
+        String sql = "SELECT * FROM ARTICLE ORDER BY ARTICLE_ID DESC";
         try (Connection connection = connect(); Statement statement = connection.createStatement(); ResultSet rs = statement.executeQuery(sql)) {
             while (rs.next()) {
                 int articleId = rs.getInt("ARTICLE_ID");
-                String userId = rs.getString("USER_ID");
+                String userName = rs.getString("USER_NAME");
                 String text = rs.getString("TEXT");
-                String pic = rs.getString("PIC");
+                byte[] pic = rs.getBytes("PIC");
 
-                articles.add(new Article(articleId, userId, text, pic));
+                articles.add(new Article(articleId, userName, text, pic));
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
@@ -78,11 +89,11 @@ public class ArticleDatabase {
             ResultSet rs = preparedStatement.executeQuery();
 
             if (rs.next()) {
-                String userId = rs.getString("USER_ID");
+                String userName = rs.getString("USER_NAME");
                 String text = rs.getString("TEXT");
-                String pic = rs.getString("PIC");
+                byte[] pic = rs.getBytes("PIC");
 
-                Article article = new Article(articleId, userId, text, pic);
+                Article article = new Article(articleId, userName, text, pic);
                 return Optional.of(article);
             }
         } catch (SQLException e) {
