@@ -8,7 +8,7 @@ public class Article {
     private String title;
     private String content;
 
-    public Article(String title, String content, Long articleId) {
+    private Article(String title, String content, Long articleId) {
         this.title = title;
         this.content = content;
         this.articleId = articleId;
@@ -30,8 +30,14 @@ public class Article {
         return articleIndex;
     }
 
-//    @Override
-//    public String toString() {
-////        return "A [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";
-//    }
+    public static Article of(String title, String content, Long articleId) {
+        Article article = new Article(title, content, articleId);
+        articleIndex++;
+        return article;
+    }
+
+    @Override
+    public String toString() {
+        return "Article [articleId=" + articleId + ", title=" + title + ", content=" + content  + "]";
+    }
 }

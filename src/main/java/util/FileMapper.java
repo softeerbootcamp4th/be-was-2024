@@ -14,13 +14,31 @@ public class FileMapper {
     public static byte[] getByteConvertedFile(String path,String userId) throws IOException {
         User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + path);
-        System.out.println("file = " + file);
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();
 
 
         String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
 
+        // 유저가 로그인 된 상태인 경우와 안된 상태 분리
+        if (user!=null) {
+            htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));
+        }
+        else{
+            htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_NOT_LOGIN, DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT);
+
+        }
+
+        return htmlContent.getBytes(StandardCharsets.UTF_8);
+    }
+    public static byte[] getIndexPageByteConvertedFile(String userId) throws IOException {
+        User user = UserDatabase.findUserById(userId).orElse(null);
+        File file = new File(RESOURCE_PATH + "/index.html");
+        InputStream fileInputStream = new FileInputStream(file);
+        byte[] allBytes = fileInputStream.readAllBytes();
+
+        String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
+        htmlContent = htmlContent.replace(DYNAMIC_ARTICLE_CONTENT, makeIndexPageArticleList());
         // 유저가 로그인 된 상태인 경우와 안된 상태 분리
         if (user!=null) {
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));

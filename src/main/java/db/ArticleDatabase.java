@@ -22,11 +22,11 @@ public class ArticleDatabase {
         articles.put(article.getArticleId(), article);
     }
 
-//    public static Optional<User> findUserById(String userId) {
-//        return Optional.ofNullable(users.get(userId));
-//    }
-//
-//    public static Collection<User> findAll() {
-//        return users.values();
-//    }
+    public static Optional<Article> findArticleById(Long articleId) {
+        return Optional.ofNullable(articles.get(articleId));
+    }
+
+    public static Collection<Article> findAll() {
+        return articles.values();
+    }
 }

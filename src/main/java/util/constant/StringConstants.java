@@ -1,6 +1,10 @@
 package util.constant;
 
+import db.ArticleDatabase;
 import logic.Logics;
+import model.Article;
+
+import java.util.Collection;
 
 public class StringConstants {
     public static final String SPACE = " ";
@@ -25,6 +29,7 @@ public class StringConstants {
     public static final String RESOURCE_PATH = "src/main/resources/static";
 
     //path
+    public static final String INDEX = "/index.html";
     public static final String PATH_CREATE = "/create";
     public static final String PATH_LOGIN = "/login";
     public static final String PATH_LOGOUT = "/logout";
@@ -36,6 +41,7 @@ public class StringConstants {
     //html
     public static final String DYNAMIC_CONTENT_IS_LOGIN = "<!-- DYNAMIC_CONTENT_IS_LOGIN -->";
     public static final String DYNAMIC_CONTENT_IS_NOT_LOGIN = "<!-- DYNAMIC_CONTENT_IS_NOT_LOGIN -->";
+    public static final String DYNAMIC_ARTICLE_CONTENT = "<!-- DYNAMIC_ARTICLE_CONTENT -->";
 
     public static final String DYNAMIC_CONTENT_IS_LOGIN_CONTENT = """
             <form class="form" action="/logout" method="post">
@@ -63,24 +69,53 @@ public class StringConstants {
                              </a>
             </li>
             """;
-    public static final String makeDynamicContentIsLoginContentWithName(String userName){
-        return  """
-            <form class="form" action="/logout" method="post">
-                        <li class="header__menu__item">
-                          <input
-                                  type="submit"
-                                  id="login-btn"
-                                  class="btn btn_contained btn_size_s"
-                                  value="로그아웃!"
-                          />
-                        </li>
-                      </form>
-                      <li class="header__menu__item">
-                          <span>안녕하세요!  """ + " "+userName+
+
+    public static final String makeDynamicContentIsLoginContentWithName(String userName) {
+        return """
+                <form class="form" action="/logout" method="post">
+                            <li class="header__menu__item">
+                              <input
+                                      type="submit"
+                                      id="login-btn"
+                                      class="btn btn_contained btn_size_s"
+                                      value="로그아웃!"
+                              />
+                            </li>
+                          </form>
+                          <li class="header__menu__item">
+                              <span>안녕하세요!  """ + " " + userName +
                 """
-                      님</span>
-                      
-                      </li>
-                """;
+                              님</span>
+                              
+                              </li>
+                        """;
+    }
+
+    public static final String makeIndexPageArticleList() {
+        Collection<Article> articles = ArticleDatabase.findAll();
+        StringBuilder htmlString = new StringBuilder();
+
+        htmlString.append("""
+                <h2>작성 글 목록 :</h2>
+                <ul>
+                """);
+
+        for (Article article : articles) {
+            htmlString.append("<li class=\"header__menu__item\">")
+                    .append("<a href=\"/article/")
+                    .append(article.getArticleId())
+                    .append("\">")
+                    .append("글 제목: ")
+                    .append(article.getTitle())
+                    .append("</a>")
+                    .append("</li>")
+                    .append("<hr/>"); // 수평선 추가
+        }
+
+        htmlString.append("""
+                </ul>
+                """);
+
+        return htmlString.toString();
     }
 }

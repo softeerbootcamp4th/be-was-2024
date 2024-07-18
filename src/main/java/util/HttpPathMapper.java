@@ -25,6 +25,7 @@ public class HttpPathMapper {
             return HttpResponse.redirectToMain();
         }
         return switch (httpRequest.getPath()) {
+            case INDEX -> index(httpRequest,userId);
             case PATH_CREATE -> create(httpRequest);
             case PATH_LOGIN -> login(httpRequest);
             case PATH_LOGOUT -> logout(httpRequest);
