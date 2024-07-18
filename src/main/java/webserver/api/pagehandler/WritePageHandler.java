@@ -4,6 +4,7 @@ import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.http.response.PageBuilder;
 import webserver.session.SessionDAO;
 import webserver.util.HtmlFiles;
 
@@ -33,7 +34,7 @@ public class WritePageHandler implements FunctionHandler {
     public HttpResponse function(HttpRequest request) throws IOException {
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.WRITE))
+                .setBody(PageBuilder.buildeWritePage(""))
                 .build();
     }
 }

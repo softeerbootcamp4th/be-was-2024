@@ -4,6 +4,7 @@ import model.post.Post;
 import model.post.PostDAO;
 import model.user.User;
 import model.user.UserDAO;
+import webserver.http.HttpResponse;
 import webserver.http.enums.StatusCode;
 import webserver.util.HtmlFiles;
 
@@ -184,6 +185,19 @@ public class PageBuilder {
                 "</body>" +
                 "</html>";
        return body.getBytes(StandardCharsets.UTF_8);
+    }
+
+    /**
+     * write 페이지 builder
+     * @param errorMessege 표시할 에러 메세지
+     * @return html body byte
+     */
+    public static byte[] buildeWritePage(String errorMessege) throws IOException {
+        String page = HtmlFiles.readHtmlString(HtmlFiles.WRITE);
+        if(!errorMessege.isEmpty()){
+
+        }else page = page.replace("{ERROR}", errorMessege);
+        return page.getBytes(StandardCharsets.UTF_8);
     }
 
     /**

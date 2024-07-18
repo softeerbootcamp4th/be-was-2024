@@ -4,6 +4,7 @@ import model.post.PostDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.http.enums.Extension;
 import webserver.http.enums.StatusCode;
 import webserver.http.response.PageBuilder;
 import webserver.session.SessionDAO;
@@ -59,21 +60,29 @@ public class WritePost implements FunctionHandler {
             for (Map.Entry<String, FileData> part : decomposed.entrySet()) {
                 String partName = part.getKey();
                 FileData fileData = part.getValue();
-                if (partName.equals("image")) {
+                if (partName.equals("image") && fileData.getData().length > 0) {
                     imgpath = root + fileData.getFileName();
                     int instantnum = 1;
                     int lastDotIndex = imgpath.lastIndexOf('.');
-
-                    String namePart = imgpath.substring(0, lastDotIndex);
-                    String extensionPart = imgpath.substring(lastDotIndex);
-
+                    String namePart = fileData.getFileName().substring(0, lastDotIndex);
+                    String extensionPart = fileData.getFileName().substring(lastDotIndex);
+                    int namelengthlimit = 270 - root.length() - extensionPart.length();
+                    if (namePart.length() > namelengthlimit){
+                        namePart = namePart.substring(0, namelengthlimit);
+                    }
                     while(new File(namePart +"("+ instantnum +")" + extensionPart).exists()){
                         instantnum++;
                     }
-                    imgpath = namePart +"("+ instantnum +")" + extensionPart;
+                    imgpath = root + namePart +"("+ instantnum +")" + extensionPart;
                     Files.write(Paths.get(imgpath), fileData.getData());
                 }else if(partName.equals("text")){
                     text = new String(fileData.getData());
+                    if(text.length() > 1000){
+                        return new HttpResponse.ResponseBuilder(401)
+                                .addheader("Content-Type", Extension.HTML.getContentType())
+                                .setBody(PageBuilder.buildeWritePage("글자수는 1000자를 넘을 수 없습니다."))
+                                .build();
+                    }
                 }
             }
 

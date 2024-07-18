@@ -96,6 +96,20 @@ public class Registration implements FunctionHandler {
                     .build();
         }
 
+        if(email.length() > 100){
+            return new HttpResponse.ResponseBuilder(422)
+                    .addheader("Content-Type", "text/html; charset=utf-8")
+                    .setBody(PageBuilder.buildRegistrationFailedPage("이메일이 100자 이상입니다."))
+                    .build();
+        }
+
+        if(username.length() > 100){
+            return new HttpResponse.ResponseBuilder(422)
+                    .addheader("Content-Type", "text/html; charset=utf-8")
+                    .setBody(PageBuilder.buildRegistrationFailedPage("이름이 100자 이상입니다."))
+                    .build();
+        }
+
         if(userDAO.getUser(id) !=null){
             return new HttpResponse.ResponseBuilder(422)
                     .addheader("Content-Type", "text/html; charset=utf-8")
