@@ -70,7 +70,6 @@ public class IOUtil {
      * @param fileData
      * @param fileName
      * @return String
-     * @throws IOException
      */
     public static String saveFile(byte[] fileData, String fileName) {
         // uploads라는 디렉토리 생성

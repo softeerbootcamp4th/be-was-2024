@@ -13,7 +13,7 @@ public class StringParser {
     /**
      * 쿠키 문자열에서 세션 아이디를 추출하는 메서드
      * @param cookie
-     * @return Optional<String>
+     * @return String
      */
     public static Optional<String> parseSessionId(String cookie) {
         if (cookie == null || cookie.isBlank()) {
