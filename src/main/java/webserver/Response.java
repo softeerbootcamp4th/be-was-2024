@@ -95,12 +95,8 @@ public class Response {
     }
 
     public void redirect(String url, DataOutputStream dos, int redirectionCode) {
-        if (cookie != null) {
-            if (cookie.isEmpty()) {
-                redirectWithoutCookie(url, dos, redirectionCode);
-            } else {
-                redirectWithCookie(url, dos, redirectionCode);
-            }
+        if (CookieUtil.isExist(cookie)) {
+            redirectWithCookie(url, dos, redirectionCode);
         } else {
             redirectWithoutCookie(url, dos, redirectionCode);
         }
