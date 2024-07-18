@@ -76,7 +76,7 @@ public class MyHttpResponse {
     public String toString() {
         return "{ httpStatus + " + httpStatus +
                 ", headers=" + headers +
-                ", body=" + body +
+                ", body=" + new String(body) +
                 " }";
     }
 }
