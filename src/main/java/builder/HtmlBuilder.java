@@ -1,8 +1,11 @@
 package builder;
 
+import db.UserDatabase;
+import model.User;
 import utils.ResourceUtil;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class HtmlBuilder {
     public String generateHtml(boolean isLoggedIn, String username) throws IOException {
@@ -29,6 +32,32 @@ public class HtmlBuilder {
                 .replace("{login_button_placeholder}", loginButtonHtml)
                 .replace("{registration_button_text}", registrationButtonText)
                 .replace("{registration_button_href}", registrationButtonHref);
+
+        return template;
+    }
+
+    public String generateUserListHtml() throws IOException {
+        String templateFilePath = "/user/list.html"; // 템플릿 파일 경로
+        ResourceUtil resourceUtil = new ResourceUtil();
+        String template = new String(resourceUtil.getByteArray(templateFilePath));
+
+        Collection<User> userList = UserDatabase.findAll();
+
+        // 사용자 목록을 HTML 형식으로 빌드
+        StringBuilder userRows = new StringBuilder();
+        int index = 1;
+        for (User user : userList) {
+            userRows.append("<tr>");
+            userRows.append("<th scope=\"row\">").append(index).append("</th>");
+            userRows.append("<td>").append(user.getUserId()).append("</td>");
+            userRows.append("<td>").append(user.getName()).append("</td>");
+            userRows.append("<td>").append(user.getEmail()).append("</td>");
+            userRows.append("</tr>");
+            index++;
+        }
+
+        // 문자열 대체
+        template = template.replace("{user_list_placeholder}", userRows.toString());
 
         return template;
     }
