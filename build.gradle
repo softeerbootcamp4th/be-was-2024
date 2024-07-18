@@ -33,5 +33,6 @@ dependencies {
 }
 
 test {
+    systemProperty 'APP_ENV', 'test'
     useJUnitPlatform()
 }
