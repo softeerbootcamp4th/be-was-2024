@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.CookieUtil;
 import utils.RequestLineUtil;
 
 import java.io.*;
@@ -135,11 +136,7 @@ public class Request {
 
     public String getSessionId() {
         String cookie = headers.get("Cookie");
-        if (cookie == null) {
-            return null;
-        } else {
-            return cookie.split("=")[1];
-        }
+        return CookieUtil.getCookie(cookie);
     }
 
     public HashMap<String, String> parseQueryString() {
