@@ -2,12 +2,13 @@ package db;
 
 import model.User;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Database {
-    private static Map<String, User> users = new HashMap<>();
+    private static final Map<String, User> users = new ConcurrentHashMap<>();
 
     public static void addUser(User user) {
         users.put(user.getUserId(), user);
@@ -17,7 +18,15 @@ public class Database {
         return users.get(userId);
     }
 
-    public static Collection<User> findAll() {
-        return users.values();
+    public static boolean userExists(String userId) {
+        return users.containsKey(userId);
+    }
+
+    public static Map<String, User> findAll() {
+        return users;
+    }
+
+    public static List<User> findAllByList() {
+        return new ArrayList<>(users.values());
     }
 }

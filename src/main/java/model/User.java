@@ -5,7 +5,7 @@ import exception.InvalidHttpRequestException;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class User {
+public class User implements MyTagDomain{
     private final String userId;
     private final String password;
     private final String name;

@@ -33,7 +33,7 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readFile("index.html")));
+        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readStaticFile("index.html")));
 
         // then
         // index.html 파일 검증
@@ -63,7 +63,7 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readFile("register/index.html")));
+        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readStaticFile("register/index.html")));
 
         // then
         // index.html 파일 검증

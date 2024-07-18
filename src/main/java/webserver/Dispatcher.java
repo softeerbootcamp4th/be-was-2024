@@ -5,7 +5,9 @@ import constant.FileExtensionType;
 import constant.HttpStatus;
 import dto.HttpRequest;
 import dto.HttpResponse;
+import exception.DynamicFileBuildException;
 import exception.InvalidHttpRequestException;
+import exception.ResourceNotFoundException;
 import handler.Handler;
 import handler.HandlerManager;
 import org.slf4j.Logger;
@@ -54,7 +56,8 @@ public class Dispatcher {
             // HttpResponse를 client에게 응답
             httpResponse.sendHttpResponse(dos);
         }
-        catch (IOException | IllegalArgumentException | InvalidHttpRequestException e){
+        catch (IOException | IllegalArgumentException | InvalidHttpRequestException
+               | ResourceNotFoundException | DynamicFileBuildException e){
             logger.error(e.getMessage());
 
             // 에러 응답을 저장할 HttpResponse 객체 생성

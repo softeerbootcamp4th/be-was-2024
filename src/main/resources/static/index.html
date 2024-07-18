@@ -12,12 +12,31 @@
       <header class="header">
         <a href="/"><img src="./img/signiture.svg" /></a>
         <ul class="header__menu">
-          <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
-          </li>
+          <my-tag if-not="login">
+            <li class="header__menu__item">
+              <a class="btn btn_contained btn_size_s" href="/login/index.html">로그인</a>
+            </li>
+          </my-tag>
+          <my-tag if="login">
+            <li class="header__menu__item">
+              <span>{User[0].name}</span>
+            </li>
+          </my-tag>
           <li class="header__menu__item">
             <a class="btn btn_ghost btn_size_s" href="/register/index.html">
               회원 가입
+            </a>
+          </li>
+          <my-tag if="login">
+            <li class="header__menu__item">
+              <form id="logout-form" action="/logout" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn_ghost btn_size_s">로그아웃</button>
+              </form>
+            </li>
+          </my-tag>
+          <li class="header__menu__item">
+            <a class="btn btn_ghost btn_size_s" href="/user/list">
+              사용자 목록
             </a>
           </li>
         </ul>
