@@ -32,7 +32,7 @@ public class ArticleH2Database {
         Collection<Article> articles = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String query = "SELECT article_id, image_path, content FROM articles";
+            String query = "SELECT article_id, image_path, content FROM articles ORDER BY article_id DESC";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
