@@ -2,25 +2,26 @@ package handler;
 
 import db.ArticleDatabase;
 import db.SessionDatabase;
-import http.HttpResponse;
+import db.UserDatabase;
+import http.*;
+import model.User;
 import processer.UserProcessor;
 import util.exception.CustomException;
-import http.HttpRequest;
-import http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import static util.Constants.*;
 import static util.TemplateEngine.showAlert;
-import static util.Utils.cookieParsing;
+import static util.Utils.*;
 
 public class PostHandler {
-    private static final ArticleDatabase articleDatabase = new ArticleDatabase();
-
+    private static ArticleDatabase articleDatabase = new ArticleDatabase();
+    private static UserDatabase userDatabase = new UserDatabase();
 
     static HttpResponse createUser(HttpRequest httpRequest) {
-        String body = new String(httpRequest.getBody());
-
+        String body = new String(httpRequest.getBody().get(0).getBody());
         String[] bodyTokens = body.split(REG_AMP);
 
         HttpStatus httpStatus;
@@ -34,12 +35,10 @@ public class PostHandler {
             UserProcessor.createUser(userId, name, password, email);
 
             httpStatus = HttpStatus.FOUND;
-        } catch (CustomException e) {
-            httpStatus = e.getHttpStatus();
-            responseBody = showAlert(e.getMessage(), PATH_HOST + PATH_REGISTRATION);
         } catch (ArrayIndexOutOfBoundsException e) {
-            httpStatus = HttpStatus.BAD_REQUEST;
-            responseBody = showAlert("모든 필드를 입력하세요.", PATH_HOST + PATH_REGISTRATION);
+            return showAlert("모든 필드를 입력하세요.", PATH_HOST + PATH_REGISTRATION);
+        } catch (CustomException e) {
+            return showAlert(e.getMessage(), PATH_HOST + PATH_REGISTRATION);
         }
 
         return new HttpResponse()
@@ -51,11 +50,9 @@ public class PostHandler {
     }
 
     static HttpResponse loginUser(HttpRequest httpRequest) {
-        String body = new String(httpRequest.getBody());
+        String body = new String(httpRequest.getBody().get(0).getBody());
 
         String[] bodyTokens = body.split(REG_AMP);
-
-
         HttpResponse response = new HttpResponse();
         byte[] responseBody = new byte[0];
 
@@ -70,13 +67,9 @@ public class PostHandler {
                     .addHeader(LOCATION, PATH_ROOT)
                     .addHeader(SET_COOKIE, "sid=" + sid + "; Path=/");
         } catch (CustomException e) {
-            responseBody = showAlert(e.getMessage(), PATH_HOST + PATH_LOGIN);
-            response.addStatus(e.getHttpStatus())
-                    .addBody(responseBody);
+            return showAlert(e.getMessage(), PATH_HOST + PATH_LOGIN);
         } catch (ArrayIndexOutOfBoundsException e) {
-            responseBody = showAlert("모든 필드를 입력하세요.", PATH_HOST + PATH_LOGIN);
-            response.addStatus(HttpStatus.BAD_REQUEST)
-                    .addBody(responseBody);
+            return showAlert("모든 필드를 입력하세요.", PATH_HOST + PATH_LOGIN);
         }
 
         response.addHeader(CONTENT_LENGTH, String.valueOf(responseBody.length))
@@ -85,17 +78,34 @@ public class PostHandler {
         return response;
     }
 
-    static HttpResponse postArticle(HttpRequest httpRequest) {
+    static HttpResponse postArticle(HttpRequest httpRequest) throws CustomException {
         String cookie = httpRequest.getHeaders(COOKIE);
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
-
+        if (sid == null) throw new CustomException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
         String userId = SessionDatabase.getUser(sid);
+        Optional<User> user = userDatabase.findUserById(userId);
 
-        String body = new String(httpRequest.getBody());
-        String text = body.split("=")[1].trim();
+        ArrayList<RequestBody> parts = httpRequest.getBody();
 
-        articleDatabase.createArticle(userId, text, "");
+        byte[] image = new byte[0];
+        String text = null;
+        for (RequestBody part : parts) {
+            RequestMultipartBody multipartBody = (RequestMultipartBody) part;
+            HashMap<String, String> headers = multipartBody.getHeaders();
+            byte[] body = multipartBody.getBody();
+
+            String contentType = headers.get(CONTENT_TYPE);
+            System.out.println("contentType = " + contentType);
+            if (contentType == null) {
+                text = new String(body);
+            } else image = body;
+        }
+
+        if (image.length == 0) throw new CustomException(HttpStatus.BAD_REQUEST, "이미지를 등록해주세요.");
+        if (text.equals("\r\n")) throw new CustomException(HttpStatus.BAD_REQUEST, "본문을 작성해주세요.");
+
+        articleDatabase.createArticle(user.get().getName(), text, image);
 
         return new HttpResponse()
                 .addStatus(HttpStatus.FOUND)
