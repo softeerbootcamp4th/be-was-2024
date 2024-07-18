@@ -2,9 +2,12 @@ package web;
 
 import common.FileUtils;
 import common.ResponseUtils;
+import db.ArticleH2Database;
 import facade.SessionFacade;
+import model.Article;
 
 import java.io.*;
+import java.util.Collection;
 
 public class DynamicHtmlGenerator {
 
@@ -12,7 +15,7 @@ public class DynamicHtmlGenerator {
 
         String htmlTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+ViewPath.DEFAULT.getFilePath());
 
-        String loginHtml;
+        String loginHtml, imgHtml;
         String userId = SessionFacade.getUserIdFromSession(request);
         if (SessionFacade.isAuthenticatedRequest(request)) {
             loginHtml = "<li class=\"header__menu__item\"><form id=\"logout\" action=\"/logout\" method=\"POST\"><button type=\"submit\">로그아웃</button></form></li>" +
@@ -22,7 +25,19 @@ public class DynamicHtmlGenerator {
                     "<li class=\"header__menu__item\"><a class=\"btn btn_ghost btn_size_s\" href=\"/registration\">회원 가입</a></li>";
         }
 
+        String imagePath = "";
+        Collection<Article> articleList = ArticleH2Database.getArticleList();
+        System.out.println("articleListSize = " + articleList.size());
+        for (Article article : articleList) {
+            System.out.println(article.getArticleId());
+            imagePath = "./eckrin/"+article.getImagePath();
+            System.out.println("imagePath = " + imagePath);
+        }
+        imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
+        System.out.println("imgHtml = " + imgHtml);
+
         String finalHtml = htmlTemplate.replace("<!-- LOGIN_PLACEHOLDER -->", loginHtml);
+        finalHtml = finalHtml.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);
         byte[] body = finalHtml.getBytes();
         HttpResponse response = ResponseUtils.responseSuccessWithFile(contentType, body);
         response.writeInBytes(dos);
