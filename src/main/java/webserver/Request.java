@@ -2,6 +2,7 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.RequestLineUtil;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -121,17 +122,7 @@ public class Request {
     }
 
     private String getStaticPath() {
-        File testFile = new File("src/main/resources/static" + path);
-
-        if (testFile.exists()) {
-            if (testFile.isDirectory()) {
-                return path + "/index.html";
-            } else {
-                return path;
-            }
-        } else {
-            return path;
-        }
+        return RequestLineUtil.getStaticPath(path);
     }
 
     public String getHttpMethod() {
