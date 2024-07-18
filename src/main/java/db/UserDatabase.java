@@ -9,25 +9,25 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-import static util.Constants.JDBC_URL_USER;
+import static util.Constants.JDBC_URL;
 
 public class UserDatabase {
     private static final Logger logger = LoggerFactory.getLogger(UserDatabase.class);
-    private DatabaseConnectionPool connectionPool;
+    private static DatabaseConnectionPool connectionPool;
 
     public UserDatabase() {
-        connectionPool = new DatabaseConnectionPool(JDBC_URL_USER);
+        connectionPool = new DatabaseConnectionPool(JDBC_URL);
     }
 
-    public Connection connect() throws SQLException {
+    public static Connection connect() throws SQLException {
         return connectionPool.getConnection();
     }
 
     public void createUserTable() {
-        String sql = "CREATE TABLE IF NOT EXISTS USERS (" +
+        String sql = "CREATE TABLE IF NOT EXISTS USERS(" +
                 "USER_ID VARCHAR(255) PRIMARY KEY," +
-                "PASSWORD VARCHAR(255)," +
                 "NAME VARCHAR(255)," +
+                "PASSWORD VARCHAR(255)," +
                 "EMAIL VARCHAR(255));";
 
         try (Connection conn = connect(); Statement statement = conn.createStatement()) {
@@ -39,11 +39,11 @@ public class UserDatabase {
     }
 
     public void addUser(User user) {
-        String sql = "INSERT INTO USERS (USER_ID, PASSWORD, NAME, EMAIL) VALUES (?, ?,?,?)";
+        String sql = "INSERT INTO USERS (USER_ID, NAME, PASSWORD, EMAIL) VALUES (?, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
             preparedStatement.setString(1, user.getUserId());
-            preparedStatement.setString(2, user.getPassword());
-            preparedStatement.setString(3, user.getName());
+            preparedStatement.setString(2, user.getName());
+            preparedStatement.setString(3, user.getPassword());
             preparedStatement.setString(4, user.getEmail());
             preparedStatement.execute();
             logger.info("User Inserted.");
@@ -83,7 +83,7 @@ public class UserDatabase {
                 String name = rs.getString("NAME");
                 String email = rs.getString("EMAIL");
 
-                users.add(new User(userId, password, name, email));
+                users.add(new User(userId, name, password, email));
             }
         } catch (SQLException e) {
             logger.error(e.getMessage());
