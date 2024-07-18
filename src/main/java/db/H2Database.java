@@ -143,7 +143,7 @@ public class H2Database {
     return users;
   }
 
-  public void addPost(Post post) throws SQLException {
+  public void addPost(Post post) {
     Connection connection = null;
     PreparedStatement statement = null;
     try {
@@ -156,12 +156,15 @@ public class H2Database {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     } finally {
-
-      if(connection != null) {
-        connection.close();
-      }
-      if(statement != null) {
-        statement.close();
+      try {
+        if(connection != null) {
+          connection.close();
+        }
+        if(statement != null) {
+          statement.close();
+        }
+      } catch (SQLException e) {
+        throw new RuntimeException("db 오류", e);
       }
     }
   }
