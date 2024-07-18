@@ -79,7 +79,6 @@ public class WebAdapter {
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
             // 게시글 데이터 및 DB 저장
-            System.out.println("new String(request.getBody() = [[" + new String(request.getBody())+"]]");
             ArticleFacade.saveArticleData(request);
 
             // 화면 리다이렉트

@@ -27,14 +27,10 @@ public class DynamicHtmlGenerator {
 
         String imagePath = "";
         Collection<Article> articleList = ArticleH2Database.getArticleList();
-        System.out.println("articleListSize = " + articleList.size());
         for (Article article : articleList) {
-            System.out.println(article.getArticleId());
             imagePath = "./eckrin/"+article.getImagePath();
-            System.out.println("imagePath = " + imagePath);
         }
         imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
-        System.out.println("imgHtml = " + imgHtml);
 
         String finalHtml = htmlTemplate.replace("<!-- LOGIN_PLACEHOLDER -->", loginHtml);
         finalHtml = finalHtml.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);

@@ -19,9 +19,7 @@ public class ArticleFacade {
         // content(string), image(byte[])를 파싱
         String boundaryKey = "--"+ RequestUtils.getBoundaryKey(request.getContentType());
         byte[] delimiter = boundaryKey.getBytes();
-        System.out.println("delimiter = " + new String(delimiter));
         byte[] body = request.getBody();
-//        System.out.println("body = " + new String(body));
 
         List<byte[]> parts = StringUtils.splitBytes(body, delimiter);
         byte[] image = parts.get(1);
@@ -30,7 +28,6 @@ public class ArticleFacade {
 
         byte[] pureImage = imageParts.get(1);
         String imgExtension = FileUtils.getImageExtensionFromPath(new String(imageParts.get(0)));
-        System.out.println("imgExtension = " + imgExtension);
 
         pureImage = Arrays.copyOf(pureImage, pureImage.length-2);
 
