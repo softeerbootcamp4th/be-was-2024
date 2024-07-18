@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 
 public class HtmlBuilder {
-    public String generateHtml(boolean isLoggedIn, String username) throws IOException {
+    public String generateIndexHtml(boolean isLoggedIn, String username) throws IOException {
         String templateFilePath = "/index.html"; // 템플릿 파일 경로
         ResourceUtil resourceUtil = new ResourceUtil();
         String template = new String(resourceUtil.getByteArray(templateFilePath));

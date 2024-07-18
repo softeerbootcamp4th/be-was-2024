@@ -172,7 +172,7 @@ class HtmlBuilderTest {
 
         // when
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        String builtHtml = htmlBuilder.generateHtml(false, "");
+        String builtHtml = htmlBuilder.generateIndexHtml(false, "");
 
         // then
         assertThat(givenHtml).isEqualTo(builtHtml);
@@ -372,7 +372,7 @@ class HtmlBuilderTest {
         String userId = user.getUserId();
 
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        String body = htmlBuilder.generateHtml(true, userId);
+        String body = htmlBuilder.generateIndexHtml(true, userId);
 
 
         // then

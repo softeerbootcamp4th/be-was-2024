@@ -35,12 +35,12 @@ public class CookieBodyBuilder extends BodyBuilder {
             User user = SessionHandler.getUser(sessionId);
             String username = user.getName();
 
-            String body = htmlBuilder.generateHtml(true, username);
+            String body = htmlBuilder.generateIndexHtml(true, username);
 
             return body.getBytes();
         } else {
             // 그냥 html
-            String body = htmlBuilder.generateHtml(false, "");
+            String body = htmlBuilder.generateIndexHtml(false, "");
             return body.getBytes();
         }
     }

@@ -25,7 +25,7 @@ public class NoneCookieBodyBuilder extends BodyBuilder {
 
     private byte[] getIndexHtmlBody() throws IOException {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
-        String body = htmlBuilder.generateHtml(false, "");
+        String body = htmlBuilder.generateIndexHtml(false, "");
         return body.getBytes();
     }
 
