@@ -175,4 +175,17 @@ public class Logics {
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
+    public static HttpResponse readArticle(HttpRequest httpRequest) throws IOException {
+        String contentType = "text/html";
+        byte[] body;
+        try {
+            body = FileMapper.getArticlePageByteConvertedFile(httpRequest.getQueryParams());
+        } catch (IOException e) {
+            return HttpResponse.clientError();
+        }
+        Map<String, String> headers = new HashMap<>();
+        headers.put(StringConstants.HEADER_CONTENT_TYPE, contentType + SEMICOLON + HEADER_CHARSET_UTF_8);
+        headers.put(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
+        return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, body);
+    }
 }

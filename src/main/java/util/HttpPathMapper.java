@@ -34,6 +34,9 @@ public class HttpPathMapper {
                 if (httpRequest.getHttpMethod() == HttpMethod.POST) {
                     yield createArticle(httpRequest,userId);
                 }
+                else if (httpRequest.getHttpMethod() == HttpMethod.GET) {
+                    yield readArticle(httpRequest);
+                }
                 else{
                     throw new IllegalStateException("메서드가잘못되었습니다");
                 }

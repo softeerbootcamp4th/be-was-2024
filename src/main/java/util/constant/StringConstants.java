@@ -96,20 +96,17 @@ public class StringConstants {
         StringBuilder htmlString = new StringBuilder();
 
         htmlString.append("""
-                <h2>작성 글 목록 :</h2>
                 <ul>
                 """);
 
         for (Article article : articles) {
             htmlString.append("<li class=\"header__menu__item\">")
-                    .append("<a href=\"/article/")
+                    .append("<a href=\"/article?id=")
                     .append(article.getArticleId())
                     .append("\">")
-                    .append("글 제목: ")
                     .append(article.getTitle())
                     .append("</a>")
-                    .append("</li>")
-                    .append("<hr/>"); // 수평선 추가
+                    .append("</li>");
         }
 
         htmlString.append("""
@@ -117,5 +114,17 @@ public class StringConstants {
                 """);
 
         return htmlString.toString();
+    }
+    public static final String makeArticlePage(String title, String content) {
+        StringBuilder articleString = new StringBuilder();
+        articleString.append("<h3>글 제목: ")
+                .append(title)
+                .append("</h3>")
+                .append("<hr/>")
+                .append("<h5>글 내용: </h5>")
+                .append("<p>")
+                .append(content)
+                .append("</p>");
+        return articleString.toString();
     }
 }

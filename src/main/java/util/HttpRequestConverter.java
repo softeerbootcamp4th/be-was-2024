@@ -32,7 +32,7 @@ public class HttpRequestConverter {
             path = path.substring(0, path.indexOf(QUESTION_MARK)); //string 재할당이 무슨 문제가 있는가
             for (String queryPair : queryPairs) {
                 String queryKey = queryPair.substring(0, queryPair.indexOf(EQUAL));
-                String queryValue = queryPair.substring(queryPair.indexOf(EQUAL), queryPair.length());
+                String queryValue = queryPair.substring(queryPair.indexOf(EQUAL)+1, queryPair.length());
                 queryParams.put(queryKey, queryValue);
 
             }
