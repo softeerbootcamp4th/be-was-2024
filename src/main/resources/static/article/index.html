@@ -1,47 +1,106 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="../reset.css" rel="stylesheet" />
-    <link href="../global.css" rel="stylesheet" />
-  </head>
-  <body>
-    <div class="container">
-      <header class="header">
-        <a href="/main"><img src="../img/signiture.svg" /></a>
-        <ul class="header__menu">
-          <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
-          </li>
-          <li class="header__menu__item">
-            <button id="logout-btn" class="btn btn_ghost btn_size_s">
-              로그아웃
-            </button>
-          </li>
-        </ul>
-      </header>
-      <div class="page">
-        <h2 class="page-title">게시글 작성</h2>
-        <form class="form">
-          <div class="textfield textfield_size_m">
-            <p class="title_textfield">내용</p>
-            <textarea
-              class="input_textfield"
-              placeholder="글의 내용을 입력하세요"
-              autocomplete="username"
-            ></textarea>
-          </div>
-          <button
-            id="registration-btn"
-            class="btn btn_contained btn_size_m"
-            style="margin-top: 24px"
-            type="button"
-          >
-            작성 완료
-          </button>
-        </form>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="../reset.css" rel="stylesheet" />
+  <link href="../global.css" rel="stylesheet" />
+  <style>
+    .upload-btn-wrapper {
+      position: relative;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .upload-btn {
+      border: 2px solid #ddd;
+      color: white;
+      background-color: #4CAF50;
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .upload-btn:hover {
+      background-color: #45a049;
+    }
+
+    .upload-input {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .file-name {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .btn-container {
+      margin-top: 24px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header class="header">
+    <a href="/main"><img src="../img/signiture.svg" /></a>
+    <ul class="header__menu">
+      <li class="header__menu__item">
+        <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
+      </li>
+      <li class="header__menu__item">
+        <button id="logout-btn" class="btn btn_ghost btn_size_s">로그아웃</button>
+      </li>
+    </ul>
+  </header>
+  <div class="page">
+    <h2 class="page-title">게시글 작성</h2>
+    <form class="form" method="post" action="/article/create" enctype="multipart/form-data">
+      <div class="textfield textfield_size_m">
+        <p class="title_textfield">내용</p>
+        <textarea
+                class="input_textfield"
+                placeholder="글의 내용을 입력하세요"
+                autocomplete="username"
+                name="content"
+        ></textarea>
       </div>
-    </div>
-  </body>
+      <div class="btn-container">
+        <div class="upload-btn-wrapper">
+          <button class="upload-btn" type="button">이미지 업로드</button>
+          <input type="file" name="image" class="upload-input" accept="image/*" />
+        </div>
+        <button
+                id="registration-btn"
+                class="btn btn_contained btn_size_m"
+                type="submit"
+        >
+          작성 완료
+        </button>
+      </div>
+      <p id="file-name" class="file-name"></p>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.querySelector('.upload-input').addEventListener('change', function() {
+    var fileName = document.getElementById('file-name');
+    var files = this.files;
+    if (files.length > 0) {
+      fileName.textContent = '업로드된 파일: ' + files[0].name;
+    } else {
+      fileName.textContent = '';
+    }
+  });
+</script>
+</body>
 </html>
