@@ -8,10 +8,10 @@ public class RequestLineUtil {
         return getStaticPath(url);
     }
 
-    public boolean isQueryString(String line) {
+    public static boolean isQueryString(String url) {
         // 일단은 "?"를 포함하는지만 검사.
         // 이후 예외처리 고민해볼 필요 있음
-        return line.contains("?");
+        return url.contains("?");
     }
 
     public static String getStaticPath(String path) {
@@ -28,7 +28,27 @@ public class RequestLineUtil {
         }
     }
 
-    public String getHttpMethod(String line) {
-        return line.split(" ")[0];
+    public static String getHttpMethod(String requestLine) {
+        return requestLine.split(" ")[0];
+    }
+
+    public static String getUrl(String requestLine) {
+        return requestLine.split(" ")[1];
+    }
+
+    public static String getPath(String url) {
+        if (url.contains("?")) {
+            return url.split("\\?")[0];
+        } else {
+            return url;
+        }
+    }
+
+    public static String getQueryString(String url) {
+        if (url.contains("?")) {
+            return url.split("\\?")[1];
+        } else {
+            return "";
+        }
     }
 }
