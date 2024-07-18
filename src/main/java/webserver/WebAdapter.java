@@ -44,7 +44,7 @@ public class WebAdapter {
      */
     private static void resolvePostRequest(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
-        if(request.getPath().equals(RestUri.SIGN_UP.getUri())) {
+        if(request.getPath().equals(RestUri.REGISTRATION.getUri())) {
             // body의 유저 정보 파싱
             Map<String, String> map = StringUtils.parseBodyInForm(request.getBody());
             // 유저 생성
@@ -53,7 +53,7 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
 
-        } else if(request.getPath().equals(RestUri.SIGN_IN.getUri())) {
+        } else if(request.getPath().equals(RestUri.LOGIN.getUri())) {
             Map<String, String> map = StringUtils.parseBodyInForm(request.getBody()); // userId, password
             HttpResponse response;
 
@@ -94,7 +94,7 @@ public class WebAdapter {
      */
     private static void resolveGetRequest(HttpRequest request, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
-        if(request.getPathWithoutQueryParam().equals(RestUri.SIGN_UP.getUri())) {
+        if(request.getPathWithoutQueryParam().equals(RestUri.REGISTRATION.getUri())) {
             HttpResponse response = ResponseUtils.responseBadRequest();
             response.writeInBytes(out);
             return;
@@ -132,6 +132,14 @@ public class WebAdapter {
             }
             response.writeInBytes(out);
             return;
+        } else if(request.getPath().equals(RestUri.LOGIN.getUri())) {
+            HttpResponse response;
+            // 인증된 상태에서 로그인하려 할 경우 홈화면으로 리다이렉트
+            if(SessionFacade.isAuthenticatedRequest(request)) {
+                response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
+                response.writeInBytes(out);
+                return;
+            }
         }
 
         // 별도 GET 처리 로직이 없는경우 뷰를 찾아 반환

@@ -1,8 +1,8 @@
 package web;
 
 public enum RestUri {
-    SIGN_UP("/signUp"),
-    SIGN_IN("/signIn"),
+    REGISTRATION("/registration"),
+    LOGIN("/login"),
     LOGOUT("/logout"),
     USER_LIST("/user/list"),
     DATABASE_INIT("/database/init"),
