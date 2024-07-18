@@ -38,7 +38,7 @@ public class SessionHandler {
         }
 
         String sessionId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6);
-        Session session = new Session(sessionId, user.getUserId(), LocalDateTime.now(ZoneId.of("GMT")));
+        Session session = new Session(sessionId, user.getUserId(), LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)));
         SessionDatabase.addSession(session);
         return Optional.of(session);
     }
@@ -49,28 +49,6 @@ public class SessionHandler {
      */
     public void logout(String sessionId) {
         SessionDatabase.removeSession(sessionId);
-    }
-
-    /**
-     * Cookie에서 Session ID 파싱
-     * @param cookie
-     * @return String
-     */
-    public Optional<String> parseSessionId(String cookie) {
-        if (cookie == null || cookie.isBlank()) {
-            return Optional.empty();
-        }
-
-        String[] cookies = cookie.split(ConstantUtil.SEMICOLON_WITH_SPACES); // ;로 시작되는 1개 이상의 공백문자 기준으로 split
-        for (String c : cookies) {
-            if (c.contains(ConstantUtil.SESSION_ID)) {
-                int idx = c.indexOf(ConstantUtil.EQUAL);
-                if(idx != -1){
-                    return Optional.of(c.substring(idx + 1));
-                }
-            }
-        }
-        return Optional.empty();
     }
 
     /**

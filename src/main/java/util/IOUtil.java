@@ -73,12 +73,12 @@ public class IOUtil {
      */
     public static String saveFile(byte[] fileData, String fileName) {
         // uploads라는 디렉토리 생성
-        File dir = new File("uploads");
+        File dir = new File(ConstantUtil.FILE_DIR);
         if (!dir.exists()) {
             dir.mkdirs();
         }
 
-        String filePath = "uploads/" + fileName;
+        String filePath = ConstantUtil.FILE_DIR + fileName;
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             fos.write(fileData);
         } catch (IOException e) {

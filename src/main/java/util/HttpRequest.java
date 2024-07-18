@@ -142,14 +142,10 @@ public class HttpRequest {
         if(elementsCount == 1) {
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
-        // 특정 헤더가 아닌데 3개 이상의 콜론을 갖는 경우
-        if(elementsCount > 3 && !headerLine.startsWith("Referer") && !headerLine.startsWith("Origin")){
-            throw new RequestException(ConstantUtil.INVALID_HEADER);
-        }
 
         int idx = headerLine.indexOf(ConstantUtil.COLON);
         // "Host localhost:8080" 같은 경우
-        if(headerLine.substring(0, idx).contains("localhost") && elementsCount == 2){
+        if(headerLine.substring(0, idx).contains(ConstantUtil.LOCALHOST) && elementsCount == 2){
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
