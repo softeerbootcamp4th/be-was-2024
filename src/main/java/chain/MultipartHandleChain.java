@@ -79,9 +79,9 @@ public class MultipartHandleChain extends MiddlewareChain {
                 // 바디 파싱
                 StringBuilder partBodyStr = new StringBuilder();
                 char[] bodyBuffer = new char[1024];
-
-                while((br.read(bodyBuffer)) != -1) {
-                    partBodyStr.append(bodyBuffer);
+                int read;
+                while((read = br.read(bodyBuffer)) != -1) {
+                    partBodyStr.append(bodyBuffer, 0, read);
                 }
 
                 byte[] partBody = partBodyStr.toString().getBytes(StandardCharsets.ISO_8859_1);
