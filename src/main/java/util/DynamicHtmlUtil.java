@@ -3,6 +3,10 @@ package util;
 import model.Article;
 import model.User;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
 
 public class DynamicHtmlUtil {
@@ -40,14 +44,23 @@ public class DynamicHtmlUtil {
      * @param articles
      * @return String
      */
-    public static String generateArticlesHtml(List<Article> articles){
+    public static String generateArticlesHtml(List<Article> articles) throws IOException {
         StringBuilder sb = new StringBuilder();
+
         for(Article article : articles){
             sb.append("<tr>")
                     .append("<th scope=\"row\">").append(articles.indexOf(article) + 1).append("</th>")
                     .append("<td>").append(article.getTitle()).append("</td>")
-                    .append("<td>").append(article.getContent()).append("</td>")
-                    .append("</tr>");
+                    .append("<td>").append(article.getContent()).append("</td>");
+
+            File file = new File(article.getImagePath());
+            if(file.exists()){
+                byte[] imageBytes = Files.readAllBytes(file.toPath());
+                String imageBase64 = Base64.getEncoder().encodeToString(imageBytes);
+                sb.append("<td>").append("<img src=\"data:image/png;base64,").append(imageBase64)
+                        .append("\" alt=\"Article Image\" style=\"width:100px; height:auto;\">").append("</td>");
+            }
+            sb.append("</tr>");
         }
         return sb.toString();
     }
