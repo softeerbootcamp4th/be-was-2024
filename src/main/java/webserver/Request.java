@@ -72,15 +72,11 @@ public class Request {
     }
 
     private void parseRequestLine(String requestLine) {
-        this.method = requestLine.split(" ")[0];
-        String url = requestLine.split(" ")[1];
-        if (url.contains("?")) {
-            this.path = url.split("\\?")[0];
-            this.queryString = url.split("\\?")[1];
-        } else {
-            this.path = url;
-            this.queryString = "";
-        }
+        this.method = RequestLineUtil.getHttpMethod(requestLine);
+        String url = RequestLineUtil.getUrl(requestLine);
+
+        this.path = RequestLineUtil.getPath(url);
+        this.queryString = RequestLineUtil.getQueryString(url);
     }
 
     private void printAllRequestHeader(String[] splittedHeader) {
