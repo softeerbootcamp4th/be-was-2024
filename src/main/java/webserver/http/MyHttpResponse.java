@@ -68,7 +68,7 @@ public class MyHttpResponse {
 
         if (extensionIndex != -1) {
             String extension = contentType.substring(extensionIndex + 1);
-            headers.put("Content-Type", ContentType.valueOf(extension).getContentType());
+            headers.put("Content-Type", ContentType.valueOf(extension.toUpperCase()).getContentType());
         }
     }
 

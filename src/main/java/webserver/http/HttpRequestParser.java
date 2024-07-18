@@ -18,7 +18,10 @@ public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
     private static final HttpRequestParser instance = new HttpRequestParser();
 
-    public static final String CONTENT_LENGTH = "Content-Length";
+    public static final String CONTENT_LENGTH_HEADER = "content-length";
+    public static final String COOKIE_HEADER = "cookie";
+    public static final String SESSION_ID = "sId";
+    public static final String HTTP_VERSION = "HTTP/1.1";
 
     private HttpRequestParser() {
     }
@@ -41,10 +44,10 @@ public class HttpRequestParser {
                 }
             }
 
-            // request line을 UTF-8 문자열로 변환하여 처리
-            String requestLine = requestLineBuffer.toString("UTF-8").trim();
+            // request line UTF-8 문자열로 변환하여 처리
+            String requestLine = requestLineBuffer.toString().trim();
             String[] requestLineParts = parseRequestFirstLine(requestLine);
-            HttpMethod method = HttpMethod.of(requestLineParts[0]);
+            HttpMethod method = HttpMethod.of(requestLineParts[0].toUpperCase());
 
             String[] url = requestLineParts[1].split("\\?");
             String path = url[0];
@@ -53,7 +56,11 @@ public class HttpRequestParser {
                 queries = parseQuery(url[1]);
             }
 
-            String version = requestLineParts[2];
+            String version = requestLineParts[2].toUpperCase();
+            if (!version.equals(HTTP_VERSION)) {
+                throw new IllegalArgumentException("Invalid HTTP version: " + version);
+            }
+
             requestLineBuffer.reset();
 
             // Read the request headers
@@ -63,7 +70,7 @@ public class HttpRequestParser {
                 requestLineBuffer.write(nextByte);
                 // 개행 문자('\r', '\n')가 나타나면 header 처리
                 if (nextByte == '\n') {
-                    String headerLine = requestLineBuffer.toString("UTF-8").trim();
+                    String headerLine = requestLineBuffer.toString().trim();
                     requestLineBuffer.reset();
 
                     if (headerLine.isEmpty()) {
@@ -71,7 +78,7 @@ public class HttpRequestParser {
                     } else {
                         int index = headerLine.indexOf(':');
                         if (index > 0) {
-                            String headerName = headerLine.substring(0, index).trim();
+                            String headerName = headerLine.substring(0, index).trim().toLowerCase();
                             String headerValue = headerLine.substring(index + 1).trim();
                             requestHeaders.put(headerName, headerValue);
                         } else {
@@ -83,8 +90,8 @@ public class HttpRequestParser {
 
             // Read the request body
             byte[] requestBody = null;
-            if (requestHeaders.containsKey("Content-Length")) {
-                int contentLength = Integer.parseInt(requestHeaders.get("Content-Length"));
+            if (requestHeaders.containsKey(CONTENT_LENGTH_HEADER)) {
+                int contentLength = Integer.parseInt(requestHeaders.get(CONTENT_LENGTH_HEADER));
                 requestBody = new byte[contentLength];
                 int bytesRead = 0;
                 while (bytesRead < contentLength) {
@@ -166,7 +173,7 @@ public class HttpRequestParser {
     }
 
     public boolean isLogin(MyHttpRequest httpRequest) {
-        Map<String, String> cookie = parseCookie(httpRequest.getHeaders().get("Cookie"));
-        return cookie.containsKey("sId") && SessionTable.findUserIdBySessionId(UUID.fromString(cookie.get("sId"))) != null;
+        Map<String, String> cookie = parseCookie(httpRequest.getHeaders().get(COOKIE_HEADER));
+        return cookie.containsKey(SESSION_ID) && SessionTable.findUserIdBySessionId(UUID.fromString(cookie.get(SESSION_ID))) != null;
     }
 }

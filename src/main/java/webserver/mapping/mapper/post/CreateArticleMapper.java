@@ -16,15 +16,20 @@ import java.util.UUID;
 
 public class CreateArticleMapper implements webserver.mapping.mapper.HttpMapper {
     private static final Logger logger = LoggerFactory.getLogger(CreateArticleMapper.class);
+
+    public static final String COOKIE_HEADER = "cookie";
+    public static final String SESSION_ID = "sId";
+    public static final String CONTENT = "content";
+
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override
     public synchronized MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
         Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));
 
-        UUID uuid = UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get("Cookie")).get("sId"));
+        UUID uuid = UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get(COOKIE_HEADER)).get(SESSION_ID));
         String userId = SessionTable.findUserIdBySessionId(uuid);
-        String content = body.get("content");
+        String content = body.get(CONTENT);
 
         Article article = new Article(userId, content);
         Database.addArticle(article);

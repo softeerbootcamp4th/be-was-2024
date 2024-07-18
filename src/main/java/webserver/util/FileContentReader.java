@@ -14,10 +14,7 @@ public class FileContentReader {
 
     private final ClassLoader classLoader = getClass().getClassLoader();
 
-    public static final String CONTENT_LENGTH = "Content-Length";
-    public static final String CONTENT_TYPE = "Content-Type";
     public static final String STATIC_RESOURCE = "static";
-
 
     private FileContentReader() {
     }
