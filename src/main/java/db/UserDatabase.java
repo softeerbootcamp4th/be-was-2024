@@ -31,8 +31,6 @@ public class UserDatabase {
         User foundUser = null;
 
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
-            System.out.println("H2 데이터베이스에 성공적으로 연결되었습니다.");
-
             // SELECT 쿼리를 사용하여 사용자 조회
             String sqlSelect = "SELECT * FROM Users WHERE userId = ?";
 
@@ -49,15 +47,11 @@ public class UserDatabase {
                                 .build();
 
                         foundUser = user;
-                        System.out.println("찾은 사용자 정보: " + user);
-                    } else {
-                        System.out.println("해당 userId를 가진 사용자가 없습니다.");
                     }
                 }
             }
 
         } catch (SQLException e) {
-            System.out.println("H2 데이터베이스 연결 실패:");
             e.printStackTrace();
         }
 
@@ -85,7 +79,6 @@ public class UserDatabase {
             }
 
         } catch (SQLException e) {
-            System.out.println("H2 데이터베이스 연결 실패:");
             e.printStackTrace();
         }
 
