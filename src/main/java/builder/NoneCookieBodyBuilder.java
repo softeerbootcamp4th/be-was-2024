@@ -14,7 +14,7 @@ public class NoneCookieBodyBuilder extends BodyBuilder {
 
     @Override
     public byte[] getBody() throws IOException {
-        if (viewData.getUrl().equals("//index.html")) {
+        if (viewData.getUrl().equals("//index.html") || viewData.getUrl().equals("/index.html")) {
             return getIndexHtmlBody();
         } else {
             return getDefaultBody();
