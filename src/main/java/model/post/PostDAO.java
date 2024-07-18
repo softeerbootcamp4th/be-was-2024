@@ -11,6 +11,10 @@ import db.JDBC;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+/**
+ * DB의 POST table에 대한 접근 클래스
+ */
 public class PostDAO {
     private Connection conn = null;
     private PreparedStatement stmt = null;
@@ -24,7 +28,10 @@ public class PostDAO {
     private String NEXT_POST = "SELECT MIN(id) AS next_id FROM post WHERE id > ?";
 
 
-    // 마지막 게시글 번호
+    /**
+     * 마지막으로 작성된 글의 id를 반환한다.
+     * @return 마지막 글의 id
+     */
     public int getLastIndex() {
         int id = 0;
         try {
@@ -45,7 +52,14 @@ public class PostDAO {
         return id;
     }
 
-    // 다음 글 찾기
+    /**
+     * postid에 대한 다음 글
+     * <p>
+     *     해당 post와 가장 가까운 다음 글의 id를 반환한다.
+     * </p>
+     * @param postid 현재 글의 id
+     * @return 다음 글의 id
+     */
     public int getNextPostIndex(int postid){
         int id = 0;
         try {
@@ -68,7 +82,14 @@ public class PostDAO {
         return id;
     }
 
-    // 이전 글 찾기
+    /**
+     * postid에 대한 이전 글
+     * <p>
+     *     해당 post와 가장 가까운 이전 글의 id를 반환한다.
+     * </p>
+     * @param postid 현재 글의 id
+     * @return 이전 글의 id
+     */
     public int getPrevPostIndex(int postid){
         int id = 0;
         try {
@@ -91,7 +112,12 @@ public class PostDAO {
         return id;
     }
 
-    // 글 삽입
+    /**
+     * 작성한 글을 저장한다
+     * @param text 글의 text
+     * @param imgpath 글의 image의 저장 경로
+     * @param userid 작성자의 id
+     */
     public void insertPost(String text, String imgpath, String userid) {
         try {
             conn = JDBC.getConnection();
@@ -110,7 +136,11 @@ public class PostDAO {
         }
     }
 
-    // 글 검색
+    /**
+     * 해당 id에 대한 글을 찾는다
+     * @param postid 찾을 글의 id
+     * @return 찾은 글의 Post class. 만약 글이 없다면 null을 반환한다.
+     */
     public Post getPost(int postid) {
         Post post = null;
         try {

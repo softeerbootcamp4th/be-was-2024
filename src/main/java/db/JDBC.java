@@ -11,10 +11,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+/**
+ * H2 database 연결을 위한 class
+ */
 public class JDBC {
     private static final Logger logger = LoggerFactory.getLogger(JDBC.class);
 
-
+    /**
+     * JDBC에 연결한다
+     * @return 연결된 connection
+     */
     public static Connection getConnection() {
         Connection conn = null;
         try {
@@ -29,6 +35,11 @@ public class JDBC {
         return conn;
     }
 
+    /**
+     * statement와 connection을 종료한다.
+     * @param stmt 종료할 statement
+     * @param conn 종료할 connection
+     */
     public static void close(PreparedStatement stmt, Connection conn) {
         try {
             stmt.close();
@@ -45,6 +56,12 @@ public class JDBC {
         }
     }
 
+    /**
+     * statement와 connection, resultset을 종료한다.
+     * @param stmt 종료할 statement
+     * @param conn 종료할 connection
+     * @param rs 종료할 resultset
+     */
     public static void close(ResultSet rs, PreparedStatement stmt, Connection conn) {
         try {
             rs.close();
