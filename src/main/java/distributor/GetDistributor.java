@@ -36,13 +36,14 @@ public class GetDistributor extends Distributor {
             processLogout();
         } else if (path.equals("/login/index.html")) {
             processLogin(path);
+        } else if (path.equals("/user/list")) {
+            processUserList();
         } else {
             processDefault(path);
         }
     }
 
     private void processDefault(String path) {
-        System.out.println("process default = " + path);
         ResponseProcessor responseProcessor = new ResponseProcessor();
         this.viewData = responseProcessor.defaultResponse(path, request.getSessionId());
     }
@@ -58,15 +59,25 @@ public class GetDistributor extends Distributor {
 
     private void processLogin(String path) {
         String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
 
         // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
         if (SessionHandler.verifySessionId(sessionId)) {
-            ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.loginSuccessWithSessionId(sessionId);
         } else {
             // 세션아이디가 존재하지 않는다면 그대로
-            ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.loginResponse(path, sessionId);
+        }
+    }
+
+    private void processUserList() {
+        String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        if (SessionHandler.verifySessionId(sessionId)) {
+            this.viewData = responseProcessor.userListResponse();
+        } else {
+            this.viewData = responseProcessor.unauthorizedUserListResponse();
         }
     }
 
