@@ -2,10 +2,9 @@ package db;
 
 import model.Post;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostDatabase {
     private static final String dbUrl = "jdbc:h2:~/test";
@@ -26,5 +25,24 @@ public class PostDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<String> findAllTitleByUserId(String userId) {
+        List<String> titles = new ArrayList<>();
+        String sqlSelect = "SELECT title FROM Posts WHERE userId = '" + userId + "'";
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sqlSelect)) {
+
+            while (rs.next()) {
+                titles.add(rs.getString("title"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return titles;
     }
 }
