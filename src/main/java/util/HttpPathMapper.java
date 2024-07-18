@@ -22,7 +22,6 @@ public class HttpPathMapper {
     public HttpResponse map(HttpRequest httpRequest,String userId) throws IOException {
         logger.info("httpRequest.getPath() = " + httpRequest.getPath());
         if (needLoginList.contains(httpRequest.getPath()) && userId==null) { // & userId로 얻은user가 올바른유저가아니면!
-            System.out.println("!@#$%#@!!@#!@#!@#!@#@#!@#!@#!@#!@#!@!@#");
             return HttpResponse.redirectToMain();
         }
         return switch (httpRequest.getPath()) {
@@ -38,7 +37,15 @@ public class HttpPathMapper {
                     throw new IllegalStateException("메서드가잘못되었습니다");
                 }
             }
-            default -> staticResponse(httpRequest, userId);
+            default -> {
+                if(!httpRequest.getPath().contains(".")){
+                    // 404리스폰스!!!
+                    yield HttpResponse.clientError();
+                }
+                else{
+                    yield staticResponse(httpRequest, userId);}
+                }
+            // 정적파일이아닌데 매핑이 안되면 404처리
         };
 
     }

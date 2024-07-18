@@ -132,8 +132,12 @@ public class Logics {
     public static HttpResponse staticResponse(HttpRequest httpRequest, String userId) throws IOException {
 
         String contentType = ExtensionMapper.getContentTypeFromRequestPath(httpRequest.getPath());
-        byte[] body = FileMapper.getByteConvertedFile(httpRequest.getPath(),userId);
-
+        byte[] body;
+        try {
+            body = FileMapper.getByteConvertedFile(httpRequest.getPath(), userId);
+        } catch (IOException e) {
+            return HttpResponse.clientError();
+        }
         Map<String, String> headers = new HashMap<>();
         headers.put(StringConstants.HEADER_CONTENT_TYPE, contentType + SEMICOLON + HEADER_CHARSET_UTF_8);
         headers.put(HEADER_CONTENT_LENGTH, String.valueOf(body.length));

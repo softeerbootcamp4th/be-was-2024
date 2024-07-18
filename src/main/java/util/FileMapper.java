@@ -14,6 +14,7 @@ public class FileMapper {
     public static byte[] getByteConvertedFile(String path,String userId) throws IOException {
         User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + path);
+        System.out.println("file = " + file);
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();
 
@@ -21,7 +22,6 @@ public class FileMapper {
         String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
 
         // 유저가 로그인 된 상태인 경우와 안된 상태 분리
-        System.out.println("userId@@@@@@@@@@@@@@@@ = " + userId);
         if (user!=null) {
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));
         }
