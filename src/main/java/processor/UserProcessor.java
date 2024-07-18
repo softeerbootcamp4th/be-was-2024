@@ -1,6 +1,6 @@
 package processor;
 
-import db.Database;
+import db.UserDatabase;
 import handler.SessionHandler;
 import model.User;
 import webserver.Request;
@@ -11,14 +11,14 @@ public class UserProcessor {
     public void createUser(Request request) {
         HashMap<String, String> userData = request.parseBody();
         User user = User.from(userData);
-        Database.addUser(user);
+        UserDatabase.addUser(user);
     }
 
     public boolean login(Request request) {
         HashMap<String, String> userData = request.parseBody();
         String userId = userData.get("userId");
         String password = userData.get("password");
-        User user = Database.findUserById(userId);
+        User user = UserDatabase.findUserById(userId);
 
         if (user != null) {
             if (password.equals(user.getPassword())) {
