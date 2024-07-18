@@ -1,5 +1,6 @@
 package webserver;
 
+import utils.CookieUtil;
 import utils.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,12 +85,8 @@ public class Response {
             response404Header(dos, this.body.length);
             responseBody(dos, this.body);
         } else {
-            if (cookie != null) {
-                if (cookie.isEmpty()) {
-                    response200Header(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
-                } else {
-                    response200HeaderWithCookie(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
-                }
+            if (CookieUtil.isExist(cookie)) {
+                response200HeaderWithCookie(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
             } else {
                 response200Header(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
             }
