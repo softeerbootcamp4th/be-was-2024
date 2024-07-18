@@ -40,10 +40,6 @@ public class RequestHandler implements Runnable {
                 BodyBuilder bodyBuilder = BodyBuilder.from(viewData);
                 byte[] body = bodyBuilder.getBody();
 
-                if (body == null) {
-                    System.out.println("null");
-                }
-
                 Response response = new Response.Builder()
                         .url(viewData.getUrl())
                         .dataOutputStream(dos)
