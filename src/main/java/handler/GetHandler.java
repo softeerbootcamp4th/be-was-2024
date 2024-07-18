@@ -67,13 +67,15 @@ public class GetHandler {
         } else {
             String userId = getUser(sid);
             Optional<User> user = userDatabase.findUserById(userId);
-            data.put(USER_NAME, user.get().getName());
+            data.put(USER_NAME, URLDecoder.decode(user.get().getName(), "UTF-8"));
             data.put("msg", "님, 환영합니다.");
             data.put("LoginOrArticle", "/article");
             data.put("loginButton", "글쓰기");
             data.put("RegistrationOrLogout", "/logout");
             data.put("registrationButton", "로그아웃");
         }
+
+        data.put("article", getAllArticles());
         return serveDynamicFile(FILE_INDEX, data);
 
     }
@@ -103,7 +105,7 @@ public class GetHandler {
         if (!isLogin(sid)) {
             return new HttpResponse()
                     .addStatus(HttpStatus.FOUND)
-                    .addHeader(LOCATION, PATH_ROOT)
+                    .addHeader(LOCATION, PATH_LOGIN)
                     .addHeader(CONTENT_TYPE, TEXT_HTML)
                     .addBody(new byte[0]);
         } else {
@@ -112,9 +114,9 @@ public class GetHandler {
             StringBuilder userList = new StringBuilder();
             for (User user : users) {
                 userList.append(TABLE_ROW_START);
-                userList.append(TABLE_DATA_START).append(user.getUserId()).append(TABLE_DATA_END);
-                userList.append(TABLE_DATA_START).append(user.getName()).append(TABLE_DATA_END);
-                userList.append(TABLE_DATA_START).append(user.getEmail()).append(TABLE_DATA_END);
+                userList.append(TABLE_DATA_START).append(URLDecoder.decode(user.getUserId(), "UTF-8")).append(TABLE_DATA_END);
+                userList.append(TABLE_DATA_START).append(URLDecoder.decode(user.getName(), "UTF-8")).append(TABLE_DATA_END);
+                userList.append(TABLE_DATA_START).append(URLDecoder.decode(user.getEmail(), "UTF-8")).append(TABLE_DATA_END);
                 userList.append(TABLE_ROW_END);
             }
 
@@ -135,52 +137,31 @@ public class GetHandler {
             return serveStaticFile(PATH_LOGIN + FILE_INDEX);
         } else {
             HashMap<String, String> data = new HashMap<>();
-            data.put("userName", userDatabase.findUserById(userId).get().getName());
+            data.put("userName", URLDecoder.decode(userDatabase.findUserById(userId).get().getName(), "UTF-8"));
             data.put("msg", "님, 환영합니다.");
 
             return serveDynamicFile(PATH_ARTICLE + FILE_INDEX, data);
         }
     }
 
-    public static HttpResponse getAllArticles(HttpRequest httpRequest) throws IOException {
-        String cookie = httpRequest.getHeaders(COOKIE);
-        HashMap<String, String> parsedCookie = cookieParsing(cookie);
-        String sid = parsedCookie.get(SID);
+    public static String getAllArticles() throws IOException {
+        StringBuilder articles = new StringBuilder();
+        List<Article> allArticles = articleDatabase.getAllArticles();
+        for (Article article : allArticles) {
+            HashMap<String, String> data = new HashMap<>();
+            String userName = article.getUserName();
+            String text = article.getText();
+            String pic = Base64.getEncoder().encodeToString(article.getPic());
 
-        HashMap<String, String> data = new HashMap<>();
-        if (!isLogin(sid)) {
-            data.put(USER_NAME, "");
-            data.put("msg", "");
-            data.put("LoginOrArticle", "/login");
-            data.put("loginButton", "로그인");
-            data.put("RegistrationOrLogout", "/registration");
-            data.put("registrationButton", "회원가입");
-        } else {
-            String userId = getUser(sid);
-            Optional<User> user = userDatabase.findUserById(userId);
-            data.put(USER_NAME, user.get().getName());
-            data.put("msg", "님, 환영합니다.");
-            data.put("LoginOrArticle", "/article");
-            data.put("loginButton", "글쓰기");
-            data.put("RegistrationOrLogout", "/logout");
-            data.put("registrationButton", "로그아웃");
+            data.put("userName", URLDecoder.decode(userName, "UTF-8"));
+            data.put("text", text);
+            data.put("base64Image", pic);
+
+            byte[] bytes = TemplateEngine.renderTemplate(getFileContent(STATIC_PATH + "/article.html").body, data);
+
+            articles.append(new String(bytes));
         }
 
-        List<Article> articles = articleDatabase.getAllArticles();
-        StringBuilder articleList = new StringBuilder();
-
-        for (Article article : articles) {
-            String decodedText = URLDecoder.decode(article.getText(), "UTF-8");
-
-            articleList.append(TABLE_ROW_START);
-            articleList.append(TABLE_DATA_START).append(article.getArticleId()).append(TABLE_DATA_END);
-            articleList.append(TABLE_DATA_START).append(userDatabase.findUserById(article.getUserId()).get().getName()).append(TABLE_DATA_END);
-            articleList.append(TABLE_DATA_START).append(decodedText).append(TABLE_DATA_END);
-            articleList.append(TABLE_ROW_END);
-        }
-
-        data.put("articleList", articleList.toString());
-
-        return serveDynamicFile(PATH_ARTICLE + FILE_ARTICLE_LIST, data);
+        return articles.toString();
     }
 }
