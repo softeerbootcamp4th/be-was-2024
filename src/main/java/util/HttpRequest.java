@@ -1,6 +1,7 @@
 package util;
 
 import exception.RequestException;
+import session.Session;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,7 @@ public class HttpRequest {
     private byte[] requestBody;
     private Map<String, String> formData = new HashMap<>();
     private Map<String, byte[]> fileData = new HashMap<>();
+    private Session session;
 
     private HttpRequest(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
         this.requestMethod = requestMethod;
@@ -77,7 +79,7 @@ public class HttpRequest {
     }
 
     public String getHeader(String key) {
-        return requestHeaders.getOrDefault(key.toLowerCase(), "");
+        return requestHeaders.getOrDefault(key, "");
     }
 
     public byte[] getBody(){
@@ -90,6 +92,10 @@ public class HttpRequest {
 
     public Map<String, byte[]> getFileData() {
         return fileData;
+    }
+
+    public Session getSession(){
+        return session;
     }
 
     /**
@@ -114,6 +120,13 @@ public class HttpRequest {
             bodyMap.put(key.trim(), value.trim());
         }
         return bodyMap;
+    }
+
+    /**
+     * 클라이언트의 쿠키로부터 파싱한 세션을 주입하는 메서드 (내부 서비스에서 활용하기 위함)
+     */
+    public void putSession(Session session){
+        this.session = session;
     }
 
     /**
