@@ -82,7 +82,7 @@ public class WebAdapter {
             ArticleFacade.saveArticleData(request);
 
             // 화면 리다이렉트
-            HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+            HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
         } else {
             resolveGetRequest(ViewPath.NOT_FOUND.getRequestUri());
