@@ -1,6 +1,6 @@
 package enums;
 
-public enum Type {
+public enum MimeType {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
     JS("js", "text/javascript"),
@@ -13,7 +13,7 @@ public enum Type {
     private final String type;
     private final String mime;
 
-    Type(String type, String mime) {
+    MimeType(String type, String mime) {
         this.type = type;
         this.mime = mime;
     }
