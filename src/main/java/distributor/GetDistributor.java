@@ -38,6 +38,8 @@ public class GetDistributor extends Distributor {
             processLogin(path);
         } else if (path.equals("/user/list")) {
             processUserList();
+        } else if (path.equals("/write/index.html")) {
+            processWrite();
         } else {
             processDefault(path);
         }
@@ -78,6 +80,17 @@ public class GetDistributor extends Distributor {
             this.viewData = responseProcessor.userListResponse();
         } else {
             this.viewData = responseProcessor.unauthorizedUserListResponse();
+        }
+    }
+
+    private void processWrite() {
+        String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        if (SessionHandler.verifySessionId(sessionId)) {
+            this.viewData = responseProcessor.writeResponse();
+        } else {
+            this.viewData = responseProcessor.unauthorizedWriteResponse();
         }
     }
 
