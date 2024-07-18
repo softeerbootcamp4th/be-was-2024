@@ -26,6 +26,8 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
     testImplementation 'org.hamcrest:hamcrest:2.2'
 
+    // H2 DB
+    implementation 'com.h2database:h2:2.1.214'
 }
 
 test {
