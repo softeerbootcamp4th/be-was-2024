@@ -1,16 +1,11 @@
 package webserver;
 
 import enums.HttpMethod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class Request{
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
-    public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_LENGTH = "Content-Length";
-  public static final String LOCATION = "Location";
+
     private HttpMethod method;
     private String path;
     private String httpVersion;
