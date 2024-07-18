@@ -39,13 +39,12 @@ public class PostDistributor extends Distributor {
     }
 
     private void processUserLogin() {
+        ResponseProcessor responseProcessor = new ResponseProcessor();
         if (userProcessor.login(request)) {
             String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
 
-            ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.loginSuccessResponse(sessionId);
         } else {
-            ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.loginFailedResponse();
         }
     }
