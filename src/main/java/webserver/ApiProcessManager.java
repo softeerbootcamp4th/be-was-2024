@@ -31,6 +31,7 @@ public class ApiProcessManager {
         apiProcessStore.add(new ApiInfo("/user/logout", HttpMethod.POST, new LogoutApiProcess()));
         apiProcessStore.add(new ApiInfo("/user/list", HttpMethod.GET, new UserlistPageApiProcess()));
         apiProcessStore.add(new ApiInfo("/user/write", HttpMethod.GET, new WritePageApiProcess()));
+        apiProcessStore.add(new ApiInfo("/user/write", HttpMethod.POST, new PostApiProcess()));
     }
 
     public ApiProcess get(String path, HttpMethod method) {
