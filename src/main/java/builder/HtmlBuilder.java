@@ -1,20 +1,20 @@
 package builder;
 
-import handler.ResourceHandler;
+import utils.ResourceUtil;
 
 import java.io.IOException;
 
 public class HtmlBuilder {
     public String buildLoginSuccessHtml(String path) throws IOException {
-        ResourceHandler resourceHandler = new ResourceHandler();
-        String template = new String(resourceHandler.getByteArray(path));
+        ResourceUtil resourceUtil = new ResourceUtil();
+        String template = new String(resourceUtil.getByteArray(path));
         return template;
     }
 
     public String generateHtml(boolean isLoggedIn, String username) throws IOException {
         String templateFilePath = "/index.html"; // 템플릿 파일 경로
-        ResourceHandler resourceHandler = new ResourceHandler();
-        String template = new String(resourceHandler.getByteArray(templateFilePath));
+        ResourceUtil resourceUtil = new ResourceUtil();
+        String template = new String(resourceUtil.getByteArray(templateFilePath));
 
         String loginButtonText, loginButtonHref, registrationButtonText, registrationButtonHref, userName;
 

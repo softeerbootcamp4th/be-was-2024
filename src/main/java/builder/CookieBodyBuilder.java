@@ -1,6 +1,6 @@
 package builder;
 
-import handler.ResourceHandler;
+import utils.ResourceUtil;
 import handler.SessionHandler;
 import model.User;
 import model.ViewData;
@@ -44,7 +44,7 @@ public class CookieBodyBuilder extends BodyBuilder {
     }
 
     private byte[] getDefaultBody() throws IOException {
-        ResourceHandler resourceHandler = new ResourceHandler();
-        return resourceHandler.getByteArray(viewData.getUrl());
+        ResourceUtil resourceUtil = new ResourceUtil();
+        return resourceUtil.getByteArray(viewData.getUrl());
     }
 }

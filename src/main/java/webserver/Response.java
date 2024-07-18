@@ -1,6 +1,6 @@
 package webserver;
 
-import handler.ResourceHandler;
+import utils.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public class Response {
 
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
 
-    private static final ResourceHandler resourceHandler = new ResourceHandler();
+    private static final ResourceUtil RESOURCE_UTIL = new ResourceUtil();
 
     public void sendResponse() throws IOException {
         if (redirectCode != 0) {
@@ -86,12 +86,12 @@ public class Response {
         } else {
             if (cookie != null) {
                 if (cookie.isEmpty()) {
-                    response200Header(dos, this.body.length, resourceHandler.getContentType(url));
+                    response200Header(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
                 } else {
-                    response200HeaderWithCookie(dos, this.body.length, resourceHandler.getContentType(url));
+                    response200HeaderWithCookie(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
                 }
             } else {
-                response200Header(dos, this.body.length, resourceHandler.getContentType(url));
+                response200Header(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
             }
             responseBody(dos, this.body);
         }

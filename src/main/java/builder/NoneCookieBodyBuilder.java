@@ -1,6 +1,6 @@
 package builder;
 
-import handler.ResourceHandler;
+import utils.ResourceUtil;
 import model.ViewData;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class NoneCookieBodyBuilder extends BodyBuilder {
     }
 
     private byte[] getDefaultBody() throws IOException {
-        ResourceHandler resourceHandler = new ResourceHandler();
-        return resourceHandler.getByteArray(viewData.getUrl());
+        ResourceUtil resourceUtil = new ResourceUtil();
+        return resourceUtil.getByteArray(viewData.getUrl());
     }
 }
