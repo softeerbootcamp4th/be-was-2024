@@ -34,9 +34,10 @@ public class ArticleHandler implements ModelHandler<Article> {
         if (fields.size() < 3 || fields.size() > 4){
             throw new ModelException(ConstantUtil.INVALID_BODY);
         }
-        if(fields.get(ConstantUtil.TITLE).isBlank() || fields.get(ConstantUtil.CONTENT).isBlank() || fields.get(ConstantUtil.AUTHOR_NAME).isBlank()){
-            throw new ModelException(ConstantUtil.INVALID_BODY);
-        }
+
+        validateValue(fields.get(ConstantUtil.TITLE));
+        validateValue(fields.get(ConstantUtil.CONTENT));
+        validateValue(fields.get(ConstantUtil.AUTHOR_NAME));
 
         Article article = Article.from(fields);
         return Optional.ofNullable(Database.addArticle(article));
@@ -59,5 +60,11 @@ public class ArticleHandler implements ModelHandler<Article> {
     @Override
     public List<Article> findAll() {
         return Database.findAllArticles().stream().toList();
+    }
+
+    private void validateValue(String value) {
+        if (value == null || value.isBlank()) {
+            throw new ModelException(ConstantUtil.INVALID_BODY);
+        }
     }
 }

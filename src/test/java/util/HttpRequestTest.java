@@ -7,8 +7,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class HttpRequestTest {
 
-    @DisplayName("from 메서드로 RequestLine을 파싱 후 HttpRequestObject를 생성하며, Optional White Space에 대해서도 문제 없이 처리한다.")
+    @DisplayName("from: RequestLine을 파싱 후 HttpRequestObject를 생성하며, Optional White Space에 대해서도 문제 없이 처리한다.")
     @ParameterizedTest
     @ValueSource(strings = {"GET /index.html HTTP/1.1", "GET  /index.html HTTP/1.1", "GET     /index.html     HTTP/1.1"})
     void from(String requestLine) {
@@ -29,7 +27,7 @@ class HttpRequestTest {
         assertThat(request.getHttpVersion()).isEqualTo("HTTP/1.1");
     }
 
-    @DisplayName("from 메서드로 RequestParam이 존재하는 RequestLine을 파싱 후 HttpRequestObject를 생성하며, Optional White Space에 대해서도 문제 없이 처리한다.")
+    @DisplayName("from: RequestParam이 존재하는 RequestLine을 파싱 후 HttpRequestObject를 생성하며, Optional White Space에 대해서도 문제 없이 처리한다.")
     @ParameterizedTest
     @ValueSource(strings = {"GET /user/create?userId=userId&password=password&name=name&email=abc@naver.com HTTP/1.1",
             "GET      /user/create?userId=userId&password=password&name=name&email=abc@naver.com   HTTP/1.1"})
@@ -47,7 +45,7 @@ class HttpRequestTest {
         assertThat(request.getParameter(ConstantUtil.EMAIL)).isEqualTo("abc@naver.com");
     }
 
-    @DisplayName("putHeaders 메서드로 HeaderLine을 파싱하여 HttpRequestObject에 추가하며, Optional White Space에 대해서도 문제 없이 처리한다.")
+    @DisplayName("putHeaders: HeaderLine을 파싱하여 HttpRequestObject에 추가하며, Optional White Space에 대해서도 문제 없이 처리한다.")
     @ParameterizedTest
     @ValueSource(strings = {"Host:localhost:8080", "Host: localhost:8080", "Host:    localhost:8080", "Connection:keep-alive", "Accept:*/*"})
     void putHeadersSingle(String headerLine) {
@@ -104,10 +102,7 @@ class HttpRequestTest {
         // given
         HttpRequest request = HttpRequest.from("POST /user/create HTTP/1.1");
         bodyLine = URLDecoder.decode(bodyLine, StandardCharsets.UTF_8);
-        List<Byte> body = new ArrayList<>();
-        for (byte b : bodyLine.getBytes(StandardCharsets.UTF_8)) {
-            body.add(b);
-        }
+        byte[] body = bodyLine.getBytes();
 
         // when
         request.putBody(body);

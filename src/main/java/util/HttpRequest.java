@@ -7,7 +7,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +23,9 @@ public class HttpRequest {
     private Map<String, String> formData = new HashMap<>();
     private Map<String, byte[]> fileData = new HashMap<>();
     private Session session;
+
+    protected HttpRequest() {
+    }
 
     private HttpRequest(String requestMethod, String requestPath, Map<String, String> requestParams, String httpVersion) {
         this.requestMethod = requestMethod;
@@ -138,8 +140,12 @@ public class HttpRequest {
         headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
         int elementsCount = headerLine.split(ConstantUtil.COLON).length;
 
-        // 콜론이 없는 경우
+        // 콜론이 없거나 너무 많은 경우
         if(elementsCount == 1) {
+            throw new RequestException(ConstantUtil.INVALID_HEADER);
+        }
+        // 특정 헤더가 아닌데 3개 이상의 콜론을 갖는 경우
+        if(elementsCount > 3 && !headerLine.startsWith("Referer") && !headerLine.startsWith("Origin")){
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
 
@@ -150,20 +156,6 @@ public class HttpRequest {
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
         requestHeaders.put(header[0].toLowerCase().trim(), header[1].trim());
-    }
-
-    /**
-     * Byte 배열로 입력되는 body를 byte[]로 저장하며, 이 때 UTF-8로 디코딩하여 저장
-     * @param body
-     */
-    public void putBody(List<Byte> body){
-        // List<Byte> to byte[]
-        byte[] byteArray = new byte[body.size()];
-        for (int i = 0; i < body.size(); i++) {
-            byteArray[i] = body.get(i);
-        }
-        // byte[] to String 후 디코딩하여 다시 byte[]로 변환
-        this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes();
     }
 
     public void putBody(byte[] body){
