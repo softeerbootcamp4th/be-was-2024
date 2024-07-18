@@ -15,9 +15,15 @@ public class HttpResponseParser {
     private final FileContentReader fileContentReader;
     private final MappingHandler mappingHandler;
 
+
     public HttpResponseParser(FileContentReader fileContentReader, MappingHandler mappingHandler) {
         this.fileContentReader = fileContentReader;
         this.mappingHandler = mappingHandler;
+    }
+
+    public HttpResponseParser() {
+        this.fileContentReader = FileContentReader.getInstance();
+        this.mappingHandler = MappingHandler.getInstance();
     }
 
 
@@ -43,7 +49,11 @@ public class HttpResponseParser {
                 dos.writeBytes(key + ": " + httpResponse.getHeaders().get(key) + "\r\n");
             }
             dos.writeBytes("\r\n");
-            dos.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
+
+            if (httpResponse.getBody() != null) {
+                dos.write(httpResponse.getBody(), 0, httpResponse.getBody().length);
+            }
+
             dos.writeBytes("\r\n");
             dos.flush();
         } catch (IOException e) {
