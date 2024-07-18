@@ -1,6 +1,7 @@
 package webserver;
 
 import auth.Cookie;
+import constant.RequestHeader;
 import enums.HttpCode;
 import enums.MimeType;
 import org.slf4j.Logger;
@@ -46,10 +47,10 @@ public class Response {
         try {
             dos.writeBytes("HTTP/1.1 " + httpCode.getCode() + " " + httpCode.getMessage() + "\r\n");
             if(httpCode.isRedirect()) {
-                dos.writeBytes(Request.LOCATION + ": " + location + "\r\n");
+                dos.writeBytes(RequestHeader.LOCATION + ": " + location + "\r\n");
             } else {
-                dos.writeBytes(Request.CONTENT_TYPE + ": " + contentType + "\r\n");
-                dos.writeBytes(Request.CONTENT_LENGTH + ": " + contentLength + "\r\n");
+                dos.writeBytes(RequestHeader.CONTENT_TYPE + ": " + contentType + "\r\n");
+                dos.writeBytes(RequestHeader.CONTENT_LENGTH + ": " + contentLength + "\r\n");
             }
             for(Cookie cookie: cookies) {
                 dos.writeBytes(Cookie.SET_COOKIE + ": " +

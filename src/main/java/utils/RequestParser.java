@@ -1,5 +1,6 @@
 package utils;
 
+import constant.RequestHeader;
 import enums.HttpMethod;
 import enums.MimeType;
 import org.slf4j.Logger;
@@ -42,9 +43,11 @@ public class RequestParser {
         // request header parse
         Map<String, String> headers = requestHeaderParse(br);
 
+        logger.debug(headers.get(RequestHeader.CONTENT_LENGTH));
+
         // request body parse
-        String body = requestBodyParse(headers.get(Request.CONTENT_LENGTH), br);
-        String contentType = headers.get(Request.CONTENT_TYPE);
+        String body = requestBodyParse(headers.get(RequestHeader.CONTENT_LENGTH), br);
+        String contentType = headers.get(RequestHeader.CONTENT_TYPE);
         if(contentType != null && contentType.equals(MimeType.FORM.getMimeType())) {
             Map<String, String> bodyQuerys = new HashMap<>();
             if(body != null) {
@@ -55,7 +58,7 @@ public class RequestParser {
 
         // cookie parse
         Map<String, String> cookies;
-        String rawCookie = headers.get("Cookie");
+        String rawCookie = headers.get("cookie");
         if(rawCookie != null) {
             cookies = queryParse(rawCookie, ";", "=");
         } else {
@@ -95,8 +98,13 @@ public class RequestParser {
             if(delimeterLoc < 0) {
                throw new IllegalStateException("유효하지 않은 Http Header 형식");
             }
-            String key = tmp.substring(0, delimeterLoc).trim();
-            String value = tmp.substring(delimeterLoc + 1).trim();
+            String key = tmp.substring(0, delimeterLoc).trim().toLowerCase();
+            String value;
+            if(key.equals(RequestHeader.COOKIE)) {
+                value = tmp.substring(delimeterLoc + 1).trim();
+            } else {
+                value = tmp.substring(delimeterLoc + 1).trim().toLowerCase();
+            }
             headers.put(key, value);
         }
         return headers;
@@ -107,6 +115,7 @@ public class RequestParser {
         if(queryString.isEmpty()) return tmpStore;
         String[] rawKeyValues= queryString.split(pairDelimeter);
         for(String rawKeyValue: rawKeyValues) {
+            logger.debug("rawKeyValue={}", rawKeyValue);
             String[] keyValue = rawKeyValue.split(keyValueDelimeter);
             if(keyValue.length == 2) {
                 String key = URLDecoder.decode(keyValue[0].trim(), StandardCharsets.UTF_8);

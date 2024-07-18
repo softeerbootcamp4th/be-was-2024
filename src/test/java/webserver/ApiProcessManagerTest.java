@@ -1,10 +1,10 @@
 package webserver;
 
-import ApiProcess.ApiProcess;
-import ApiProcess.NotFoundApiProcess;
-import ApiProcess.HomepageApiProcess;
-import ApiProcess.RegisterpageApiProcess;
-import ApiProcess.StaticApiProcess;
+import apiprocess.ApiProcess;
+import apiprocess.NotFoundApiProcess;
+import apiprocess.HomepageApiProcess;
+import apiprocess.RegisterpageApiProcess;
+import apiprocess.StaticApiProcess;
 
 import enums.HttpMethod;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ class ApiProcessManagerTest {
     void notFoundTest() {
 
         // when
-        ApiProcess apiProcess = apiProcessManager.getApiProcess("/notfound", HttpMethod.GET);
+        ApiProcess apiProcess = apiProcessManager.get("/notfound", HttpMethod.GET);
 
         // then
         assertThat(apiProcess).isInstanceOf(NotFoundApiProcess.class);
@@ -33,8 +33,8 @@ class ApiProcessManagerTest {
         // given
 
         // when
-        ApiProcess homePageApiProcess = apiProcessManager.getApiProcess("/", HttpMethod.GET);
-        ApiProcess registerPageApiProcess = apiProcessManager.getApiProcess("/registration", HttpMethod.GET);
+        ApiProcess homePageApiProcess = apiProcessManager.get("/", HttpMethod.GET);
+        ApiProcess registerPageApiProcess = apiProcessManager.get("/registration", HttpMethod.GET);
 
         // then
         assertThat(homePageApiProcess).isInstanceOf(HomepageApiProcess.class);
@@ -47,7 +47,7 @@ class ApiProcessManagerTest {
         // given
 
         // when
-        ApiProcess apiProcess = apiProcessManager.getApiProcess("/main.css", HttpMethod.GET);
+        ApiProcess apiProcess = apiProcessManager.get("/main.css", HttpMethod.GET);
 
         // then
         assertThat(apiProcess).isInstanceOf(StaticApiProcess.class);
