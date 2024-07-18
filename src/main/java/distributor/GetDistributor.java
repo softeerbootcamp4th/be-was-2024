@@ -32,16 +32,12 @@ public class GetDistributor extends Distributor {
 
     private void processNoneQuery() {
         String path = request.getPath();
-        if (path.equals("/logout")) {
-            processLogout();
-        } else if (path.equals("/login/index.html")) {
-            processLogin(path);
-        } else if (path.equals("/user/list")) {
-            processUserList();
-        } else if (path.equals("/write/index.html")) {
-            processWrite();
-        } else {
-            processDefault(path);
+        switch (path) {
+            case "/logout" -> processLogout();
+            case "/login/index.html" -> processLogin(path);
+            case "/user/list" -> processUserList();
+            case "/write/index.html" -> processWrite();
+            default -> processDefault(path);
         }
     }
 
