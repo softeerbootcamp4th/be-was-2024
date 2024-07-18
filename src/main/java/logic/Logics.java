@@ -10,7 +10,10 @@ import dto.enums.HttpMethod;
 import dto.enums.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import util.ExtensionMapper;
+import util.FileMapper;
 import util.HttpRequestConverter;
+import util.constant.StringConstants;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -47,7 +50,7 @@ public class Logics {
         return  HttpResponse.redirectToMain();
         //TODO : body를 리턴하지 않아도 되는가
     }
-    public static HttpResponse login(HttpRequest httpRequest) throws IOException {
+    public static HttpResponse  login(HttpRequest httpRequest) throws IOException {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
         }
@@ -123,4 +126,15 @@ public class Logics {
             return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, bodyArray);
         }
     }
+    public static HttpResponse staticResponse(HttpRequest httpRequest, String userId) throws IOException {
+
+        String contentType = ExtensionMapper.getContentTypeFromRequestPath(httpRequest.getPath());
+        byte[] body = FileMapper.getByteConvertedFile(httpRequest.getPath(),userId);
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put(StringConstants.HEADER_CONTENT_TYPE, contentType + SEMICOLON + HEADER_CHARSET_UTF_8);
+        headers.put(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
+        return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, body);
+    }
+
 }

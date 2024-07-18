@@ -26,13 +26,16 @@ public class HttpResponseConverter {
              userId = SessionDatabase.findSessionById(sessionId).map(Session::getUserId).orElse(null);
         }
 
+        HttpPathMapper httpPathMapper = new HttpPathMapper();
+        return httpPathMapper.map(httpRequest,userId);
 
-        if (isHttpResponseDynamic(httpRequest.getPath())) {
-            return createDynamicHttpResponse(httpRequest, userId);
-        } else {
-            return createStaticHttpResponse(httpRequest, userId);
-
-        }
+//
+//        if (isHttpResponseDynamic(httpRequest.getPath())) {
+//            return createDynamicHttpResponse(httpRequest, userId);
+//        } else {
+//            return createStaticHttpResponse(httpRequest, userId);
+//
+//        }
     }
 
 
