@@ -14,11 +14,10 @@ public class ArticleH2Database {
 
     public static Article createArticle(Article article) {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String query = "INSERT INTO articles (article_id, image, content) VALUES (?, ?, ?)";
+            String query = "INSERT INTO articles (image_path, content) VALUES (?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, article.getArticleId());
-                preparedStatement.setBytes(2, article.getImage());
-                preparedStatement.setString(3, article.getContent());
+                preparedStatement.setString(1, article.getImagePath());
+                preparedStatement.setString(2, article.getContent());
                 preparedStatement.executeUpdate();
             }
 
@@ -33,15 +32,15 @@ public class ArticleH2Database {
         Collection<Article> articles = new ArrayList<>();
 
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
-            String query = "SELECT article_id, image, content FROM articles";
+            String query = "SELECT article_id, image_path, content FROM articles";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     while (resultSet.next()) {
                         String articleId = resultSet.getString("article_id");
-                        byte[] image = resultSet.getBytes("image");
+                        String imagePath = resultSet.getString("image_path");
                         String content = resultSet.getString("content");
 
-                        articles.add(new Article(articleId, image, content));
+                        articles.add(new Article(articleId, imagePath, content));
                     }
                 }
             }
