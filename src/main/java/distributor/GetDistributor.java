@@ -48,8 +48,8 @@ public class GetDistributor extends Distributor {
 
     private void processLogout() {
         // 세션 삭제
-        String userId = request.getSessionId();
-        SessionHandler.deleteSession(userId);
+        String sessionId = request.getSessionId();
+        SessionHandler.deleteSession(sessionId);
 
         ResponseProcessor responseProcessor = new ResponseProcessor();
         this.viewData = responseProcessor.logoutResponse();
@@ -58,16 +58,10 @@ public class GetDistributor extends Distributor {
     private void processLogin(String path) {
         String sessionId = request.getSessionId();
 
-        if (sessionId != null) {
-            // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
-            if (SessionHandler.verifySessionId(sessionId)) {
-                ResponseProcessor responseProcessor = new ResponseProcessor();
-                this.viewData = responseProcessor.loginSuccessWithSessionId(sessionId);
-            } else {
-                // 세션아이디가 존재하지 않는다면 그대로
-                ResponseProcessor responseProcessor = new ResponseProcessor();
-                this.viewData = responseProcessor.loginResponse(path, sessionId);
-            }
+        // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
+        if (SessionHandler.verifySessionId(sessionId)) {
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginSuccessWithSessionId(sessionId);
         } else {
             // 세션아이디가 존재하지 않는다면 그대로
             ResponseProcessor responseProcessor = new ResponseProcessor();
