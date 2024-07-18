@@ -18,4 +18,12 @@ public class MultipartFormDataParser {
         return b;
 
     }
+
+    public static String contentParser(Map<String, String> headers, byte[] body){
+        String boundary = headers.get("content-type").split("boundary=")[1]; // boundary정보 분리
+        String byteStr = new String(body, StandardCharsets.UTF_8); // body->String 변경
+        String[] parsed = byteStr.split(boundary);
+        String content = parsed[1].split("\r\n")[3];
+        return content;
+    }
 }
