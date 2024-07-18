@@ -3,6 +3,7 @@ package webserver.http;
 import db.SessionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import webserver.enums.HttpMethod;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -43,7 +44,7 @@ public class HttpRequestParser {
             // request line을 UTF-8 문자열로 변환하여 처리
             String requestLine = requestLineBuffer.toString("UTF-8").trim();
             String[] requestLineParts = parseRequestFirstLine(requestLine);
-            String method = requestLineParts[0];
+            HttpMethod method = HttpMethod.of(requestLineParts[0]);
 
             String[] url = requestLineParts[1].split("\\?");
             String path = url[0];

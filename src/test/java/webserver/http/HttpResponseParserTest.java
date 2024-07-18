@@ -3,6 +3,7 @@ package webserver.http;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import webserver.enums.HttpMethod;
 import webserver.enums.HttpStatus;
 import webserver.mapping.MappingHandler;
 import webserver.util.FileContentReader;
@@ -52,7 +53,7 @@ class HttpResponseParserTest {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
 
-        MyHttpRequest httpRequest = new MyHttpRequest("GET", "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
+        MyHttpRequest httpRequest = new MyHttpRequest(HttpMethod.GET, "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
         MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         when(fileContentReader.isStaticResource(anyString())).thenReturn(true);
@@ -73,7 +74,7 @@ class HttpResponseParserTest {
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
 
-        MyHttpRequest httpRequest = new MyHttpRequest("GET", "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
+        MyHttpRequest httpRequest = new MyHttpRequest(HttpMethod.GET, "/", null, "HTTP/1.1", Map.of("Host", "localhost:8080"), null);
         MyHttpResponse httpResponse = new MyHttpResponse(HttpStatus.OK, Map.of("Content-Type", "text/html"), "Hello, World!".getBytes());
 
         when(fileContentReader.isStaticResource(any())).thenReturn(false);
