@@ -3,16 +3,21 @@ package webserver;
 import common.*;
 import db.UserH2Database;
 import exception.CannotResolveRequestException;
+import facade.ArticleFacade;
 import facade.SessionFacade;
 import facade.UserFacade;
 import file.ViewFile;
 import model.Session;
 import model.User;
-import web.*;
+import web.HttpRequest;
+import web.HttpResponse;
+import web.RestUri;
+import web.ViewPath;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -31,7 +36,11 @@ public class WebAdapter {
     }
 
     /**
-     * POST 요청을 처리
+     * POST 요청을 받아서 비즈니스 로직 처리
+     * SIGN_UP - 유저 생성, DB 저장
+     * SIGN_IN - ID, PWD 검증후 세션 포함하여 홈화면 리다이렉트
+     * LOGOUT - 세션 저장소 swap 이후 홈화면 리다이렉트
+     * ARTICLE - multipart-form-data 파싱후 이미지 저장, 데이터베이스에 정보 저장
      */
     private static void resolvePostRequest(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
@@ -69,25 +78,9 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
-            // content(string)과 image(byte[])를 파싱하여 데이터베이스에 저장
-            String boundaryKey = "--"+RequestUtils.getBoundaryKey(request.getContentType());
-            byte[] delimiter = boundaryKey.getBytes();
-            byte[] body = request.getBody();
-
-            List<byte[]> parts = StringUtils.splitBytes(body, delimiter);
-            byte[] image = null;
-            String content = null;
-
-            image = parts.get(1);
-            content = new String(parts.get(2));
-
-            List<byte[]> imageParts = StringUtils.splitBytes(image, "\r\n\r\n".getBytes());
-            byte[] pureImage = imageParts.get(1);
-            pureImage = Arrays.copyOf(pureImage, pureImage.length-2);
-            String pureContent = content.split("\r\n\r\n")[1];
-            pureContent = pureContent.substring(0, pureContent.length()-2);
-
-
+            // 게시글 데이터 및 DB 저장
+            System.out.println("new String(request.getBody() = [[" + new String(request.getBody())+"]]");
+            ArticleFacade.saveArticleData(request);
 
             // 화면 리다이렉트
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);

@@ -24,6 +24,9 @@ public class StringUtils {
         return map;
     }
 
+    /**
+     * bytes 배열을 delimeterbytes 배열로 split하는 메서드
+     */
     public static List<byte[]> splitBytes(byte[] bytes, byte[] delimiterBytes) {
         List<byte[]> resultList = new ArrayList<>();
         int index = indexOf(bytes, delimiterBytes, 0);
@@ -46,6 +49,9 @@ public class StringUtils {
         return resultList;
     }
 
+    /**
+     * 순차 탐색을 통해서 일치하는 부분을 찾기
+     */
     public static int indexOf(byte[] source, byte[] target, int fromIndex) {
         for (int i=fromIndex; i<=source.length-target.length; i++) {
             boolean found = true;
