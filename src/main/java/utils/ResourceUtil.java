@@ -1,13 +1,13 @@
-package handler;
+package utils;
 
-import enums.Type;
+import enums.MimeType;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class ResourceHandler {
+public class ResourceUtil {
     public byte[] getByteArray(String url) throws IOException {
         String path = "src/main/resources/static" + url;
         // 파일
@@ -29,7 +29,7 @@ public class ResourceHandler {
         String type = url.substring(url.lastIndexOf(".") + 1);
 
         // TYPE을 순회하면서 type에 해당하는 mime type 찾기
-        for (Type t : Type.values()) {
+        for (MimeType t : MimeType.values()) {
             if (t.getType().equals(type)) {
                 return t.getMime();
             }
