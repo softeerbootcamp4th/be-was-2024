@@ -5,10 +5,6 @@ public class CookieUtil {
         if (sessionId == null) {
             return false;
         }
-        if (sessionId.isEmpty()) {
-            return false;
-        } else{
-            return true;
-        }
+        return !sessionId.isEmpty();
     }
 }
