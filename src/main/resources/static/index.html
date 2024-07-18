@@ -13,14 +13,12 @@
     <a href="/"><img src="./img/signiture.svg" /></a>
     <ul class="header__menu">
       <li class="header__menu__item">
-        <p class="user-name">username</p>
+        {username_placeholder}
       </li>
+      {login_button_placeholder}
       <li class="header__menu__item">
-        <a class="btn btn_contained btn_size_s" href="login_button_href">login_button_text</a>
-      </li>
-      <li class="header__menu__item">
-        <a class="btn btn_ghost btn_size_s" href="registration_button_href">
-          registration_button_text
+        <a class="btn btn_ghost btn_size_s" href="{registration_button_href}">
+          {registration_button_text}
         </a>
       </li>
     </ul>
@@ -132,9 +130,7 @@
             이전 글
           </a>
         </li>
-        <li class="nav__menu__item">
-          <a class="btn btn_ghost btn_size_m">댓글 작성</a>
-        </li>
+        {post_button_placeholder}
         <li class="nav__menu__item">
           <a class="nav__menu__item__btn" href="">
             다음 글
