@@ -38,6 +38,21 @@ public class ResponseUtils {
                 .build();
     }
 
+    public static HttpResponse responseSuccessWithFile(String contentType, byte[] body) {
+        return new HttpResponse.HttpResponseBuilder()
+                .code(ResponseCode.OK)
+                .contentType(contentType)
+                .contentLength(body.length)
+                .body(body)
+                .build();
+    }
+
+    public static HttpResponse responseServerError() {
+        return new HttpResponse.HttpResponseBuilder()
+                .code(ResponseCode.INTERNAL_SERVER_ERROR)
+                .build();
+    }
+
     public static HttpResponse responseBadRequest() {
         return new HttpResponse.HttpResponseBuilder()
                 .code(ResponseCode.BAD_REQUEST)
@@ -47,6 +62,5 @@ public class ResponseUtils {
     public static HttpResponse createResponse(ResponseCode code, String contentType) {
         return new HttpResponse.HttpResponseBuilder().code(code).contentType(contentType).build();
     }
-
 }
 

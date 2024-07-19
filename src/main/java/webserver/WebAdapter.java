@@ -1,14 +1,11 @@
 package webserver;
 
-import common.JsonBuilder;
-import common.StringUtils;
-import db.SessionDatabase;
-import db.SessionIdMapper;
+import common.*;
 import db.UserDatabase;
 import exception.CannotResolveRequestException;
 import facade.SessionFacade;
 import facade.UserFacade;
-import common.ResponseUtils;
+import file.ViewFile;
 import model.Session;
 import model.User;
 import web.*;
@@ -86,20 +83,19 @@ public class WebAdapter {
                 .build();
     }
 
-    public static String resolveRequestUri(HttpRequest request, OutputStream out) throws IOException {
+    public static void resolveRequest(HttpRequest request, OutputStream out) throws IOException {
         if(request.isGetRequest()) {
-            return resolveGetRequestUri(request, out);
+            resolveGetRequest(request, out);
         } else if(request.isPostRequest()) {
-            return resolvePostRequestUri(request, out);
+            resolvePostRequest(request, out);
         }
-
-        throw new CannotResolveRequestException("Cannot Resolve Request Method");
+        else throw new CannotResolveRequestException("Cannot Resolve Request Method");
     }
 
     /**
      * POST 요청을 처리
      */
-    private static String resolvePostRequestUri(HttpRequest request, OutputStream out) throws IOException {
+    private static void resolvePostRequest(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
         if(request.getPath().equals(RestUri.SIGN_UP.getUri())) {
             // body의 유저 정보 파싱
@@ -115,12 +111,10 @@ public class WebAdapter {
             HttpResponse response;
 
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
-                // 세션 생성
-                Session session = SessionDatabase.createDefaultSession();
-                // 생성된 세션을 세션 저장소에 저장
-                SessionIdMapper.addSessionId(session.getId(), map.get("userId"));
+                Session newSession = SessionFacade.createSession(map.get("userId"));
+
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
-                hashMap.put(SESSION_ID, session.getId());
+                hashMap.put(SESSION_ID, newSession.getId());
 
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
@@ -137,8 +131,6 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
             response.writeInBytes(out);
         }
-
-        return ViewPath.DEFAULT.getFilePath();
     }
 
 
@@ -146,18 +138,24 @@ public class WebAdapter {
     /**
      * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답
      */
-    private static String resolveGetRequestUri(HttpRequest request, OutputStream out) throws IOException {
+    private static void resolveGetRequest(HttpRequest request, OutputStream out) throws IOException {
         // GET으로 회원가입 요청시 400 응답
         if(request.getPathWithoutQueryParam().equals(RestUri.SIGN_UP.getUri())) {
             HttpResponse response = ResponseUtils.responseBadRequest();
             response.writeInBytes(out);
         }
         // 유저 리스트 찾아서 json으로 반환
-        if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
-            Collection<User> users = UserDatabase.findAll();
-            String jsonUser = JsonBuilder.buildJsonResponse(users);
+        else if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
+            HttpResponse response;
+            // 인증된 요청일경우 표시
+            if(SessionFacade.isAuthenticatedRequest(request)) {
+                Collection<User> users = UserDatabase.findAll();
+                String jsonUser = JsonBuilder.buildJsonResponse(users);
 
-            HttpResponse response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
+                response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
+            } else {
+                response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
+            }
             response.writeInBytes(out);
         }
         // 데이터베이스 초기화
@@ -168,14 +166,16 @@ public class WebAdapter {
             response.writeInBytes(out);
         }
 
-        // 최종적으로 뷰를 찾아 반환
-        return resolveGetRequestUri(request.getPath());
+        // 별도 GET 처리 로직이 없는경우 뷰를 찾아 반환
+        String filePath = resolveGetRequest(request.getPath());
+        ViewFile viewFile = new ViewFile(filePath, FileUtils.getExtensionFromPath(filePath));
+        ViewResolver.readAndResponseFromPath(request, out, FileUtils.getStaticFilePath(viewFile.getPath()), WebUtils.getProperContentType(viewFile.getExtension()));
     }
 
     /**
      * GET 요청에 적절한 뷰를 응답해준다
      */
-    private static String resolveGetRequestUri(String restUri) {
+    private static String resolveGetRequest(String restUri) {
         return ViewPath.findByRequestUri(restUri).getFilePath();
     }
 }

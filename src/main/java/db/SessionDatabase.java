@@ -14,7 +14,7 @@ public class SessionDatabase {
 
     public static Session createDefaultSession() {
         String SID = StringUtils.createRandomUUID();
-        Session createSession = new Session(SID, System.currentTimeMillis()+1800);
+        Session createSession = new Session(SID, System.currentTimeMillis()+1800*1000);
         sessions.put(SID, createSession);
         return createSession;
     }

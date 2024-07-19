@@ -34,7 +34,7 @@ public class HttpSession {
     public static class HttpSessionBuilder {
         private String name;
         private String id;
-        private long maxAge = 1800; // 세션의 기본 지속 유효시간을 1800s(30min)으로 설정
+        private long maxAge = 1800*1000; // 세션의 기본 지속 유효시간을 1800s(30min)으로 설정
         private String path = "/";
         private String domain = "localhost"; //TODO("프로퍼리 파일로 관리")
         private Boolean secure = true;

@@ -10,7 +10,6 @@ public class SessionIdMapper {
      * @return userId
      */
     public static String addSessionId(String sessionId, String userId) {
-
         return sessionIds.put(sessionId, userId);
     }
 
