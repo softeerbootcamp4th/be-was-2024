@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class View {
     private final String template;
@@ -24,10 +26,17 @@ public class View {
     }
 
     public String render(Map<String, Object> model) {
-        String renderedHtml = template;
-        for (Map.Entry<String, Object> entry : model.entrySet()) {
-            renderedHtml = renderedHtml.replace("{{" + entry.getKey() + "}}", entry.getValue().toString());
+        Pattern pattern = Pattern.compile("\\{\\{(.*?)\\}\\}");
+        Matcher matcher = pattern.matcher(template);
+
+        StringBuilder buffer = new StringBuilder();
+        while (matcher.find()) {
+            String key = matcher.group(1).trim();
+            String replacement = model.getOrDefault(key, "").toString();
+            matcher.appendReplacement(buffer, Matcher.quoteReplacement(replacement));
         }
-        return renderedHtml;
+        matcher.appendTail(buffer);
+
+        return buffer.toString();
     }
 }
