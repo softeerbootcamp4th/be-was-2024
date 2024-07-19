@@ -1,6 +1,7 @@
 package controller;
 
 import exception.ModelException;
+import exception.RequestException;
 import handler.UserHandler;
 import util.HttpRequest;
 import util.HttpRequestMapper;
@@ -33,8 +34,8 @@ public class SignUpController extends AbstractController{
         try {
             UserHandler.getInstance().create(request.getBodyMap());
             return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
-        } catch (ModelException e) {
-            return HttpResponse.sendRedirect(HttpRequestMapper.REGISTER.getPath(), request.getHttpVersion());
+        } catch (RequestException | ModelException e) {
+            return HttpResponse.sendRedirect(HttpRequestMapper.SIGNUP.getPath(), request.getHttpVersion());
         }
     }
 }

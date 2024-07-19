@@ -64,7 +64,7 @@ public enum HttpRequestMapper {
             case ROOT, DEFAULT_PAGE -> new DefaultController();
             case ARTICLE, ARTICLE_CREATE -> new ArticleController();
             case USER_LIST -> new UserListController();
-            case SIGNUP_REQUEST, REGISTER -> new SignUpController();
+            case SIGNUP_REQUEST, SIGNUP -> new SignUpController();
             case LOGIN, LOGIN_REQUEST -> new LoginController();
             case LOGIN_FAIL -> new LoginFailController();
             case LOGOUT_REQUEST -> new LogoutController();
