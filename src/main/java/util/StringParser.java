@@ -41,7 +41,6 @@ public class StringParser {
      * 멀티파트 형식의 요청 시 이를 파싱하는 메서드
      * @param httpRequest
      * @param boundary
-     * @return void
      */
     public static void processMultipartData(HttpRequest httpRequest, String boundary) {
         String bodyString = new String(httpRequest.getBody(), StandardCharsets.ISO_8859_1);

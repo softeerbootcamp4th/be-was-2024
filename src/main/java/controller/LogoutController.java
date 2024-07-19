@@ -1,6 +1,5 @@
 package controller;
 
-import exception.RequestException;
 import session.Session;
 import session.SessionHandler;
 import util.*;
@@ -19,7 +18,7 @@ public class LogoutController extends AbstractController{
     public HttpResponse doPost(HttpRequest request) {
         Session session = request.getSession();
         if(session == null){
-            throw new RequestException(ConstantUtil.INVALID_HEADER);
+            return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         }
 
         HttpResponse response = HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
