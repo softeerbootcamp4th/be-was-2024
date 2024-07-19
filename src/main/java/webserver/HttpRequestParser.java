@@ -21,8 +21,12 @@ public class HttpRequestParser {
         Map<String, String> headers = httpRequestMessage.getHeaders();
         String length = headers.get("Content-Length");
         if (length != null) {
+            int totalLength = Integer.parseInt(length);
+            int readLength = 0;
             byte[] bytes = new byte[Integer.parseInt(length)];
-            bis.read(bytes,0,bytes.length);
+            while(readLength < totalLength) {
+                readLength += bis.read(bytes,readLength, totalLength - readLength);
+            }
             httpRequestMessage.setBody(bytes);
         }
         return httpRequestMessage;

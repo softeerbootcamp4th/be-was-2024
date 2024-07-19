@@ -2,6 +2,7 @@ package webserver;
 
 import data.HttpRequestMessage;
 import data.HttpResponseMessage;
+import data.MultipartFile;
 import db.PostDatabase;
 import db.UserDatabase;
 import db.Session;
@@ -9,6 +10,10 @@ import exception.BadMethodException;
 import handler.ViewHandler;
 import model.Post;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.MultiPartParser;
+import util.MultiPartUtils;
 
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -16,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class DynamicRequestProcess {
+    private static final Logger log = LoggerFactory.getLogger(DynamicRequestProcess.class);
+
     public static HttpResponseMessage registration(HttpRequestMessage httpRequestMessage){
         if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> map = new HashMap<>();
@@ -71,8 +78,15 @@ public class DynamicRequestProcess {
         }
         else{
             Post post = PostDatabase.getPost(Long.parseLong(page));
+            if (post == null){
+                param.put("Location", "/?page=" + (Long.parseLong(page) - 1));
+                return new HttpResponseMessage("303", param, null);
+            }
             param.put("writer", post.getAuthorName());
             param.put("content", post.getContent());
+            String image = post.getImage();
+            if (image == null) param.put("image","");
+            else param.put("image", "src=\"/post-images/" + image + "\"");
         }
         Map<String, String> cookies = httpRequestMessage.getCookies();
         HashMap<String, String> headers = new HashMap<>();
@@ -119,9 +133,14 @@ public class DynamicRequestProcess {
         Map<String, String> cookies = httpRequestMessage.getCookies();
         Map<String,String> headers = new HashMap<>();
         String sid = cookies.get("SID");
-        if (sid == null || UserDatabase.findUserById(Session.getUser(sid).getUserId()) == null) {
-            headers.put("Location","/login");
-            return new HttpResponseMessage("303",headers,null);
+        try {
+            if (sid == null || UserDatabase.findUserById(Session.getUser(sid).getUserId()) == null) {
+                headers.put("Location", "/login");
+                return new HttpResponseMessage("303", headers, null);
+            }
+        } catch (NullPointerException e) {
+            headers.put("Location", "/login");
+            return new HttpResponseMessage("303", headers, null);
         }
         return UriMapper.staticRequestProcess("src/main/resources/static/article/index.html");
     }
@@ -136,14 +155,10 @@ public class DynamicRequestProcess {
             headers.put("Location","/login");
             return new HttpResponseMessage("303",headers,null);
         }
-        Map<String,String> bodyMap = new HashMap<>();
-        String body = new String(httpRequestMessage.getBody());
-        String[] bodySplit = body.split("&");
-        for (String entry : bodySplit) {
-            String[] keyValue = entry.split("=");
-            bodyMap.put(keyValue[0],keyValue[1]);
-        }
-        Post post = new Post(user.getId(), user.getName(),URLDecoder.decode(bodyMap.get("content"), StandardCharsets.UTF_8));
+        byte[] body = httpRequestMessage.getBody();
+        byte[] boundary = MultiPartUtils.getBoundary(httpRequestMessage.getHeaders());
+        List<MultipartFile> multipartFiles = MultiPartParser.parse(body,boundary);
+        Post post = MultiPartUtils.processMultiPart(user.getId(), user.getName(), multipartFiles);
         PostDatabase.addPost(post);
         headers.put("Location","/");
         return new HttpResponseMessage("303",headers,null);

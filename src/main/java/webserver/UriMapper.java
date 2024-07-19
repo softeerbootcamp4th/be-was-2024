@@ -11,8 +11,6 @@ import java.util.HashMap;
 
 public class UriMapper {
     public static HttpResponseMessage mapUri(HttpRequestMessage httpRequestMessage) throws RuntimeException, IOException {
-        //Exact Matching
-        String method = httpRequestMessage.getMethod();
         String uri = httpRequestMessage.getUri();
         return switch (uri) {
                 case "/", "/index.html" -> DynamicRequestProcess.home(httpRequestMessage);
@@ -59,6 +57,7 @@ public class UriMapper {
             case "png" -> "image/png";
             case "ico" -> "image/x-icon";
             case "svg" -> "image/svg+xml";
+            case "gif" -> "image/gif";
             default -> "text/plain";
         };
     }
