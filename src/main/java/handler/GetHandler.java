@@ -13,6 +13,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
@@ -157,7 +158,6 @@ public class GetHandler {
 
     private void sendBoardContent(DataOutputStream dos,String boardTitle) {
         try {
-            logger.error(boardTitle);
             Board board = Database.getOneBoard(boardTitle);
             if (board != null) {
                 String jsonResponse = String.format("{\"title\":\"%s\", \"content\":\"%s\"}",
@@ -187,8 +187,10 @@ public class GetHandler {
             json.append("{ \"boards\": [");
             for (int i = 0; i < boards.size(); i++) {
                 Board board = boards.get(i);
+                String base64Image = Base64.getEncoder().encodeToString(board.getImage());
                 json.append("{");
-                json.append("\"title\": \"").append(URLDecoder.decode(board.getTitle(),StandardCharsets.UTF_8)).append("\"");
+                json.append("\"title\": \"").append(URLDecoder.decode(board.getTitle(),StandardCharsets.UTF_8)).append("\",");
+                json.append("\"image\": \"").append(base64Image).append("\"");
                 json.append("}");
                 if (i < boards.size() - 1) {
                     json.append(",");
@@ -197,6 +199,7 @@ public class GetHandler {
             json.append("]}");
 
             String jsonResponse = json.toString();
+            logger.error("Generated JSON: " + jsonResponse);
             byte[] bodyBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
             dos.writeBytes("HTTP/1.1 200 OK \r\n");
             dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");

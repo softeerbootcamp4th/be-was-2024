@@ -67,7 +67,6 @@ public class RequestObject {
         }
         String contentLengthHeader = headers.get(HttpHeader.CONTENT_LENGTH);
         contentLength = contentLengthHeader == null ? 0 : Integer.parseInt(contentLengthHeader);
-        logger.debug(contentLength+"");
         if(contentLength>0) {
             body = new byte[contentLength];
             int bytesRead = inputStream.read(body,0,contentLength);
