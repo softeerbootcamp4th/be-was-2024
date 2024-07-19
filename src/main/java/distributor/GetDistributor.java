@@ -27,6 +27,8 @@ public class GetDistributor extends Distributor {
         if (path.equals("/user/create")) {
             ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.notFoundResponse();
+        } else if (path.equals("/posts")) {
+            processShowPost();
         }
     }
 
@@ -88,6 +90,14 @@ public class GetDistributor extends Distributor {
         } else {
             this.viewData = responseProcessor.unauthorizedWriteResponse();
         }
+    }
+
+    private void processShowPost() {
+        String sessionId = request.getSessionId();
+        String title = request.parseQueryString().get("title");
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        this.viewData = responseProcessor.showPostResponse(sessionId, title);
     }
 
     @Override
