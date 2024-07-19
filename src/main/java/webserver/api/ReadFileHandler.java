@@ -44,7 +44,8 @@ public class ReadFileHandler implements FunctionHandler {
             if(!file.contains(".")) { // 확장자가 있다면
                 return ResponseLibrary.notFound;
             }else{
-                extension = Extension.valueOfExtension(file.split("\\.")[1]); // 마지막 인덱스
+                int lastDotIndex = file.lastIndexOf('.');
+                extension = Extension.valueOfExtension(file.substring(lastDotIndex + 1)); // 마지막 인덱스
             }
 
             byte[] body = Files.readAllBytes(new File(pathname).toPath());
