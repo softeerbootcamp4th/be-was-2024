@@ -7,10 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RequestObject {
 
@@ -25,7 +22,13 @@ public class RequestObject {
 
     private int contentLength;
 
-    private final Map<String,String> headers = new HashMap<>();
+    private final Map<HttpHeader,String> headers = new HashMap<>();
+
+
+    // 멀티파트 바디 파싱 결과
+    private String parsedTitle;
+    private String parsedContent;
+    private byte[] parsedImage;
 
     public RequestObject(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
@@ -54,15 +57,17 @@ public class RequestObject {
         this.version= temp[2];
 
         for(int i=1;i<headerLines.length;i++) {
-            if (headerLines[i].contains(":")) {
-                String[] headerParts = headerLines[i].split(":", 2);
-                headers.put(headerParts[0].trim(), headerParts[1].trim());
-            }
-            if(headerLines[i].startsWith("Content-Length")) {
-                this.contentLength=Integer.parseInt(headerLines[i].split(":")[1].trim());
-                break;
+            String line = headerLines[i];
+            int colonIndex = line.indexOf(":");
+            if (colonIndex != -1) {
+                String key = line.substring(0, colonIndex).trim();
+                String value = line.substring(colonIndex + 1).trim();
+                headers.put(HttpHeader.fromString(key), value);
             }
         }
+        String contentLengthHeader = headers.get(HttpHeader.CONTENT_LENGTH);
+        contentLength = contentLengthHeader == null ? 0 : Integer.parseInt(contentLengthHeader);
+        logger.debug(contentLength+"");
         if(contentLength>0) {
             body = new byte[contentLength];
             int bytesRead = inputStream.read(body,0,contentLength);
@@ -72,6 +77,17 @@ public class RequestObject {
             }
         } else {
             body =null;
+        }
+
+        String contentTypeHeader = headers.get(HttpHeader.CONTENT_TYPE);
+        if(contentTypeHeader != null && contentTypeHeader.startsWith("multipart/form-data")) {
+            try{
+                parseMultipart();
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+                throw new IOException("Failed to parse multipart body", e);
+            }
         }
     }
 
@@ -92,12 +108,21 @@ public class RequestObject {
     public void setBody(byte[] body) {
         this.body = body;
     }
+    public String getParsedContent() {
+        return this.parsedContent;
+    }
+    public byte[] getParsedImage() {
+        return this.parsedImage;
+    }
+    public String getParsedTitle(){
+        return this.parsedTitle;
+    }
 
     //헤더에서 쿠키를 파싱한다
     public Map<String, String> getCookies() {
         Map<String, String> cookies = new HashMap<>();
-        if (headers.containsKey("Cookie")) {
-            String cookieHeader = headers.get("Cookie");
+        if (headers.containsKey(HttpHeader.COOKIE)) {
+            String cookieHeader = headers.get(HttpHeader.COOKIE);
             String[] cookiePairs = cookieHeader.split("; ");
             for (String cookie : cookiePairs) {
                 String[] cookieParts = cookie.split("=", 2);
@@ -107,5 +132,95 @@ public class RequestObject {
             }
         }
         return cookies;
+    }
+
+    private void parseMultipart() throws Exception{
+        String contentTypeHeader = headers.get(HttpHeader.CONTENT_TYPE);
+        String boundary = extractBoundary(contentTypeHeader);
+        if( boundary ==null){
+            throw new Exception("Boundary not found error");
+        }
+        byte[] boundaryBytes =("--" + boundary).getBytes();
+        byte[] endBoundaryBytes = ("--" + boundary +"--").getBytes();
+
+        int pos = 0;
+        while (pos < body.length){
+            int boundaryIndex = indexOf(body, boundaryBytes, pos);
+            if (boundaryIndex ==-1) {
+                break;
+            }
+            pos = boundaryIndex + boundaryBytes.length;
+
+            int partEndIndex = indexOf(body,boundaryBytes,pos);
+            if(partEndIndex==-1){
+                partEndIndex = indexOf(body,endBoundaryBytes,pos);
+                if(partEndIndex==-1) {
+                    partEndIndex = body.length;
+                }
+            }
+
+            byte[] part;
+            if(partEndIndex> body.length -4){
+                part = Arrays.copyOfRange(body, pos, partEndIndex);
+            } else {
+                part = Arrays.copyOfRange(body,pos,partEndIndex-2);
+            }
+
+            try {
+                parsePart(part);
+            } catch (Exception e) {
+                e.printStackTrace(); // 에러 로그 출력
+                throw new Exception("Failed to parse part", e);
+            }
+            pos = partEndIndex;
+        }
+    }
+
+    private void parsePart(byte[] part) {
+        int headerEndIndex = indexOf(part, "\r\n\r\n".getBytes(), 0);
+        if (headerEndIndex == -1) {
+            headerEndIndex = part.length;
+        }
+
+        String headers = new String(part, 0, headerEndIndex);
+        byte[] body;
+
+        if (headerEndIndex + 4 > part.length) {
+            body = new byte[0]; // 본문이 없는 경우 빈 배열로 설정
+        } else {
+            body = Arrays.copyOfRange(part, headerEndIndex + 4, part.length);
+        }
+
+        if (headers.contains("Content-Disposition: form-data; name=\"content\"")) {
+            parsedContent = new String(body);
+        } else if (headers.contains("Content-Disposition: form-data; name=\"image\"; filename=\"")) {
+            parsedImage = body;
+        }
+        else if(headers.contains("Content-Disposition: form-data; name=\"title\"")){
+            parsedTitle = new String(body);
+        }
+    }
+
+    private int indexOf(byte[] array, byte[] target, int start) {
+        outer: for (int i = start; i <= array.length - target.length; i++) {
+            for (int j = 0; j < target.length; j++) {
+                if (array[i + j] != target[j]) {
+                    continue outer;
+                }
+            }
+            return i;
+        }
+        return -1;
+    }
+
+    private String extractBoundary(String contentType) {
+        String[] parts = contentType.split(";");
+        for (String part : parts) {
+            part = part.trim();
+            if (part.startsWith("boundary=")) {
+                return part.substring("boundary=".length());
+            }
+        }
+        return null;
     }
 }

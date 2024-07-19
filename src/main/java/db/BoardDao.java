@@ -11,11 +11,12 @@ import java.util.List;
 
 public class BoardDao {
     public void addBoard(Board board) throws SQLException {
-        String sql = "INSERT INTO boards (title, content) VALUES (?, ?)";
+        String sql = "INSERT INTO boards (title, content, image) VALUES (?, ?, ?)";
         try (Connection connection = DatabaseUtil.getConnection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, board.getTitle());
             pstmt.setString(2, board.getContent());
-            pstmt.executeUpdate();
+            pstmt.setBytes(3,board.getImage());
+            pstmt.execute();
         }
     }
 
@@ -26,7 +27,8 @@ public class BoardDao {
             while (rs.next()) {
                 boards.add(new Board(
                         rs.getString("title"),
-                        rs.getString("content")
+                        rs.getString("content"),
+                        rs.getBytes("image")
                 ));
             }
         }
@@ -41,7 +43,8 @@ public class BoardDao {
                 if(rs.next()){
                     String boardTitle = rs.getString("title");
                     String content = rs.getString("content");
-                    return new Board(boardTitle,content);
+                    byte[] image = rs.getBytes("image");
+                    return new Board(boardTitle,content,image);
                 } else {
                     return null;
                 }

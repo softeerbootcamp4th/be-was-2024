@@ -58,23 +58,13 @@ public class PostHandler {
     }
 
     private void boardWrite(DataOutputStream dos, RequestObject requestObject) {
-        String body = new String(requestObject.getBody(), StandardCharsets.UTF_8);
-        String[] params = body.split("&");
-        String title = null;
-        String content = null;
-        for (String param : params) {
-            String[] keyValue = param.split("=");
-            if (keyValue.length == 2) {
-                if ("title".equals(keyValue[0])) {
-                    title = keyValue[1];
-                } else if ("content".equals(keyValue[0])) {
-                    content = keyValue[1];
-                }
-            }
-        }
-        if (title != null && content != null) {
+
+        String title = requestObject.getParsedTitle();
+        String content = requestObject.getParsedContent();
+        byte[] image = requestObject.getParsedImage();
+        if (title != null && content != null && image != null) {
             try{
-                Database.addBoard(new Board(title,content));
+                Database.addBoard(new Board(title,content,image));
             } catch(Exception e)
             {
                 logger.debug(e.getMessage());

@@ -42,7 +42,8 @@ public class DatabaseUtil {
     private static String createBoardTable() {
         return "CREATE TABLE IF NOT EXISTS boards (" +
                 "title VARCHAR(255) NOT NULL, " +
-                "content TEXT NOT NULL" +
+                "content TEXT NOT NULL," +
+                "image BLOB"+
                 ")";
     }
 }
