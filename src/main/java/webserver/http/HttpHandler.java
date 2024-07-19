@@ -11,6 +11,9 @@ import webserver.http.response.Response;
 import webserver.http.response.ResponseHandler;
 import webserver.http.response.ResponseWriter;
 
+/**
+ * 요청을 응답으로 변환하고 출력하는 클래스
+ */
 public class HttpHandler implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(HttpHandler.class);
 
@@ -26,6 +29,9 @@ public class HttpHandler implements Runnable {
         this.responseWriter = responseWriter;
     }
 
+    /**
+     * 요청을 응답으로 변환하고 출력하는 메소드
+     */
     public void run() {
         logger.debug("New Client Connect! Connected IP : {}, Port : {}", connection.getInetAddress(), connection.getPort());
         try {

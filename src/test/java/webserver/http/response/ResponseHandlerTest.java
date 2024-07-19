@@ -13,11 +13,43 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseHandlerTest {
 
+    PluginMapper pluginMapper = new PluginMapper();
+    ResponseHandler responseHandler = new ResponseHandler(pluginMapper);
+
+    @Test
+    @DisplayName("존재하지 않는 URL 요청에 대해 404 상태코드를 응답하도록 구현한다.")
+    void testResponse404() throws IOException {
+
+        //given
+        Request notExistPathRequest = new Request.Builder(HttpMethod.GET, "/a/b/c/d/e.html").build();
+
+        //when
+        Response response = responseHandler.response(notExistPathRequest);
+
+        //then
+        assertEquals(Status.NOT_FOUND, response.getStatus());
+
+    }
+
+    @Test
+    @DisplayName("처리할 수 없는 메소드 요청에는 405 상태코드를 응답하도록 구현한다.")
+    void testResponse405() throws IOException {
+
+        //given
+        Request request = new Request.Builder(HttpMethod.POST, "/index.html").build();
+        pluginMapper.put(HttpMethod.GET, "/index.html", null);
+
+        //when
+        Response response = responseHandler.response(request);
+
+        //then
+        assertEquals(Status.METHOD_NOT_ALLOWED, response.getStatus());
+
+    }
+
     @Nested
     @DisplayName("정적 요청에 대한 응답")
     class StaticResponseTest {
-
-        ResponseHandler responseHandler = new ResponseHandler(new PluginMapper());
 
         @Test
         @DisplayName("HTML")
