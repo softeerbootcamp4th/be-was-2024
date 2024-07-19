@@ -98,4 +98,13 @@ public class ResponseProcessor {
                 .redirectCode(302)
                 .build();
     }
+
+    public ViewData showPostResponse(String sessionId, String title) {
+        return new ViewData.Builder()
+                .url("/post/index.html")
+                .statusCode(200)
+                .cookie(sessionId)
+                .title(title)
+                .build();
+    }
 }
