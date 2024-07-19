@@ -17,8 +17,8 @@ public class DynamicHtmlGenerator {
 
         // 로그인 정보 동적 세팅
         String loginHtml;
-        String userId = SessionFacade.getUserIdFromSession(request);
         if (SessionFacade.isAuthenticatedRequest(request)) {
+            String userId = SessionFacade.getUserIdFromSession(request);
             loginHtml = "<li class=\"header__menu__item\"><form id=\"logout\" action=\"/logout\" method=\"POST\"><button type=\"submit\">로그아웃</button></form></li>" +
                     "<li class=\"header__menu__item\"><p class=\"comment__item__article\"> 안녕하세요, "+userId+"님.</p></li>";
         } else {
