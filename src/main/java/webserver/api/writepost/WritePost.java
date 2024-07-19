@@ -63,7 +63,7 @@ public class WritePost implements FunctionHandler {
                 if (partName.equals("image") && fileData.getData().length > 0) {
                     imgpath = root + fileData.getFileName();
                     int instantnum = 1;
-                    int lastDotIndex = imgpath.lastIndexOf('.');
+                    int lastDotIndex = fileData.getFileName().lastIndexOf('.');
                     String namePart = fileData.getFileName().substring(0, lastDotIndex);
                     String extensionPart = fileData.getFileName().substring(lastDotIndex);
                     int namelengthlimit = 270 - root.length() - extensionPart.length();
