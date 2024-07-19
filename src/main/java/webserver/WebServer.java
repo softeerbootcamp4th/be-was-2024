@@ -3,6 +3,8 @@ package webserver;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import model.ArticleDao;
+import model.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +31,12 @@ public class WebServer {
 
             // 스레드 풀 생성
             ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
+
+            // user 테이블 생성
+            UserDao.createTable();
+
+            // article 테이블 생성
+            ArticleDao.createTable();
 
             // 클라이언트가 연결될때까지 대기한다.
             Socket connection;
