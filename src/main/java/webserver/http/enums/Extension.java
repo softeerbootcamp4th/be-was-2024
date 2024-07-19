@@ -15,6 +15,8 @@ public  enum Extension {
     PNG("png", "image/png"),
     JPG("jpg","image/jpeg"),
     SVG("svg","image/svg+xml"),
+    WEBP("webp", "image/webp"),
+    GIF("gif", "image/gif"),
     Default("", "text/pain");
 
     private final String extensionName;
