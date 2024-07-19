@@ -7,7 +7,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * HTTP 요청을 파싱
+ */
 public class HttpRequestParser {
+    /**
+     * inputStream으로 HttpRequestMessage를 만든다
+     * @param in
+     * @return HttpRequestMessage
+     * @throws IOException
+     */
     public static HttpRequestMessage getHttpRequestMessage(InputStream in) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         BufferedInputStream bis = new BufferedInputStream(in);

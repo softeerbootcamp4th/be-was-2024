@@ -9,7 +9,17 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+/**
+ * URI를 매칭하는 클래스
+ */
 public class UriMapper {
+    /**
+     * Uri를 해당하는 메소드와 매칭하는 메소드
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws RuntimeException
+     * @throws IOException
+     */
     public static HttpResponseMessage mapUri(HttpRequestMessage httpRequestMessage) throws RuntimeException, IOException {
         String uri = httpRequestMessage.getUri();
         return switch (uri) {
@@ -26,6 +36,12 @@ public class UriMapper {
         };
     }
 
+    /**
+     * 에러 응답을 처리한다.
+     * @param code
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage errorResponseProcess(String code) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         String path = "src/main/resources/static/error/" + code + ".html";
@@ -35,6 +51,12 @@ public class UriMapper {
         return new HttpResponseMessage(code,headers,bytes);
     }
 
+    /**
+     * 정적 리소스 요청을 처리한다.
+     * @param path
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage staticRequestProcess(String path) throws IOException {
         HashMap<String, String> headers = new HashMap<>();
         headers.put("Content-Type", findContentType(path.substring(path.lastIndexOf('.') + 1)));

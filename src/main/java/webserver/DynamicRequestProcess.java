@@ -20,9 +20,17 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+/**
+ * 동적인 자원 요청을 처리하는 클래스
+ */
 public class DynamicRequestProcess {
     private static final Logger log = LoggerFactory.getLogger(DynamicRequestProcess.class);
 
+    /**
+     * 회원가입
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     */
     public static HttpResponseMessage registration(HttpRequestMessage httpRequestMessage){
         if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> map = new HashMap<>();
@@ -37,6 +45,12 @@ public class DynamicRequestProcess {
         map.put("Location","/index.html");
         return new HttpResponseMessage("303",map,null);
     }
+
+    /**
+     * 로그인
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     */
     public static HttpResponseMessage login(HttpRequestMessage httpRequestMessage){
         if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> map = new HashMap<>();
@@ -60,6 +74,12 @@ public class DynamicRequestProcess {
         return new HttpResponseMessage("303",map,null);
     }
 
+    /**
+     * 홈 화면
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage home(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
         Map<String,String> param = new HashMap<>();
@@ -106,6 +126,12 @@ public class DynamicRequestProcess {
         return new HttpResponseMessage("200",headers,loginedHomeView.getBytes());
     }
 
+    /**
+     * 유저 리스트
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage userList(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
         Map<String, String> cookies = httpRequestMessage.getCookies();
@@ -119,6 +145,12 @@ public class DynamicRequestProcess {
         return new HttpResponseMessage("200",headers,html.getBytes());
     }
 
+    /**
+     * 로그아웃
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage logout(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String,String> headers = new HashMap<>();
@@ -128,6 +160,12 @@ public class DynamicRequestProcess {
         return new HttpResponseMessage("303",headers,null);
     }
 
+    /**
+     * 글쓰기
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage article(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("GET")) throw new BadMethodException("Method not supported");
         Map<String, String> cookies = httpRequestMessage.getCookies();
@@ -145,6 +183,12 @@ public class DynamicRequestProcess {
         return UriMapper.staticRequestProcess("src/main/resources/static/article/index.html");
     }
 
+    /**
+     * 글쓰기 제출
+     * @param httpRequestMessage
+     * @return HttpResponseMessage
+     * @throws IOException
+     */
     public static HttpResponseMessage postArticle(HttpRequestMessage httpRequestMessage) throws IOException {
         if (!httpRequestMessage.getMethod().equals("POST")) throw new BadMethodException("Method not supported");
         Map<String, String> cookies = httpRequestMessage.getCookies();

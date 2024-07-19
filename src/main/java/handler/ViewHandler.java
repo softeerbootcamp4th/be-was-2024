@@ -10,9 +10,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
+ * 간단한 템플릿 엔진
  */
 public class ViewHandler {
+    /**
+     * param에 담겨있는 값을 html에 넣기
+     * @param path
+     * @param params
+     * @return param값이 적용된 html String
+     * @throws IOException
+     */
     public static String viewParamProcess(String path, Map<String,String> params) throws IOException {
         Pattern pattern = Pattern.compile("\\$\\{(\\w+)}");
         byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
@@ -28,6 +35,13 @@ public class ViewHandler {
         return buffer.toString();
     }
 
+    /**
+     * html에 list를 넣어준다.
+     * @param path
+     * @param list
+     * @return list가 들어간 html String
+     * @throws IOException
+     */
     public static String viewListProcess(String path, List<String> list) throws IOException {
         byte[] bytes = FileUtil.readAllBytesFromFile(new File(path));
         String templateHtml = new String(bytes);

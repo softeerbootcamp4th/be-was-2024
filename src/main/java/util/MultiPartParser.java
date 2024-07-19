@@ -14,6 +14,12 @@ import java.util.*;
 public class MultiPartParser {
     private static final Logger logger = LoggerFactory.getLogger(MultiPartParser.class);
 
+    /**
+     *
+     * @param body
+     * @param boundary
+     * @return
+     */
     public static List<MultipartFile> parse(byte[] body, byte[] boundary) {
         List<byte[]> parts = parseMultipart(body, boundary);
         List<MultipartFile> multipartFiles = new ArrayList<>();
@@ -39,7 +45,12 @@ public class MultiPartParser {
         header.put(split[0], split[1]);
     }
 
-
+    /**
+     * 멀티파트 request의 바디를 각 파트별로 나눠서 반환한다.
+     * @param byteArray
+     * @param boundary
+     * @return 멀티파트의 파트 리스트
+     */
     public static List<byte[]> parseMultipart(byte[] byteArray, byte[] boundary) {
         List<byte[]> parts = new ArrayList<>();
         int boundaryLength = boundary.length;

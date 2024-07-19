@@ -16,6 +16,10 @@ import java.sql.SQLException;
 public class PostDatabase {
     private static final Logger logger = LoggerFactory.getLogger(PostDatabase.class);
 
+    /**
+     * 포스트를 DB에 추가하는 메소드
+     * @param post
+     */
     public static void addPost(Post post){
         String query = "INSERT INTO POST (AUTHOR_ID, AUTHOR_NAME, IMAGE, CONTENT) VALUES (?, ?, ?, ?)";
         try (Connection connection = JdbcDatabase.getConnection();
@@ -30,6 +34,11 @@ public class PostDatabase {
         }
     }
 
+    /**
+     * Id로 Post 찾는 메소드
+     * @param postId
+     * @return PostId에 해당하는 Post를 반환합니다
+     */
     public static Post getPost(Long postId){
         String query = "SELECT * FROM POST WHERE ID = ?";
         try (Connection connection = JdbcDatabase.getConnection();
@@ -50,6 +59,10 @@ public class PostDatabase {
         return null;
     }
 
+    /**
+     * 가장 작은 PostId 반환하는 메소드
+     * @return 가장 작은 Post테이블의 PK를 리턴합니다.
+     */
     public static Long getMinimumPostId(){
         String query = "SELECT MIN(ID) FROM POST";
         Long minId = null;

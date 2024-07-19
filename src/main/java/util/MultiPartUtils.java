@@ -16,6 +16,11 @@ import java.util.UUID;
 public class MultiPartUtils {
     private static final Logger log = LoggerFactory.getLogger(MultiPartUtils.class);
 
+    /**
+     * 멀티파트 요청에서 boundary정보를 가져온다.
+     * @param headers
+     * @return boundary byte 배열
+     */
     public static byte[] getBoundary(Map<String,String> headers){
         String contentType = headers.get("Content-Type");
         String[] contentTypeSplit = contentType.split(";");
@@ -28,6 +33,14 @@ public class MultiPartUtils {
         return null;
     }
 
+    /**
+     * 멀티파트 파트들을 가져와서 Post객체에 넣는다.
+     * 즉, 데이터베이스에 넣을 Post객체를 완성한다.
+     * @param userId
+     * @param userName
+     * @param files
+     * @return 멀티파트 정보가 입력된 Post객체
+     */
     public static Post processMultiPart(Long userId, String userName, List<MultipartFile> files){
         Post post = new Post(userId,null,userName,null);
         for (MultipartFile file : files) {

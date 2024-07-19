@@ -11,6 +11,11 @@ public class MultipartFile {
     private String contentType;
     private final byte[] data;
 
+    /**
+     * 멀티파트 파일 생성
+     * @param headers
+     * @param data
+     */
     public MultipartFile(Map<String, String> headers, byte[] data) {
         contentDisposition = new HashMap<>();
         parseHeader(headers);

@@ -3,7 +3,7 @@ package model;
 import java.util.logging.Logger;
 
 /**
- * 게시글 엔티티
+ * DB에 저장할 게시글 엔티티
  */
 public class Post {
     private Long authorId;
