@@ -48,7 +48,10 @@ public class FrontRequestProcess {
                 int idx = path.lastIndexOf(ConstantUtil.DOT);
                 if (idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
                 String extension = path.substring(idx + 1);
-                if (!extension.equals(ContentType.HTML.getExtension())) {
+                if(!extension.equals(ContentType.HTML.getExtension())) {
+                    if (!ContentType.isSupported(extension)) { // 잘못된 파일확장자
+                        return HttpResponse.notFound(request.getHttpVersion());
+                    }
                     return HttpResponse.forward(path, request.getHttpVersion());
                 }
             }
