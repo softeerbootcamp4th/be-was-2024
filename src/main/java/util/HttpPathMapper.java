@@ -49,7 +49,7 @@ public class HttpPathMapper {
                 else{
                     yield staticResponse(httpRequest, userId);}
                 }
-            // 정적파일이아닌데 매핑이 안되면 404처리
+
         };
 
     }

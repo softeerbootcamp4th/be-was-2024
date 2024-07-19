@@ -1,7 +1,8 @@
 package util;
 
 import db.ArticleDatabase;
-import db.UserDatabase;
+import db.StringIdDatabase;
+import db.UserDB;
 import model.Article;
 import model.User;
 
@@ -13,9 +14,11 @@ import static util.constant.StringConstants.*;
 
 
 public class FileMapper {
+    private final static StringIdDatabase<User> userDatabase = UserDB.getInstance();
 
     public static byte[] getByteConvertedFile(String path,String userId) throws IOException {
-        User user = UserDatabase.findUserById(userId).orElse(null);
+        User user = userDatabase.findById(userId).orElse(null);
+//        User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + path);
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();
@@ -26,7 +29,8 @@ public class FileMapper {
 
 
     public static byte[] getIndexPageByteConvertedFile(String userId) throws IOException {
-        User user = UserDatabase.findUserById(userId).orElse(null);
+        User user = userDatabase.findById(userId).orElse(null);
+//        User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + "/index.html");
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();

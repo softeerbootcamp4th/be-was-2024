@@ -2,7 +2,8 @@ package logic;
 
 import db.ArticleDatabase;
 import db.SessionDatabase;
-import db.UserDatabase;
+import db.StringIdDatabase;
+import db.UserDB;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import model.Article;
@@ -26,6 +27,7 @@ import static util.constant.StringConstants.*;
 // 알맞은 HttpRequest 에 대해 로직을 처리하고 HttpResponse 를 반환
 public class Logics {
     private static final Logger logger = LoggerFactory.getLogger(Logics.class);
+    private static final StringIdDatabase<User> userDatabase = UserDB.getInstance();
 
     public static final String USER_ID = "userId";
     public static final String PASSWORD = "password";
@@ -64,7 +66,7 @@ public class Logics {
         String email = bodyToMap.get(EMAIL);
 
         User user = new User(userId, password, name, email);
-        UserDatabase.addUser(user);
+        userDatabase.save(user);
 
         return  HttpResponse.redirectToMain();
         //TODO : body를 리턴하지 않아도 되는가
@@ -73,7 +75,6 @@ public class Logics {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
         }
-
         ///header
         Map<String, String> headers = new HashMap<>();
 
@@ -82,7 +83,7 @@ public class Logics {
         String userId = bodyToMap.get(USER_ID);
         String password = bodyToMap.get(PASSWORD);
 
-        User user = UserDatabase.findUserById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userDatabase.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         if (userId.equals(user.getUserId()) && password.equals(user.getPassword())) {
             headers.put("Location", "/index.html");
             logger.info("userId : "+userId+"Login successful");
@@ -123,7 +124,7 @@ public class Logics {
             return  HttpResponse.redirectToMain();
         }else{
             List<Byte> body = new ArrayList<>();
-            List<User> list = UserDatabase.findAll().stream().toList();
+            List<User> list = userDatabase.findAll().stream().toList();
 
             list.forEach(user -> {
                 byte[] userBytes = user.toString().getBytes(StandardCharsets.UTF_8); // Use UTF-8 encoding
