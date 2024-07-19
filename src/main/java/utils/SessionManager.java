@@ -18,9 +18,9 @@ public class SessionManager {
     public static User getUser(String sessionId) {
         return sessionMap.get(sessionId);
     }
-    public static String getSession(User user) {
+    public static String getSession(String userId) {
         for (String sessionId : sessionMap.keySet()) {
-            if (sessionMap.get(sessionId).equals(user)) {
+            if (sessionMap.get(sessionId).getUserId().equals(userId)) {
                 return sessionId;
             }
         }
