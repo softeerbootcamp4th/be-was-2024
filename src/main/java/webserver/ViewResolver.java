@@ -7,6 +7,7 @@ import file.ViewFile;
 import web.DynamicHtmlGenerator;
 import web.HttpRequest;
 import web.HttpResponse;
+import web.ViewPath;
 
 import java.io.*;
 
@@ -27,7 +28,7 @@ public class ViewResolver {
     public static void readAndResponseFromPath(HttpRequest request, OutputStream out, String filePath, String contentType) throws IOException{
         DataOutputStream dos = new DataOutputStream(out);
 
-        if(filePath.equals(FileUtils.STATIC_DIR_PATH+"/index.html")) {
+        if(filePath.equals(FileUtils.STATIC_DIR_PATH+ ViewPath.DEFAULT.getFilePath())) {
             DynamicHtmlGenerator.responseDynamicStringHtml(request, dos, contentType);
             return;
         }

@@ -80,7 +80,7 @@ public class RequestUtils {
                 offset += readSize;
             }
 
-            sbb.append("==========================\n").append(new String(body)).append("\n");
+            sbb.append(new String(body)).append("\n");
         }
 
 //        logger.debug("{}", sbb);

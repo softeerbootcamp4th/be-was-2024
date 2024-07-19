@@ -11,6 +11,14 @@ import java.util.Collection;
 
 public class DynamicHtmlGenerator {
 
+    private static String CUSTOM_PATH = "./eckrin/";
+
+    private static String USERNAME_PLACEHOLDER = "<!-- USERNAME_PLACEHOLDER -->";
+    private static String IMG_PLACEHOLDER = "<!-- IMG_PLACEHOLDER -->";
+    private static String CONTENT_PLACEHOLDER = "<!-- CONTENT_PLACEHOLDER -->";
+    private static String POST_PLACEHOLDER = "<!-- POST_PLACEHOLDER -->";
+    private static String LOGIN_PLACEHOLDER = "<!-- LOGIN_PLACEHOLDER -->";
+
     public static void responseDynamicStringHtml(HttpRequest request, OutputStream dos, String contentType) throws IOException {
 
         String htmlTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+ViewPath.DEFAULT.getFilePath());
@@ -32,16 +40,16 @@ public class DynamicHtmlGenerator {
         for (Article article : articleList) {
             String postTemplate = getStringFromFilepath(FileUtils.STATIC_DIR_PATH+"/partial/post.html");
             String articleUserId = article.getUserId();
-            String imagePath = "./eckrin/"+article.getImagePath();
+            String imagePath = CUSTOM_PATH + article.getImagePath();
             String imgHtml = "<img class=\"post__img\" src=\""+imagePath+"\"/>";
             String contentHtml = article.getContent();
-            postTemplate = postTemplate.replace("<!-- USERNAME_PLACEHOLDER -->", articleUserId);
-            postTemplate = postTemplate.replace("<!-- IMG_PLACEHOLDER -->", imgHtml);
-            postTemplate = postTemplate.replace("<!-- CONTENT_PLACEHOLDER -->", contentHtml);
-            htmlTemplate = htmlTemplate.replace("<!-- POST_PLACEHOLDER -->", postTemplate + "\n<!-- POST_PLACEHOLDER -->");
+            postTemplate = postTemplate.replace(USERNAME_PLACEHOLDER, articleUserId);
+            postTemplate = postTemplate.replace(IMG_PLACEHOLDER, imgHtml);
+            postTemplate = postTemplate.replace(CONTENT_PLACEHOLDER, contentHtml);
+            htmlTemplate = htmlTemplate.replace(POST_PLACEHOLDER, postTemplate + "\n" + POST_PLACEHOLDER);
         }
 
-        String finalHtml = htmlTemplate.replace("<!-- LOGIN_PLACEHOLDER -->", loginHtml);
+        String finalHtml = htmlTemplate.replace(LOGIN_PLACEHOLDER, loginHtml);
         byte[] body = finalHtml.getBytes();
         HttpResponse response = ResponseUtils.responseSuccessWithFile(contentType, body);
         response.writeInBytes(dos);
