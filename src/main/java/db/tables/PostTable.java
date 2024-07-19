@@ -13,10 +13,12 @@ import java.util.Map;
 
 public class PostTable {
     private final static String insertSQL = "insert into post(title, content, userId) values(?, ?, ?)";
-    private final static String findByIdSQL = "select id, title, content, userId from post where id = ?";
-    private final static String findByUserIdSQL = "select id, title, content, userId  from post where userId = ?";
+    private final static String findByIdSQL = "select id, title, content, userId from post where id = ? limit 1";
+    private final static String findByUserIdSQL = "select id, title, content, userId  from post where userId = ? limit 1";
     private final static String findAllSQL = "select id, title, content, userId  from post";
-    private final static String findLastCreatedSQL = "select id, title, content, userId  from post order by id desc";
+    private final static String findLastCreatedSQL = "select id, title, content, userId  from post order by id desc limit 1";
+    private final static String findBeforeSQL = "select id from post where id < ? order by id desc limit 1";
+    private final static String findAfterSQL = "select id from post where id > ? order by id asc limit 1";
 
     public static void insert(Post post) {
         DBUtil.statement(conn -> {
@@ -156,6 +158,44 @@ public class PostTable {
                     );
                 }
                 return post;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static Integer findBeforeId(int id) {
+        return DBUtil.query(conn -> {
+            try (PreparedStatement stmt = conn.prepareStatement(findBeforeSQL)) {
+                stmt.setInt(1, id);
+                Integer beforeId = null;
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                       beforeId = rs.getInt("id");
+                    }
+                }
+
+                return beforeId;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static Integer findAfterId(int id) {
+        return DBUtil.query(conn -> {
+            try (PreparedStatement stmt = conn.prepareStatement(findAfterSQL)) {
+                stmt.setInt(1, id);
+                Integer afterId = null;
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        afterId = rs.getInt("id");
+                    }
+                }
+
+                return afterId;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

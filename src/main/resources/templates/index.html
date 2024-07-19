@@ -31,7 +31,7 @@
     <header class="header">
         <a href="/"><img src="/img/signiture.svg"/></a>
         <ul class="header__menu">
-            <my-template if-not="user">
+            <my-template if-not='@auth_user'>
                 <li class="header__menu__item">
                     <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
                 </li>
@@ -41,8 +41,8 @@
                     </a>
                 </li>
             </my-template>
-            <my-template if="user">
-                <li>{user.name} 님, 안녕하세요!</li>
+            <my-template if='@auth_user'>
+                <li>{@auth_user.name} 님, 안녕하세요!</li>
                 <li class="header__menu__item">
                     <form method="post" action="/auth/signout">
                         <button class="btn btn_ghost btn_size_s" type="submit">로그아웃</button>
@@ -59,23 +59,34 @@
                     <p class="post__account__nickname">{authorName}</p>
                 </div>
             </my-template>
-            <div class="slider-container">
-                <div class="slider img_section">
-                    <my-template if="imageLinks" foreach="imageLink: imageLinks">
-                        <img class="post__img" src="{imageLink.link}"/>
-                    </my-template>
-                    <my-template if-not="imageLinks">
-                        <img class="post__img"/>
-                    </my-template>
+            <div style="display: flex; flex-flow: row; justify-content: space-around; align-items: center; gap: 2rem">
+                <my-template if="postId">
+                    <a href="/posts/move?dir=left&postId={postId}"
+                       style="font-size: x-large; font-weight: bold; text-decoration: none"> < </a>
+                </my-template>
+                <div class="slider-container">
+                    <div class="slider img_section">
+                        <my-template if="imageLinks" foreach="imageLink: imageLinks">
+                            <img class="post__img" src="{imageLink.link}"/>
+                        </my-template>
+                        <my-template if-not="imageLinks">
+                            <img class="post__img"/>
+                        </my-template>
+                    </div>
                 </div>
+                <my-template if="postId">
+                    <a href="/posts/move?dir=right&postId={postId}"
+                    style="font-size: x-large; font-weight: bold; text-decoration: none"> > </a>
+                </my-template>
             </div>
+
             <div style="display: flex; flex-flow: row; justify-content: center; align-items: center; width: 100%; gap: 2rem;">
-                <button class="leftImage" style="font-size: large; font-weight: bolder; padding: 1rem;"> <</button>
+                <button class="leftImage" style="font-size: medium; font-weight: bolder; padding: 1rem; border-style: none; background: none"> <</button>
                 <div class="imageNumber"
-                     style="font-size: large; font-weight: bolder; padding: 1rem; border: black solid 1px; border-radius: 10px">
+                     style="font-size: medium; font-weight: bolder; padding: 1rem; border: black solid 1px; border-radius: 10px">
                     0
                 </div>
-                <button class="rightImage" style="font-size: large; font-weight: bolder; padding: 1rem;"> ></button>
+                <button class="rightImage" style="font-size: medium; font-weight: bolder; padding: 1rem; border-style: none; background: none"> ></button>
             </div>
             <div class="post__menu">
                 <ul class="post__menu__personal">
@@ -150,7 +161,9 @@
         <!--                </p>-->
         <!--            </li>-->
         <!--        </ul>-->
-        <a href="/posts/write">글쓰기</a>
+        <my-template if='@auth_user'>
+            <a href="/posts/write">글쓰기</a>
+        </my-template>
         <script>
             function initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay) {
                 if (imgSection == null) return;
@@ -205,13 +218,16 @@
             }
 
             // 슬라이더 초기화
-            document.addEventListener("DOMContentLoaded", function() {
+            document.addEventListener("DOMContentLoaded", function () {
                 const imgSection = document.querySelector('.img_section');
                 const leftImageButton = document.querySelector('button.leftImage');
                 const rightImageButton = document.querySelector('button.rightImage');
                 const imageIdxDisplay = document.querySelector('div.imageNumber');
 
-                const {leftImage, rightImage} = initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay);
+                const {
+                    leftImage,
+                    rightImage
+                } = initSlider(imgSection, leftImageButton, rightImageButton, imageIdxDisplay);
                 const {startSlide, stopSlide} = useSlideEffect(rightImage, 3000);
 
                 startSlide();

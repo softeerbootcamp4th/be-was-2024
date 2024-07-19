@@ -32,7 +32,7 @@ public class IndexPageHandler implements IRouteHandler {
         model.put("authorName", postUser.getName());
         model.put("post", post);
         model.put("imageLinks", post.getImageLinks());
-
+        model.put("postId", post.getId());
         res.setStatusInfo(HttpStatusType.OK);
         MyView.render(req, res, "/index", model);
     }
