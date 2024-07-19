@@ -1,14 +1,16 @@
 package util;
 
-import db.SessionDatabase;
+import db.Database;
+import db.SessionDB;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import model.Session;
-import util.constant.StringConstants;
 
 import java.io.IOException;
 
 public class HttpResponseConverter {
+    private static final Database<Session,String> sessionDatabase = SessionDB.getInstance();
+
 
 
     // httpRequest 를 httpResponse 로 변경하는 로직
@@ -16,7 +18,7 @@ public class HttpResponseConverter {
         String sessionId = httpRequest.getSessionOrNull().orElse(null);
         String userId = null;
         if (sessionId != null) {
-            userId = SessionDatabase.findSessionById(sessionId).map(Session::getUserId).orElse(null);
+            userId = sessionDatabase.findById(sessionId).map(Session::getUserId).orElse(null);
         }
 
         HttpPathMapper httpPathMapper = new HttpPathMapper();

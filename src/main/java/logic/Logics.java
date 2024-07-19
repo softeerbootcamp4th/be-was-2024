@@ -24,9 +24,9 @@ import static util.constant.StringConstants.*;
 // 알맞은 HttpRequest 에 대해 로직을 처리하고 HttpResponse 를 반환
 public class Logics {
     private static final Logger logger = LoggerFactory.getLogger(Logics.class);
-    private static final StringIdDatabase<User> userDatabase = UserDB.getInstance();
-    private static final StringIdDatabase<Session> sessionDatabase = SessionDB.getInstance();
-    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
+    private static final Database<User,String> userDatabase = UserDB.getInstance();
+    private static final Database<Session,String> sessionDatabase = SessionDB.getInstance();
+    private static final Database<Article,Long> articleDatabase = ArticleDB.getInstance();
 
     public static final String USER_ID = "userId";
     public static final String PASSWORD = "password";
@@ -91,7 +91,7 @@ public class Logics {
             sessionDatabase.save(session);
 
             //TODO : TOHeaderString 메서드로 만들기
-            headers.put("Set-Cookie", sessionDatabase.convertSessionIdToHeaderString(session.getSessionId()));
+            headers.put("Set-Cookie", convertSessionIdToHeaderString(session.getSessionId()));
 
         } else {
             headers.put("Location", "/login_failed.html");
@@ -109,7 +109,7 @@ public class Logics {
         if (sessionId!=null) {
             Session session = sessionDatabase.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
             sessionDatabase.delete(session);
-            logger.info(sessionDatabase.getLogoutString(session.getSessionId()));
+            logger.info(getLogoutString(session.getSessionId()));
         }
 
         ///header

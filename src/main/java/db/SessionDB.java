@@ -1,7 +1,6 @@
 package db;
 
 import model.Session;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class SessionDB implements StringIdDatabase<Session>{
+public class SessionDB implements Database<Session,String>{
 
     private static final Logger logger = LoggerFactory.getLogger(SessionDB.class);
     private static final SessionDB instance = new SessionDB();
@@ -36,7 +35,7 @@ public class SessionDB implements StringIdDatabase<Session>{
     @Override
     public void save(Session session) {
         logger.info("Adding session: ("+session.getUserId()+", sessionID :" + session.getSessionId(),")");
-        sessions.put(session.getUserId(), session);
+        sessions.put(session.getSessionId(), session);
     }
 
     @Override
@@ -45,14 +44,6 @@ public class SessionDB implements StringIdDatabase<Session>{
 
     }
 
-    public void deleteSession(String sessionId) {
-        sessions.remove(sessionId);
-    }
 
-    public String convertSessionIdToHeaderString(String sessionId){
-        return "sid=" + sessionId + "; Path=/";
-    }
-    public String getLogoutString(String sessionId){
-        return "Logout Success : " + sessionId;
-    }
+
 }

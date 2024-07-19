@@ -1,7 +1,5 @@
 package model;
 
-import java.util.UUID;
-
 public class Session {
     private String sessionId;
     private String userId;

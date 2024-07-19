@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class ArticleDB implements LongIdDatabase<Article> {
+public class ArticleDB implements Database<Article,Long> {
     private static final Logger logger = LoggerFactory.getLogger(ArticleDB.class);
     private static final ArticleDB instance = new ArticleDB();
     private static Map<Long, Article> articles = new HashMap<>();

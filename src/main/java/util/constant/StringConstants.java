@@ -1,15 +1,14 @@
 package util.constant;
 
 import db.ArticleDB;
-import db.LongIdDatabase;
-import logic.Logics;
+import db.Database;
 import model.Article;
 
 import java.util.Collection;
 
 public class StringConstants {
 
-    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
+    private static final Database<Article,Long> articleDatabase = ArticleDB.getInstance();
 
     public static final String SPACE = " ";
     public static final String CHARSET = "UTF-8";
@@ -130,5 +129,13 @@ public class StringConstants {
                 .append(content)
                 .append("</p>");
         return articleString.toString();
+    }
+
+    //세션 데이터베이스에서 사용할 문자열 함수
+    public static String convertSessionIdToHeaderString(String sessionId){
+        return "sid=" + sessionId + "; Path=/";
+    }
+    public static String getLogoutString(String sessionId){
+        return "Logout Success : " + sessionId;
     }
 }

@@ -12,12 +12,11 @@ import static util.constant.StringConstants.*;
 
 
 public class FileMapper {
-    private final static StringIdDatabase<User> userDatabase = UserDB.getInstance();
-    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
+    private static final Database<User, String> userDatabase = UserDB.getInstance();
+    private static final Database<Article, Long> articleDatabase = ArticleDB.getInstance();
 
-    public static byte[] getByteConvertedFile(String path,String userId) throws IOException {
+    public static byte[] getByteConvertedFile(String path, String userId) throws IOException {
         User user = userDatabase.findById(userId).orElse(null);
-//        User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + path);
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();
@@ -29,7 +28,6 @@ public class FileMapper {
 
     public static byte[] getIndexPageByteConvertedFile(String userId) throws IOException {
         User user = userDatabase.findById(userId).orElse(null);
-//        User user = UserDatabase.findUserById(userId).orElse(null);
         File file = new File(RESOURCE_PATH + "/index.html");
         InputStream fileInputStream = new FileInputStream(file);
         byte[] allBytes = fileInputStream.readAllBytes();
@@ -37,15 +35,15 @@ public class FileMapper {
         String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
         htmlContent = htmlContent.replace(DYNAMIC_ARTICLE_CONTENT, makeIndexPageArticleList());
         // 유저가 로그인 된 상태인 경우와 안된 상태 분리
-        if (user!=null) {
+        if (user != null) {
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_LOGIN, makeDynamicContentIsLoginContentWithName(user.getName()));
-        }
-        else{
+        } else {
             htmlContent = htmlContent.replace(DYNAMIC_CONTENT_IS_NOT_LOGIN, DYNAMIC_CONTENT_IS_NOT_LOGIN_CONTENT);
 
         }
         return htmlContent.getBytes(StandardCharsets.UTF_8);
     }
+
     public static byte[] getArticlePageByteConvertedFile(Map<String, String> queryParams) throws IOException {
         // queryParams로부터 article 정보 확인하기
         Long articleId = Long.parseLong(queryParams.get("id"));
@@ -57,7 +55,7 @@ public class FileMapper {
         byte[] allBytes = fileInputStream.readAllBytes();
 
         String htmlContent = new String(allBytes, StandardCharsets.UTF_8);
-        htmlContent = htmlContent.replace(DYNAMIC_ARTICLE_CONTENT, makeArticlePage(article.getTitle(),article.getContent()));
+        htmlContent = htmlContent.replace(DYNAMIC_ARTICLE_CONTENT, makeArticlePage(article.getTitle(), article.getContent()));
         // 유저가 로그인 된 상태인 경우와 안된 상태 분리
         return htmlContent.getBytes(StandardCharsets.UTF_8);
     }

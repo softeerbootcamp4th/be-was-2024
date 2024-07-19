@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class UserDB implements StringIdDatabase<User>
+public class UserDB implements Database<User,String>
 {
     private static final Logger logger = LoggerFactory.getLogger(UserDB.class);
     private static final UserDB instance = new UserDB();
