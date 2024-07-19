@@ -46,7 +46,7 @@ public class ArticleController extends AbstractController{
             formData.put(ConstantUtil.IMAGE_PATH, savedPath);
         }
 
-        formData.put(ConstantUtil.AUTHOR_NAME, user.getName()); // authorName 추가
+        formData.put(ConstantUtil.AUTHOR_NAME, user.getUserId()); // authorName 추가
         ArticleHandler.getInstance().create(formData);
         return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
     }
