@@ -31,10 +31,10 @@ public class Database {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              Statement statement = connection.createStatement()) {
 
-            String deleteUserTableSQL = "DROP TABLE IF EXISTS \"User\"";
-            String deleteArticleTableSQL = "DROP TABLE IF EXISTS \"Article\"";
-            statement.execute(deleteUserTableSQL);
-            statement.execute(deleteArticleTableSQL);
+//            String deleteUserTableSQL = "DROP TABLE IF EXISTS \"User\"";
+//            String deleteArticleTableSQL = "DROP TABLE IF EXISTS \"Article\"";
+//            statement.execute(deleteUserTableSQL);
+//            statement.execute(deleteArticleTableSQL);
 
             String createUserTableSQL = "CREATE TABLE IF NOT EXISTS \"User\" (" +
                     "userId VARCHAR(255) PRIMARY KEY, " +

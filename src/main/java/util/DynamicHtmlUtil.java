@@ -50,6 +50,7 @@ public class DynamicHtmlUtil {
             for(Article article : articles){
                 sb.append("<tr>")
                         .append("<th scope=\"row\">").append(articles.indexOf(article) + 1).append("</th>")
+                        .append("<td>").append(article.getAuthorName()).append("</td>")
                         .append("<td>").append(article.getTitle()).append("</td>")
                         .append("<td>").append(article.getContent()).append("</td>");
 
