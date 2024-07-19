@@ -2,6 +2,8 @@ package db;
 
 import model.Post;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,5 +46,30 @@ public class PostDatabase {
         }
 
         return titles;
+    }
+
+    public static Post findPostByUserIdAndTitle(String userId, String title) {
+        userId = URLDecoder.decode(userId, StandardCharsets.UTF_8);
+        title = URLDecoder.decode(title, StandardCharsets.UTF_8);
+
+        String sqlSelect = "SELECT * FROM Posts WHERE userId = '" + userId + "' AND title = '" + title + "'";
+
+        Post foundPost = null;
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sqlSelect)) {
+
+            if (rs.next()) {
+                foundPost = new Post.Builder()
+                        .title(rs.getString("title"))
+                        .content(rs.getString("content"))
+                        .build();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return foundPost;
     }
 }
