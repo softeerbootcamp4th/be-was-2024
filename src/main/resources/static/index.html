@@ -98,8 +98,10 @@
         // 게시글 목록을 HTML에 추가
         postsContainer.innerHTML = data.boards.map(board => `
           <div class="post">
-          <a class="btn btn_contained btn_size_s" href="/showBoard/${board.title}"><h3>${board.title}</h3></a>
+          <h3>${board.title}</h3>
+          <h3>${board.content}</h3>
             <img src ="data:image/jpeg;base64,${board.image}">
+            <br><br><br>
           </div>
         `).join("");
       } else {

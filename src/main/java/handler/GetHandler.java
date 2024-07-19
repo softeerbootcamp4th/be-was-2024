@@ -190,6 +190,7 @@ public class GetHandler {
                 String base64Image = Base64.getEncoder().encodeToString(board.getImage());
                 json.append("{");
                 json.append("\"title\": \"").append(URLDecoder.decode(board.getTitle(),StandardCharsets.UTF_8)).append("\",");
+                json.append("\"content\": \"").append(URLDecoder.decode(board.getContent(),StandardCharsets.UTF_8)).append("\",");
                 json.append("\"image\": \"").append(base64Image).append("\"");
                 json.append("}");
                 if (i < boards.size() - 1) {
