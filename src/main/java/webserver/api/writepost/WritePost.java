@@ -70,7 +70,7 @@ public class WritePost implements FunctionHandler {
                     if (namePart.length() > namelengthlimit){
                         namePart = namePart.substring(0, namelengthlimit);
                     }
-                    while(new File(namePart +"("+ instantnum +")" + extensionPart).exists()){
+                    while(new File(root + namePart +"("+ instantnum +")" + extensionPart).exists()){
                         instantnum++;
                     }
                     imgpath = root + namePart +"("+ instantnum +")" + extensionPart;
