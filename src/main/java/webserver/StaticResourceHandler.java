@@ -1,6 +1,7 @@
 package webserver;
 
 import enums.FileType;
+import enums.HttpHeader;
 import enums.Status;
 import utils.HttpRequestParser;
 import utils.HttpResponseHandler;
@@ -24,8 +25,8 @@ public class StaticResourceHandler {
         byte[] body = readFileToByteArray(filePath);
         httpResponseHandler
                 .setStatus(Status.OK)
-                .addHeader("Content-Type", FileType.getContentTypeByExtension(extension))
-                .addHeader("Content-Length", String.valueOf(body.length))
+                .addHeader(HttpHeader.CONTENT_TYPE, FileType.getContentTypeByExtension(extension))
+                .addHeader(HttpHeader.CONTENT_LENGTH, String.valueOf(body.length))
                 .setBody(body)
                 .respond();
     }
