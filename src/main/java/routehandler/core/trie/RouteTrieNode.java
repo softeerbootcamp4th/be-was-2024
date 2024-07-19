@@ -3,12 +3,14 @@ package routehandler.core.trie;
 import http.enums.HttpMethodType;
 import routehandler.core.IRouteHandler;
 import routehandler.core.exception.NoMatchedMethodException;
-import routehandler.core.exception.NoMatchedRouteException;
 import routehandler.utils.RouteUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 전체 경로 중 /로 구분되는 한 path segment를 라우팅하는 노드
+ */
 public class RouteTrieNode {
     private final Map<String, RouteTrieNode> children;
     private RouteTrieNode pathVariableNode;

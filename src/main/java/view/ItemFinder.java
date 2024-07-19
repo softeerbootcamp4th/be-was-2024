@@ -6,6 +6,9 @@ import view.exception.TemplateExceptionMessage;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+/**
+ * 객체가 가진 프로퍼티를 찾아주는 클래스
+ */
 public class ItemFinder {
        private final Map<String, Object> items;
 

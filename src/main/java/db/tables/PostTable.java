@@ -96,6 +96,10 @@ public class PostTable {
         });
     }
 
+    /**
+     * 게시글 목록에 대해 대응되는 이미지 링크를 채운다.
+     * @param posts 이미지를 채울 게시글 목록
+     */
     public static void fetchImageLinks(List<Post> posts) {
         List<Integer> postIds = posts.stream().map(Post::getId).toList();
 
@@ -113,6 +117,10 @@ public class PostTable {
         }
     }
 
+    /**
+     * 하나의 게시글에 대해 대응되는 이미지 링크를 채운다.
+     * @param post 이미지를 채울 게시글
+     */
     public static void fetchImageLinks(Post post) {
         List<ImageLink> imageLinks = ImageLinkTable.findByPostIdInClause(List.of(post.getId()));
         post.setImageLinks(imageLinks);
@@ -142,6 +150,10 @@ public class PostTable {
         });
     }
 
+    /**
+     * 최근 생성된 게시글을 가져온다
+     * @return 최근 생성된 게시글
+     */
     public static Post findLastCreated() {
         return DBUtil.query((conn) -> {
             try (
@@ -164,6 +176,11 @@ public class PostTable {
         });
     }
 
+    /**
+     * 앞 게시글의 id를 가져온다
+     * @param id 현재 게시글의 id
+     * @return 앞 게시글의 id ( 없으면 null )
+     */
     public static Integer findBeforeId(int id) {
         return DBUtil.query(conn -> {
             try (PreparedStatement stmt = conn.prepareStatement(findBeforeSQL)) {
@@ -183,6 +200,11 @@ public class PostTable {
         });
     }
 
+    /**
+     * 뒤 게시글의 id를 가져온다
+     * @param id 현재 게시글의 id
+     * @return 뒤 게시글의 id ( 없으면 null )
+     */
     public static Integer findAfterId(int id) {
         return DBUtil.query(conn -> {
             try (PreparedStatement stmt = conn.prepareStatement(findAfterSQL)) {

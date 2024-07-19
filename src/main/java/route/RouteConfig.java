@@ -13,6 +13,9 @@ import route.routes.auth.SignUpHandler;
 import route.routes.user.UserListPageHandler;
 import routehandler.utils.Route;
 
+/**
+ * 현재 서비스의 경로와 핸들러를 매칭하는 설정 파일
+ */
 public class RouteConfig {
     public static RouteHandleChain routeHandleChain() {
         return new RouteHandleChain(

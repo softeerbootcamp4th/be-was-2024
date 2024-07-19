@@ -5,6 +5,9 @@ import http.cookie.enums.CookieAttribute;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * http 쿠키를 추상화 한 클래스
+ */
 public class MyCookie {
     private final String key;
     private String value;

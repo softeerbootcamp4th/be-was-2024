@@ -25,11 +25,11 @@ public class WebServer {
 
         ChainManager chainManager = new ChainManager(
                 new UserSessionChain(),
-//            new AuthRedirectToLoginChain(
-//                    "/user/list",
-//                    "/posts/write",
-//                    "/posts/edit"
-//            ),
+                new AuthRedirectToLoginChain(
+                        "/user/list",
+                        "/posts/write",
+                        "/posts/edit"
+                ),
                 new StaticResourceChain(),
                 new UploadResourceChain(),
                 new MultipartHandleChain(),

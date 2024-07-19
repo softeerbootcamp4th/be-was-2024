@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileReadUtil;
 
+/**
+ * 사용자가 업로드한 자원을 찾을 때 사용하는 체인
+ */
 public class UploadResourceChain extends MiddlewareChain {
     private static final Logger logger = LoggerFactory.getLogger(UploadResourceChain.class);
     @Override

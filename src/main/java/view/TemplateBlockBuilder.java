@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * my-template 하나의 템플릿 블록을 치환해주는 빌더 클래스
+ */
 public class TemplateBlockBuilder {
 
     public static String build(Map<String, String> attributes, String body, ItemFinder finder) {

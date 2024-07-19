@@ -12,6 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * View를 제공하는 클래스
+ */
 public class MyView {
     private static final Logger logger = LoggerFactory.getLogger(MyView.class);
 

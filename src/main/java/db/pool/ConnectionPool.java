@@ -6,11 +6,15 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * JDBC 커넥션에 대한 커넥션 풀을 구현한 클래스
+ */
 public class ConnectionPool {
     private static final Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
 
@@ -47,6 +51,10 @@ public class ConnectionPool {
         }
     }
 
+    /**
+     * 현재 유효한 커넥션을 얻는다. 유효 커넥션이 없다면 null을 반환한다
+     * @return 유효한 커넥션 ( 없으면 null )
+     */
     public synchronized Connection getConnection() {
         for (var pooled : connections) {
             if (pooled.isUsed()) continue;
@@ -59,6 +67,10 @@ public class ConnectionPool {
         return null;
     }
 
+    /**
+     * 다 이용한 커넥션을 커넥션 풀에 반납한다.
+     * @param connection 반납할 커넥션
+     */
     public void releaseConnection(Connection connection) {
         var usedConnection = usedConnections.get(connection);
         if (usedConnection == null) return;
@@ -68,7 +80,10 @@ public class ConnectionPool {
         usedConnection.setUsed(false);
     }
 
-    public void close() throws Exception {
+    /**
+     * 커넥션 풀을 닫는다.
+     */
+    public void close() throws SQLException {
         for (var pooled : connections) {
             Connection connection = pooled.getConnection();
             if (connection != null && !connection.isClosed()) {

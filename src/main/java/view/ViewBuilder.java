@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 뷰 빌더
+ */
 public class ViewBuilder {
 
     // original view를 적절한 형태로 변환한다.

@@ -14,6 +14,9 @@ import routehandler.core.trie.RouteTrie;
 import routehandler.utils.Route;
 import routehandler.utils.RouteRecord;
 
+/**
+ * 유저가 요청한 경로에 대한 라우팅을 처리하는 체인.
+ */
 public class RouteHandleChain extends MiddlewareChain {
     private static Logger logger = LoggerFactory.getLogger(RouteHandleChain.class);
     private final RouteTrie trie;

@@ -8,6 +8,9 @@ import http.enums.HttpStatusType;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * http response 메시지로부터 http response message 를 빌드하는 유틸 기능
+ */
 public class HttpResponseMessageBuildUtil {
     public static byte[] build(MyHttpResponse response) {
         StringBuilder builder = new StringBuilder();

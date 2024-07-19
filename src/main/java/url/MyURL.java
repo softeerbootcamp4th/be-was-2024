@@ -8,8 +8,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-// 필요하면 나머지도 구현
-
+/**
+ * URL을 추상화한 객체
+ */
 public class MyURL {
     private String protocol;
     private String domain;

@@ -1,5 +1,8 @@
 package routehandler.core.exception;
 
+/**
+ * 대응되는 경로가 없음을 표현하는 예외
+ */
 public class NoMatchedRouteException extends RuntimeException {
 
     public NoMatchedRouteException() {

@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * content-type = multipart/form-data 인 요청이 들어왔을 때, 요청 데이터를 파싱하는 체인
+ */
 public class MultipartHandleChain extends MiddlewareChain {
     private static final Logger logger = LoggerFactory.getLogger(MultipartHandleChain.class);
     public static final String boundaryRegex = "multipart/form-data\\s*;\\s*boundary\\s*=\\s*(.*)";

@@ -77,6 +77,11 @@ public class ImageLinkTable {
         });
     }
 
+    /**
+     * in 키워드를 기반으로 이미지 목록을 받아온다.
+     * @param postIds 게시글의 id 리스트
+     * @return id 리스트에 매칭된 게시글 리스트
+     */
     public static List<ImageLink> findByPostIdInClause(List<Integer> postIds) {
         return DBUtil.query((conn) -> {
             StringBuilder queryBuilder = new StringBuilder();

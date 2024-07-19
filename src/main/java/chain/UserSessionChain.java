@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import session.MySession;
 
+/**
+ * 유저 로그인 정보(세션 정보)를 관리하는 체인
+ */
 public class UserSessionChain extends MiddlewareChain {
     private static final Logger logger = LoggerFactory.getLogger(UserSessionChain.class);
     @Override

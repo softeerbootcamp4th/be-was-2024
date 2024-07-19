@@ -5,6 +5,9 @@ import config.AppConfig;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 
+/**
+ * 유저가 로그인하지 않았을 때 로그인 페이지로 redirect하는 체인
+ */
 public class AuthRedirectToLoginChain extends MiddlewareChain {
     String[] authUrls;
     public AuthRedirectToLoginChain(String... urls) {

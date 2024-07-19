@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SignInHandler implements IRouteHandler {
-    private final static Logger logger = LoggerFactory.getLogger(SignUpHandler.class);
-
     @Override
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         String formData = new String(req.getBody(), StandardCharsets.UTF_8);
