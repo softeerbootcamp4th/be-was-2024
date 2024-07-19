@@ -11,6 +11,7 @@ import util.RequestObject;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +32,12 @@ public class GetHandler
     public void handleGetRequest(DataOutputStream dos, RequestObject requestObject)
     {
         String path = requestObject.getPath();
+        if(path.startsWith("/showBoard"))
+        {
+            String boardTitle = path.substring("/showBoard/".length());
+            sendBoardContent(dos,boardTitle);
+            return;
+        }
         try {
             switch(path) {
                 case "/user/info" : handleUserInfoRequest(dos,requestObject);
@@ -165,6 +172,33 @@ public class GetHandler
         dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
         dos.writeBytes("\r\n");
         responseBody(dos,bodyBytes);
+    }
+
+    private void sendBoardContent(DataOutputStream dos,String boardTitle) {
+        try {
+            logger.error(boardTitle);
+            Board board = Database.getOneBoard(boardTitle);
+            if (board != null) {
+                String jsonResponse = String.format("{\"title\":\"%s\", \"content\":\"%s\"}",
+                        URLDecoder.decode(board.getTitle(),StandardCharsets.UTF_8),URLDecoder.decode(board.getContent(),StandardCharsets.UTF_8));
+                byte[] bodyBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+                dos.writeBytes("HTTP/1.1 200 OK \r\n");
+                dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");
+                dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+                dos.writeBytes("\r\n");
+                dos.write(bodyBytes);
+            } else {
+                dos.writeBytes("HTTP/1.1 404 Not Found \r\n");
+                dos.writeBytes("\r\n");
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage());
+        }
+        catch(SQLException e)
+        {
+            logger.error(e.getMessage());
+        }
+
     }
 
     private void sendBoardList(DataOutputStream dos) {

@@ -32,4 +32,9 @@ public class Database {
     public static List<Board> getBoards() throws SQLException {
         return boardDao.getBoards();
     }
+
+    public static Board getOneBoard(String title) throws SQLException
+    {
+        return boardDao.getOneBoard(title);
+    }
 }

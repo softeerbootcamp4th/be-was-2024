@@ -32,4 +32,23 @@ public class BoardDao {
         }
         return boards;
     }
+
+    public Board getOneBoard(String title) throws SQLException{
+        String sql = "SELECT * FROM boards WHERE title=?";
+        try(Connection connection = DatabaseUtil.getConnection(); PreparedStatement pstmt = connection.prepareStatement(sql))
+        {
+            pstmt.setString(1,title);
+            try(ResultSet rs = pstmt.executeQuery()){
+                if(rs.next()){
+                    String boardTitle = rs.getString("title");
+                    String content = rs.getString("content");
+                    return new Board(boardTitle,content);
+                }
+                else {
+                    return null;
+                }
+            }
+
+        }
+    }
 }
