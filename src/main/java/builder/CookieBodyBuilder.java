@@ -2,7 +2,6 @@ package builder;
 
 import utils.ResourceUtil;
 import handler.SessionHandler;
-import model.User;
 import model.ViewData;
 
 import java.io.IOException;
@@ -22,6 +21,8 @@ public class CookieBodyBuilder extends BodyBuilder {
             return getIndexHtmlBody();
         } else if (viewData.getUrl().equals("/user/list.html")) {
             return getUserListHtmlBody();
+        } else if (viewData.getUrl().equals("/post/index.html")) {
+            return getPostHtmlBody();
         } else {
             return getDefaultBody();
         }
@@ -45,6 +46,13 @@ public class CookieBodyBuilder extends BodyBuilder {
     private byte[] getUserListHtmlBody() throws IOException {
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         String body = htmlBuilder.generateUserListHtml();
+        return body.getBytes();
+    }
+
+    private byte[] getPostHtmlBody() throws IOException {
+        String sessionId = this.cookie;
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        String body = htmlBuilder.generatePostHtml(sessionId, viewData.getTitle());
         return body.getBytes();
     }
 
