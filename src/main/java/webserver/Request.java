@@ -6,6 +6,7 @@ import utils.CookieUtil;
 import utils.RequestLineUtil;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +71,7 @@ public class Request {
         }
 
         stringBody = new String(byteBody, StandardCharsets.UTF_8);
+        stringBody = URLDecoder.decode(stringBody, StandardCharsets.UTF_8);
     }
 
     private void parseRequestLine(String requestLine) {
