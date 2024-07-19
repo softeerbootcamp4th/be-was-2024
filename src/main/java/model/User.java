@@ -28,6 +28,10 @@ public class User {
         this(0, userId, password, name, email);
     }
 
+    public int getId() {
+        return id;
+    }
+
     public String getUserId() {
         return userId;
     }

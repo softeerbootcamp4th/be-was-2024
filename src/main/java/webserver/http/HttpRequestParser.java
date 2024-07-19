@@ -152,6 +152,10 @@ public class HttpRequestParser {
     }
 
     public Map<String, String> parseCookie(String cookie) {
+        if (cookie == null) {
+            return null;
+        }
+        
         Map<String, String> cookies = new HashMap<>();
 
         String[] keyValues = cookie.split("; ");

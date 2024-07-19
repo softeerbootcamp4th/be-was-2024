@@ -63,7 +63,7 @@ public class LoginUserMapper implements HttpMapper {
         }
 
         UUID sessionId = UUID.randomUUID();
-        SessionTable.addSession(sessionId, userId);
+        SessionTable.addSession(sessionId, user.getId());
 
         Map<String, String> responseHeaders = new HashMap<>();
         responseHeaders.put("Set-Cookie", "sId=" + sessionId + "; Path=/");
