@@ -1,9 +1,6 @@
 package logic;
 
-import db.ArticleDatabase;
-import db.SessionDatabase;
-import db.StringIdDatabase;
-import db.UserDB;
+import db.*;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import model.Article;
@@ -28,6 +25,8 @@ import static util.constant.StringConstants.*;
 public class Logics {
     private static final Logger logger = LoggerFactory.getLogger(Logics.class);
     private static final StringIdDatabase<User> userDatabase = UserDB.getInstance();
+    private static final StringIdDatabase<Session> sessionDatabase = SessionDB.getInstance();
+    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
 
     public static final String USER_ID = "userId";
     public static final String PASSWORD = "password";
@@ -89,10 +88,10 @@ public class Logics {
             logger.info("userId : "+userId+"Login successful");
 
             Session session = new Session(UUID.randomUUID().toString(),userId,EXPIRE_TIME);
-            SessionDatabase.addSession(session);
+            sessionDatabase.save(session);
 
             //TODO : TOHeaderString 메서드로 만들기
-            headers.put("Set-Cookie", SessionDatabase.convertSessionIdToHeaderString(session.getSessionId()));
+            headers.put("Set-Cookie", sessionDatabase.convertSessionIdToHeaderString(session.getSessionId()));
 
         } else {
             headers.put("Location", "/login_failed.html");
@@ -106,10 +105,11 @@ public class Logics {
             throw new RuntimeException("Invalid method");
         }
 
-        String session = httpRequest.getSessionOrNull().orElse(null);
-        if (session!=null) {
-            SessionDatabase.deleteSession(session);
-            logger.info(SessionDatabase.getLogoutString(session));
+        String sessionId = httpRequest.getSessionOrNull().orElse(null);
+        if (sessionId!=null) {
+            Session session = sessionDatabase.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
+            sessionDatabase.delete(session);
+            logger.info(sessionDatabase.getLogoutString(session.getSessionId()));
         }
 
         ///header
@@ -170,7 +170,7 @@ public class Logics {
         String content = bodyToMap.get(CONTENT);
 
         Article article =  Article.of(title,content,Article.getArticleIndex());
-        ArticleDatabase.addArticle(article);
+        articleDatabase.save(article);
 
         headers.put("Location", "/index.html");
 

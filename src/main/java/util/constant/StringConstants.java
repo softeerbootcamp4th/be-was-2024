@@ -1,12 +1,16 @@
 package util.constant;
 
-import db.ArticleDatabase;
+import db.ArticleDB;
+import db.LongIdDatabase;
 import logic.Logics;
 import model.Article;
 
 import java.util.Collection;
 
 public class StringConstants {
+
+    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
+
     public static final String SPACE = " ";
     public static final String CHARSET = "UTF-8";
     public static final String EMPTY_SPACE = "";
@@ -92,7 +96,7 @@ public class StringConstants {
     }
 
     public static final String makeIndexPageArticleList() {
-        Collection<Article> articles = ArticleDatabase.findAll();
+        Collection<Article> articles = articleDatabase.findAll();
         StringBuilder htmlString = new StringBuilder();
 
         htmlString.append("""

@@ -8,4 +8,6 @@ public interface Database<T> {
     public List<T> findAll();
 
     public void save(T t);
+
+    public void delete(T t);
 }

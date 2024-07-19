@@ -12,6 +12,8 @@ import java.util.Optional;
 public class UserDatabase {
     private static final Logger logger = LoggerFactory.getLogger(UserDatabase.class);
 
+
+
     private static Map<String, User> users = new HashMap<>();
 
     public static void addUser(User user) {

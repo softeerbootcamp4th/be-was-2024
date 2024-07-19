@@ -37,4 +37,9 @@ public class UserDB implements StringIdDatabase<User>
         logger.info("Adding user: " + user.getName());
         users.put(user.getUserId(), user);
     }
+
+    @Override
+    public void delete(User user) {
+
+    }
 }

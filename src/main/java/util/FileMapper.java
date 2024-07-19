@@ -1,8 +1,6 @@
 package util;
 
-import db.ArticleDatabase;
-import db.StringIdDatabase;
-import db.UserDB;
+import db.*;
 import model.Article;
 import model.User;
 
@@ -15,6 +13,7 @@ import static util.constant.StringConstants.*;
 
 public class FileMapper {
     private final static StringIdDatabase<User> userDatabase = UserDB.getInstance();
+    private static final LongIdDatabase<Article> articleDatabase = ArticleDB.getInstance();
 
     public static byte[] getByteConvertedFile(String path,String userId) throws IOException {
         User user = userDatabase.findById(userId).orElse(null);
@@ -50,7 +49,7 @@ public class FileMapper {
     public static byte[] getArticlePageByteConvertedFile(Map<String, String> queryParams) throws IOException {
         // queryParams로부터 article 정보 확인하기
         Long articleId = Long.parseLong(queryParams.get("id"));
-        Article article = ArticleDatabase.findArticleById(articleId).orElseThrow(() -> new RuntimeException("해당 articleId로 글을 찾을 수 없습니다."));
+        Article article = articleDatabase.findById(articleId).orElseThrow(() -> new RuntimeException("해당 articleId로 글을 찾을 수 없습니다."));
 
 
         File file = new File(RESOURCE_PATH + "/article.html");
