@@ -18,6 +18,11 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
 }
 
+javadoc{
+    source = sourceSets.main.java.srcDirs
+    options.encoding = 'UTF-8'
+}
+
 test {
     useJUnitPlatform()
 }
