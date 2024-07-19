@@ -17,8 +17,15 @@
             var name = document.forms["question"]["name"].value.trim();
             var email = document.forms["question"]["email"].value.trim();
 
+            var koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
             if (userId === "" || password === "" || name === "" || email === "") {
                 alert("모든 필드를 입력해 주세요.");
+                return false;
+            }
+
+            if (koreanRegex.test(userId) || koreanRegex.test(email)) {
+                alert("아이디나 이메일에는 한글을 사용할 수 없습니다.");
                 return false;
             }
             return true;

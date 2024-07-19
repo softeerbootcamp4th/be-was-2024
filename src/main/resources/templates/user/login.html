@@ -14,10 +14,18 @@
             var userId = document.forms["question"]["userId"].value.trim();
             var password = document.forms["question"]["password"].value.trim();
 
+            var koreanRegex = /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/;
+
             if (userId === "" || password === "") {
                 alert("모든 필드를 입력해 주세요.");
                 return false;
             }
+
+            if (koreanRegex.test(userId)) {
+                alert("아이디에 한글을 사용할 수 없습니다.");
+                return false;
+            }
+
             return true;
         }
     </script>
