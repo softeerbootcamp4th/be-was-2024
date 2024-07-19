@@ -49,8 +49,8 @@ public class FrontRequestProcess {
                 if (idx == -1) throw new RequestException(ConstantUtil.INVALID_PATH + path);
                 String extension = path.substring(idx + 1);
                 if(!extension.equals(ContentType.HTML.getExtension())) {
-                    if (!ContentType.isSupported(extension)) { // 잘못된 파일확장자
-                        return HttpResponse.notFound(request.getHttpVersion());
+                    if (!ContentType.isSupported(extension)) { // 잘못된 파일확장자는 무조건 메인화면으로 리다이렉트
+                        return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
                     }
                     return HttpResponse.forward(path, request.getHttpVersion());
                 }
