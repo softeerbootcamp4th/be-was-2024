@@ -136,17 +136,16 @@ public class PathMap {
         PathNode current = root;
         if(routes.length > 1){
             for(int i = 1; i < routes.length; i++){
-                // 하단에 path variable이  있다면
-                if(current.getPathvariable()!=null ){
-                    //path variable 추가
-                    request.addPathVariable(current.getPathvariable(), routes[i]);
-                    if(++i >= routes.length){
-                        break;
-                    }
-                }
                 PathNode next = current.findChild(routes[i]);
                 if(next == null) {
-                    break;
+                    // 하단에 path variable이  있다면
+                    if(current.getPathvariable()!=null ){
+                        //path variable 추가
+                        request.addPathVariable(current.getPathvariable(), routes[i]);
+                        if(++i >= routes.length){
+                            break;
+                        }
+                    }else break;
                 }
                 current = next;
             }
