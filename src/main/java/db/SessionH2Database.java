@@ -5,6 +5,7 @@ import model.Session;
 
 import java.sql.*;
 
+@Deprecated
 public class SessionH2Database {
 
     private final static String URL = DatabaseInfo.DB_URL.getKey();

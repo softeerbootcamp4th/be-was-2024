@@ -4,6 +4,7 @@ import common.*;
 import db.UserH2Database;
 import exception.CannotResolveRequestException;
 import facade.ArticleFacade;
+import facade.AuthenticationFacade;
 import facade.SessionFacade;
 import facade.UserFacade;
 import file.ViewFile;
@@ -45,6 +46,7 @@ public class WebAdapter {
     private static void resolvePostRequest(HttpRequest request, OutputStream out) throws IOException {
         // POST registration
         if(request.getPath().equals(RestUri.REGISTRATION.getUri())) {
+            AuthenticationFacade.redirectHomeIfNotAuthenticated(request, out);
             // body의 유저 정보 파싱
             Map<String, String> map = StringUtils.parseBodyInForm(request.getBody());
             // 유저 생성
@@ -60,9 +62,10 @@ public class WebAdapter {
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
                 Session newSession = SessionFacade.createSession(map.get("userId"));
 
+
+
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
                 hashMap.put(SESSION_ID, newSession.getId());
-
                 response = ResponseUtils.redirectToViewWithCookie(hashMap);
 
             } else { // id, pwd 불일치
@@ -78,6 +81,7 @@ public class WebAdapter {
             HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
             response.writeInBytes(out);
         } else if(request.getPath().equals(RestUri.ARTICLE.getUri())) {
+            AuthenticationFacade.redirectHomeIfNotAuthenticated(request, out);
             // 게시글 데이터 및 DB 저장
             ArticleFacade.saveArticleData(request);
 
@@ -93,18 +97,15 @@ public class WebAdapter {
      * 비즈니스 로직 처리가 필요하다면 처리한 후, 뷰 응답
      */
     private static void resolveGetRequest(HttpRequest request, OutputStream out) throws IOException {
-        // GET으로 회원가입 요청시 400 응답
         if(request.getPathWithoutQueryParam().equals(RestUri.USER_LIST.getUri())) {
-            HttpResponse response;
-            // 인증된 요청일경우 표시
-            if(SessionFacade.isAuthenticatedRequest(request)) {
-                Collection<User> users = UserH2Database.findAll();
-                String jsonUser = JsonBuilder.buildJsonResponse(users);
+            // 인증 여부 확인
+            AuthenticationFacade.redirectHomeIfNotAuthenticated(request, out);
 
-                response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
-            } else {
-                response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
-            }
+            Collection<User> users = UserH2Database.findAll();
+            String jsonUser = JsonBuilder.buildJsonResponse(users);
+
+            HttpResponse response = ResponseUtils.responseSuccessWithJson(jsonUser.length(), jsonUser.getBytes());
+
             response.writeInBytes(out);
             return;
         }
@@ -126,14 +127,8 @@ public class WebAdapter {
             }
             response.writeInBytes(out);
             return;
-        } else if(request.getPath().equals(RestUri.LOGIN.getUri())) {
-            HttpResponse response;
-            // 인증된 상태에서 로그인하려 할 경우 홈화면으로 리다이렉트
-            if(SessionFacade.isAuthenticatedRequest(request)) {
-                response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
-                response.writeInBytes(out);
-                return;
-            }
+        } else if(request.getPath().equals(RestUri.LOGIN.getUri()) || request.getPath().equals(RestUri.REGISTRATION.getUri())) {
+            AuthenticationFacade.redirectHomeIfAuthenticated(request, out);
         }
 
         // 별도 GET 처리 로직이 없는경우 뷰를 찾아 반환

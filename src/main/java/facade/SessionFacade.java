@@ -20,7 +20,6 @@ public class SessionFacade {
 
     public static boolean isAuthenticatedRequest(HttpRequest request) {
         String SID = request.getCookie().get(SESSION_ID);
-        System.out.println("SID = " + SID);
 
         SessionDatabase.removeExpiredSessions();
 
