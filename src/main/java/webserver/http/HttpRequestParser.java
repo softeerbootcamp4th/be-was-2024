@@ -4,12 +4,15 @@ import db.SessionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.enums.HttpMethod;
+import webserver.http.multipart.ContentDisposition;
+import webserver.http.multipart.Part;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -30,7 +33,7 @@ public class HttpRequestParser {
         return instance;
     }
 
-    public MyHttpRequest parseRequest(InputStream in) throws IOException {
+    public MyHttpRequest parseRequest(InputStream in) {
         ByteArrayOutputStream requestLineBuffer = new ByteArrayOutputStream();
         int nextByte;
 
@@ -175,5 +178,57 @@ public class HttpRequestParser {
     public boolean isLogin(MyHttpRequest httpRequest) {
         Map<String, String> cookie = parseCookie(httpRequest.getHeaders().get(COOKIE_HEADER));
         return cookie.containsKey(SESSION_ID) && SessionTable.findUserIdBySessionId(UUID.fromString(cookie.get(SESSION_ID))) != null;
+    }
+
+    public ArrayList<Part> parseMultipartFormData(byte[] body, String boundary) {
+        ArrayList<Part> multiParts = new ArrayList<>();
+
+        String[] parts = new String(body, StandardCharsets.ISO_8859_1).split("--" + boundary);
+
+        if (parts.length > 4) {
+            throw new IllegalArgumentException("Invalid multipart/form-data: " + new String(body, StandardCharsets.ISO_8859_1));
+        }
+
+        for (int i = 1; i < parts.length - 1; i++) {
+            int headersAndBodyIndex = parts[i].indexOf("\r\n\r\n");
+            if (headersAndBodyIndex == -1) {
+                throw new IllegalArgumentException("Invalid multipart/form-data: " + parts[i]);
+            }
+
+            String headers = parts[i].substring(0, headersAndBodyIndex);
+            String bodyPart = trimCRLF(parts[i].substring(headersAndBodyIndex + 4));
+
+            String[] headerLines = trimCRLF(headers).split("\r\n");
+            Map<String, String> headerMap = new HashMap<>();
+            ContentDisposition disposition = new ContentDisposition();
+
+            for (String headerLine : headerLines) {
+                String[] header = headerLine.split(":");
+                if (header.length != 2) {
+                    throw new IllegalArgumentException("Invalid header: " + headerLine);
+                }
+
+                if (header[0].trim().toLowerCase().equals("content-disposition")) {
+                    disposition = ContentDisposition.parse(header[1]);
+                } else {
+                    headerMap.put(header[0].trim(), header[1].trim());
+                }
+
+            }
+
+            multiParts.add(new Part(disposition, disposition.getFilename(), headerMap, bodyPart.getBytes(StandardCharsets.ISO_8859_1)));
+        }
+
+        return multiParts;
+    }
+
+    private String trimCRLF(String str) {
+        if (str.startsWith("\r\n")) {
+            str = str.substring(2);
+        }
+        if (str.endsWith("\r\n")) {
+            str = str.substring(0, str.length() - 2);
+        }
+        return str;
     }
 }
