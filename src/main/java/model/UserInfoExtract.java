@@ -27,6 +27,9 @@ public class UserInfoExtract {
         String name = userInfo.get("name");
         String email = userInfo.get("email");
 
+        if(password.contains("%")){
+            throw new RuntimeException();
+        }
         if(Database.findUserById(userId) != null){
             throw new RuntimeException();
         }
