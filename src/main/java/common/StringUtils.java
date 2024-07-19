@@ -1,5 +1,10 @@
 package common;
 
+import web.HttpResponse;
+import web.ViewPath;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 
 public class StringUtils {
@@ -12,14 +17,19 @@ public class StringUtils {
      * url-encoded 형태로 오는 body를 Map으로 파싱
      * TODO 현재 내용이 empty일 때 문제 발생
      */
-    public static Map<String, String> parseBodyInForm(byte[] body) {
+    public static Map<String, String> parseBodyInForm(byte[] body, OutputStream out) throws IOException {
         HashMap<String, String> map = new HashMap<>();
         String bodyStr = new String(body);
         String[] chunks = bodyStr.split("&");
         for (String chunk : chunks) {
-            String key = chunk.split("=")[0];
-            String value = chunk.split("=")[1];
-            map.put(key, value);
+            if(chunk.split("=").length<2) {
+                HttpResponse response = ResponseUtils.redirectToView(ViewPath.LOGIN);
+                response.writeInBytes(out);
+            } else {
+                String key = chunk.split("=")[0];
+                String value = chunk.split("=")[1];
+                map.put(key, value);
+            }
         }
         return map;
     }

@@ -13,6 +13,8 @@ public class UserH2Database {
     private final static String PASSWORD = DatabaseInfo.DB_PASSWORD.getKey();
 
     public static User addUser(User user) {
+        if(user.getUserId()==null || user.getPassword()==null || user.getName()==null) return null;
+
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             String query = "INSERT INTO users (user_id, password, name, email) VALUES (?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {

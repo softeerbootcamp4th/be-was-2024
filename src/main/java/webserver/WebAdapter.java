@@ -48,21 +48,24 @@ public class WebAdapter {
         if(request.getPath().equals(RestUri.REGISTRATION.getUri())) {
             AuthenticationFacade.redirectHomeIfNotAuthenticated(request, out);
             // body의 유저 정보 파싱
-            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody());
+            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody(), out);
             // 유저 생성
-            UserFacade.createUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
+            User createUser = UserFacade.createUser(new User(map.get("userId"), map.get("password"), map.get("name"), ""));
 
-            HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
-            response.writeInBytes(out);
+            if(createUser!=null) {
+                HttpResponse response = ResponseUtils.redirectToView(ViewPath.DEFAULT);
+                response.writeInBytes(out);
+            } else {
+                HttpResponse response = ResponseUtils.redirectToView(ViewPath.REGISTRATION);
+                response.writeInBytes(out);
+            }
 
         } else if(request.getPath().equals(RestUri.LOGIN.getUri())) {
-            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody()); // userId, password
+            Map<String, String> map = StringUtils.parseBodyInForm(request.getBody(), out); // userId, password
             HttpResponse response;
 
             if(UserFacade.isUserExist(map)) { // id, pw 일치하다면
                 Session newSession = SessionFacade.createSession(map.get("userId"));
-
-
 
                 Map<String, String> hashMap = new ConcurrentHashMap<>();
                 hashMap.put(SESSION_ID, newSession.getId());
