@@ -3,6 +3,7 @@ package builder;
 import db.PostDatabase;
 import db.UserDatabase;
 import handler.SessionHandler;
+import model.Post;
 import model.User;
 import utils.ResourceUtil;
 
@@ -39,7 +40,8 @@ public class HtmlBuilder {
         List<String> titles = PostDatabase.findAllTitleByUserId(userId);
         StringBuilder titleList = new StringBuilder();
         for (String title : titles) {
-            titleList.append("<li>").append(title).append("</li>\n");
+            String postUrl = "/posts?title=" + title;
+            titleList.append("<li><a href=\"").append(postUrl).append("\">").append(title).append("</a></li>\n");
         }
 
         // 문자열 대체
@@ -96,6 +98,23 @@ public class HtmlBuilder {
 
         // 문자열 대체
         template = template.replace("{user_list_placeholder}", userRows.toString());
+
+        return template;
+    }
+
+    public String generatePostHtml(String sessionId, String title) throws IOException {
+        String templateFilePath = "/post/index.html"; // 템플릿 파일 경로
+        ResourceUtil resourceUtil = new ResourceUtil();
+        String template = new String(resourceUtil.getByteArray(templateFilePath));
+
+        User user = SessionHandler.getUser(sessionId);
+        String userId = user.getUserId();
+
+        Post post = PostDatabase.findPostByUserIdAndTitle(userId, title);
+
+        // 문자열 대체
+        template = template.replace("{title_placeholder}", post.getTitle())
+                .replace("{content_placeholder}", post.getContent());
 
         return template;
     }
