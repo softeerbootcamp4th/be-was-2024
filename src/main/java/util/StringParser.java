@@ -59,6 +59,7 @@ public class StringParser {
             if(contentDisposition[1].contains(ConstantUtil.FILE_NAME)) {
                 String[] filename = contentDisposition[1].split(ConstantUtil.FILE_NAME + "=\"");
                 String fileName = filename[1].substring(0, filename[1].length()-1);
+                fileName = new String(fileName.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8).trim();
 
                 // 파일 데이터는 바이트 배열로 직접 추출
                 byte[] fileData = part.substring(part.indexOf(ConstantUtil.CRLF + ConstantUtil.CRLF) + 4).getBytes(StandardCharsets.ISO_8859_1);
