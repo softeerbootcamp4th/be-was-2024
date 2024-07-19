@@ -11,6 +11,7 @@ public class SessionHandler {
 
 
 
+    synchronized//만에 하나에 세션이 중복될 상황을 대비해서
     public static String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();
         sessionMap.put(sessionId, user);
