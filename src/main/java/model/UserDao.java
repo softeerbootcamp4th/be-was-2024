@@ -95,4 +95,30 @@ public class UserDao {
             }
         }
     }
+
+    // 사용자 ID로 사용자 찾기 메서드
+    public User findUserById(String userId) throws SQLException {
+        String selectSQL = "SELECT * FROM USERS WHERE USERID = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(selectSQL)) {
+            preparedStatement.setString(1, userId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    String password = resultSet.getString("PASSWORD");
+                    String name = resultSet.getString("NAME");
+                    String email = resultSet.getString("EMAIL");
+                    return new User(userId, password, name, email);
+                }
+            }
+        }
+        return null;
+    }
+
+    public void deleteAllUsers() throws SQLException {
+        String deleteAllSQL = "DELETE FROM USERS";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(deleteAllSQL)) {
+            preparedStatement.executeUpdate();
+        }
+    }
 }
