@@ -20,6 +20,10 @@ public class ArticleController extends AbstractController{
      */
     @Override
     public HttpResponse doGet(HttpRequest request) {
+        if(request.getSession() == null){
+            return HttpResponse.sendRedirect(HttpRequestMapper.LOGIN.getPath(), request.getHttpVersion());
+        }
+
         return HttpResponse.forward(HttpRequestMapper.ARTICLE.getPath(), request.getHttpVersion());
     }
 

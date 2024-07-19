@@ -38,6 +38,9 @@ public class SessionHandler {
         }
 
         String sessionId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6);
+        while(SessionDatabase.findSessionById(sessionId).isPresent()){ // 중복되는 sessionId가 없도록 while문으로 처리
+            sessionId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 6);
+        }
         Session session = new Session(sessionId, user.getUserId(), LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)));
         SessionDatabase.addSession(session);
         return Optional.of(session);
