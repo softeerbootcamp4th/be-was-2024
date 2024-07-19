@@ -14,6 +14,7 @@ import webserver.mapping.mapper.post.LogoutUserMapper;
 import webserver.util.UrlTrie;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class MappingHandler {
     private static final UrlTrie urlTrie = new UrlTrie();
@@ -41,7 +42,7 @@ public class MappingHandler {
         urlTrie.insert("/article/create", HttpMethod.POST, new CreateArticleMapper());
     }
 
-    public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException {
+    public MyHttpResponse mapping(MyHttpRequest httpRequest) throws IOException, SQLException {
         HttpMethod method = httpRequest.getMethod();
         String path = httpRequest.getPath();
 

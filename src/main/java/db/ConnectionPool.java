@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool {
-    // 싱글톤 인스턴스
     private static ConnectionPool instance = new ConnectionPool();
 
     // JDBC 연결 정보
@@ -30,11 +29,12 @@ public class ConnectionPool {
         return instance;
     }
 
-    private void initializeConnectionPool() {
+    public void initializeConnectionPool() {
         while (!checkIfConnectionPoolIsFull()) {
             // 커넥션 풀이 꽉 차지 않았으면 새로운 커넥션 추가
             connectionPool.add(createNewConnection());
         }
+
     }
 
     private synchronized boolean checkIfConnectionPoolIsFull() {

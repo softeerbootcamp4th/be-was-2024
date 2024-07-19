@@ -8,6 +8,7 @@ import webserver.util.FileContentReader;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class HttpResponseParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpResponseParser.class);
@@ -27,7 +28,7 @@ public class HttpResponseParser {
     }
 
 
-    public void parseResponse(DataOutputStream dos, MyHttpRequest httpRequest) throws IOException {
+    public void parseResponse(DataOutputStream dos, MyHttpRequest httpRequest) throws IOException, SQLException {
         MyHttpResponse httpResponse;
 
 
