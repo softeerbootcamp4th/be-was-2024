@@ -5,12 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class FileDetection
-{
+public class FileDetection {
 
     public static String fixedPath;
-    static
-    {
+    static {
         Properties properties = new Properties();
         try (InputStream input = FileDetection.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input != null) {
@@ -23,8 +21,7 @@ public class FileDetection
             e.printStackTrace();
         }
     }
-    public static String getPath(String path)
-    {
+    public static String getPath(String path) {
         File file = new File(path);
         return file.isDirectory()? path+"/index.html" : path;
     }

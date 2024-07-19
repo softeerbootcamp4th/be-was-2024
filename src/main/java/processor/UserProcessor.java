@@ -24,8 +24,7 @@ public class UserProcessor {
         return LazyHolder.INSTANCE;
     }
 
-    public void userCreate(RequestObject requestObject)
-    {
+    public void userCreate(RequestObject requestObject) {
         Map<String,String> map =  new HashMap<>();
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
@@ -44,7 +43,6 @@ public class UserProcessor {
         {
 
         }
-
     }
 
     public User userFind(RequestObject requestObject) throws Exception {
@@ -52,14 +50,12 @@ public class UserProcessor {
         String[] pairs = paramLine.split("&");
         String[] idLine = pairs[0].split("=");
         String[] passwordLine = pairs[1].split("=");
-        if(idLine.length==1||passwordLine.length==1)
-        {
+        if(idLine.length==1||passwordLine.length==1) {
             throw new Exception("아이디와 비밀번호를 모두 입력해야 합니다");
         }
         User user = Database.findUserById(idLine[1]);
 
-        if(user==null)
-        {
+        if(user==null) {
             throw new Exception("해당하는 Id가 존재하지 않습니다");
         }
         if (!user.getPassword().equals(passwordLine[1])) {

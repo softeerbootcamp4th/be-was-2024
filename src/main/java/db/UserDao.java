@@ -23,11 +23,9 @@ public class UserDao {
             pstmt.setString(3, user.getName());
             pstmt.setString(4, user.getEmail());
             pstmt.executeUpdate();
-        } catch(SQLException e)
-        {
+        } catch(SQLException e) {
             logger.error("SQL Exception while adding user : {}" , e.getMessage());
-        }
-        catch(Exception e)
+        } catch(Exception e)
         {
             logger.debug(e.getMessage());
         }

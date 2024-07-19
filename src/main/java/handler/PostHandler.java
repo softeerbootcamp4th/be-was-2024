@@ -14,8 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostHandler
-{
+public class PostHandler {
 
 
     private static final Logger logger = LoggerFactory.getLogger(PostHandler.class);
@@ -29,13 +28,11 @@ public class PostHandler
     private static class LazyHolder{
         private static final PostHandler INSTANCE = new PostHandler();
     }
-    public static PostHandler getInstance()
-    {
+    public static PostHandler getInstance() {
         return LazyHolder.INSTANCE;
     }
 
     public void handlePostRequest(DataOutputStream dos, RequestObject requestObject) {
-
         String path = requestObject.getPath();
 
         //switch로 리팩토링 , 메소드 빼놓기
@@ -47,13 +44,10 @@ public class PostHandler
     }
 
     private void userLogin(DataOutputStream dos, RequestObject requestObject) {
-        try
-        {
+        try {
             User user = userProcessor.userFind(requestObject);
             loginSuccess(dos,user);//로그인 성공 시
-        }
-        catch(Exception e)//해당하는 예외 메세지를 출력한다
-        {
+        } catch(Exception e) {//해당하는 예외 메세지를 출력한다
             responseAlert(dos,e.getMessage(),"/login/index.html");
         }
     }
@@ -91,8 +85,7 @@ public class PostHandler
 
 
 
-    private void response302Header(DataOutputStream dos, String loc)
-    {
+    private void response302Header(DataOutputStream dos, String loc) {
         try {
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: "+loc+"\r\n");
@@ -117,19 +110,15 @@ public class PostHandler
         }
     }
 
-    public void loginSuccess(DataOutputStream dos, User user)
-    {
-        try
-        {
+    public void loginSuccess(DataOutputStream dos, User user) {
+        try {
             String session = SessionHandler.createSession(user);
             logger.error(session);
             dos.writeBytes("HTTP/1.1 302 Found \r\n");
             dos.writeBytes("Location: /index.html \r\n");
             dos.writeBytes("Set-Cookie: SID=" + session + "; Path=/; \r\n");
             dos.writeBytes("\r\n");
-        }
-        catch(IOException e)
-        {
+        } catch(IOException e) {
             logger.error(e.getMessage());
         }
     }

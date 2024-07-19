@@ -16,8 +16,7 @@ public class RequestHandler implements Runnable {
     private final GetHandler getHandler;
     private final PostHandler postHandler;
 
-    public RequestHandler(Socket connectionSocket)
-    {
+    public RequestHandler(Socket connectionSocket) {
         this.connection = connectionSocket;
         this.getHandler =GetHandler.getInstance();
         this.postHandler=PostHandler.getInstance();
@@ -38,17 +37,13 @@ public class RequestHandler implements Runnable {
     }
 
     //각 요청을 메소드에 맞게 뿌려준다
-    private void requestDistribute(DataOutputStream dos,RequestObject requestObject)
-    {
+    private void requestDistribute(DataOutputStream dos,RequestObject requestObject) {
         String method = requestObject.getMethod();
-        if(method.equals("GET") )//GET방식 들어올 경우
-        {
+        if(method.equals("GET") ) {//GET방식 들어올 경우
             getHandler.handleGetRequest(dos,requestObject);
-        }
-        else if(method.equals("POST"))
+        }else if(method.equals("POST"))
         {
             postHandler.handlePostRequest(dos,requestObject);
         }
     }
-
 }

@@ -27,8 +27,7 @@ public class RequestObject {
 
     private final Map<String,String> headers = new HashMap<>();
 
-    public RequestObject(InputStream inputStream) throws IOException
-    {
+    public RequestObject(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
 
         int c;
@@ -54,54 +53,43 @@ public class RequestObject {
         this.path = temp[1];
         this.version= temp[2];
 
-        for(int i=1;i<headerLines.length;i++)
-        {
+        for(int i=1;i<headerLines.length;i++) {
             if (headerLines[i].contains(":")) {
                 String[] headerParts = headerLines[i].split(":", 2);
                 headers.put(headerParts[0].trim(), headerParts[1].trim());
             }
-            if(headerLines[i].startsWith("Content-Length"))
-            {
+            if(headerLines[i].startsWith("Content-Length")) {
                 this.contentLength=Integer.parseInt(headerLines[i].split(":")[1].trim());
                 break;
             }
         }
-        if(contentLength>0)
-        {
+        if(contentLength>0) {
             body = new byte[contentLength];
             int bytesRead = inputStream.read(body,0,contentLength);
             if(bytesRead!=contentLength)
             {
                 throw new IOException("Failed to read full request body");
             }
-        }
-        else
-        {
+        } else {
             body =null;
         }
-
     }
 
-    public String getPath()
-    {
+    public String getPath() {
         return this.path;
     }
 
-    public String getMethod()
-    {
+    public String getMethod() {
         return this.method;
     }
 
-    public String getVersion()
-    {
+    public String getVersion() {
         return this.version;
     }
-    public byte[] getBody()
-    {
+    public byte[] getBody() {
         return this.body;
     }
-    public void setBody(byte[] body)
-    {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
