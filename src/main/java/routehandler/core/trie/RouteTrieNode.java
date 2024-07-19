@@ -1,5 +1,6 @@
 package routehandler.core.trie;
 
+import http.MyHttpRequest;
 import http.enums.HttpMethodType;
 import routehandler.core.IRouteHandler;
 import routehandler.core.exception.NoMatchedMethodException;
@@ -47,6 +48,15 @@ public class RouteTrieNode {
      * @param pathSegment / 을 기준으로 나눈 각 pathname의 부분
      * @return 다음 노드 (nullable)
      */
+    public RouteTrieNode nextForSearch(String pathSegment, MyHttpRequest req) {
+        // 구체적으로 매칭되는 노드가 있다면 반환하고, 없으면 pathVariableNode 반환
+        RouteTrieNode node = children.get(pathSegment);
+        if (node != null) return node;
+
+        if(pathVariableNode != null) req.setPathVariable(pathVariableName, pathSegment);
+        return pathVariableNode;
+    }
+
     public RouteTrieNode nextForSearch(String pathSegment) {
         // 구체적으로 매칭되는 노드가 있다면 반환하고, 없으면 pathVariableNode 반환
         return children.getOrDefault(pathSegment, pathVariableNode);

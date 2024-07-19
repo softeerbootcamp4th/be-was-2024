@@ -48,7 +48,7 @@ public class RouteHandleChain extends MiddlewareChain {
         HttpMethodType method = req.getMethod();
 
         try {
-            IRouteHandler handler = trie.search(pathname,method);
+            IRouteHandler handler = trie.search(pathname,method, req);
             handler.handle(req, res);
         } catch (NoMatchedMethodException e) {
             res.setStatusInfo(HttpStatusType.METHOD_NOT_ALLOWED);

@@ -1,5 +1,6 @@
 package http;
 
+import config.AppConfig;
 import http.cookie.MyCookies;
 import http.enums.HttpMethodType;
 import http.utils.HttpMethodTypeUtil;
@@ -127,5 +128,20 @@ public class MyHttpRequest {
      */
     public Map<String, Object> getStore() {
         return Collections.unmodifiableMap(store);
+    }
+
+    /**
+     * path variable을 얻는다.
+     */
+    public String getPathVariable(String key) {
+        Object value = store.get(AppConfig.PATHVAR_PREFIX + key);
+        return value != null ? (String) value : null;
+    }
+
+    /**
+     * path variable을 설정한다.
+     */
+    public void setPathVariable(String key, String value) {
+        store.put(AppConfig.PATHVAR_PREFIX + key, value);
     }
 }

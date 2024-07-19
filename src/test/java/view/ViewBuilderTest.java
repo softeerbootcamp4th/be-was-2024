@@ -24,17 +24,17 @@ class ViewBuilderTest {
                 "</head>\n" +
                 "<body>\n" +
                 "<div class=\"container\">\n" +
-                "<my-template if='user'> <div>login</div> </my-template>\n" +
-                "<my-template if-not='user'> logout </my-template>\n" +
+                "<my-template if='@auth_user'> <div>login</div> </my-template>\n" +
+                "<my-template if-not='@auth_user'> logout </my-template>\n" +
                 "    <h1>main page</h1>\n" +
                 "    <p>hello world this is hello</p>\n" +
-                "<my-template if='user'> " +
+                "<my-template if='@auth_user'> " +
                 "    <div>\n" +
                 "        <h2>user info</h2>\n" +
                 "        <ul>\n" +
                 "            <li>userId: {user.userId}</li>\n" +
                 "            <li>password: {user.password}</li>\n" +
-                "            <li>name: {user.name}\n</li>" +
+                "            <li>name: {@auth_user.name}\n</li>" +
                 "            <li>email: {user.email}\n</li>" +
                 "        </ul>\n" +
                 "    </div>\n" +
@@ -91,7 +91,7 @@ class ViewBuilderTest {
     @DisplayName("if-not 조건을 만족하면 태그 내 결과가 템플릿이 채워져 출력된다")
     void returnTemplatedMessageIf_IfNotConditionSatisfied() {
         String template = "<div>not template</div>" +
-                "< my-template if-not='user' >" +
+                "< my-template if-not='@auth_user' >" +
                 "<div>login</div>" +
                 "</ my-template >";
 

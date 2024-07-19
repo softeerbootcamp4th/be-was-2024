@@ -1,5 +1,6 @@
 package routehandler.core.trie;
 
+import http.MyHttpRequest;
 import http.enums.HttpMethodType;
 import routehandler.core.IRouteHandler;
 import routehandler.core.exception.NoMatchedRouteException;
@@ -41,12 +42,12 @@ public class RouteTrie {
      * @param method 찾는 메서드
      * @return 매칭된 핸들러 ( 없으면 예외 발생 )
      */
-    public IRouteHandler search(String pathname, HttpMethodType method) {
+    public IRouteHandler search(String pathname, HttpMethodType method, MyHttpRequest req) {
         String[] pathSegments = RouteUtil.getPathSegments(pathname);
         RouteTrieNode node = root;
 
         for(String pathSegment: pathSegments) {
-            var newNode = node.nextForSearch(pathSegment);
+            var newNode = node.nextForSearch(pathSegment, req);
             if(newNode == null) throw new NoMatchedRouteException( "no route found matching " + pathSegment);
 
             node = newNode;
