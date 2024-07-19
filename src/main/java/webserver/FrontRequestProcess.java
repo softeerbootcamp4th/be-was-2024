@@ -67,11 +67,13 @@ public class FrontRequestProcess {
             // 요청에 대응되는 Controller를 찾아서 요청 처리하고 응답 객체 반환
             Controller controller = HttpRequestMapper.getController(path, method);
             return controller.service(request);
-        } catch (ModelException | RequestException e){
-            logger.debug(e.getMessage());
-            return HttpResponse.error(e.getMessage(), request.getHttpVersion());
+        } catch (RequestException | ModelException e) {
+            logger.error(e.getMessage());
+            return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
         }
     }
+
+
 
     /**
      * 응답을 실제로 처리하는 메서드, 완성된 응답을 클라이언트에 DataOutputStream을 통해 전송

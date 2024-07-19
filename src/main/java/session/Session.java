@@ -24,6 +24,10 @@ public class Session {
         this.expiredAt = time.plusMinutes(30); // 30분 뒤 만료
     }
 
+    public Session(String sessionId, String userId){
+        this(sessionId, userId, LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)));
+    }
+
     public String getUserId() {
         return userId;
     }

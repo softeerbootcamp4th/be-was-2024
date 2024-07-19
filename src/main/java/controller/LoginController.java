@@ -21,6 +21,10 @@ public class LoginController extends AbstractController {
      */
     @Override
     public HttpResponse doGet(HttpRequest request) {
+        if(request.getSession() != null){ // 이미 로그인 되어있는 경우 기본 화면으로 리다이렉트
+            return HttpResponse.sendRedirect(HttpRequestMapper.DEFAULT_PAGE.getPath(), request.getHttpVersion());
+        }
+
         String path = HttpRequestMapper.LOGIN.getPath();
         return HttpResponse.forward(path, request.getHttpVersion(), IOUtil.readBytesFromFile(path));
     }
