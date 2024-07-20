@@ -39,6 +39,7 @@ public class GetDistributor extends Distributor {
             case "/login/index.html" -> processLogin(path);
             case "/user/list" -> processUserList();
             case "/write/index.html" -> processWrite();
+            case "/post/list" -> processPostList();
             default -> processDefault(path);
         }
     }
@@ -98,6 +99,11 @@ public class GetDistributor extends Distributor {
         ResponseProcessor responseProcessor = new ResponseProcessor();
 
         this.viewData = responseProcessor.showPostResponse(sessionId, title);
+    }
+
+    private void processPostList() {
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.showPostListResponse();
     }
 
     @Override
