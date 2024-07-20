@@ -107,4 +107,11 @@ public class ResponseProcessor {
                 .title(title)
                 .build();
     }
+
+    public ViewData showPostListResponse() {
+        return new ViewData.Builder()
+                .url("/post/list.html")
+                .statusCode(200)
+                .build();
+    }
 }
