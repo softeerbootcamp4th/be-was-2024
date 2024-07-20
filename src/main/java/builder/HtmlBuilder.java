@@ -29,12 +29,17 @@ public class HtmlBuilder {
         String userId = user.getUserId();
         String username = user.getName();
 
-        String loginButtonHtml, registrationButtonText, registrationButtonHref, userNameHtml;
+        String loginButtonHtml, registrationButtonText, registrationButtonHref, userNameHtml, userListHtml;
 
         loginButtonHtml = ""; // 로그인된 상태에서는 로그인 버튼을 숨김
         registrationButtonText = "로그아웃";
         registrationButtonHref = "/logout";
         userNameHtml = "<p class=\"user-name\">" + username + " 님</p>";
+        userListHtml = "<li class=\"header__menu__item\">\n" +
+                "        <a class=\"btn btn_ghost btn_size_s\" href=\"/user/list\">\n" +
+                "          사용자 목록\n" +
+                "        </a>\n" +
+                "      </li>";
 
         // 글 제목 목록 받아오기
         List<String> titles = PostDatabase.findAllTitleByUserId(userId);
@@ -49,6 +54,7 @@ public class HtmlBuilder {
                 .replace("{login_button_placeholder}", loginButtonHtml)
                 .replace("{registration_button_text}", registrationButtonText)
                 .replace("{registration_button_href}", registrationButtonHref)
+                .replace("{user_list_placeholder}", userListHtml)
                 .replace("{title_placeholder}", titleList.toString());
 
         return template;
@@ -71,6 +77,7 @@ public class HtmlBuilder {
                 .replace("{login_button_placeholder}", loginButtonHtml)
                 .replace("{registration_button_text}", registrationButtonText)
                 .replace("{registration_button_href}", registrationButtonHref)
+                .replace("{user_list_placeholder}", "")
                 .replace("{title_placeholder}", "");
 
         return template;
@@ -115,6 +122,14 @@ public class HtmlBuilder {
         // 문자열 대체
         template = template.replace("{title_placeholder}", post.getTitle())
                 .replace("{content_placeholder}", post.getContent());
+
+        return template;
+    }
+
+    public String generatePostListHtml() throws IOException {
+        String templateFilePath = "/post/list.html"; // 템플릿 파일 경로
+        ResourceUtil resourceUtil = new ResourceUtil();
+        String template = new String(resourceUtil.getByteArray(templateFilePath));
 
         return template;
     }
