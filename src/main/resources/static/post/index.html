@@ -16,6 +16,7 @@
             align-items: center;
             height: 100vh;
         }
+
         .container {
             background-color: #ffffff;
             border-radius: 8px;
@@ -25,10 +26,12 @@
             padding: 20px;
             box-sizing: border-box;
         }
+
         .header {
             display: flex;
             justify-content: flex-end;
         }
+
         .header a {
             text-decoration: none;
             color: #ffffff;
@@ -36,17 +39,32 @@
             padding: 10px 20px;
             border-radius: 4px;
         }
+
         .header a:hover {
             background-color: #0056b3;
         }
+
         .title {
             font-size: 24px;
             margin: 20px 0;
             color: #007bff;
         }
+
         .content {
             font-size: 18px;
             line-height: 1.6;
+            word-wrap: break-word;
+            white-space: pre-wrap; /* preserves whitespace but allows wrapping */
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
@@ -56,6 +74,9 @@
         <a href="/">메인으로</a>
     </div>
     <h1 class="title">{title_placeholder}</h1>
+    <div class="image-container">
+        <img src="{image_placeholder}" alt="Post Image">
+    </div>
     <div class="content">{content_placeholder}</div>
 </div>
 </body>
