@@ -24,12 +24,10 @@ public class PostDistributor extends Distributor {
 
     private void processQuery() {
         String path = request.getPath();
-        if (path.equals("/user/create")) {
-            processUserCreate();
-        } else if (path.equals("/user/write")) {
-            processUserWrite();
-        } else if (path.equals("/user/login")) {
-            processUserLogin();
+        switch (path) {
+            case "/user/create" -> processUserCreate();
+            case "/user/write" -> processUserWrite();
+            case "/user/login" -> processUserLogin();
         }
     }
 
