@@ -21,13 +21,19 @@
           {registration_button_text}
         </a>
       </li>
+      <li class="header__menu__item">
+        <a class="btn btn_ghost btn_size_s" href="/post/list">
+          글 목록
+        </a>
+      </li>
+      {user_list_placeholder}
     </ul>
   </header>
   <div class="wrapper">
     <div class="post">
       <div class="post__account">
         <img class="post__account__img" />
-        <p class="post__account__nickname">account</p>
+        <p class="post__account__nickname">{username_placeholder}</p>
       </div>
       <img class="post__img" />
       <div class="post__menu">
@@ -125,7 +131,7 @@
     <nav class="nav">
       <ul class="nav__menu">
         <li class="nav__menu__item">
-          <a class="nav__menu__item__btn" href="">
+          <a class="nav__menu__item__btn" href="/posts/{prev_post_id}">
             <img
                     class="nav__menu__item__img"
                     src="./img/ci_chevron-left.svg"
@@ -137,7 +143,7 @@
           <a class="btn btn_ghost btn_size_m" href="/write">글쓰기</a>
         </li>
         <li class="nav__menu__item">
-          <a class="nav__menu__item__btn" href="">
+          <a class="nav__menu__item__btn" href="/posts/{next_post_id}">
             다음 글
             <img
                     class="nav__menu__item__img"
