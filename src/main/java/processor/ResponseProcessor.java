@@ -99,12 +99,12 @@ public class ResponseProcessor {
                 .build();
     }
 
-    public ViewData showPostResponse(String sessionId, String title) {
+    public ViewData showPostResponse(String userId, String title) {
         return new ViewData.Builder()
                 .url("/post/index.html")
                 .statusCode(200)
-                .cookie(sessionId)
                 .title(title)
+                .writer(userId)
                 .build();
     }
 
