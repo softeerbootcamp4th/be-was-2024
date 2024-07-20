@@ -1,11 +1,13 @@
 package db;
 
 import model.Post;
+import model.User;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PostDatabase {
@@ -71,5 +73,80 @@ public class PostDatabase {
         }
 
         return foundPost;
+    }
+
+    public static Collection<Post> findAll() {
+        List<Post> postList = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // SELECT 쿼리를 사용하여 모든 사용자 조회
+            String sqlSelectAll = "SELECT * FROM Posts";
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlSelectAll);
+                 ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Post post = new Post.Builder()
+                            .postId(rs.getInt("postId"))
+                            .title(rs.getString("title"))
+                            .content(rs.getString("content"))
+                            .userId(rs.getString("userId"))
+                            .build();
+
+                    postList.add(post);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return postList;
+    }
+
+    public static Integer findPrevPostId(int postId) {
+        String sqlPrev = "SELECT postId FROM Posts WHERE postId < ? ORDER BY postId DESC LIMIT 1";
+
+        Integer prevPostId = null;
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Find the previous post
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlPrev)) {
+                pstmt.setInt(1, postId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        prevPostId = rs.getInt("postId");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return prevPostId;
+    }
+
+    public static Integer findNextPostId(int postId) {
+        String sqlNext = "SELECT postId FROM Posts WHERE postId > ? ORDER BY postId ASC LIMIT 1";
+
+        Integer nextPostId = null;
+
+        try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword)) {
+            // Find the previous post
+            try (PreparedStatement pstmt = conn.prepareStatement(sqlNext)) {
+                pstmt.setInt(1, postId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (rs.next()) {
+                        nextPostId = rs.getInt("postId");
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return nextPostId;
     }
 }
