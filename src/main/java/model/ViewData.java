@@ -6,6 +6,7 @@ public class ViewData {
     private final int statusCode;
     private final String cookie;
     private final String title;
+    private final String writer;
 
     private ViewData(ViewData.Builder builder) {
         this.url = builder.url;
@@ -13,6 +14,7 @@ public class ViewData {
         this.statusCode = builder.statusCode;
         this.cookie = builder.cookie;
         this.title = builder.title;
+        this.writer = builder.writer;
     }
 
     public static class Builder {
@@ -21,6 +23,7 @@ public class ViewData {
         private int statusCode = 0;
         private String cookie = "";
         private String title = "";
+        private String writer = "";
 
         public ViewData.Builder url(String url) {
             this.url = url;
@@ -47,6 +50,11 @@ public class ViewData {
             return this;
         }
 
+        public ViewData.Builder writer(String writer) {
+            this.writer = writer;
+            return this;
+        }
+
         public ViewData build() {
             return new ViewData(this);
         }
@@ -70,5 +78,9 @@ public class ViewData {
 
     public String getTitle() {
         return this.title;
+    }
+
+    public String getWriter() {
+        return this.writer;
     }
 }
