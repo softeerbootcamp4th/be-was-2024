@@ -94,11 +94,11 @@ public class GetDistributor extends Distributor {
     }
 
     private void processShowPost() {
-        String sessionId = request.getSessionId();
         String title = request.parseQueryString().get("title");
+        String writer = request.parseQueryString().get("userId");
         ResponseProcessor responseProcessor = new ResponseProcessor();
 
-        this.viewData = responseProcessor.showPostResponse(sessionId, title);
+        this.viewData = responseProcessor.showPostResponse(writer, title);
     }
 
     private void processPostList() {
