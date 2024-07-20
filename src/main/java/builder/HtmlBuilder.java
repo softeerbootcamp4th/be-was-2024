@@ -109,13 +109,10 @@ public class HtmlBuilder {
         return template;
     }
 
-    public String generatePostHtml(String sessionId, String title) throws IOException {
+    public String generatePostHtml(String userId, String title) throws IOException {
         String templateFilePath = "/post/index.html"; // 템플릿 파일 경로
         ResourceUtil resourceUtil = new ResourceUtil();
         String template = new String(resourceUtil.getByteArray(templateFilePath));
-
-        User user = SessionHandler.getUser(sessionId);
-        String userId = user.getUserId();
 
         Post post = PostDatabase.findPostByUserIdAndTitle(userId, title);
 
@@ -130,6 +127,23 @@ public class HtmlBuilder {
         String templateFilePath = "/post/list.html"; // 템플릿 파일 경로
         ResourceUtil resourceUtil = new ResourceUtil();
         String template = new String(resourceUtil.getByteArray(templateFilePath));
+
+        Collection<Post> postList = PostDatabase.findAll();
+
+        // 글 목록을 HTML 형식으로 빌드
+        StringBuilder postRows = new StringBuilder();
+        int index = 1;
+        for (Post post : postList) {
+            postRows.append("<tr>");
+            postRows.append("<th scope=\"row\">").append(index).append("</th>");
+            postRows.append("<td>").append("<a href=\"/posts?title=").append(post.getTitle()).append("&userId=").append(post.getUserId()).append("\">").append(post.getTitle()).append("</a>").append("</td>");
+            postRows.append("<td>").append(post.getUserId()).append("</td>");
+            postRows.append("</tr>");
+            index++;
+        }
+
+        // 문자열 대체
+        template = template.replace("{post_list_placeholder}", postRows.toString());
 
         return template;
     }
