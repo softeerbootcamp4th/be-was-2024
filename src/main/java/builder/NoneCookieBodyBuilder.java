@@ -18,6 +18,8 @@ public class NoneCookieBodyBuilder extends BodyBuilder {
             return getIndexHtmlBody();
         } else if (viewData.getUrl().equals("/user/list.html")) {
             return getUserListHtmlBody();
+        } else if (viewData.getUrl().equals("/post/index.html")) {
+            return getPostHtmlBody();
         } else if (viewData.getUrl().equals("/post/list.html")) {
             return getPostListBody();
         } else {
@@ -40,6 +42,12 @@ public class NoneCookieBodyBuilder extends BodyBuilder {
     private byte[] getDefaultBody() throws IOException {
         ResourceUtil resourceUtil = new ResourceUtil();
         return resourceUtil.getByteArray(viewData.getUrl());
+    }
+
+    private byte[] getPostHtmlBody() throws IOException {
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        String body = htmlBuilder.generatePostHtml(viewData.getWriter(), viewData.getTitle());
+        return body.getBytes();
     }
 
     private byte[] getPostListBody() throws IOException {
