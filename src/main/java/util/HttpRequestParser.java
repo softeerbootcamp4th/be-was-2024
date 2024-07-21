@@ -1,21 +1,26 @@
 package util;
 
-import constant.MimeType;
+import constant.FileExtensionType;
+import constant.HttpResponseAttribute;
 import dto.HttpRequest;
+import dto.multipart.MultiPartData;
+import dto.multipart.MultiPartDataOfFile;
+import dto.multipart.MultiPartDataOfText;
 import exception.InvalidHttpRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
-    private static final String CONTENT_LENGTH = "Content-Length";
 
     private HttpRequestParser() {}
 
@@ -23,9 +28,26 @@ public class HttpRequestParser {
     public static HttpRequest parseHttpRequest(BufferedReader br) throws IOException {
         HttpRequest request = new HttpRequest();
         StringBuilder headers = new StringBuilder();
-        String requestLine = br.readLine();
-        headers.append(requestLine);
 
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        // HTTP 요청의 첫 번째 라인 읽기
+        int byteRead;
+        while ((byteRead = bis.read()) != -1) {
+            buffer.write(byteRead);
+            if (byteRead == '\r') {
+                byteRead = bis.read();
+                if (byteRead == '\n') {
+                    break;
+                } else {
+                    buffer.write(byteRead);
+                }
+            }
+        }
+
+        // 요청 라인 파싱
+        String requestLine = buffer.toString(StandardCharsets.UTF_8).trim();
+        headers.append(requestLine).append("\n");
         String[] requestLineParts = requestLine.split(" ");
         request.setHttpMethod(requestLineParts[0]);
         String uri = requestLineParts[1];
@@ -33,33 +55,56 @@ public class HttpRequestParser {
         //uri 파싱
         parseUri(uri, request);
 
-        String line;
-        // request header 파싱 및 로그를 통해 출력
-        while(!(line = br.readLine()).isEmpty()) {
-            headers.append(line).append("\n");
+
+        boolean isHeaderLineEnd = false;
+        // 남은 헤더 읽기
+        while(!isHeaderLineEnd) {
+            buffer.reset();
+            while ((byteRead = bis.read()) != -1) {
+                buffer.write(byteRead);
+                if (byteRead == '\r') {
+                    byteRead = bis.read();
+                    if (byteRead == '\n') {
+                        break;
+                    } else {
+                        buffer.write(byteRead);
+                    }
+                }
+            }
+
+            if(buffer.toString().trim().isEmpty()) {
+                isHeaderLineEnd = true;
+                continue;
+            }
+
+            // 헤더 라인 파싱
+            String headerLine = buffer.toString(StandardCharsets.UTF_8).trim();
+            headers.append(headerLine).append("\n");
 
             // header line 파싱 및 key, value 형태로 헤더 정보 저장
-            String[] headerParts = line.split(":", 2);
+            String[] headerParts = headerLine.split(":", 2);
+
             // header value의 구분자로 분리
             String[] headerValues = headerParts[1].split("[,;]");
             for(String headerValue : headerValues) {
                 headerValue = URLDecoder.decode(headerValue, StandardCharsets.UTF_8);
                 request.setHeader(headerParts[0].trim(), headerValue.trim());
             }
+
         }
+
         logger.debug("Request Headers:\n {}", headers);
 
         //request body 읽기 및 HttpRequest에 저장
-        if(request.getHeader(CONTENT_LENGTH).isPresent()) {
-            int contentLength = Integer.parseInt(request.getHeader(CONTENT_LENGTH).get().get(0));
-            char[] body = new char[contentLength];
-            if(br.read(body, 0, body.length)!=contentLength) {
+        if(request.getHeader(HttpResponseAttribute.CONTENT_LENGTH.getValue()).isPresent()) {
+            int contentLength = Integer.parseInt(request.getHeader(HttpResponseAttribute.CONTENT_LENGTH.getValue()).get().get(0));
+            byte[] body = new byte[contentLength];
+            if(bis.read(body, 0, contentLength) != contentLength) {
                 logger.error("Invalid request body");
                 throw new InvalidHttpRequestException("Invalid request body");
             }
-            String requestBody = new String(body);
-            request.setBody(requestBody);
-            logger.debug("Request Body:\n {}", requestBody);
+
+            request.setBody(body);
         }
 
         return request;
@@ -68,7 +113,20 @@ public class HttpRequestParser {
     private static void parseUri(String uri, HttpRequest request) {
         String[] uriParts = uri.split("\\?");
         if(uriParts.length == 1){
-            String path = uriParts[0];
+            String path = URLDecoder.decode(uriParts[0], StandardCharsets.UTF_8);
+
+            Pattern pattern = Pattern.compile("/\\{(\\d+)\\}");
+            Matcher matcher = pattern.matcher(path);
+            StringBuilder result = new StringBuilder();
+            // 패턴과 일치하는 부분을 찾아서 처리
+            if (matcher.find()) {
+                String number = matcher.group(1); // 숫자 부분 추출
+                request.setPathVariable(Integer.valueOf(number));
+                // {} 부분을 삭제하고 결과 문자열에 추가
+                matcher.appendReplacement(result, "");
+            }
+            matcher.appendTail(result); // 나머지 문자열 추가
+            path=result.toString();
             request.setPath(path);
 
             String[] pathParts = path.split("\\.");
@@ -116,11 +174,89 @@ public class HttpRequestParser {
                 }
                 return bodyParams;
 
-            // TODO: JSON 데이터 파싱 작업
-            case APPLICATON_JSON:
-                break;
+        Map<String, MultiPartData> params = new HashMap<>();
+
+        for (String bodyPart : bodyParts) {
+            Map<String, String> contentDispositionParams = new HashMap<>();
+            for(String contentHeaderParts : bodyPart.split("\r\n")) {
+
+                // Content-Disposition 헤더의 값 추출
+                if (contentHeaderParts.contains("Content-Disposition")) {
+                    String[] contentDispositionParts = contentHeaderParts.split("[:;]");
+
+                    for (String contentDispositionPart : contentDispositionParts) {
+                        if (contentDispositionPart.contains("=")) {
+                            String[] filenameParts = contentDispositionPart.split("=");
+                            contentDispositionParams.put(filenameParts[0].trim()
+                                    , URLDecoder.decode(filenameParts[1].trim().replace("\"", ""), StandardCharsets.UTF_8));
+                        }
+                    }
+                    // Content-Type 헤더의 값 추출
+                } else if (contentHeaderParts.contains("Content-Type")) {
+                    String[] contentTypeParts = contentHeaderParts.split(":");
+                    contentDispositionParams.put("Content-Type"
+                            , URLDecoder.decode(contentTypeParts[1].trim(), StandardCharsets.UTF_8));
+                }
+            }
+            // boundary로 파싱 시, 데이터가 없으면 continue
+            if(bodyPart.isEmpty())
+                continue;
+
+            // multipart 데이터 추출
+            String[] contentParts = bodyPart.split("\r\n\r\n");
+            String content;
+            if(contentParts.length == 2){
+                content = contentParts[1];
+
+                if (content.endsWith("\r\n")) {
+                    content = content.substring(0, content.length() - 2);
+                }
+            }
+            else
+                continue;
+
+            // filename이 있을 시, MultiPartDataOfFile 클래스에 데이터 저장
+            if(contentDispositionParams.containsKey("filename")) {
+                String name = contentDispositionParams.get("name");
+                String filename = contentDispositionParams.get("filename");
+                FileExtensionType contentType = FileExtensionType.of(contentDispositionParams.get("Content-Type"));
+
+                MultiPartDataOfFile multiPartDataOfFile = new MultiPartDataOfFile(
+                        filename, contentType, content.getBytes(StandardCharsets.ISO_8859_1)
+                );
+                params.put(name, multiPartDataOfFile);
+            }
+            // filename이 없을 시, MultiPartDataOfText 클래스에 데이터 저장
+            else{
+                String name = contentDispositionParams.get("name");
+                FileExtensionType contentType;
+
+                if(!contentDispositionParams.containsKey("Content-Type"))
+                    contentType = FileExtensionType.PLAIN;
+                else
+                    contentType = FileExtensionType.of(contentDispositionParams.get("Content-Type"));
+
+                MultiPartDataOfText multiPartDataOfText = new MultiPartDataOfText(
+                        contentType, new String(content.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8)
+                );
+                params.put(name, multiPartDataOfText);
+            }
         }
-        return null;
+
+        return params;
+    }
+
+    private static String extractBoundary(HttpRequest httpRequest) {
+        List<String> contentTypeValues = httpRequest.getHeader("Content-Type").orElseThrow(
+                () -> new InvalidHttpRequestException("Content-Type is empty")
+        );
+        for (String contentTypeValue : contentTypeValues) {
+            if(contentTypeValue.contains("boundary")){
+                String[] boundaryParts = contentTypeValue.split("=");
+                return boundaryParts[boundaryParts.length-1].trim();
+            }
+        }
+        throw new InvalidHttpRequestException("Boundary not found in multipart/form-data");
     }
 
 }
