@@ -15,17 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
-    private static final String LOCATION = "Location";
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String ERROR_MESSAGE_404 =
-            "<html>" +
-                    "<head><title>404 Not Found</title></head>" +
-                    "<body><h1>404 Not Found</h1></body>" +
-                    "</html>";
 
     private HttpStatus status;
     private Map<String, List<String>> headers;
