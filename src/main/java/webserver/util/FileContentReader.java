@@ -46,18 +46,15 @@ public class FileContentReader {
         }
     }
 
-    public byte[] readStaticResourceByAbsolute(String path) throws IOException {
-        try (InputStream inputStream = new FileInputStream(new File(path));
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+    public String readStaticResourceToString(String path) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(STATIC_RESOURCE + path)));
+        StringBuilder stringBuilder = new StringBuilder();
 
-            byte[] byteArray = new byte[1024];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(byteArray)) != -1) {
-                outputStream.write(byteArray, 0, bytesRead);
-            }
-
-            return outputStream.toByteArray();
+        String line;
+        while ((line = bufferedReader.readLine()) != null) {
+            stringBuilder.append(line);
         }
+
+        return stringBuilder.toString();
     }
 }

@@ -5,16 +5,17 @@ import db.SessionTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.annotation.LoginCheck;
+import webserver.enums.HtmlFlag;
 import webserver.enums.HttpStatus;
 import webserver.http.HttpRequestParser;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
 import webserver.http.multipart.Part;
+import webserver.util.FileContentReader;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.UUID;
@@ -31,32 +32,34 @@ public class CreateArticleMapper implements webserver.mapping.mapper.HttpMapper 
     ConnectionPool databaseConnections = ConnectionPool.getInstance();
 
     @Override
-    public synchronized MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException, SQLException {
-        UUID uuid = UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get(HEADER_COOKIE)).get(COOKIE_SESSION_ID));
-        int userId = SessionTable.findUserIdBySessionId(uuid);
-        Connection connection = databaseConnections.getConnection();
+    public synchronized MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
 
-        if (httpRequest.getHeaders().get("content-type").startsWith("multipart/form-data")) {
-            String boundary = httpRequest.getHeaders().get("content-type").split("boundary=")[1];
-            ArrayList<Part> parts = httpRequestParser.parseMultipartFormData(httpRequest.getBody(), boundary);
+        try {
+            UUID uuid = UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get(HEADER_COOKIE)).get(COOKIE_SESSION_ID));
+            int userId = SessionTable.findUserIdBySessionId(uuid);
+            Connection connection = databaseConnections.getConnection();
 
-            // 파일 로컬 저장
-            Part body = parts.get(1);
-            String filePath = body.write(body.getBody());
+            if (httpRequest.getHeaders().get("content-type").startsWith("multipart/form-data")) {
+                String boundary = httpRequest.getHeaders().get("content-type").split("boundary=")[1];
+                ArrayList<Part> parts = httpRequestParser.parseMultipartFormData(httpRequest.getBody(), boundary);
 
-            String sql = "INSERT INTO articles (userId, content, imgPath) VALUES (?, ?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1, userId);
-            preparedStatement.setString(2, new String(parts.get(0).getBody()));
-            preparedStatement.setString(3, filePath);
-            preparedStatement.executeUpdate();
+                // 파일 로컬 저장
+                Part body = parts.get(1);
+                String filePath = body.write(body.getBody());
 
-            logger.debug("Article created: {}", parts.get(0));
+                String sql = "INSERT INTO articles (userId, content, imgPath) VALUES (?, ?, ?)";
+                PreparedStatement preparedStatement = connection.prepareStatement(sql);
+                preparedStatement.setInt(1, userId);
+                preparedStatement.setString(2, new String(parts.get(0).getBody()));
+                preparedStatement.setString(3, filePath);
+                preparedStatement.executeUpdate();
 
-            preparedStatement.close();
-            databaseConnections.releaseConnection(connection);
+                logger.debug("Article created: {}", parts.get(0));
 
-        }
+                preparedStatement.close();
+                databaseConnections.releaseConnection(connection);
+
+            }
 //        else {
 //            Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));
 //            String content = body.get(BODY_CONTENT);
@@ -66,8 +69,14 @@ public class CreateArticleMapper implements webserver.mapping.mapper.HttpMapper 
 //            logger.debug("Article created: {}", article);
 //        }
 
-        MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/"), null);
+            MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/"), null);
 
-        return response;
+            return response;
+        } catch (Exception e) {
+            FileContentReader fileContentReader = FileContentReader.getInstance();
+
+            String errorBody = fileContentReader.readStaticResourceToString("/error.html").replaceAll(HtmlFlag.ERROR_MESSAGE.getFlag(), e.getMessage());
+            return new MyHttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, Map.of("Content-Type", "text/html"), errorBody.getBytes());
+        }
     }
 }
