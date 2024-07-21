@@ -33,8 +33,9 @@ public class MappingHandler {
         urlTrie.insert("/main", HttpMethod.GET, new HomeMapper());
         urlTrie.insert("/registration", HttpMethod.GET, new RegistrationFormMapper());
         urlTrie.insert("/login", HttpMethod.GET, new LoginFormMapper());
-        urlTrie.insert("/article", HttpMethod.GET, new ArticleFormMapper());
         urlTrie.insert("/user/list", HttpMethod.GET, new UserListMapper());
+        urlTrie.insert("/article", HttpMethod.GET, new ArticleFormMapper());
+        urlTrie.insert("/article/{articleId}", HttpMethod.GET, new ArticleDetailMapper());
 
         urlTrie.insert("/user/create", HttpMethod.POST, new CreateUserMapper());
         urlTrie.insert("/user/login", HttpMethod.POST, new LoginUserMapper());

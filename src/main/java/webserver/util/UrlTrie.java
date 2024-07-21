@@ -45,6 +45,11 @@ public class UrlTrie {
             }
 
             if (!currentNode.getChildren().containsKey(part)) {
+                UrlTrieNode pathVariableNode = getPathVariableChild(currentNode);
+                if (pathVariableNode != null) {
+                    currentNode = pathVariableNode;
+                    continue;
+                }
                 // 404 Error
                 return new NotFoundMapper();
             }
@@ -61,7 +66,21 @@ public class UrlTrie {
 
         return currentNode.getMapper(method);
     }
+
+    private UrlTrieNode getPathVariableChild(UrlTrieNode node) {
+        for (Map.Entry<String, UrlTrieNode> entry : node.getChildren().entrySet()) {
+            if (isPathVariable(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    private boolean isPathVariable(String pathPart) {
+        return pathPart.startsWith("{") && pathPart.endsWith("}");
+    }
 }
+
 
 class UrlTrieNode {
     private Map<String, UrlTrieNode> children;

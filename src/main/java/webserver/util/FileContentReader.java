@@ -2,9 +2,7 @@ package webserver.util;
 
 import webserver.http.MyHttpResponse;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -45,6 +43,21 @@ public class FileContentReader {
             response.addContentType(uri);
             return response;
 
+        }
+    }
+
+    public byte[] readStaticResourceByAbsolute(String path) throws IOException {
+        try (InputStream inputStream = new FileInputStream(new File(path));
+             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+
+            byte[] byteArray = new byte[1024];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(byteArray)) != -1) {
+                outputStream.write(byteArray, 0, bytesRead);
+            }
+
+            return outputStream.toByteArray();
         }
     }
 }

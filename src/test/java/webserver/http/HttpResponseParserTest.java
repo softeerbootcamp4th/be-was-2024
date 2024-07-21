@@ -11,6 +11,7 @@ import webserver.util.FileContentReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +49,7 @@ class HttpResponseParserTest {
 
     @Test
     @DisplayName("Static Resource 요청 테스트")
-    void test2() throws IOException {
+    void test2() throws IOException, SQLException {
         // Given
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
@@ -69,7 +70,7 @@ class HttpResponseParserTest {
 
     @Test
     @DisplayName("Mapper 요청 테스트")
-    void test() throws IOException {
+    void test() throws IOException, SQLException {
         // Given
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(byteArrayOutputStream);
