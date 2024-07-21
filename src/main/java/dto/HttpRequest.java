@@ -12,10 +12,11 @@ public class HttpRequest {
 
     private HttpMethod httpMethod;
     private String path;
+    private Integer pathVariable;
     private Map<String, String> queryParams;
     private String extensionType;
     private Map<String, List<String>> headers;
-    private String body;
+    private byte[] body;
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
@@ -39,7 +40,7 @@ public class HttpRequest {
         return Optional.ofNullable(headers.get(key));
     }
 
-    public Optional<String> getBody() {
+    public Optional<byte[]> getBody() {
         return Optional.ofNullable(body);
     }
 
@@ -73,7 +74,7 @@ public class HttpRequest {
         headers.get(headerName).add(headerValue);
     }
 
-    public void setBody(String body) {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
@@ -106,5 +107,13 @@ public class HttpRequest {
             }
         }
         return Optional.empty();
+    }
+
+    public Optional<Integer> getPathVariable() {
+        return Optional.ofNullable(pathVariable);
+    }
+
+    public void setPathVariable(Integer pathVariable) {
+        this.pathVariable = pathVariable;
     }
 }
