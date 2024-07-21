@@ -10,6 +10,7 @@ public enum HttpStatus {
     FOUND(302, "FOUND"),
     BAD_REQUEST(400, "BAD REQUEST"),
     NOT_FOUND(404, "NOT FOUND"),
+    METHOD_NOT_ALLOWED(405, "Method Not Allowed"),
     INTERNAL_SERVER_ERROR(500, "INTERNAL SERVICE ERROR");
 
     final int statusCode;
