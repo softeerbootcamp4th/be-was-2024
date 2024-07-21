@@ -1,6 +1,8 @@
 package constant;
 
-
+/**
+ * HttpRequest의 Mime Type Enum
+ */
 public enum MimeType{
     NULL(""),
     APPLICATON_JSON("application/json"),
