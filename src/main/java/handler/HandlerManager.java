@@ -18,6 +18,9 @@ import util.HttpRequestParser;
 import java.io.*;
 import java.util.*;
 
+/**
+ * HttpRequest를 처리할 수 있는 handler를 관리하는 클래스
+ */
 public class HandlerManager {
     private static final Logger logger = LoggerFactory.getLogger(HandlerManager.class);
 
@@ -63,7 +66,12 @@ public class HandlerManager {
         return LazyHolder.INSTANCE;
     }
 
-    // HttpRequest를 처리할 수 있는 Handler 반환
+    /**
+     * HttpRequest를 처리할 수 있는 Handler를 반환한다.
+     *
+     * @param httpRequest : HttpRequest의 정보를 갖고있는 객체
+     * @return : 요청을 처리할 수 있는 Handler 객체
+     */
     public Handler getHandler(HttpRequest httpRequest){
 
         // 정적 파일 요청인 경우
@@ -104,7 +112,15 @@ public class HandlerManager {
 
     // HttpRequest의 content type에 따른 HttpRequest body 파싱 및 반환
 
-        List<String> valueList = httpRequest.getHeader(CONTENT_TYPE).orElseThrow(
+    /**
+     * application/x-www-form-urlencoded 형식의 데이터를 파싱하여 반환한다.
+     *
+     * @param httpRequest : HttpRequest의 정보를 갖고있는 객체
+     * @return : application/x-www-form-urlencoded 형식의 데이터가 저장된 map
+     */
+    public static Map<String, String> getBodyParams(HttpRequest httpRequest){
+
+        List<String> valueList = httpRequest.getHeader(HttpResponseAttribute.CONTENT_TYPE.getValue()).orElseThrow(
                 () -> new InvalidHttpRequestException("content type is empty")
         );
 
@@ -121,8 +137,13 @@ public class HandlerManager {
 
     }
 
-    // 정적 파일 응답 메서드
-    public void handleStaticResource(HttpRequest httpRequest, HttpResponse httpResponse) throws IllegalArgumentException {
+    /**
+     * 정적 파일 데이터를 httpResponse 객체에 저장한다.
+     *
+     * @param httpRequest : HttpRequest의 정보를 갖고있는 객체
+     * @param httpResponse : 응답 데이터를 저장하는 HttpResponse 객체
+     */
+    public static void handleStaticResource(HttpRequest httpRequest, HttpResponse httpResponse) {
 
         byte[] body = readStaticFile(httpRequest.getPath().orElseThrow(
                 () -> new InvalidHttpRequestException("invalid path")));
@@ -143,7 +164,12 @@ public class HandlerManager {
         }
     }
 
-    // File Path에 해당하는 파일을 byte 배열로 반환
+    /**
+     * File path에 해당하는 파일을 읽어 byte 배열로 반환한다.
+     *
+     * @param filePath : 파일의 path
+     * @return : 파일 데이터를 byte[] 형태로 반환
+     */
     public static byte[] readStaticFile(String filePath) {
         if(filePath.startsWith("/")) {
             filePath = filePath.substring(1);
