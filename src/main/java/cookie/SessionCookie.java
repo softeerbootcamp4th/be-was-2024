@@ -1,6 +1,8 @@
 package cookie;
 
-// sessionId를 저장하는 쿠키
+/**
+ * sessionId를 저장하는 쿠키
+ */
 public class SessionCookie implements Cookie{
 
     private String sessionId;
@@ -43,6 +45,11 @@ public class SessionCookie implements Cookie{
         this.httpOnly = httpOnly;
     }
 
+    /**
+     * 쿠키의 값과 속성을 string으로 반환하여 OutputStream에 바로 저장할 수 있도록 한다.
+     *
+     * @return : 쿠키의 값과 속성을 string으로 반환
+     */
     public String getCookieString(){
         StringBuilder sb = new StringBuilder();
         sb.append(headerName + ": ")
