@@ -19,13 +19,23 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * HttpRequest를 파싱하는 메서드를 가진 클래스
+ */
 public class HttpRequestParser {
     private static final Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
 
     private HttpRequestParser() {}
 
 
-    public static HttpRequest parseHttpRequest(BufferedReader br) throws IOException {
+    /**
+     * InputStream에서 데이터를 파싱하여 HttpRequest를 생성한다.
+     *
+     * @param bis : HttpRequest를 읽을 수 있는 BufferedInputStream
+     * @return : HttpRequest에 대한 정보를 필드에 가지고 있는 HttpRequest 객체
+     * @throws IOException : I/O 에러 발생 시
+     */
+    public static HttpRequest parseHttpRequest(BufferedInputStream bis) throws IOException {
         HttpRequest request = new HttpRequest();
         StringBuilder headers = new StringBuilder();
 
@@ -154,25 +164,48 @@ public class HttpRequestParser {
         request.setQueryParams(queryParams);
     }
 
-    public static Map<String, String> parseRequestBody(String body, MimeType mimeType){
-        switch(mimeType){
-            case APPLICATION_FORM_URLENCODED :
-                String[] bodyParts = body.split("&");
-                Map<String, String> bodyParams = new HashMap<>();
-                for (String bodyPart : bodyParts) {
-                    String[] formData = bodyPart.split("=");
-                    if(formData.length == 2){
-                        formData[0] = URLDecoder.decode(formData[0], StandardCharsets.UTF_8);
-                        formData[1] = URLDecoder.decode(formData[1], StandardCharsets.UTF_8);
-                        bodyParams.put(formData[0], formData[1]);
-                    }
-                    else if(formData.length == 1){
-                        formData[0] = URLDecoder.decode(formData[0], StandardCharsets.UTF_8);
-                        bodyParams.put(formData[0], "");
-                    }
+    /**
+     * application/x-www-form-urlencoded 형식의 데이터를 파싱한다.
+     *
+     * @param httpRequest : HttpRequest의 정보를 담는 객체
+     * @return : application/x-www-form-urlencoded 형식의 데이터를 Map에 저장하여 반환
+     */
+    public static Map<String, String> parseUrlEncodedFormData(HttpRequest httpRequest) {
+        byte[] byteBody = httpRequest.getBody().orElseThrow(
+                () -> new InvalidHttpRequestException("body is empty"));
 
-                }
-                return bodyParams;
+        String body = new String(byteBody, StandardCharsets.ISO_8859_1);
+        String[] bodyParts = body.split("&");
+        Map<String, String> bodyParams = new HashMap<>();
+        for (String bodyPart : bodyParts) {
+            String[] formData = bodyPart.split("=");
+            if (formData.length == 2) {
+                formData[0] = URLDecoder.decode(formData[0], StandardCharsets.UTF_8);
+                formData[1] = URLDecoder.decode(formData[1], StandardCharsets.UTF_8);
+                bodyParams.put(formData[0], formData[1]);
+            } else if (formData.length == 1) {
+                formData[0] = URLDecoder.decode(formData[0], StandardCharsets.UTF_8);
+                bodyParams.put(formData[0], "");
+            }
+        }
+        return bodyParams;
+    }
+
+    /**
+     * multipart/form-data 형식의 데이터를 파싱한다.
+     *
+     * @param httpRequest : HttpRequest의 정보를 담는 객체
+     * @return : multipart/form-data 형식의 데이터를 Map에 저장하여 반환
+     */
+    public static Map<String, MultiPartData> parseMultipartFormData(HttpRequest httpRequest){
+        byte[] byteBody = httpRequest.getBody().orElseThrow(
+                () -> new InvalidHttpRequestException("body is empty")
+        );
+
+        // boundary 문자열 추출
+        String boundary = extractBoundary(httpRequest);
+        String body = new String(byteBody, StandardCharsets.ISO_8859_1);
+        String[] bodyParts = body.split(Pattern.quote("--" + boundary) + "|" + Pattern.quote("--" + boundary + "--"));
 
         Map<String, MultiPartData> params = new HashMap<>();
 
