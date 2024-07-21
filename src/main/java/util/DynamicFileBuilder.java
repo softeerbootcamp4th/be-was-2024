@@ -22,15 +22,6 @@ import java.util.regex.Pattern;
 public class DynamicFileBuilder {
     private static final Logger logger = LoggerFactory.getLogger(DynamicFileBuilder.class);
 
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String CHARSET_UTF8 = "utf-8";
-    private static final String ERROR_MESSAGE_404 =
-            "<html>" +
-                    "<head><title>404 Not Found</title></head>" +
-                    "<body><h1>404 Not Found</h1></body>" +
-                    "</html>";
-
     // 동적 파일을 응답하는 HttpResponse 설정
     public static void setHttpResponse(HttpResponse httpResponse, String filePath, Map<String, List<MyTagDomain>> model) throws UnsupportedEncodingException {
         StringBuilder content = new StringBuilder();
