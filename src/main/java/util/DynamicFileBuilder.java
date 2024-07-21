@@ -1,9 +1,6 @@
 package util;
 
-import constant.FileExtensionType;
-import constant.HttpStatus;
-import constant.MyTagAttribute;
-import constant.MyTagRegex;
+import constant.*;
 import dto.HttpResponse;
 import exception.DynamicFileBuildException;
 import handler.HandlerManager;
@@ -13,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.lang.reflect.Field;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -37,13 +35,14 @@ public class DynamicFileBuilder {
                 content.append(line).append("\n");
             }
 
+            // 동적 파일 데이터 생성
             byte[] responseContent = buildDynamicFile(content.toString(), model);
 
             // 동적 파일 응답 설정
             httpResponse.setHttpStatus(HttpStatus.OK);
-            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
-            httpResponse.addHeader(CONTENT_TYPE, CHARSET_UTF8);
-            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(responseContent.length));
+            httpResponse.addHeader(HttpResponseAttribute.CONTENT_TYPE.getValue(), FileExtensionType.HTML.getContentType());
+            httpResponse.addHeader(HttpResponseAttribute.CONTENT_TYPE.getValue(), HttpResponseAttribute.CHARSET_UTF8.getValue());
+            httpResponse.addHeader(HttpResponseAttribute.CONTENT_LENGTH.getValue(), String.valueOf(responseContent.length));
             httpResponse.setBody(responseContent);
 
         }
@@ -51,10 +50,7 @@ public class DynamicFileBuilder {
             logger.error(e.getMessage());
 
             // 동적 파일 읽기 실패시, 404 에러 응답
-            httpResponse.setHttpStatus(HttpStatus.NOT_FOUND);
-            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
-            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
-            httpResponse.setBody(ERROR_MESSAGE_404.getBytes(CHARSET_UTF8));
+            ErrorResponseBuilder.buildErrorResponse(HttpStatus.NOT_FOUND, httpResponse);
         }
 
     }
@@ -121,7 +117,7 @@ public class DynamicFileBuilder {
                 if(idxMatcher.find()){
                     int idx = Integer.parseInt(idxMatcher.group(1));
                     middlePart = middlePart.replace(bindField,
-                                    getFieldValue(model.get(attributeValue).get(idx), className, fieldName).toString()); // {클래스명.변수명} 치환
+                                    getFieldValue(model.get(attributeValue).get(idx), className, fieldName)); // {클래스명.변수명} 치환
                 }
                 else
                     throw new DynamicFileBuildException("index not found");
@@ -169,20 +165,26 @@ public class DynamicFileBuilder {
             try {
                 Field field = obj.getClass().getDeclaredField(fieldName);
                 field.setAccessible(true);
-                return field.get(obj).toString();
+                Object fieldValue = field.get(obj);
+
+                if (fieldValue instanceof byte[] bytes) {
+                    // byte[] 타입인 경우 Base64로 인코딩하여 문자열로 반환
+                    return Base64.getEncoder().encodeToString(bytes);
+                } else {
+                    // 기타 타입인 경우 toString() 메서드를 호출하여 문자열로 반환
+                    return fieldValue.toString();
+                }
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 throw new DynamicFileBuildException("can't get field " + fieldName + " from " + className + "in DynamicFileBuilder");
             }
         }
-        throw new DynamicFileBuildException("can't get obj " + " from " + className + "in DynamicFileBuilder");
+        throw new DynamicFileBuildException("can't get obj " + " from " + className + " in DynamicFileBuilder");
     }
 
     // my-tag의 적용 여부를 반환하는 메서드
     private static boolean isTagAttributeValid(MyTagAttribute attribute, String attributeValue,
                                                Map<String, List<MyTagDomain>> model){
-        // model에 담긴 값이 없으면 유효x
-        if(model.isEmpty())
-            return false;
+
 
         // 속성이 if-not이면 속성 값이 model의 key에 없어야 유효
         if(attribute == MyTagAttribute.IF_NOT)
