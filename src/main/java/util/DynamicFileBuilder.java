@@ -16,12 +16,21 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// 동적 파일을 생성하는 클래스
+/**
+ * 동적 파일을 생성하는 클래스
+ */
 public class DynamicFileBuilder {
     private static final Logger logger = LoggerFactory.getLogger(DynamicFileBuilder.class);
 
     // 동적 파일을 응답하는 HttpResponse 설정
-    public static void setHttpResponse(HttpResponse httpResponse, String filePath, Map<String, List<MyTagDomain>> model) throws UnsupportedEncodingException {
+
+    /**
+     *
+     * @param httpResponse : 응답 데이터를 저장하는 HttpResponse 객체
+     * @param filePath : 동적으로 변환할 파일의 경로
+     * @param model : 파일에 동적으로 바인딩할 데이터
+     */
+    public static void setHttpResponse(HttpResponse httpResponse, String filePath, Map<String, List<MyTagDomain>> model){
         StringBuilder content = new StringBuilder();
 
         if(filePath.startsWith("/")) {
