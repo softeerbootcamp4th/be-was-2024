@@ -3,12 +3,11 @@ package handler;
 
 import dto.HttpRequest;
 import dto.HttpResponse;
-
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Map;
-import java.util.Optional;
 
+/**
+ * HttpRequest를 처리하는 handler의 함수형 인터페이스
+ */
 @FunctionalInterface
 public interface Handler {
     void handle(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException;
