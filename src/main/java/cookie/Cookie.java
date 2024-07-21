@@ -1,8 +1,11 @@
 package cookie;
 
+/**
+ * Cookie 인터페이스
+ */
 public interface Cookie {
-    static final String headerName = "Set-Cookie";
-    static final String CRLF = "\r\n";
+    String headerName = "Set-Cookie";
+    String CRLF = "\r\n";
 
-    public String getCookieString();
+    String getCookieString();
 }
