@@ -1,5 +1,8 @@
 package cookie;
 
+/**
+ * 쿠키 속성 Enum
+ */
 public enum CookieAttribute {
     SESSION_ID("sessionId"),
     DOMAIN("Domain"),
