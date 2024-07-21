@@ -9,11 +9,19 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 쓰레드 풀을 생성하고 소켓을 통해 각각의 HttpRequest를 쓰레드에게 처리하도록 하는 클래스
+ */
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
     private static final int THREAD_POOL_SIZE = 20;
 
+    /**
+     *
+     * @param args : 프로그램에 넘기는 인수
+     * @throws Exception : IOException 외의 예외
+     */
     public static void main(String[] args) throws Exception {
         int port = 0;
         if (args == null || args.length == 0) {
@@ -37,6 +45,7 @@ public class WebServer {
         } catch (IOException e) {
             logger.error("Error occurred while starting the server", e);
         } finally {
+
             executorService.shutdown();
         }
     }
