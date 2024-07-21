@@ -28,7 +28,6 @@ public class FileContentReader {
 
     public boolean isUploadedResource(String uri) {
         File file = new File(uri.substring(1));
-        System.out.println("file = " + file.exists());
         return uri.startsWith("/src/main/resources/upload/") && file.exists();
     }
 

@@ -1,5 +1,8 @@
 package db;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -7,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionPool {
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionPool.class);
+
     private static ConnectionPool instance = new ConnectionPool();
 
     // JDBC 연결 정보
@@ -46,9 +51,9 @@ public class ConnectionPool {
         Connection connection = null;
         try {
             connection = DriverManager.getConnection(url, username, password);
-            System.out.println("Connection " + connection + " created successfully.");
+            logger.debug("Connection: {}", connection);
         } catch (SQLException e) {
-            System.out.println("Error creating connection: " + e.getMessage());
+            logger.error("Error creating connection: {}", e.getMessage());
         }
         return connection;
     }
@@ -75,7 +80,7 @@ public class ConnectionPool {
             try {
                 connection.close();
             } catch (SQLException e) {
-                System.out.println("Error closing connection: " + e.getMessage());
+                logger.error("Error closing connection: {}", e.getMessage());
             }
         }
         connectionPool.clear();
