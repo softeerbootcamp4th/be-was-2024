@@ -50,6 +50,8 @@ public class LoginUserMapper implements HttpMapper {
             }
         }
 
+        databaseConnections.releaseConnection(connection);
+
         // UserId not found or password does not match
         if (user == null || !user.getPassword().equals(body.get("password"))) {
             String redirectUrl = "/login?error=unauthorized";

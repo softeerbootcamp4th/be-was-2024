@@ -43,9 +43,11 @@ public class CreateUserMapper implements HttpMapper {
         preparedStatement.setString(3, newUser.getName());
         preparedStatement.setString(4, newUser.getEmail());
         preparedStatement.executeUpdate();
-        connection.commit();
 
         logger.debug("INSERT INTO users (userId, password, name, email) VALUES ({}, {}, {}, {})", userId, password, name, email);
+
+        preparedStatement.close();
+        databaseConnections.releaseConnection(connection);
 
         MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of("Location", "/"), null);
 

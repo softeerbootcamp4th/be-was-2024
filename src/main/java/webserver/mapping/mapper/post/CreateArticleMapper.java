@@ -53,6 +53,9 @@ public class CreateArticleMapper implements webserver.mapping.mapper.HttpMapper 
 
             logger.debug("Article created: {}", parts.get(0));
 
+            preparedStatement.close();
+            databaseConnections.releaseConnection(connection);
+
         }
 //        else {
 //            Map<String, String> body = httpRequestParser.parseQuery(new String(httpRequest.getBody()));

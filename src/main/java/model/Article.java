@@ -1,31 +1,36 @@
 package model;
 
 public class Article {
-    private static int nextId = 1; // 다음 articleId 초기값 설정
-    private String articleId;
+    private int id;
     private String userId;
     private String content;
+    private String imgPath;
 
-    public Article(String userId, String content) {
-        this.articleId = generateNextId();
+    public Article(int id, String userId, String content, String imgPath) {
+        this.id = id;
         this.userId = userId;
         this.content = content;
-    }
-
-    private static synchronized String generateNextId() {
-        return String.valueOf(nextId++);
+        this.imgPath = imgPath;
     }
 
     public String getUserId() {
         return userId;
     }
 
-    public String getArticleId() {
-        return articleId;
+    public int getId() {
+        return id;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getImgPath() {
+        return imgPath;
     }
 
     @Override
     public String toString() {
-        return "Article [articleId=" + articleId + ", userId=" + userId + ", content=" + content + "]";
+        return "Article [id=" + id + ", userId=" + userId + ", content=" + content + ", imgPath=" + imgPath + "]";
     }
 }
