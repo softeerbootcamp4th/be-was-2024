@@ -15,6 +15,9 @@ import util.HttpRequestParser;
 
 import java.io.*;
 
+/**
+ * HttpRequest를 처리하는 클래스
+ */
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
     private final HandlerManager handlerManager = HandlerManager.getInstance();
@@ -29,7 +32,16 @@ public class Dispatcher {
         return Dispatcher.LazyHolder.INSTANCE;
     }
 
-    public void dispatch(BufferedReader br, DataOutputStream dos) throws IOException {
+    /**
+     * HttpRequestParser를 통해 HttpRequest를 파싱한다.
+     * 파싱 결과인 HttpRequest를 처리할 수 있는 Handler를 HandlerManager를 통해 가져온다.
+     * Handler의 처리 결과를 담은 HttpResponse를 client에게 응답으로 보낸다.
+     * 예외 발생 시, DB connection을 해제하고 예외응답을 client에게 보낸다.
+     *
+     * @param bis : HttpRequest를 읽을 수 있는 BufferedInputStream
+     * @param dos : HttpResponse에 응답을 생성할 수 있는 DataOutputStream
+     */
+    public void dispatch(BufferedInputStream bis, DataOutputStream dos){
         try {
             // HttpRequest 파싱 및 결과 반환
             HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(bis);
