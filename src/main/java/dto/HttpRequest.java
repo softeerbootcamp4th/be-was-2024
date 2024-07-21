@@ -5,6 +5,9 @@ import exception.InvalidHttpRequestException;
 
 import java.util.*;
 
+/**
+ * HttpRequest의 정보를 저장하는 클래스
+ */
 public class HttpRequest {
     private static final String COOKIE_HEADER = "Cookie";
     private static final String COOKIE_NAME_SESSION_ID = "sessionId";
@@ -78,6 +81,11 @@ public class HttpRequest {
         this.body = body;
     }
 
+    /**
+     * HttpRequest의 쿠키에서 sessionId의 값을 반환한다.
+     *
+     * @return : session Id가 없을 수도 있으므로 Optional에 sessionId를 담아 반환
+     */
     public Optional<String> getSessionId(){
         if(headers == null)
             return Optional.empty();
@@ -95,6 +103,11 @@ public class HttpRequest {
         return Optional.empty();
     }
 
+    /**
+     * HttpRequest 쿠키에서 redirect 주소 값을 반환한다.
+     *
+     * @return : redirect 주소가 없을 수도 있으므로 Optional에 redirect 주소를 담아 반환
+     */
     public Optional<String> getRedirectUrl(){
         if(headers == null)
             return Optional.empty();
