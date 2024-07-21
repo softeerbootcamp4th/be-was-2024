@@ -6,6 +6,23 @@
     <link href="/reset.css" rel="stylesheet"/>
     <link href="/global.css" rel="stylesheet"/>
     <link href="/main.css" rel="stylesheet"/>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentUrl = window.location.pathname;
+            const articleNumberMatch = currentUrl.match(/\/article\/(\d+)/);
+            if (articleNumberMatch) {
+                const articleNumber = parseInt(articleNumberMatch[1]);
+                const prevArticleNumber = articleNumber - 1;
+                const nextArticleNumber = articleNumber + 1;
+
+                const prevLink = document.getElementById('prev-link');
+                const nextLink = document.getElementById('next-link');
+
+                prevLink.href = `/article/${prevArticleNumber}`;
+                nextLink.href = `/article/${nextArticleNumber}`;
+            }
+        });
+    </script>
 </head>
 <body>
 <div class="container">
@@ -55,7 +72,7 @@
         <nav class="nav">
             <ul class="nav__menu">
                 <li class="nav__menu__item">
-                    <a class="nav__menu__item__btn" href="">
+                    <a class="nav__menu__item__btn" id="prev-link" href="#">
                         <img
                                 class="nav__menu__item__img"
                                 src="/img/ci_chevron-left.svg"
@@ -67,7 +84,7 @@
                     <a class="btn btn_ghost btn_size_m">댓글 작성</a>
                 </li>
                 <li class="nav__menu__item">
-                    <a class="nav__menu__item__btn" href="">
+                    <a class="nav__menu__item__btn" id="next-link" href="#">
                         다음 글
                         <img
                                 class="nav__menu__item__img"
