@@ -3,15 +3,23 @@ package model;
 import exception.InvalidHttpRequestException;
 
 import java.util.Map;
-import java.util.stream.Stream;
 
 public class User implements MyTagDomain{
+    private int id;
     private final String userId;
     private final String password;
     private final String name;
     private final String email;
 
     public User(String userId, String password, String name, String email) {
+        this.userId = userId;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+    }
+
+    public User(int id, String userId, String password, String name, String email) {
+        this.id = id;
         this.userId = userId;
         this.password = password;
         this.name = name;
@@ -33,6 +41,15 @@ public class User implements MyTagDomain{
             throw new InvalidHttpRequestException("User information cannot be null");
         }
         return value;
+    }
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId(){
+        return id;
     }
 
     public String getUserId() {
