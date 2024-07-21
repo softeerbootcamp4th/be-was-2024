@@ -49,15 +49,14 @@ public class RequestParserTest {
     @Test
     @DisplayName("Headers 파싱 테스트")
     void testHeadersParser() throws IOException {
-        StringBuilder headerString = new StringBuilder();
-        headerString.append("lower-case: lower-case-value\r\n");
-        headerString.append("UPPER-CASE: UPPER-CASE-VALUE\r\n");
-        headerString.append("mIXeD-caSE: MixEd-CASe-VAlue\r\n");
-        headerString.append("optional-whitespace:OWS\r\n");
-        headerString.append("required-whitespace: RWS\r\n");
-        headerString.append("bad-whitespace   :    BWS\r\n\r\n");
+        String headerString = "lower-case: lower-case-value\r\n" +
+                "UPPER-CASE: UPPER-CASE-VALUE\r\n" +
+                "mIXeD-caSE: MixEd-CASe-VAlue\r\n" +
+                "optional-whitespace:OWS\r\n" +
+                "required-whitespace: RWS\r\n" +
+                "bad-whitespace   :    BWS\r\n\r\n";
 
-        HashMap<String, String> headers = requestParser.getHeaders(getInputStream(headerString.toString()), new StringBuilder());
+        HashMap<String, String> headers = requestParser.getHeaders(getInputStream(headerString), new StringBuilder());
 
         assertEquals("lower-case-value", headers.get("lower-case"));
         assertEquals("UPPER-CASE-VALUE", headers.get("upper-case"));

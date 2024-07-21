@@ -11,19 +11,34 @@ import java.util.Optional;
 
 import static util.Constants.*;
 
+/**
+ * 게시글을 저장하는 데이터베이스입니다.
+ */
+
 public class ArticleDatabase {
     private static final Logger logger = LoggerFactory.getLogger(ArticleDatabase.class);
     private DatabaseConnectionPool connectionPool;
 
+    /**
+     * JDBC_URL에 연결된 커넥션 풀을 주입합니다.
+     */
     public ArticleDatabase() {
         connectionPool = new DatabaseConnectionPool(JDBC_URL);
     }
 
+    /**
+     * connectionPool을 이용해 connection을 사용합니다.
+     * @return connectionPool에서 현재 사용 가능한 커넥션을 반환합니다.
+     * @throws SQLException SQL문 오류 시 발생합니다.
+     */
     public Connection connect() throws SQLException {
         return connectionPool.getConnection();
     }
 
-    public void dropArticleTable() {
+    /**
+     * 데이터베이스 안의 모든 데이터를 삭제합니다.
+     */
+    public void dropAllObjects() {
         String sql = "DROP ALL OBJECTS;";
         try (Connection conn = connect(); Statement statement = conn.createStatement()) {
             statement.execute(sql);
@@ -33,7 +48,16 @@ public class ArticleDatabase {
         }
     }
 
-
+    /**
+     * Article 테이블을 생성합니다.
+     * Article 테이블은 다음과 같은 필드를 갖습니다.
+     *<pre>
+     *Article_id: int, auto_increment, primary key
+     *user_name: varchar(255)
+     *text: text, not null
+     *pic: blob, not null</pre>
+     *
+     */
     public void createArticleTable() {
         String sql = "CREATE TABLE IF NOT EXISTS ARTICLE(" +
                 "ARTICLE_ID INT AUTO_INCREMENT PRIMARY KEY," +
@@ -50,6 +74,12 @@ public class ArticleDatabase {
         }
     }
 
+    /**
+     * 게시글을 생성하는 메서드입니다.
+     * @param userName 작성자 이름
+     * @param text 게시글 본문
+     * @param pic 게시글 이미지
+     */
     public void createArticle(String userName, String text, byte[] pic) {
         String sql = "INSERT INTO ARTICLE (ARTICLE_ID, USER_NAME, TEXT, PIC) VALUES (DEFAULT, ?, ?, ?)";
         try (Connection conn = connect(); PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
@@ -63,6 +93,10 @@ public class ArticleDatabase {
         }
     }
 
+    /**
+     * 전체 게시글을 반환하는 메서드입니다.
+     * @return Article 클래스를 List 형식을 이용하여 반환합니다.
+     */
     public List<Article> getAllArticles() {
         List<Article> articles = new ArrayList<>();
         String sql = "SELECT * FROM ARTICLE ORDER BY ARTICLE_ID DESC";
@@ -81,6 +115,11 @@ public class ArticleDatabase {
         return articles;
     }
 
+    /**
+     * 게시글을 단건 조회하는 메서드입니다.
+     * @param articleId 조회할 게시글의 id
+     * @return Article 클래스를 Optional을 이용하여 반환합니다.
+     */
     public Optional<Article> getArticle(Integer articleId) {
         String sql = "SELECT * FROM ARTICLE WHERE ARTICLE_ID = ?";
 

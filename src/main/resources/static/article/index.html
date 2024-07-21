@@ -11,16 +11,25 @@
             align-items: center;
             gap: 10px;
         }
+
         .image_wrapper {
             height: 50px;
         }
+
         .file-name {
             font-size: 14px;
             color: #333;
         }
+
         .btn_size_xs {
             padding: 6px 12px;
             font-size: 14px;
+        }
+
+        /* 비활성화 상태 스타일 */
+        .btn_disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -85,9 +94,17 @@
     </div>
 </div>
 <script>
-    document.getElementById('imageUpload').addEventListener('change', function() {
+    document.getElementById('imageUpload').addEventListener('change', function () {
         const fileName = this.files[0] ? this.files[0].name : '선택된 파일 없음';
         document.getElementById('fileName').textContent = fileName;
+    });
+
+    document.getElementById('dataForm').addEventListener('submit', function (event) {
+        const submitButton = document.getElementById('registration-btn');
+        submitButton.classList.add('btn_disabled');
+        setTimeout(() => {
+            submitButton.classList.remove('btn_disabled');
+        }, 3000); // 필요한 시간에 맞게 조정
     });
 </script>
 </body>

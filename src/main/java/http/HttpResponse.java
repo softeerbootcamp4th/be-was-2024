@@ -2,6 +2,9 @@ package http;
 
 import java.util.HashMap;
 
+/**
+ * HttpResponse를 표현하는 클래스입니다.
+ */
 public class HttpResponse {
 
     private static final String HTTP_VERSION = "HTTP/1.1 ";

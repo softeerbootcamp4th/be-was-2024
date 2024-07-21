@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * 프로젝트 내에서 사용될 상수들을 선언한 클래스입니다.
+ */
 public class Constants {
     private static final Logger logger = LoggerFactory.getLogger(Constants.class);
 
@@ -66,6 +69,9 @@ public class Constants {
 
     private static final Properties properties = new Properties();
 
+    /**
+     * Properties 클래스를 이용해 정적 파일 경로, 데이터베이스 경로, 데이터베이스 사용자 이름, 데이터베이스 비밀번호를 로딩합니다.
+     */
     static {
         try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {

@@ -46,7 +46,7 @@ public class RequestParser {
         return new StartLine(method, requestUrl, version);
     }
 
-    public HashMap<String, String> getHeaders(InputStream in, StringBuilder log) throws IOException {
+    public HashMap<String, String> getHeaders(InputStream in, StringBuilder log)  {
         HashMap<String, String> headers = new HashMap<>();
         String headerLine;
 
@@ -145,7 +145,7 @@ public class RequestParser {
         return headers;
     }
 
-    private ArrayList<byte[]> splitByBoundary(byte[] bodies, String boundary) throws IOException {
+    private ArrayList<byte[]> splitByBoundary(byte[] bodies, String boundary)  {
         ArrayList<byte[]> parts = new ArrayList<>();
         byte[] boundaryBytes = boundary.getBytes();
         byte[] endBoundaryBytes = (boundary + "--").getBytes();
@@ -187,6 +187,7 @@ public class RequestParser {
             return i;
         }
         return -1;
+        // TODO: 대용량 이미지를 파싱 시 문제 생길 수 있음
     }
 
 

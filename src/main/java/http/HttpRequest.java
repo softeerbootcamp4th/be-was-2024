@@ -3,8 +3,10 @@ package http;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * HttpRequest를 표현하는 클래스입니다.
+ */
 public class HttpRequest {
-
     StartLine startLine;
     HashMap<String, String> headers = new HashMap<>();
     ArrayList<RequestBody> body;
@@ -39,5 +41,4 @@ public class HttpRequest {
     public ArrayList<RequestBody> getBody() {
         return body;
     }
-
 }
