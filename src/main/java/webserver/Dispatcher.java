@@ -32,7 +32,7 @@ public class Dispatcher {
     public void dispatch(BufferedReader br, DataOutputStream dos) throws IOException {
         try {
             // HttpRequest 파싱 및 결과 반환
-            HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(br);
+            HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(bis);
 
             // HandlerManager를 통해 request를 처리할 수 있는 handler 반환
             Handler handler = handlerManager.getHandler(httpRequest);
@@ -47,16 +47,14 @@ public class Dispatcher {
             httpResponse.sendHttpResponse(dos);
         }
         catch (IOException | IllegalArgumentException | InvalidHttpRequestException
-               | ResourceNotFoundException | DynamicFileBuildException e){
+               | ResourceNotFoundException | DynamicFileBuildException | DatabaseException e){
             logger.error(e.getMessage());
 
-            // 에러 응답을 저장할 HttpResponse 객체 생성
+            // DB connection 해제
+            DatabaseConnection.closeConnection();
+
             HttpResponse httpResponse = new HttpResponse();
-            httpResponse.setHttpStatus(HttpStatus.NOT_FOUND);
-            httpResponse.addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
-            httpResponse.addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
-            httpResponse.setBody(ERROR_MESSAGE_404.getBytes());
-            httpResponse.sendHttpResponse(dos);
+            ErrorResponseBuilder.buildErrorResponse(e, httpResponse);
         }
     }
 }
