@@ -1,13 +1,18 @@
 package util;
 
+import constant.FileExtensionType;
 import constant.HttpMethod;
 import constant.MimeType;
 import dto.HttpRequest;
+import dto.multipart.MultiPartData;
+import dto.multipart.MultiPartDataOfFile;
+import dto.multipart.MultiPartDataOfText;
 import exception.InvalidHttpRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,12 +44,11 @@ public class HttpRequestParserTest {
                 "&name=" + ENCODED_NAME +
                 "&email=" + ENCODED_EMAIL + CRLF
                 ).getBytes());
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
+        BufferedInputStream bis = new BufferedInputStream(inputStream);
         // when
-        HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(br);
-        Map<String, String> parsedRequestBody = HttpRequestParser.parseRequestBody(httpRequest.getBody().get()
-        , MimeType.APPLICATION_FORM_URLENCODED);
+        HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(bis);
+        Map<String, String> parsedRequestBody = HttpRequestParser.parseUrlEncodedFormData(httpRequest);
 
         // then
         assertThat(httpRequest.getHttpMethod()).isEqualTo(HttpMethod.POST);
@@ -66,10 +70,9 @@ public class HttpRequestParserTest {
         // given
         InputStream inputStream = new ByteArrayInputStream((
                 HttpMethod.GET.name() + " /register/index.html " + HTTP_VERSION + CRLF + CRLF).getBytes());
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
+        BufferedInputStream bis = new BufferedInputStream(inputStream);
         // when
-        HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(br);
+        HttpRequest httpRequest = HttpRequestParser.parseHttpRequest(bis);
 
         // then
         assertThat(httpRequest.getHttpMethod()).isEqualTo(HttpMethod.GET);
@@ -84,12 +87,50 @@ public class HttpRequestParserTest {
         // 잘못된 HttpMethod
         InputStream inputStream = new ByteArrayInputStream((
                 "GOOD /register/index.html " + HTTP_VERSION + CRLF + CRLF).getBytes());
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
-
+        BufferedInputStream bis = new BufferedInputStream(inputStream);
         // when & then
-        assertThatThrownBy(() -> HttpRequestParser.parseHttpRequest(br))
+        assertThatThrownBy(() -> HttpRequestParser.parseHttpRequest(bis))
                 .isInstanceOf(InvalidHttpRequestException.class)
                 .hasMessage("Incorrect HttpMethod");
 
+    }
+
+    @Test
+    @DisplayName("multipart 요청 파싱 성공")
+    public void ParseMultipartSuccess() {
+        // given
+        HttpRequest httpRequest = new HttpRequest();
+        httpRequest.setHeader("Content-Type", MimeType.MULTIPART_FORM_DATA.getTypeName());
+        httpRequest.setHeader("Content-Type", "boundary=Boundary");
+        String bodyText = "--Boundary\r\n" +
+                "Content-Disposition: form-data; name=text_field\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n" +
+                "This is a text field value.\r\n" +
+                "--Boundary\r\n" +
+                "Content-Disposition: form-data; name=image_file; filename=example.jpg\r\n" +
+                "Content-Type: image/jpeg\r\n" +
+                "\r\n" +
+                "FFD8FFE000104A46494600010101006000600000FFDB004300080606070605080707\r\n" +
+                "--Boundary--\r\n";
+        byte[] body = bodyText.getBytes(StandardCharsets.ISO_8859_1);
+        httpRequest.setBody(body);
+
+        // when
+        Map<String, MultiPartData> multipartFormData = HttpRequestParser.parseMultipartFormData(httpRequest);
+        MultiPartDataOfText multiPartDataOfText = (MultiPartDataOfText) multipartFormData.get("text_field");
+        MultiPartDataOfFile multiPartDataOfFile = (MultiPartDataOfFile) multipartFormData.get("image_file");
+
+        // then
+        assertThat(multipartFormData).hasSize(2);
+
+        assertThat(multiPartDataOfText.getText()).isEqualTo("This is a text field value.");
+        assertThat(multiPartDataOfText.getContentType()).isEqualTo(FileExtensionType.PLAIN);
+
+        assertThat(multiPartDataOfFile.getFileName()).isEqualTo("example.jpg");
+        assertThat(multiPartDataOfFile.getContent())
+                .isEqualTo("FFD8FFE000104A46494600010101006000600000FFDB004300080606070605080707"
+                        .getBytes(StandardCharsets.ISO_8859_1));
+        assertThat(multiPartDataOfFile.getContentType()).isEqualTo(FileExtensionType.JPG);
     }
 }
