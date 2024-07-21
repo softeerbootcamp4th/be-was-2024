@@ -1,5 +1,8 @@
 package constant;
 
+/**
+ * File 확장자 타입 Enum
+ */
 public enum FileExtensionType {
     HTML("text/html"),
     CSS("text/css"),
