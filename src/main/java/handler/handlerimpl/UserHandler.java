@@ -17,6 +17,9 @@ import java.util.Map;
 import static handler.HandlerManager.getBodyParams;
 import static repository.DatabaseConnection.getConnection;
 
+/**
+ * 유저 관련 작업을 처리하는 클래스
+ */
 public class UserHandler {
     // 회원가입 handler
     public static Handler userCreateHanlder = (httpRequest, httpResponse) -> {
