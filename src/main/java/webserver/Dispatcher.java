@@ -1,10 +1,7 @@
 package webserver;
-
-import com.sun.net.httpserver.Request;
-import constant.FileExtensionType;
-import constant.HttpStatus;
 import dto.HttpRequest;
 import dto.HttpResponse;
+import exception.DatabaseException;
 import exception.DynamicFileBuildException;
 import exception.InvalidHttpRequestException;
 import exception.ResourceNotFoundException;
@@ -12,22 +9,15 @@ import handler.Handler;
 import handler.HandlerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import repository.DatabaseConnection;
+import util.ErrorResponseBuilder;
 import util.HttpRequestParser;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 
 public class Dispatcher {
     private static final Logger logger = LoggerFactory.getLogger(Dispatcher.class);
     private final HandlerManager handlerManager = HandlerManager.getInstance();
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String ERROR_MESSAGE_404 =
-            "<html>" +
-                    "<head><title>404 Not Found</title></head>" +
-                    "<body><h1>404 Not Found</h1></body>" +
-            "</html>";
 
     private Dispatcher() {}
 
