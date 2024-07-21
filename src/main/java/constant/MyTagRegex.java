@@ -1,5 +1,8 @@
 package constant;
 
+/**
+ * 동적 파일 생성 시 사용되는 Regex Enum
+ */
 public enum MyTagRegex {
     // my-tag의 속성 및 속성값을 capture하는 regex
     CAPTURE_ATTRIBUTE("<\\s*my-tag\\b(\\s+([\\w-]+)\\s*=\\s*\"([^\"]*)\")\\s*>([\\s\\S]*?)</\\s*my-tag\\s*>"),
