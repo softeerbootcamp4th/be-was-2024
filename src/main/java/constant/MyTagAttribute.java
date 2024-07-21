@@ -1,6 +1,9 @@
 package constant;
 
-// my-tag의 속성 리스트
+
+/**
+ * my-tag의 속성 Enum
+ */
 public enum MyTagAttribute {
     IF("if"), // 속성값이 model에 저장되어 있는 경우 유효
     IF_NOT("if-not"), // 속성값이 model에 저장되어 있지 않아야 유효
