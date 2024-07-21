@@ -8,6 +8,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import org.slf4j.Logger;
 
+
+/**
+ * H2데이터베이스 연결을 위한 클래스
+ */
 public class DatabaseUtil {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUtil.class);
 
@@ -25,6 +29,9 @@ public class DatabaseUtil {
         }
     }
 
+    /**
+     * H2 데이터베이스를 연결하기위한 메소드
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, JDBC_USER, JDBC_PASSWORD);
 

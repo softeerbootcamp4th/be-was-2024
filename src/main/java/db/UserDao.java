@@ -1,6 +1,6 @@
 package db;
 
-import handler.PostHandler;
+
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +12,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * User객체를 h2데이터베이스에 추가하고 얻어오는 클래스
+ */
 public class UserDao {
     private static final Logger logger = LoggerFactory.getLogger(UserDao.class);
+
+    /**
+     * H2 데이터베이스에 User를 추가한다
+     * @param user 추가하고자 하는 User객체
+     */
     public void addUser(User user)  {
         String sql = "INSERT INTO users (user_id, password, name, email) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseUtil.getConnection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -31,6 +40,11 @@ public class UserDao {
         }
     }
 
+
+    /**
+     * Id로 User를 데이터베이스에서 찾아서 반환해주는 메소드
+     * @param userId 찾고자 하는 User객체의 Id
+     */
     public User findUserById(String userId) throws SQLException {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         try (Connection connection = DatabaseUtil.getConnection(); PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -48,6 +62,9 @@ public class UserDao {
         }
     }
 
+    /**
+     * 데이터베이스에서 모든 User객체를 찾아서 List에 담아서 반환해주는 메소드
+     */
     public List<User> findAll() throws SQLException {
         String sql = "SELECT * FROM users";
         List<User> users = new ArrayList<>();

@@ -10,10 +10,10 @@ import util.RequestObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Post메소드로 들어온 모든 요청을 다뤄주는 클래스
+ */
 public class PostHandler {
 
 
@@ -28,10 +28,19 @@ public class PostHandler {
     private static class LazyHolder{
         private static final PostHandler INSTANCE = new PostHandler();
     }
+
+    /**
+     * LazyHolder방식으로 싱글톤 구현 위한 클래스
+     */
     public static PostHandler getInstance() {
         return LazyHolder.INSTANCE;
     }
 
+    /**
+     * Post메소드로 들어온 요청의 경로를 파싱해서 해당하는 메소드를 호출해주는 클래스
+     * @param dos DataOutputStream 객체
+     * @param requestObject
+     */
     public void handlePostRequest(DataOutputStream dos, RequestObject requestObject) {
         String path = requestObject.getPath();
 
@@ -85,7 +94,7 @@ public class PostHandler {
         }
     }
 
-    public void responseAlert(DataOutputStream dos, String content, String location) {
+    private void responseAlert(DataOutputStream dos, String content, String location) {
         try {
             String body = "<html><head><script type='text/javascript'>alert('" + content + "');window.location='"+location+"';</script></head></html>";
             byte[] bodyBytes = body.getBytes("UTF-8");
@@ -100,7 +109,7 @@ public class PostHandler {
         }
     }
 
-    public void loginSuccess(DataOutputStream dos, User user) {
+    private void loginSuccess(DataOutputStream dos, User user) {
         try {
             String session = SessionHandler.createSession(user);
             logger.error(session);

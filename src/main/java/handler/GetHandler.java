@@ -11,12 +11,15 @@ import util.RequestObject;
 import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 
+
+/**
+ * Get메소드로 들어온 요청을 다뤄주는 클래스
+ */
 public class GetHandler {
     private GetHandler() {}
 
@@ -24,10 +27,19 @@ public class GetHandler {
     private static class LazyHolder{
         private static final GetHandler INSTANCE = new GetHandler();
     }
+
+    /**
+     * LazyHolder형식으로 싱글톤 생성 위한 클래스
+     */
     public static GetHandler getInstance() {
         return LazyHolder.INSTANCE;
     }
 
+    /**
+     * Get 메소드로 들어온 요청의 경로값을 파싱해서 다시 해당하는 메소드를 호출하는 클래스
+     * @param dos DataoutputStream
+     * @param requestObject 들어온 요청을담은 객체
+     */
     public void handleGetRequest(DataOutputStream dos, RequestObject requestObject) {
         String path = requestObject.getPath();
         try {

@@ -10,10 +10,19 @@ import handler.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+
+/**
+ * WebServer 클래스
+ */
 public class WebServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
     private static final int DEFAULT_PORT = 8080;
 
+
+    /**
+     * Main 함수
+     */
     public static void main(String args[]) throws Exception {
         int port = 0;
         if (args == null || args.length == 0) {
@@ -50,7 +59,5 @@ public class WebServer {
         {
             logger.error("Server Start Error : "+ e.getMessage());
         }
-
-
     }
 }

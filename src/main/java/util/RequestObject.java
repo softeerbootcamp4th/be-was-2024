@@ -6,9 +6,13 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+
+
+/**
+ * 들어온 요청을 객체화 하여 값을 파싱해서 각 필드별로 저장시키는 클래스
+ */
 public class RequestObject {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestObject.class);
@@ -30,6 +34,12 @@ public class RequestObject {
     private String parsedContent;
     private byte[] parsedImage;
 
+
+
+    /**
+     * RequestObject 생성자
+     * @param inputStream Http통신에서 들어온 요청 값 inputStream 값
+     */
     public RequestObject(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
 
@@ -90,34 +100,69 @@ public class RequestObject {
         }
     }
 
+
+    /**
+     * path Getter
+     */
     public String getPath() {
         return this.path;
     }
 
+
+    /**
+     * method Getter
+     */
     public String getMethod() {
         return this.method;
     }
 
+    /**
+     * version Getter
+     */
     public String getVersion() {
         return this.version;
     }
+
+    /**
+     * body Getter
+     */
     public byte[] getBody() {
         return this.body;
     }
+
+    /**
+     * body Setter
+     * @param body
+     */
     public void setBody(byte[] body) {
         this.body = body;
     }
+
+    /**
+     * content Getter
+     */
     public String getParsedContent() {
         return this.parsedContent;
     }
+
+
+    /**
+     * parsedImage Getter
+     */
     public byte[] getParsedImage() {
         return this.parsedImage;
     }
+
+    /**
+     * parsedTitle Getter
+     */
     public String getParsedTitle(){
         return this.parsedTitle;
     }
 
-    //헤더에서 쿠키를 파싱한다
+    /**
+     * Cookies Getter
+     */
     public Map<String, String> getCookies() {
         Map<String, String> cookies = new HashMap<>();
         if (headers.containsKey(HttpHeader.COOKIE)) {

@@ -3,6 +3,11 @@ package util;
 import java.util.HashMap;
 import java.util.Map;
 
+
+
+/**
+ * HttpHeader값을 담은 enum
+ */
 public enum HttpHeader {
 
     ACCEPT("Accept"),
@@ -33,10 +38,18 @@ public enum HttpHeader {
         this.headerName = headerName;
     }
 
+
+    /**
+     * headerName Getter
+     */
     public String getHeaderName() {
         return headerName;
     }
 
+
+    /**
+     * 들어온 headerName값을 실제 HttpHeader String으로 변환해준다
+     */
     public static HttpHeader fromString(String headerName) {
         return LOOKUP.get(headerName.toLowerCase());
     }

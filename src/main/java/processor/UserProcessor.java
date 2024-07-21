@@ -1,15 +1,17 @@
 package processor;
 
 import db.Database;
-import handler.PostHandler;
 import model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import util.RequestObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
+
+
+/**
+ * User객체를 처리하기 위한 class
+ */
 public class UserProcessor {
 
     private UserProcessor() {}
@@ -19,11 +21,21 @@ public class UserProcessor {
     }
 
 
+
+    /**
+     * LazyHolder 방식으로 싱글톤 구현
+     */
     public static UserProcessor getInstance()
     {
         return LazyHolder.INSTANCE;
     }
 
+
+
+    /**
+     * requestObject에 담겨있는 user생성을 위한 값들을 파싱 후 User를 생성
+     * @param requestObject 넘어온 requestObject
+     */
     public void userCreate(RequestObject requestObject) {
         Map<String,String> map =  new HashMap<>();
         String paramLine = new String(requestObject.getBody());
@@ -45,6 +57,11 @@ public class UserProcessor {
         }
     }
 
+
+
+    /**
+     * 로그인 시 넘어온 Id값 Password로 해당하는 User가 있는지 찾고 User를 반환
+     */
     public User userFind(RequestObject requestObject) throws Exception {
         String paramLine = new String(requestObject.getBody());
         String[] pairs = paramLine.split("&");
