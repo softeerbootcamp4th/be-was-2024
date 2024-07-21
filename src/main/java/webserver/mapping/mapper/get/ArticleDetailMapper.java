@@ -77,6 +77,7 @@ public class ArticleDetailMapper implements HttpMapper {
         String imgPath = "<img src=\"/" + article.getImgPath() + "\" width=\"600\" height=\"400\"/>";
 
         return fileContentReader.readStaticResourceToString("/articleDetail.html")
+                .replaceAll(HtmlFlag.AUTHOR.getFlag(), article.getUserId())
                 .replaceAll(HtmlFlag.CONTENT.getFlag(), "<div style=\"white-space: pre-wrap; word-wrap: break-word; solid #000; padding: 10px; width: 600px;\">" + article.getContent() + "</div>")
                 .replaceAll(HtmlFlag.ARTICLE_IMAGE.getFlag(), imgPath);
     }
