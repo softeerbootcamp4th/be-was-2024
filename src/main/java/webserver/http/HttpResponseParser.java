@@ -34,8 +34,10 @@ public class HttpResponseParser {
 
         if (fileContentReader.isStaticResource(httpRequest.getPath())) {
             httpResponse = new MyHttpResponse(HttpStatus.OK);
-
             fileContentReader.readStaticResource(httpRequest.getPath(), httpResponse);
+        } else if (fileContentReader.isUploadedResource(httpRequest.getPath())) {
+            httpResponse = new MyHttpResponse(HttpStatus.OK);
+            fileContentReader.readUploadedResource(httpRequest.getPath(), httpResponse);
         } else {
             httpResponse = mappingHandler.mapping(httpRequest);
         }

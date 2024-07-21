@@ -2,7 +2,8 @@ package webserver.enums;
 
 public enum HtmlFlag {
     ERROR_MESSAGE("<-- ERROR MESSAGE -->"),
-    CONTENT("<-- CONTENT -->");
+    CONTENT("<-- CONTENT -->"),
+    ARTICLE_IMAGE("<-- ARTICLE IMAGE -->");
 
     private final String flag;
 

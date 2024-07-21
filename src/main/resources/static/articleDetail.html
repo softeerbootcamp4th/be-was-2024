@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="/reset.css" rel="stylesheet"/>
+    <link href="/global.css" rel="stylesheet"/>
+    <link href="/main.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg"/></a>
+        <ul class="header__menu">
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            </li>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/registration">
+                    회원 가입
+                </a>
+            </li>
+        </ul>
+    </header>
+    <div class="wrapper">
+        <div class="post">
+            <div class="post__account">
+                <img class="post__account__img"/>
+                <p class="post__account__nickname">account</p>
+            </div>
+
+            <-- ARTICLE IMAGE -->
+
+            <div class="post__menu">
+                <ul class="post__menu__personal">
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="/img/like.svg"/>
+                        </button>
+                    </li>
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="/img/sendLink.svg"/>
+                        </button>
+                    </li>
+                </ul>
+                <button class="post__menu__btn">
+                    <img src="/img/bookMark.svg"/>
+                </button>
+            </div>
+
+            <-- CONTENT -->
+
+        </div>
+        <nav class="nav">
+            <ul class="nav__menu">
+                <li class="nav__menu__item">
+                    <a class="nav__menu__item__btn" href="">
+                        <img
+                                class="nav__menu__item__img"
+                                src="/img/ci_chevron-left.svg"
+                        />
+                        이전 글
+                    </a>
+                </li>
+                <li class="nav__menu__item">
+                    <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+                </li>
+                <li class="nav__menu__item">
+                    <a class="nav__menu__item__btn" href="">
+                        다음 글
+                        <img
+                                class="nav__menu__item__img"
+                                src="/img/ci_chevron-right.svg"
+                        />
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

@@ -26,6 +26,12 @@ public class FileContentReader {
         return resourcePath != null && !Files.isDirectory(Paths.get(resourcePath.getPath()));
     }
 
+    public boolean isUploadedResource(String uri) {
+        File file = new File(uri.substring(1));
+        System.out.println("file = " + file.exists());
+        return uri.startsWith("/src/main/resources/upload/") && file.exists();
+    }
+
     public MyHttpResponse readStaticResource(String uri, MyHttpResponse response) throws IOException {
         String resourcePath = STATIC_RESOURCE + uri;
 
@@ -56,5 +62,21 @@ public class FileContentReader {
         }
 
         return stringBuilder.toString();
+    }
+
+    public MyHttpResponse readUploadedResource(String uri, MyHttpResponse response) {
+        File file = new File(uri.substring(1));
+        byte[] fileContent = new byte[(int) file.length()];
+
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            fileInputStream.read(fileContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        response.setBody(fileContent);
+        response.addContentType(uri);
+
+        return response;
     }
 }
