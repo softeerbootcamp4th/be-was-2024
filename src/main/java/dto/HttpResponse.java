@@ -1,6 +1,7 @@
 package dto;
 
 import constant.FileExtensionType;
+import constant.HttpResponseAttribute;
 import constant.HttpStatus;
 import cookie.Cookie;
 import cookie.SessionCookie;
@@ -37,14 +38,7 @@ public class HttpResponse {
 
     public void setRedirect(String url){
         setHttpStatus(HttpStatus.FOUND);
-        addHeader(LOCATION, url);
-    }
-
-    public void setErrorResponse(HttpStatus errorStatus){
-        setHttpStatus(HttpStatus.NOT_FOUND);
-        addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
-        addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
-        setBody(ERROR_MESSAGE_404.getBytes());
+        addHeader(HttpResponseAttribute.LOCATION.getValue(), url);
     }
     // HttpResponse header 생성
     private void makeHttpResponse(DataOutputStream dos) throws IOException {
