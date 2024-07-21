@@ -15,6 +15,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * client에게 응답할 HttpResponse 정보를 저장하는 클래스
+ */
 public class HttpResponse {
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
@@ -29,13 +32,23 @@ public class HttpResponse {
         cookies = new ArrayList<>();
     }
 
-    // client에 HttpResponse 응답
+    /**
+     * HttpResponse를 client에게 응답한다.
+     *
+     * @param dos : client에게 응답할 떄 사용하는 OutputStream 객체
+     * @throws IOException : I/O 작업 시 발생
+     */
     public void sendHttpResponse(DataOutputStream dos) throws IOException {
 
         makeHttpResponse(dos);
         dos.flush();
     }
 
+    /**
+     * redirect 응답 정보를 저장한다.
+     *
+     * @param url : redirect url
+     */
     public void setRedirect(String url){
         setHttpStatus(HttpStatus.FOUND);
         addHeader(HttpResponseAttribute.LOCATION.getValue(), url);
@@ -75,6 +88,12 @@ public class HttpResponse {
         this.status = status;
     }
 
+    /**
+     * HttpResponse의 헤더 값을 설정한다.
+     *
+     * @param headerName : 헤더 속성 이름
+     * @param headerValue : 헤더 값
+     */
     public void addHeader(String headerName, String headerValue) {
 
         if(!headers.containsKey(headerName)){
