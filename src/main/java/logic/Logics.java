@@ -24,9 +24,9 @@ import static util.constant.StringConstants.*;
 // 알맞은 HttpRequest 에 대해 로직을 처리하고 HttpResponse 를 반환
 public class Logics {
     private static final Logger logger = LoggerFactory.getLogger(Logics.class);
-    private static final Database<User,String> userDatabase = UserDB.getInstance();
-    private static final Database<Session,String> sessionDatabase = SessionDB.getInstance();
-    private static final Database<Article,Long> articleDatabase = ArticleDB.getInstance();
+    private static final Database<User, String> userDatabase = UserDB.getInstance();
+    private static final Database<Session, String> sessionDatabase = SessionDB.getInstance();
+    private static final Database<Article, Long> articleDatabase = ArticleDB.getInstance();
 
     public static final String USER_ID = "userId";
     public static final String PASSWORD = "password";
@@ -67,10 +67,11 @@ public class Logics {
         User user = new User(userId, password, name, email);
         userDatabase.save(user);
 
-        return  HttpResponse.redirectToMain();
+        return HttpResponse.redirectToMain();
         //TODO : body를 리턴하지 않아도 되는가
     }
-    public static HttpResponse  login(HttpRequest httpRequest) throws IOException {
+
+    public static HttpResponse login(HttpRequest httpRequest) throws IOException {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
         }
@@ -82,12 +83,15 @@ public class Logics {
         String userId = bodyToMap.get(USER_ID);
         String password = bodyToMap.get(PASSWORD);
 
-        User user = userDatabase.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userDatabase.findById(userId).orElse(null);
+        if (user == null) {
+            return HttpResponse.clientError();
+        }
         if (userId.equals(user.getUserId()) && password.equals(user.getPassword())) {
             headers.put("Location", "/index.html");
-            logger.info("userId : "+userId+"Login successful");
+            logger.info("userId : " + userId + "Login successful");
 
-            Session session = new Session(UUID.randomUUID().toString(),userId,EXPIRE_TIME);
+            Session session = new Session(UUID.randomUUID().toString(), userId, EXPIRE_TIME);
             sessionDatabase.save(session);
 
             //TODO : TOHeaderString 메서드로 만들기
@@ -95,18 +99,19 @@ public class Logics {
 
         } else {
             headers.put("Location", "/login_failed.html");
-            logger.info("userId : "+userId+"Login failed");
+            logger.info("userId : " + userId + "Login failed");
         }
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
 
     }
+
     public static HttpResponse logout(HttpRequest httpRequest) throws IOException {
         if (!httpRequest.getHttpMethod().equals(HttpMethod.POST)) {
             throw new RuntimeException("Invalid method");
         }
 
         String sessionId = httpRequest.getSessionOrNull().orElse(null);
-        if (sessionId!=null) {
+        if (sessionId != null) {
             Session session = sessionDatabase.findById(sessionId).orElseThrow(() -> new RuntimeException("Session not found"));
             sessionDatabase.delete(session);
             logger.info(getLogoutString(session.getSessionId()));
@@ -119,10 +124,11 @@ public class Logics {
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
-    public static HttpResponse getUserList(HttpRequest httpRequest,String userId) throws IOException {
-        if(userId==null) {
-            return  HttpResponse.redirectToMain();
-        }else{
+
+    public static HttpResponse getUserList(HttpRequest httpRequest, String userId) throws IOException {
+        if (userId == null) {
+            return HttpResponse.redirectToMain();
+        } else {
             List<Byte> body = new ArrayList<>();
             List<User> list = userDatabase.findAll().stream().toList();
 
@@ -146,6 +152,7 @@ public class Logics {
             return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, bodyArray);
         }
     }
+
     public static HttpResponse staticResponse(HttpRequest httpRequest, String userId) throws IOException {
 
         String contentType = ExtensionMapper.getContentTypeFromRequestPath(httpRequest.getPath());
@@ -160,6 +167,7 @@ public class Logics {
         headers.put(HEADER_CONTENT_LENGTH, String.valueOf(body.length));
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.OK, headers, body);
     }
+
     public static HttpResponse createArticle(HttpRequest httpRequest, String userId) throws IOException {
         ///header
         Map<String, String> headers = new HashMap<>();
@@ -169,13 +177,14 @@ public class Logics {
         String title = bodyToMap.get(TITLE);
         String content = bodyToMap.get(CONTENT);
 
-        Article article =  Article.of(title,content,Article.getArticleIndex());
+        Article article = Article.of(title, content, Article.getArticleIndex());
         articleDatabase.save(article);
 
         headers.put("Location", "/index.html");
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.SEE_OTHER, headers, new byte[0]);
     }
+
     public static HttpResponse readArticle(HttpRequest httpRequest) throws IOException {
         String contentType = "text/html";
         byte[] body;

@@ -4,7 +4,6 @@ import dto.enums.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import static util.constant.StringConstants.PROTOCOL_VERSION;
 
@@ -49,7 +48,7 @@ public class HttpResponse {
 
     public static HttpResponse clientError() {
         Map<String, String> headers = new HashMap<>();
-        String str = "파일이 존재하지 않습니다!";
+        String str = "BAD REQUEST :(";
         byte[] body = str.getBytes(); // 또는 str.getBytes(StandardCharsets.UTF_8); 로 변경 가능
 
         return HttpResponse.of(PROTOCOL_VERSION, HttpStatus.NOT_FOUND, headers, body);

@@ -14,7 +14,6 @@ public class HttpSender {
 
     /**
      * outputStream을 통해, HTTPResponse를 전송하는 로직
-     *
      * @param out : outputStream
      */
     public void sendHttpResponse(OutputStream out, HttpResponse httpResponse) {
