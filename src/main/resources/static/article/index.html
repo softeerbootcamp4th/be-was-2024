@@ -9,34 +9,36 @@
   <body>
     <div class="container">
       <header class="header">
-        <a href="/main"><img src="../img/signiture.svg" /></a>
+        <a href="/"><img src="../img/signiture.svg" /></a>
         <ul class="header__menu">
           <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
-          </li>
-          <li class="header__menu__item">
-            <button id="logout-btn" class="btn btn_ghost btn_size_s">
-              로그아웃
-            </button>
+            <form method="POST" action="/user/logout">
+              <button class="btn btn_contained btn_size_s" type="submit">로그아웃</button>
+            </form>
           </li>
         </ul>
       </header>
       <div class="page">
         <h2 class="page-title">게시글 작성</h2>
-        <form class="form">
+        <form method="post" action="/article/post" class="form" enctype="multipart/form-data">
           <div class="textfield textfield_size_m">
             <p class="title_textfield">내용</p>
             <textarea
               class="input_textfield"
               placeholder="글의 내용을 입력하세요"
               autocomplete="username"
+              name="content"
             ></textarea>
+          </div>
+          <div style="height: 40px;" class="textfield textfield_size_m">
+            <p class="title_textfield">이미지 업로드</p>
+            <input name="image" type="file" accept="image/*" />
           </div>
           <button
             id="registration-btn"
             class="btn btn_contained btn_size_m"
             style="margin-top: 24px"
-            type="button"
+            type="submit"
           >
             작성 완료
           </button>
