@@ -1,5 +1,6 @@
 package handler;
 
+import model.Board;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,12 +9,16 @@ import util.RequestObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PostHandler
 {
 
 
     private static final Logger logger = LoggerFactory.getLogger(PostHandler.class);
+    private static final List<Board> boards = new ArrayList<>();
 
     private final UserProcessor userProcessor;
 
@@ -37,6 +42,7 @@ public class PostHandler
         switch(path){
             case "/user/create" -> userCreate(dos,requestObject);
             case "/user/login" -> userLogin(dos,requestObject);
+            case "/write" -> boardWrite(dos,requestObject);
         }
     }
 
@@ -55,6 +61,32 @@ public class PostHandler
     private void userCreate(DataOutputStream dos, RequestObject requestObject) {
         userProcessor.userCreate(requestObject);
         response302Header(dos,"/index.html");
+    }
+
+    private void boardWrite(DataOutputStream dos, RequestObject requestObject) {
+        String body = new String(requestObject.getBody(), StandardCharsets.UTF_8);
+        String[] params = body.split("&");
+        String title = null;
+        String content = null;
+        for (String param : params) {
+            String[] keyValue = param.split("=");
+            if (keyValue.length == 2) {
+                if ("title".equals(keyValue[0])) {
+                    title = keyValue[1];
+                } else if ("content".equals(keyValue[0])) {
+                    content = keyValue[1];
+                }
+            }
+        }
+        if (title != null && content != null) {
+
+            boards.add(new Board(title, content));
+        }
+        response302Header(dos, "/index.html");
+    }//작성 후 메인페이지로 넘어감
+
+    public static List<Board> getBoards(){
+        return boards;
     }
 
     private void response302Header(DataOutputStream dos, String loc)

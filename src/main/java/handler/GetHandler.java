@@ -1,6 +1,7 @@
 package handler;
 
 import db.Database;
+import model.Board;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,7 +9,10 @@ import util.FileDetection;
 import util.RequestObject;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class GetHandler
 {
@@ -30,8 +34,10 @@ public class GetHandler
             switch(path) {
                 case "/user/info" : handleUserInfoRequest(dos,requestObject);
                                     break;
-                case "/user/list" : checkCookies(dos,requestObject,path);
+                case "/write"   : case "/user/list" : checkCookies(dos,requestObject ,path);
                                     break;
+                case "/board/list" : sendBoardList(dos);
+                                     break;
                 default :  path= FileDetection.getPath(FileDetection.fixedPath+path);
                                 staticFileHandler(dos,path);
                                 break;
@@ -42,11 +48,11 @@ public class GetHandler
     }
 
 
-    private void checkCookies(DataOutputStream dos,RequestObject requestObject,String path)
+    private void checkCookies(DataOutputStream dos,RequestObject requestObject, String path)
     {
         if(requestObject.getCookies().isEmpty()) {//쿠키 값이 비어있다면, 즉 로그인이 안 돼있으면
             staticFileHandler(dos,FileDetection.fixedPath+"/login/index.html");
-        } else {
+        } else if(path.equals("/user/list")){ //유저 목록 정보
             try{
                 handleUserListRequest(dos,requestObject);
             }
@@ -54,6 +60,9 @@ public class GetHandler
             {
                 logger.debug(e.getMessage());
             }
+        } else if(path.equals("/write"))//로그인이 된 상태에서 접근 시 글 작성 페이지로 이동한다
+        {
+            staticFileHandler(dos, FileDetection.fixedPath+"/article/index.html");
         }
     }
 
@@ -112,6 +121,7 @@ public class GetHandler
             logger.error("404 response error : {}",e.getMessage());
         }
     }
+
     //세션을 얻어낸다
     private void handleUserInfoRequest(DataOutputStream dos, RequestObject requestObject) throws IOException {
         String sessionId = requestObject.getCookies().get("SID");
@@ -147,6 +157,36 @@ public class GetHandler
         dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
         dos.writeBytes("\r\n");
         responseBody(dos,bodyBytes);
+    }
+
+    private void sendBoardList(DataOutputStream dos) {
+        try {
+            List<Board> boards = PostHandler.getBoards();
+            StringBuilder json = new StringBuilder();
+            json.append("{ \"boards\": [");
+            for (int i = 0; i < boards.size(); i++) {
+                Board board = boards.get(i);
+                json.append("{");
+                json.append("\"title\": \"").append(board.getTitle()).append("\",");
+                json.append("\"content\": \"").append(board.getContent()).append("\"");
+                json.append("}");
+                if (i < boards.size() - 1) {
+                    json.append(",");
+                }
+            }
+            json.append("]}");
+
+            String jsonResponse = json.toString();
+            byte[] bodyBytes = jsonResponse.getBytes(StandardCharsets.UTF_8);
+            dos.writeBytes("HTTP/1.1 200 OK \r\n");
+            dos.writeBytes("Content-Type: application/json;charset=utf-8\r\n");
+            dos.writeBytes("Content-Length: " + bodyBytes.length + "\r\n");
+            dos.writeBytes("\r\n");
+            dos.write(bodyBytes);
+            dos.flush();
+        } catch (IOException e) {
+            logger.error("Error sending board list: {}", e.getMessage());
+        }
     }
 
     private String getContentType(String url)

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -79,8 +80,8 @@ public class RequestObject {
             body =null;
         }
 
-
     }
+
     public String getPath()
     {
         return this.path;
