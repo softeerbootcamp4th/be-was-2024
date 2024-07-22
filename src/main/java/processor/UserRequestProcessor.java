@@ -15,8 +15,10 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 public class UserRequestProcessor extends RequestProcessor {
+    private static final String EMAIL_REGEX = "^[_a-z0-9-]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
 
     public UserRequestProcessor(RequestInfo requestInfo) throws StatusCodeException, IOException {
         init(requestInfo);
@@ -79,7 +81,7 @@ public class UserRequestProcessor extends RequestProcessor {
 
     // POST "/user/create"
     private void createUser() throws UnsupportedEncodingException {
-        HashMap<String, String> param = StringUtils.paramToMap(getBody(), "&");
+        HashMap<String, String> param = StringUtils.paramToMap(new String(getBody(), StandardCharsets.UTF_8), "&");
         String userId = param.get("userId");
         String name = param.get("name");
         String password = param.get("password");
@@ -92,6 +94,18 @@ public class UserRequestProcessor extends RequestProcessor {
             setResult(HTTPStatusCode.BAD_REQUEST, getResponseHeader(), "" +
                     "<script>" +
                     "alert('Fill all the required fields');" +
+                    "location.href='/registration'" +
+                    "</script>");
+
+            return;
+        }
+
+        email = URLDecoder.decode(email, "UTF-8");
+        if (!email.matches(EMAIL_REGEX)) {
+            insertHTMLTypeToHeader();
+            setResult(HTTPStatusCode.BAD_REQUEST, getResponseHeader(), "" +
+                    "<script>" +
+                    "alert('잘못된 이메일 형식입니다.');" +
                     "location.href='/registration'" +
                     "</script>");
 
@@ -117,7 +131,7 @@ public class UserRequestProcessor extends RequestProcessor {
 
     // POST "/user/login"
     private void loginUser() {
-        HashMap<String, String> param = StringUtils.paramToMap(getBody(), "&");
+        HashMap<String, String> param = StringUtils.paramToMap(new String(getBody(), StandardCharsets.UTF_8), "&");
         String userId = param.get("userId");
         String password = param.get("password");
 
