@@ -1,11 +1,8 @@
 package utils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
+import enums.Method;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,80 +12,141 @@ public class HttpRequestParser {
     private final String startLine;
     private final String url;
     private final String path;
+    private final byte[] body;
+    private final String extension;
+    private final Method method;
+    private final Map<String, String> cookiesMap = new HashMap<>();
     private final Map<String, String> requestHeadersMap = new HashMap<>();
     private final Map<String, String> queryParametersMap = new HashMap<>();
+    private final String EXTENTION_REGEX = "\\.([a-z]+)$";
     public HttpRequestParser(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+        ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
+        int c;
+        int prev1 = -1, prev2 = -1, prev3 = -1;
 
-        startLine = br.readLine();
+        // Read headers
+        while ((c = inputStream.read()) != -1) {
+            headerBuffer.write(c);
+            if (prev3 == '\r' && prev2 == '\n' && prev1 == '\r' && c == '\n') {
+                break;
+            }
+            prev3 = prev2;
+            prev2 = prev1;
+            prev1 = c;
+        }
 
-        String readLine;
-        while ((readLine = br.readLine()) != null && !readLine.isEmpty()) {
-            int colonIndex = readLine.indexOf(":");
+        String headersString = headerBuffer.toString();
+        String[] headerLines = headersString.split("\r\n");
 
+        startLine = headerLines[0];
+
+        for (int i = 1; i < headerLines.length; i++) {
+            String line = headerLines[i];
+            int colonIndex = line.indexOf(":");
             if (colonIndex != -1) {
-                String key = readLine.substring(0, colonIndex).trim();
-                String value = readLine.substring(colonIndex + 1).trim();
-
+                String key = line.substring(0, colonIndex).trim();
+                String value = line.substring(colonIndex + 1).trim();
                 requestHeadersMap.put(key, value);
             }
         }
 
+        // 쿠키 파싱
+        String cookieHeader = requestHeadersMap.get("Cookie");
+        if (cookieHeader != null) {
+            for (String keyValue : cookieHeader.split(";")) {
+                int equalsIndex = keyValue.indexOf("=");
+                if (equalsIndex != -1) {
+                    String key = keyValue.substring(0, equalsIndex).trim();
+                    String value = keyValue.substring(equalsIndex + 1).trim();
+
+                    cookiesMap.put(key, value);
+                }
+            }
+        }
+
+        String contentLengthHeader = requestHeadersMap.get("Content-Length");
+        int contentLength = contentLengthHeader == null ? 0 : Integer.parseInt(contentLengthHeader);
+
+        // body 파싱
+        if (contentLength > 0) {
+            body = new byte[contentLength];
+            int bytesRead = inputStream.read(body, 0, contentLength);
+
+            if (bytesRead != contentLength) {
+                throw new IOException("Failed to read full request body");
+            }
+        } else {
+            body = null;
+        }
+
+        method = Method.fromString(startLine.split(" ")[0]);
         url = startLine.split(" ")[1];
         String[] tokens = url.split("\\?");
 
         path = tokens[0];
+
+        // 확장자 파싱
+        Pattern compile = Pattern.compile(EXTENTION_REGEX);
+        Matcher matcher = compile.matcher(path);
+
+        // 파일 확장자를 가진 path인지 검증
+        extension = matcher.find() ? matcher.group(1) : null;
+
         if (tokens.length > 1) {
             String queryParameters = tokens[1];
-            for (String queryParameter : queryParameters.split("&")) {
-                String[] keyValue = queryParameter.split("=");
-                String key = URLDecoder.decode(keyValue[0], StandardCharsets.UTF_8);
-                String value = URLDecoder.decode(keyValue[1], StandardCharsets.UTF_8);
-                queryParametersMap.put(key, value);
+            for (String keyValue : queryParameters.split("&")) {
+                int equalsIndex = keyValue.indexOf("=");
+                if (equalsIndex != -1) {
+                    String key = keyValue.substring(0, equalsIndex);
+                    String value = keyValue.substring(equalsIndex + 1);
+                    queryParametersMap.put(key, value);
+                }
             }
         }
     }
 
     public String getStartLine() {
-        return this.startLine;
+        return startLine;
     }
 
     public String getUrl() {
-        return this.url;
+        return url;
     }
 
     public String getPath() {
-        return this.path;
+        return path;
     }
 
-    public Map<String, String> getQueryParametersMap() {
-        return this.queryParametersMap;
+    public byte[] getBody() {
+        return body;
     }
 
     public Map<String, String> getRequestHeadersMap() {
-        return this.requestHeadersMap;
+        return requestHeadersMap;
+    }
+
+    public Map<String, String> getQueryParametersMap() {
+        return queryParametersMap;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public Map<String, String> getCookiesMap() {
+        return cookiesMap;
+    }
+
+    public String getExtension() {
+        return extension;
     }
 
     public String headersToString() {
         StringBuilder sb = new StringBuilder();
         for (String key : requestHeadersMap.keySet()) {
-            sb.append(key).append(": ").append(requestHeadersMap.get(key));
+            sb.append(key).append(": ").append(requestHeadersMap.get(key)).append("\n");
         }
 
         return sb.toString();
-    }
-
-    public String getExtension() {
-        String regex = "\\.([a-z]+)$";
-
-        Pattern compile = Pattern.compile(regex);
-        Matcher matcher = compile.matcher(path);
-
-        // 파일 확장자를 가진 url인지 검증
-        if (matcher.find()) {
-            return matcher.group(1);
-        }
-
-        return null;
     }
 }
