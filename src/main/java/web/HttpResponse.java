@@ -5,6 +5,9 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * HTTP 응답에 대한 정보를 담는 POJO
+ */
 public class HttpResponse {
 
     private String httpVersion;

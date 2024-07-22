@@ -10,9 +10,13 @@ import web.HttpRequest;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 게시글 관리 관련 기능 퍼사드 클래스
+ */
 public class ArticleFacade {
 
     /**
+     * Multipartdata 형태의 HttpRequest에서 image와 content 추출 후 DB에 저장하는 메서드
      * byte 단위로 body 파싱
      */
     public static void saveArticleData(HttpRequest request) {

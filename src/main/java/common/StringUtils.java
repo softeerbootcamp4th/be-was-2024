@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
+/**
+ * 다양한 문자열 혹은 바이트 처리를 위한 클래스
+ */
 public class StringUtils {
 
     public static String createRandomUUID() {

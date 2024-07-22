@@ -1,5 +1,8 @@
 package file;
 
+/**
+ * 리소스 파일의 정보를 저장 (path: 리소스 경로, extension: 확장자)
+ */
 public class ViewFile {
 
     private final String path;

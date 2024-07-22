@@ -17,6 +17,11 @@ public class WebUtils {
         }
     }
 
+    /**
+     * 파일 확장자에 해당하는 적절한 MIME 타입값 리턴
+     * @param extension 파일 확장자
+     * @return MIME 타입값
+     */
     public static String getProperContentType(String extension) {
         return MIME.findByKey(extension).getType();
     }

@@ -5,6 +5,10 @@ import model.Session;
 
 import java.sql.*;
 
+/**
+ * 세션을 H2 DB에 저장할 때 사용할 수 있는 API를 관리
+ * 세션 보관 정책을 인메모리에 저장하게 함에 따라 deprecated 되었습니다.
+ */
 @Deprecated
 public class SessionH2Database {
 

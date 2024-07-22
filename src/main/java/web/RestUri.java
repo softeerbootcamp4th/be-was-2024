@@ -1,5 +1,8 @@
 package web;
 
+/**
+ * 요청 uri 정리
+ */
 public enum RestUri {
     REGISTRATION("/registration"),
     LOGIN("/login"),

@@ -11,6 +11,9 @@ import web.ViewPath;
 
 import java.io.*;
 
+/**
+ * 응답으로부터 적절한 뷰를 반환하기 위한 클래스
+ */
 public class ViewResolver {
 
     /**

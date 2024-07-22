@@ -1,5 +1,6 @@
 package model;
 
+// Article POJO
 public class Article {
     private String articleId;
     private String userId;

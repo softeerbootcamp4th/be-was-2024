@@ -32,6 +32,8 @@ public class UserH2Database {
         return user;
     }
 
+    // users; drop table users; select * from users
+    // where 1=1
     public static User findUserById(String findUserId) {
         try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD)) {
             String query = "SELECT user_id, password, name, email FROM users WHERE user_id = ?";

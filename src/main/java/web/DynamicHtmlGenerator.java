@@ -9,6 +9,10 @@ import model.Article;
 import java.io.*;
 import java.util.Collection;
 
+/**
+ * 순수 자바 코드로 직접 동적 html을 생성하기 위한 Generator
+ * File을 읽어오고, String으로 변환하여 수정한 후 다시 File로 쓰는 방식으로 동작
+ */
 public class DynamicHtmlGenerator {
 
     private static String CUSTOM_PATH = "./eckrin/";
@@ -55,6 +59,11 @@ public class DynamicHtmlGenerator {
         response.writeInBytes(dos);
     }
 
+    /**
+     * filePath로부터 파일을 읽고, 파일을 String으로 변환한 뒤 반환한다.
+     * @param filePath 읽을 파일의 경로
+     * @return String 변환된 파일
+     */
     private static String getStringFromFilepath(String filePath) throws IOException {
         FileInputStream fis = null;
         BufferedReader reader = null;

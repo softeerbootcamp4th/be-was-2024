@@ -1,5 +1,8 @@
 package web;
 
+/**
+ * HTTP 정적 자원 경로
+ */
 public enum ViewPath {
     DEFAULT("/", "/index.html"),
     LOGIN("/login", "/login/index.html"),

@@ -1,7 +1,8 @@
 package model;
 
-import java.util.UUID;
-
+/**
+ * Cookie POJO
+ */
 public class Cookie {
     private final String name;
     private final String id;

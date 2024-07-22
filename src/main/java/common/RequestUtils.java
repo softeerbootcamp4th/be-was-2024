@@ -14,6 +14,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * Request를 파싱하여 Request Line, Header, Body를 추출하는 클래스
+ * Header와 Body는 \r\n\r\n으로 구분하며, 헤더의 Content-Length값에 따라서 Body를 읽는다.
+ */
 public class RequestUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestUtils.class);
@@ -90,7 +94,8 @@ public class RequestUtils {
 
     /**
      * request로 들어온 HTTP 요청을 한줄씩 파싱하여 적절한 HttpRequest 객체를 생성
-     * @param request 요청 전문
+     * @param request Request Line과 Header
+     * @param body request body (byte[])
      * @return HttpRequest
      */
     private static HttpRequest parseRequest(String request, byte[] body) {
@@ -144,6 +149,11 @@ public class RequestUtils {
                 .build();
     }
 
+    /**
+     * Multipart 파일의 Body 구분자를 추출하기 위한 메서드
+     * @param contentType Request 헤더의 Content-Type
+     * @return Body Delimiter
+     */
     public static String getBoundaryKey(String contentType) {
         return contentType.split("boundary=")[1];
     }

@@ -8,6 +8,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * 파일 저장, 확장자 추출, 파일 생성 등을 담당하는 유틸리티 클래스
+ */
 public class FileUtils {
 
     public static final String STATIC_DIR_PATH = "./src/main/resources/static";

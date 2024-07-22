@@ -1,5 +1,8 @@
 package web;
 
+/**
+ * MIME과 적절한 Content-type을 매핑
+ */
 public enum MIME {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
