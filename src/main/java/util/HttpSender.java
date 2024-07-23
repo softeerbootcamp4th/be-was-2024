@@ -1,7 +1,6 @@
 package util;
 
-import model.HttpResponse;
-import util.constant.StringConstants;
+import dto.HttpResponse;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

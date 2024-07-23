@@ -1,9 +1,11 @@
 package util;
 
-import model.HttpRequest;
-import model.enums.HttpMethod;
+import dto.HttpRequest;
+import dto.enums.HttpMethod;
 
 import java.io.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +43,12 @@ public class HttpRequestConverter {
         Map<String, String> headers = new HashMap<>();
         httpRequestLine = buffer.readLine();
         while (!httpRequestLine.isEmpty()) {
-            String s = httpRequestLine.replaceAll(SPACE, EMPTY_SPACE); /// 반홚
-            String headerName = httpRequestLine.split(COLON)[0];
-            String headerValue = httpRequestLine.split(COLON)[1]; //idx
+            String httpRequestLineElemSpace = httpRequestLine.replaceAll(SPACE, EMPTY_SPACE); /// 반홚
+            String headerName = httpRequestLineElemSpace.split(COLON)[0];
+            String headerValue = httpRequestLineElemSpace.split(COLON)[1]; //idx
             headers.put(headerName, headerValue);
             httpRequestLine = buffer.readLine();
         }
-
         /* httpRequest bodys */
         List<Byte> body = new ArrayList<Byte>();
 
@@ -69,5 +70,19 @@ public class HttpRequestConverter {
 
     }
 
+    public static Map<String, String> bodyToMap(byte[] body) throws UnsupportedEncodingException {
+
+        String bodyToString = URLDecoder.decode(new String(body, StandardCharsets.UTF_8), UTF_8);
+
+        String[] bodyParsedPairList = bodyToString.split(AMPERSAND);
+
+        Map<String, String> parsingBodyParams = new HashMap<>();
+        for (String bodyParsedPair : bodyParsedPairList) {
+            String queryKey = bodyParsedPair.substring(0, bodyParsedPair.indexOf(EQUAL));
+            String queryValue = bodyParsedPair.substring(bodyParsedPair.indexOf(EQUAL) + 1);
+            parsingBodyParams.put(queryKey, queryValue);
+        }
+        return parsingBodyParams;
+    }
 
 }
