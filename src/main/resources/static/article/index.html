@@ -5,6 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="../reset.css" rel="stylesheet"/>
     <link href="../global.css" rel="stylesheet"/>
+    <style>
+        .file-upload {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .image_wrapper {
+            height: 50px;
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: #333;
+        }
+
+        .btn_size_xs {
+            padding: 6px 12px;
+            font-size: 14px;
+        }
+
+        /* 비활성화 상태 스타일 */
+        .btn_disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -14,6 +41,9 @@
             <div class="btn_size_s">
                 {{userName}}{{msg}}
             </div>
+            <li class="header__menu__item">
+                <a class="btn btn_contained btn_size_s" href="/user/list">유저 리스트</a>
+            </li>
             <li class="header__menu__item">
                 <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
             </li>
@@ -26,7 +56,21 @@
     </header>
     <div class="page">
         <h2 class="page-title">게시글 작성</h2>
-        <form class="form" id="dataForm" method="post" action="/article">
+        <form class="form" id="dataForm" method="post" action="/article" enctype="multipart/form-data">
+            <div class="textfield textfield_size_m image_wrapper">
+                <p class="title_textfield">이미지 첨부</p>
+                <div class="file-upload">
+                    <label for="imageUpload" class="btn btn_contained btn_size_xs">이미지 선택</label>
+                    <input
+                            type="file"
+                            id="imageUpload"
+                            name="image"
+                            accept="image/*"
+                            style="display: none;"
+                    />
+                    <span class="file-name" id="fileName">선택된 파일 없음</span>
+                </div>
+            </div>
             <div class="textfield textfield_size_m">
                 <p class="title_textfield">내용</p>
                 <label for="text"></label>
@@ -49,5 +93,19 @@
         </form>
     </div>
 </div>
+<script>
+    document.getElementById('imageUpload').addEventListener('change', function () {
+        const fileName = this.files[0] ? this.files[0].name : '선택된 파일 없음';
+        document.getElementById('fileName').textContent = fileName;
+    });
+
+    document.getElementById('dataForm').addEventListener('submit', function (event) {
+        const submitButton = document.getElementById('registration-btn');
+        submitButton.classList.add('btn_disabled');
+        setTimeout(() => {
+            submitButton.classList.remove('btn_disabled');
+        }, 3000); // 필요한 시간에 맞게 조정
+    });
+</script>
 </body>
 </html>

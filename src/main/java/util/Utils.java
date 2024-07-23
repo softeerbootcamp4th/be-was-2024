@@ -3,7 +3,7 @@ package util;
 import http.HttpStatus;
 
 import java.io.*;
-import java.util.HashMap;
+import java.util.*;
 
 import static util.Constants.REG_EQ;
 import static util.Constants.REG_SMCLN;
@@ -23,14 +23,24 @@ public class Utils {
 
     public static ResponseWithStatus getFileContent(String path) throws IOException {
         try {
-            StringBuilder content = new StringBuilder();
+
             File file = new File(path);
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                content.append(line).append("\n");
+            byte[] bytesArray = new byte[(int) file.length()];
+
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(file);
+                fis.read(bytesArray);
+            } finally {
+                if (fis != null) {
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-            return new ResponseWithStatus(HttpStatus.OK, content.toString().getBytes());
+            return new ResponseWithStatus(HttpStatus.OK, bytesArray);
         } catch (FileNotFoundException e) {
             return new ResponseWithStatus(HttpStatus.NOT_FOUND, getNotFoundPage());
         }
@@ -41,7 +51,7 @@ public class Utils {
             case "html" -> "text/html";
             case "css" -> "text/css";
             case "js" -> "text/javascript";
-            case "ico" -> "image/vnd.microsoft.icon";
+            case "ico" -> "image/x-icon";
             case "png" -> "image/png";
             case "jpg" -> "image/jpg";
             case "svg" -> "image/svg+xml";
@@ -52,7 +62,7 @@ public class Utils {
     public static HashMap<String, String> cookieParsing(String cookies) {
         HashMap<String, String> parsedCookies = new HashMap<>();
 
-        if(cookies == null) return parsedCookies;
+        if (cookies == null) return parsedCookies;
         String[] splitCookies = cookies.split(REG_SMCLN);
         for (String cookie : splitCookies) {
             cookie = cookie.strip();
@@ -67,4 +77,12 @@ public class Utils {
         return parsedCookies;
     }
 
+    public static String getBoundary(String Content_Type) {
+        String[] parameters = Content_Type.split(";");
+        for (String parameter : parameters) {
+            if (!parameter.trim().startsWith("boundary")) continue;
+            return "--" + parameter.split("=")[1].trim();
+        }
+        return null;
+    }
 }

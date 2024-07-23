@@ -10,8 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static util.Constants.FILE_INDEX;
 import static util.Constants.STATIC_PATH;
-import static util.Utils.getContentType;
-import static util.Utils.getFileContent;
+import static util.Utils.*;
 
 public class UtilTest {
 
@@ -46,5 +45,14 @@ public class UtilTest {
 
         assertEquals(fileContent.status.getStatus(), 404);
         assertEquals(fileContent.status.getMessage(), "Not found");
+    }
+
+    @Test
+    @DisplayName("바운더리 값 반환 테스트")
+    void getBoundaryTest(){
+        String Content_Type = "multipart/form-data; boundary=---011000010111000001101001";
+
+        String boundary = getBoundary(Content_Type);
+        assertEquals(boundary, "-----011000010111000001101001");
     }
 }

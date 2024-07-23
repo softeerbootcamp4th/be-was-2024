@@ -1,5 +1,8 @@
 package util;
 
+import http.HttpResponse;
+import http.HttpStatus;
+
 import java.io.*;
 import java.util.Map;
 
@@ -7,8 +10,7 @@ import static util.Constants.*;
 
 public class TemplateEngine {
 
-    public static byte[] showAlert(String msg, String redirectUrl) {
-
+    public static HttpResponse showAlert(String msg, String redirectUrl) {
         String alert = "<html>" +
                 "<head>" +
                 "<script type=\"text/javascript\">" +
@@ -17,8 +19,10 @@ public class TemplateEngine {
                 "</script>" +
                 "</head>" +
                 "</html>";
-
-        return alert.getBytes();
+        return new HttpResponse()
+                .addHeader(CONTENT_TYPE, TEXT_HTML)
+                .addStatus(HttpStatus.BAD_REQUEST)
+                .addBody(alert.getBytes());
     }
 
     public static byte[] getNotFoundPage() throws IOException {

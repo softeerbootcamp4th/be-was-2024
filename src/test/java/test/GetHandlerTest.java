@@ -23,7 +23,7 @@ public class GetHandlerTest {
         File file = new File(STATIC_PATH + FILE_INDEX);
 
         String statusLine = response.getStatusLine();
-        String contentType = response.getHeader(CONTENT_TYPE);
+        String contentType = response.getHeader("content-type");
 
         assertEquals(response.getBody().length, file.length());
         assertEquals(statusLine, "HTTP/1.1 200 Ok\r\n");

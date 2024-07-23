@@ -1,44 +1,44 @@
 package http;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * HttpRequest를 표현하는 클래스입니다.
+ */
 public class HttpRequest {
-
-    HttpMethod httpMethod;
-    String requestUrl;
-    String version;
+    StartLine startLine;
     HashMap<String, String> headers = new HashMap<>();
-    byte[] body;
+    ArrayList<RequestBody> body;
 
-
-    public void setStartLine(HttpMethod httpMethod, String requestUrl, String version) {
-        this.httpMethod = httpMethod;
-        this.requestUrl = requestUrl;
-        this.version = version;
+    public HttpRequest setStartLine(StartLine startLine) {
+        this.startLine = startLine;
+        return this;
     }
 
-    public void setHeaders(HashMap<String, String> headers) {
+    public HttpRequest setHeaders(HashMap<String, String> headers) {
         this.headers = headers;
+        return this;
     }
 
-    public void setBody(byte[] body) {
+    public HttpRequest setBody(ArrayList<RequestBody> body) {
         this.body = body;
+        return this;
     }
 
     public HttpMethod getHttpMethod() {
-        return this.httpMethod;
+        return startLine.getHttpMethod();
     }
 
     public String getRequestUrl() {
-        return this.requestUrl;
+        return startLine.getRequestUrl();
     }
 
     public String getHeaders(String key) {
         return headers.get(key);
     }
 
-    public byte[] getBody() {
+    public ArrayList<RequestBody> getBody() {
         return body;
     }
-
 }
