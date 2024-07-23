@@ -26,7 +26,6 @@ public class HtmlBuilder {
         String template = new String(resourceUtil.getByteArray(templateFilePath));
 
         User user = SessionHandler.getUser(sessionId);
-        String userId = user.getUserId();
         String username = user.getName();
 
         String loginButtonHtml, registrationButtonText, registrationButtonHref, userNameHtml, userListHtml;
@@ -107,9 +106,14 @@ public class HtmlBuilder {
 
         Post post = PostDatabase.findPostByUserIdAndTitle(userId, title);
 
+        String base64Image = resourceUtil.getImageAsBase64(post.getPath());
+        String mimeType = resourceUtil.getContentType(post.getPath());
+        String replaceImageString = "data:" + mimeType + ";base64," + base64Image;
+
         // 문자열 대체
         template = template.replace("{title_placeholder}", post.getTitle())
-                .replace("{content_placeholder}", post.getContent());
+                .replace("{content_placeholder}", post.getContent())
+                .replace("{image_placeholder}", replaceImageString);
 
         return template;
     }
