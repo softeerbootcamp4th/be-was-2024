@@ -1,6 +1,7 @@
 package webserver;
 
-import handler.ResourceHandler;
+import utils.CookieUtil;
+import utils.ResourceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,7 @@ public class Response {
     private final int statusCode;
     private final DataOutputStream dos;
     private final String cookie;
+    private final byte[] body;
 
     private Response(Builder builder) {
         this.url = builder.url;
@@ -20,6 +22,7 @@ public class Response {
         this.statusCode = builder.statusCode;
         this.dos = builder.dos;
         this.cookie = builder.cookie;
+        this.body = builder.body;
     }
 
     public static class Builder {
@@ -28,6 +31,7 @@ public class Response {
         private int statusCode = 0;
         private DataOutputStream dos;
         private String cookie = "";
+        private byte[] body;
 
         public Builder url(String url) {
             this.url = url;
@@ -54,6 +58,11 @@ public class Response {
             return this;
         }
 
+        public Builder body(byte[] body) {
+            this.body = body;
+            return this;
+        }
+
         public Response build() {
             return new Response(this);
         }
@@ -61,7 +70,7 @@ public class Response {
 
     private static final Logger logger = LoggerFactory.getLogger(Response.class);
 
-    private static final ResourceHandler resourceHandler = new ResourceHandler();
+    private static final ResourceUtil RESOURCE_UTIL = new ResourceUtil();
 
     public void sendResponse() throws IOException {
         if (redirectCode != 0) {
@@ -71,48 +80,41 @@ public class Response {
         }
     }
 
-    public void response(String url, DataOutputStream dos) throws IOException {
-        // url로부터 html파일을 byte array로 읽어오기
-        byte[] body = resourceHandler.getByteArray(url);
-
-        if (cookie.isEmpty()) {
-            response200Header(dos, body.length, resourceHandler.getContentType(url));
+    public void response(String url, DataOutputStream dos) {
+        if (statusCode == 404) {
+            response404Header(dos, this.body.length);
+            responseBody(dos, this.body);
         } else {
-            response200HeaderWithCookie(dos, body.length, resourceHandler.getContentType(url));
+            if (CookieUtil.isExist(cookie)) {
+                response200HeaderWithCookie(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
+            } else {
+                response200Header(dos, this.body.length, RESOURCE_UTIL.getContentType(url));
+            }
+            responseBody(dos, this.body);
         }
-
-        responseBody(dos, body);
     }
 
-    public void redirect(String url, DataOutputStream dos, int redirectionCode) throws IOException {
-        if (cookie.isEmpty()) {
-            redirectWithoutCookie(url, dos, redirectionCode);
-        } else {
+    public void redirect(String url, DataOutputStream dos, int redirectionCode) {
+        if (CookieUtil.isExist(cookie)) {
             redirectWithCookie(url, dos, redirectionCode);
+        } else {
+            redirectWithoutCookie(url, dos, redirectionCode);
         }
     }
 
-    private void redirectWithCookie(String url, DataOutputStream dos, int redirectionCode) throws IOException {
+    private void redirectWithCookie(String url, DataOutputStream dos, int redirectionCode) {
         if (redirectionCode == 301) {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
             response302HeaderWithCookie(dos, url);
-        } else {
-            byte[] body = resourceHandler.getByteArray(url);
-            response404Header(dos, body.length);
-            responseBody(dos, body);
         }
     }
 
-    private void redirectWithoutCookie(String url, DataOutputStream dos, int redirectionCode) throws IOException {
+    private void redirectWithoutCookie(String url, DataOutputStream dos, int redirectionCode) {
         if (redirectionCode == 301) {
             response301Header(dos, url);
         } else if (redirectionCode == 302) {
             response302Header(dos, url);
-        } else {
-            byte[] body = resourceHandler.getByteArray(url);
-            response404Header(dos, body.length);
-            responseBody(dos, body);
         }
     }
 

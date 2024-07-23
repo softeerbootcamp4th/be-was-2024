@@ -1,65 +1,57 @@
 package distributor;
 
 import handler.SessionHandler;
+import model.ViewData;
+import processor.ResponseProcessor;
 import processor.UserProcessor;
 import webserver.Request;
-import webserver.Response;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class PostDistributor extends Distributor {
     Request request;
     UserProcessor userProcessor = new UserProcessor();
+    ViewData viewData;
 
-    PostDistributor(Request request) {
+    protected PostDistributor(Request request) {
         this.request = request;
     }
 
     @Override
-    public void process(DataOutputStream dos) throws IOException {
-        processQuery(dos);
+    public void process() {
+        processQuery();
     }
 
-    private void processQuery(DataOutputStream dos) throws IOException {
+    private void processQuery() {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            processUserCreate(dos);
+            processUserCreate();
         } else if (path.equals("/user/login")) {
-            processUserLogin(dos);
+            processUserLogin();
         }
     }
 
-    private void processUserCreate(DataOutputStream dos) throws IOException {
+    private void processUserCreate() {
         userProcessor.createUser(request);
-        Response response = new Response.Builder()
-                .url("/index.html")
-                .dataOutputStream(dos)
-                .redirectCode(302)
-                .build();
 
-        response.sendResponse();
+        String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
+
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.createUserResponse(sessionId);
     }
 
-    private void processUserLogin(DataOutputStream dos) throws IOException {
+    private void processUserLogin() {
         if (userProcessor.login(request)) {
             String sessionId = SessionHandler.getSessionId(request.parseBody().get("userId"));
-            Response response = new Response.Builder()
-                    .url("/main/index.html")
-                    .dataOutputStream(dos)
-                    .cookie(sessionId)
-                    .redirectCode(302)
-                    .build();
 
-            response.sendResponse();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginSuccessResponse(sessionId);
         } else {
-            Response response = new Response.Builder()
-                    .url("/login/login_failed.html")
-                    .dataOutputStream(dos)
-                    .redirectCode(404)
-                    .build();
-
-            response.sendResponse();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.loginFailedResponse();
         }
+    }
+
+    @Override
+    public ViewData getViewData() {
+        return this.viewData;
     }
 }

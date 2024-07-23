@@ -36,6 +36,9 @@ public class SessionHandler {
     }
 
     public static boolean verifySessionId(String sessionId) {
+        if (sessionId == null) {
+            return false;
+        }
         return sessionIdList.get(sessionId) != null;
     }
 }

@@ -1,85 +1,88 @@
 package distributor;
 
 import handler.SessionHandler;
+import model.ViewData;
+import processor.ResponseProcessor;
 import webserver.Request;
-import webserver.Response;
-
-import java.io.DataOutputStream;
-import java.io.IOException;
 
 public class GetDistributor extends Distributor {
     Request request;
+    ViewData viewData;
 
     protected GetDistributor(Request request) {
         this.request = request;
     }
 
     @Override
-    public void process(DataOutputStream dos) throws IOException {
+    public void process() {
         if (request.isQueryString()) {
-            processQuery(dos);
+            processQuery();
         } else {
-            processNonQuery(dos);
+            processNoneQuery();
         }
     }
 
-    private void processQuery(DataOutputStream dos) throws IOException {
+    private void processQuery() {
         String path = request.getPath();
         if (path.equals("/user/create")) {
-            Response response = new Response.Builder()
-                    .url("/not_found.html")
-                    .dataOutputStream(dos)
-                    .redirectCode(404)
-                    .build();
-
-            response.sendResponse();
+            ResponseProcessor responseProcessor = new ResponseProcessor();
+            this.viewData = responseProcessor.notFoundResponse();
         }
     }
 
-    private void processNonQuery(DataOutputStream dos) throws IOException {
+    private void processNoneQuery() {
         String path = request.getPath();
         if (path.equals("/logout")) {
-            // 세션 삭제
-            String userId = request.getSessionId();
-            SessionHandler.deleteSession(userId);
-
-            Response response = new Response.Builder()
-                    .url("/index.html")
-                    .dataOutputStream(dos)
-                    .redirectCode(302)
-                    .build();
-
-            response.sendResponse();
+            processLogout();
         } else if (path.equals("/login/index.html")) {
-            String sessionId = request.getSessionId();
-
-            // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
-            if (SessionHandler.verifySessionId(sessionId)) {
-                Response response = new Response.Builder()
-                        .url("/main/index.html")
-                        .statusCode(200)
-                        .dataOutputStream(dos)
-                        .build();
-
-                response.sendResponse();
-            } else {
-                // 세션아이디가 존재하지 않는다면 그대로
-                Response response = new Response.Builder()
-                        .url(path)
-                        .statusCode(200)
-                        .dataOutputStream(dos)
-                        .build();
-
-                response.sendResponse();
-            }
+            processLogin(path);
+        } else if (path.equals("/user/list")) {
+            processUserList();
         } else {
-            Response response = new Response.Builder()
-                    .url(path)
-                    .statusCode(200)
-                    .dataOutputStream(dos)
-                    .build();
-
-            response.sendResponse();
+            processDefault(path);
         }
+    }
+
+    private void processDefault(String path) {
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.defaultResponse(path, request.getSessionId());
+    }
+
+    private void processLogout() {
+        // 세션 삭제
+        String sessionId = request.getSessionId();
+        SessionHandler.deleteSession(sessionId);
+
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.logoutResponse();
+    }
+
+    private void processLogin(String path) {
+        String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        // 만약 세션아이디가 존재한다면 그냥 로그인 화면으로 이동
+        if (SessionHandler.verifySessionId(sessionId)) {
+            this.viewData = responseProcessor.loginSuccessWithSessionId(sessionId);
+        } else {
+            // 세션아이디가 존재하지 않는다면 그대로
+            this.viewData = responseProcessor.loginResponse(path, sessionId);
+        }
+    }
+
+    private void processUserList() {
+        String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        if (SessionHandler.verifySessionId(sessionId)) {
+            this.viewData = responseProcessor.userListResponse();
+        } else {
+            this.viewData = responseProcessor.unauthorizedUserListResponse();
+        }
+    }
+
+    @Override
+    public ViewData getViewData() {
+        return this.viewData;
     }
 }

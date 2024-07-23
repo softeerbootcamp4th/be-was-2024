@@ -4,9 +4,12 @@ import java.io.*;
 import java.net.Socket;
 
 import distributor.Distributor;
+import model.ViewData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import builder.BodyBuilder;
 import webserver.Request;
+import webserver.Response;
 
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
@@ -30,7 +33,23 @@ public class RequestHandler implements Runnable {
                 Request request = Request.from(in);
 
                 Distributor distributor = Distributor.from(request);
-                distributor.process(dos);
+                distributor.process();
+
+                ViewData viewData = distributor.getViewData();
+
+                BodyBuilder bodyBuilder = BodyBuilder.from(viewData);
+                byte[] body = bodyBuilder.getBody();
+
+                Response response = new Response.Builder()
+                        .url(viewData.getUrl())
+                        .dataOutputStream(dos)
+                        .redirectCode(viewData.getRedirectCode())
+                        .statusCode(viewData.getStatusCode())
+                        .cookie(viewData.getCookie())
+                        .body(body)
+                        .build();
+
+                response.sendResponse();
             }
         } catch (IOException e) {
             logger.error(e.getMessage());
