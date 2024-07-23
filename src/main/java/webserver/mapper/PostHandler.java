@@ -5,7 +5,12 @@ import db.Session;
 import model.*;
 import webserver.HttpRequest;
 import webserver.HttpResponse;
+import webserver.ImageSaver;
+import webserver.MultipartFormDataParser;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 /**
@@ -50,10 +55,12 @@ public class PostHandler {
                     httpResponse.resetCookieAndRedirectPath(redirectUrl);
                     break;
                 case "/board/create":
+                    String content = MultipartFormDataParser.contentParser(headers, body);
+                    body = MultipartFormDataParser.imageParser(headers, body);
+                    String fileName = ImageSaver.saveImage(body, System.getProperty("staticResourceDir"));
                     sessionId = UserInfoExtract.extractSessionIdFromHeader(headers.get("cookie"));
                     user = Session.findUserBySessionId(sessionId);
-                    String content = new String(body, "UTF-8").split("=")[1];
-                    BoardDatabase.addBoard(new Board(user.getUserId(), content));
+                    BoardDatabase.addBoard(new Board(user.getUserId(), content, fileName));
                     redirectUrl = "/main/index.html";
                     httpResponse.redirectPath(redirectUrl);
                     break;
