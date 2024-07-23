@@ -3,6 +3,9 @@ package webserver.enumPackage;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Http 헤더의 Content-Type에 대한 정보를 담은 이넘타입
+ */
 public enum ContentType {
     HTML("html", "text/html"),
     CSS("css", "text/css"),

@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * User 형식을 담고 있는 클래스
+ */
 public class User {
     private String userId;
     private String password;
@@ -11,6 +14,11 @@ public class User {
         this.password = password;
         this.name = name;
         this.email = email;
+    }
+
+    public User(String userId, String password) {
+        this.userId = userId;
+        this.password = password;
     }
 
     public String getUserId() {

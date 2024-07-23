@@ -1,9 +1,11 @@
 package webserver;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * HttpRequest 형식을 담고 있는 클래스
+ */
 public class HttpRequest {
     private String method;
     private String url;
