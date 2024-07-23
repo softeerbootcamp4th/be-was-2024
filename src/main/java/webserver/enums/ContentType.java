@@ -1,13 +1,13 @@
 package webserver.enums;
 
 public enum ContentType {
-    html("text/html"),
-    css("text/css"),
-    js("application/javascript"),
-    ico("image/x-icon"),
-    png("image/png"),
-    jpg("image/jpeg"),
-    svg("image/svg+xml");
+    HTML("text/html"),
+    CSS("text/css"),
+    JS("application/javascript"),
+    ICO("image/x-icon"),
+    PNG("image/png"),
+    JPG("image/jpeg"),
+    SVG("image/svg+xml");
 
     private final String contentType;
 

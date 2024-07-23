@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import webserver.enums.HttpMethod;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -103,14 +104,45 @@ public class HttpRequestParserTest {
         MyHttpRequest myHttpRequest = httpRequestParser.parseRequest(inputStream);
 
         // Then
-        assertEquals("POST", myHttpRequest.getMethod());
+        assertEquals(HttpMethod.POST, myHttpRequest.getMethod());
         assertEquals("/api/data", myHttpRequest.getPath());
         assertEquals("HTTP/1.1", myHttpRequest.getVersion());
 
-        assertEquals("localhost:8080", myHttpRequest.getHeaders().get("Host"));
-        assertEquals("keep-alive", myHttpRequest.getHeaders().get("Connection"));
-        assertEquals("16", myHttpRequest.getHeaders().get("Content-Length"));
-        assertEquals("application/x-www-form-urlencoded", myHttpRequest.getHeaders().get("Content-Type"));
+        assertEquals("localhost:8080", myHttpRequest.getHeaders().get("Host".toLowerCase()));
+        assertEquals("keep-alive", myHttpRequest.getHeaders().get("Connection".toLowerCase()));
+        assertEquals("16", myHttpRequest.getHeaders().get("Content-Length".toLowerCase()));
+        assertEquals("application/x-www-form-urlencoded", myHttpRequest.getHeaders().get("Content-Type".toLowerCase()));
+
+        assertEquals("name=John&age=30", new String(myHttpRequest.getBody()));
+
+    }
+
+    @Test
+    @DisplayName("HttpRequest 전문 파싱 테스트")
+    void HTTPRequestParserUpperCaseLowerCaseTest() throws IOException {
+        // Given
+        String httpRequest = "post /api/data Http/1.1\n" +
+                "Host: localhost:8080\n" +
+                "connection: keep-alive\n" +
+                "CONTENT-LENGTH: 16\n" +
+                "Content-Type: application/x-www-form-urlencoded\n" +
+                "\n" +
+                "name=John&age=30";
+        InputStream inputStream = new ByteArrayInputStream(httpRequest.getBytes());
+
+
+        // When
+        MyHttpRequest myHttpRequest = httpRequestParser.parseRequest(inputStream);
+
+        // Then
+        assertEquals(HttpMethod.POST, myHttpRequest.getMethod());
+        assertEquals("/api/data", myHttpRequest.getPath());
+        assertEquals("HTTP/1.1", myHttpRequest.getVersion());
+
+        assertEquals("localhost:8080", myHttpRequest.getHeaders().get("host"));
+        assertEquals("keep-alive", myHttpRequest.getHeaders().get("connection"));
+        assertEquals("16", myHttpRequest.getHeaders().get("content-length"));
+        assertEquals("application/x-www-form-urlencoded", myHttpRequest.getHeaders().get("content-type"));
 
         assertEquals("name=John&age=30", new String(myHttpRequest.getBody()));
 

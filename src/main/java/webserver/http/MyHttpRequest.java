@@ -1,5 +1,7 @@
 package webserver.http;
 
+import webserver.enums.HttpMethod;
+
 import java.util.Map;
 
 public class MyHttpRequest {
@@ -8,7 +10,7 @@ public class MyHttpRequest {
      * <p>
      * Request-URI = path [ "?" query ]
      */
-    private final String method;
+    private final HttpMethod method;
     private final String path;
     private final Map<String, String> query;
     private final String version;
@@ -26,7 +28,7 @@ public class MyHttpRequest {
      */
     private final byte[] body;
 
-    public MyHttpRequest(String method, String path, Map<String, String> query, String version, Map<String, String> headers, byte[] body) {
+    public MyHttpRequest(HttpMethod method, String path, Map<String, String> query, String version, Map<String, String> headers, byte[] body) {
         this.method = method;
         this.path = path;
         this.query = query;
@@ -35,7 +37,7 @@ public class MyHttpRequest {
         this.body = body;
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return method;
     }
 

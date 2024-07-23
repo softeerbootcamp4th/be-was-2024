@@ -1,5 +1,6 @@
 package webserver;
 
+import db.ConnectionPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,9 @@ public class WebServer {
             port = Integer.parseInt(args[0]);
         }
 
+        ConnectionPool connectionPool = ConnectionPool.getInstance();
+        connectionPool.initializeConnectionPool();
+
         // 서버소켓을 생성한다. 웹서버는 기본적으로 8080번 포트를 사용한다.
         try (ServerSocket listenSocket = new ServerSocket(port)) {
             logger.info("Web Application Server started {} port.", port);
@@ -31,7 +35,10 @@ public class WebServer {
             while ((connection = listenSocket.accept()) != null) {
 
                 executor.submit(new RequestHandler(connection));
+
             }
+
+            connection.close();
         }
     }
 }

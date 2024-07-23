@@ -15,12 +15,14 @@ import java.util.UUID;
 
 public class LogoutUserMapper implements HttpMapper {
     private static final Logger logger = LoggerFactory.getLogger(LogoutUserMapper.class);
+    public static final String HEADER_COOKIE = "cookie";
+    
     HttpRequestParser httpRequestParser = HttpRequestParser.getInstance();
 
     @Override
     public MyHttpResponse handle(MyHttpRequest httpRequest) throws IOException {
 
-        SessionTable.removeSession(UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get("Cookie")).get("sId")));
+        SessionTable.removeSession(UUID.fromString(httpRequestParser.parseCookie(httpRequest.getHeaders().get(HEADER_COOKIE)).get("sId")));
 
         MyHttpResponse response = new MyHttpResponse(HttpStatus.FOUND, Map.of(
                 "Content-Type", "text/plain",

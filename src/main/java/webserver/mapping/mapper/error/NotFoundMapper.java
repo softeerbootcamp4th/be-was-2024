@@ -1,8 +1,9 @@
-package webserver.mapping.mapper;
+package webserver.mapping.mapper.error;
 
 import webserver.enums.HttpStatus;
 import webserver.http.MyHttpRequest;
 import webserver.http.MyHttpResponse;
+import webserver.mapping.mapper.HttpMapper;
 import webserver.util.FileContentReader;
 
 import java.io.IOException;
