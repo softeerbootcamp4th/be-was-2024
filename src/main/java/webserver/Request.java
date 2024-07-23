@@ -1,5 +1,6 @@
 package webserver;
 
+import model.FileData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.CookieUtil;
@@ -18,6 +19,7 @@ public class Request {
     private String path;
     private String queryString;
     private byte[] byteBody;
+    private FileData fileData;
     private String stringBody;
     private Map<String, String> headers = new HashMap<>();
 
@@ -70,8 +72,12 @@ public class Request {
             bytesRead += result;
         }
 
-        stringBody = new String(byteBody, StandardCharsets.UTF_8);
-        stringBody = URLDecoder.decode(stringBody, StandardCharsets.UTF_8);
+        if (getBoundaryFromContentType() != null) {
+            parseMultipartData(byteBody, getBoundaryFromContentType());
+        } else {
+            stringBody = new String(byteBody, StandardCharsets.UTF_8);
+            stringBody = URLDecoder.decode(stringBody, StandardCharsets.UTF_8);
+        }
     }
 
     private void parseRequestLine(String requestLine) {
@@ -108,6 +114,77 @@ public class Request {
             contentLength = Integer.parseInt(contentLengthValue);
         }
         return contentLength;
+    }
+
+    private String getBoundaryFromContentType() {
+        String contentType = headers.get("Content-Type");
+        if (contentType != null && contentType.contains("boundary=")) {
+            return "--" + contentType.split("boundary=")[1];
+        }
+        return null;
+    }
+
+    private void parseMultipartData(byte[] body, String boundary) {
+        String CONTENT_DISPOSITION = "Content-Disposition";
+
+        String bodyStr = new String(body, StandardCharsets.ISO_8859_1);
+        String[] splitData = bodyStr.split(boundary);
+
+        StringBuilder stringBodyBuilder = new StringBuilder();
+
+        for (String part : splitData) {
+            if (part.trim().isEmpty() || part.equals("--")) continue;
+
+            int headerEndIndex = part.indexOf("\r\n\r\n");
+            if (headerEndIndex == -1) continue;
+
+            String header = part.substring(0, headerEndIndex).trim();
+            String bodyContent = part.substring(headerEndIndex + 4);
+
+            // 헤더 파싱
+            String[] headerLines = header.split("\r\n");
+            String partName = null;
+            String filename = null;
+            for (String headerLine : headerLines) {
+                if (headerLine.startsWith(CONTENT_DISPOSITION)) {
+                    partName = extractPartName(headerLine);
+                    filename = extractFileName(headerLine);
+                }
+            }
+
+            if (filename != null) {
+                // 파일 데이터
+                this.fileData = new FileData.Builder()
+                        .fileBinaryData(bodyContent.getBytes(StandardCharsets.ISO_8859_1))
+                        .fileName(filename)
+                        .build();
+            } else {
+                // 텍스트 데이터
+                stringBodyBuilder.append(partName).append("=").append(bodyContent.trim()).append("&");
+            }
+        }
+
+        this.stringBody = new String(stringBodyBuilder.substring(0, stringBodyBuilder.length() - 1).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
+    }
+
+    private String extractPartName(String contentDisposition) {
+        String[] parts = contentDisposition.split(";");
+        for (String part : parts) {
+            if (part.trim().startsWith("name")) {
+                return part.substring(part.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
+    }
+
+    private String extractFileName(String contentDisposition) {
+        String[] parts = contentDisposition.split(";");
+        for (String part : parts) {
+            if (part.trim().startsWith("filename")) {
+                return part.substring(part.indexOf('=') + 1).trim().replace("\"", "");
+            }
+        }
+        return null;
     }
 
     public static Request from(InputStream inputStream) throws IOException {
@@ -147,6 +224,10 @@ public class Request {
 
     public HashMap<String, String> parseBody() {
         return createHashMap(splitString(stringBody));
+    }
+
+    public FileData getFileData() {
+        return this.fileData;
     }
 
     private String[] splitString(String dataString) {
