@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .header a {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+
+        .header a:hover {
+            background-color: #0056b3;
+        }
+
+        .title {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #007bff;
+        }
+
+        .content {
+            font-size: 18px;
+            line-height: 1.6;
+            word-wrap: break-word;
+            white-space: pre-wrap; /* preserves whitespace but allows wrapping */
+        }
+
+        .image-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <a href="/">메인으로</a>
+    </div>
+    <h1 class="title">{title_placeholder}</h1>
+    <div class="image-container">
+        <img src="{image_placeholder}" alt="Post Image">
+    </div>
+    <div class="content">{content_placeholder}</div>
+</div>
+</body>
+</html>

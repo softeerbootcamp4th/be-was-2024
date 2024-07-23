@@ -27,19 +27,20 @@ public class GetDistributor extends Distributor {
         if (path.equals("/user/create")) {
             ResponseProcessor responseProcessor = new ResponseProcessor();
             this.viewData = responseProcessor.notFoundResponse();
+        } else if (path.equals("/posts")) {
+            processShowPost();
         }
     }
 
     private void processNoneQuery() {
         String path = request.getPath();
-        if (path.equals("/logout")) {
-            processLogout();
-        } else if (path.equals("/login/index.html")) {
-            processLogin(path);
-        } else if (path.equals("/user/list")) {
-            processUserList();
-        } else {
-            processDefault(path);
+        switch (path) {
+            case "/logout" -> processLogout();
+            case "/login/index.html" -> processLogin(path);
+            case "/user/list" -> processUserList();
+            case "/write/index.html" -> processWrite();
+            case "/post/list" -> processPostList();
+            default -> processDefault(path);
         }
     }
 
@@ -79,6 +80,30 @@ public class GetDistributor extends Distributor {
         } else {
             this.viewData = responseProcessor.unauthorizedUserListResponse();
         }
+    }
+
+    private void processWrite() {
+        String sessionId = request.getSessionId();
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        if (SessionHandler.verifySessionId(sessionId)) {
+            this.viewData = responseProcessor.writeResponse();
+        } else {
+            this.viewData = responseProcessor.unauthorizedWriteResponse();
+        }
+    }
+
+    private void processShowPost() {
+        String title = request.parseQueryString().get("title");
+        String writer = request.parseQueryString().get("userId");
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+
+        this.viewData = responseProcessor.showPostResponse(writer, title);
+    }
+
+    private void processPostList() {
+        ResponseProcessor responseProcessor = new ResponseProcessor();
+        this.viewData = responseProcessor.showPostListResponse();
     }
 
     @Override

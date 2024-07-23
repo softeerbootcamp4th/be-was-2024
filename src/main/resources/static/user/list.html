@@ -86,7 +86,7 @@
     <header class="header">
         <ul class="header__menu">
             <li class="header__menu__item">
-                <a class="btn btn_contained btn_size_s" href="/">뒤로가기</a>
+                <a class="btn btn_contained btn_size_s" href="/">메인으로</a>
             </li>
         </ul>
     </header>
@@ -98,9 +98,7 @@
         </thead>
         <tbody>
         <my-tag each="userlist">
-            <tr>
-                <th scope="row">{User.#}</th> <td>{User.userId}</td> <td>{User.name}</td> <td>{User.email}</td>
-            </tr>
+            {user_list_placeholder}
         </my-tag>
         </tbody>
     </table>

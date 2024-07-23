@@ -5,10 +5,20 @@ public class CookieUtil {
         if (sessionId == null) {
             return false;
         }
-        if (sessionId.isEmpty()) {
-            return false;
-        } else{
-            return true;
+        return !sessionId.isEmpty();
+    }
+
+    public static String getCookie(String cookie) {
+        if (cookie == null) {
+            return null;
         }
+        String[] cookies = cookie.split(";");
+        for (String c : cookies) {
+            if (c.contains("SID")) {
+                c = c.trim();
+                return c.split("=")[1];
+            }
+        }
+        return null;
     }
 }

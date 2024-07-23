@@ -16,7 +16,11 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.3'
     testImplementation 'org.assertj:assertj-core:3.16.1'
 
+    // DB
+    implementation 'com.h2database:h2:2.1.214'
 
+    // jdbc
+    // implementation 'org.springframework:spring-jdbc:5.3.22'
 }
 
 test {

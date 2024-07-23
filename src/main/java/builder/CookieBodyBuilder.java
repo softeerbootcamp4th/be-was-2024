@@ -2,7 +2,6 @@ package builder;
 
 import utils.ResourceUtil;
 import handler.SessionHandler;
-import model.User;
 import model.ViewData;
 
 import java.io.IOException;
@@ -20,27 +19,41 @@ public class CookieBodyBuilder extends BodyBuilder {
     public byte[] getBody() throws IOException {
         if (viewData.getUrl().equals("//index.html") || viewData.getUrl().equals("/index.html")) {
             return getIndexHtmlBody();
+        } else if (viewData.getUrl().equals("/user/list.html")) {
+            return getUserListHtmlBody();
+        } else if (viewData.getUrl().equals("/post/index.html")) {
+            return getPostHtmlBody();
         } else {
             return getDefaultBody();
         }
     }
 
     private byte[] getIndexHtmlBody() throws IOException {
-        String sessionId = viewData.getCookie();
+        String sessionId = this.cookie;
         HtmlBuilder htmlBuilder = new HtmlBuilder();
         if (SessionHandler.verifySessionId(sessionId)) {
             // 사용자 아이디로 동적 html 생성
-            User user = SessionHandler.getUser(sessionId);
-            String userId = user.getUserId();
-
-            String body = htmlBuilder.generateHtml(true, userId);
+            String body = htmlBuilder.generateIndexHtml(true, sessionId);
 
             return body.getBytes();
         } else {
             // 그냥 html
-            String body = htmlBuilder.generateHtml(false, "");
+            String body = htmlBuilder.generateIndexHtml(false, "");
             return body.getBytes();
         }
+    }
+
+    private byte[] getUserListHtmlBody() throws IOException {
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        String body = htmlBuilder.generateUserListHtml();
+        return body.getBytes();
+    }
+
+    private byte[] getPostHtmlBody() throws IOException {
+        String sessionId = this.cookie;
+        HtmlBuilder htmlBuilder = new HtmlBuilder();
+        String body = htmlBuilder.generatePostHtml(sessionId, viewData.getTitle());
+        return body.getBytes();
     }
 
     private byte[] getDefaultBody() throws IOException {

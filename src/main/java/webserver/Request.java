@@ -2,9 +2,11 @@ package webserver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.CookieUtil;
 import utils.RequestLineUtil;
 
 import java.io.*;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +71,7 @@ public class Request {
         }
 
         stringBody = new String(byteBody, StandardCharsets.UTF_8);
+        stringBody = URLDecoder.decode(stringBody, StandardCharsets.UTF_8);
     }
 
     private void parseRequestLine(String requestLine) {
@@ -135,11 +138,7 @@ public class Request {
 
     public String getSessionId() {
         String cookie = headers.get("Cookie");
-        if (cookie == null) {
-            return null;
-        } else {
-            return cookie.split("=")[1];
-        }
+        return CookieUtil.getCookie(cookie);
     }
 
     public HashMap<String, String> parseQueryString() {
