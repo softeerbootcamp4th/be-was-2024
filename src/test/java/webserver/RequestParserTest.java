@@ -1,10 +1,13 @@
 package webserver;
 
-import ApiProcess.ApiProcess;
+import apiprocess.ApiProcess;
+import constant.RequestHeader;
 import db.Database;
 import enums.HttpCode;
 import enums.HttpMethod;
+import enums.MimeType;
 import model.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -13,14 +16,22 @@ import utils.RequestParser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RequestParserTest {
 
-    private static Logger logger = LoggerFactory.getLogger(RequestParserTest.class);
+    Logger logger = LoggerFactory.getLogger(RequestParserTest.class);
+    ApiProcessManager apiProcessManager = ApiProcessManager.getInstance();
+    Map<String, Object> model = new HashMap<>();
 
+    @BeforeEach
+    void beforeEach() {
+        model.clear();
+    }
     @Test
     @DisplayName("정상적인 http request가 들어온 경우")
     void requestTest() throws IOException {
@@ -35,8 +46,8 @@ class RequestParserTest {
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(request.getPath()).isEqualTo("/index.html");
         assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getHeader(RequestHeader.CONNECTION)).isEqualTo("keep-alive");
+        assertThat(request.getHeader(RequestHeader.HOST)).isEqualTo("localhost:8080");
     }
 
     @Test
@@ -53,8 +64,8 @@ class RequestParserTest {
         assertThat(request.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(request.getPath()).isEqualTo("/index.html");
         assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getHeader(RequestHeader.CONNECTION)).isEqualTo("keep-alive");
+        assertThat(request.getHeader(RequestHeader.HOST)).isEqualTo("localhost:8080");
     }
 
     @Test
@@ -76,8 +87,8 @@ class RequestParserTest {
         assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
         assertThat(request.getPath()).isEqualTo("/index.html");
         assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getHeader(RequestHeader.CONNECTION)).isEqualTo("keep-alive");
+        assertThat(request.getHeader(RequestHeader.HOST)).isEqualTo("localhost:8080");
         assertThat(request.getParameter("username")).isEqualTo("minjun");
         assertThat(request.getParameter("userId")).isEqualTo("minjun123");
         assertThat(request.getParameter("password")).isEqualTo("1234");
@@ -123,43 +134,11 @@ class RequestParserTest {
         assertThat(request.getMethod()).isEqualTo(HttpMethod.POST);
         assertThat(request.getPath()).isEqualTo("/index.html");
         assertThat(request.getHttpVersion()).isEqualTo("http/1.1");
-        assertThat(request.getHeader("Connection")).isEqualTo("keep-alive");
-        assertThat(request.getHeader("Host")).isEqualTo("localhost:8080");
+        assertThat(request.getHeader(RequestHeader.CONNECTION)).isEqualTo("keep-alive");
+        assertThat(request.getHeader(RequestHeader.HOST)).isEqualTo("localhost:8080");
         assertThat(request.getParameter("username")).isNull();
         assertThat(request.getParameter("userId")).isEqualTo("minjun123");
         assertThat(request.getParameter("password")).isEqualTo("1234");
-    }
-
-    @Test
-    @DisplayName("회원 등록 로직 테스트")
-    void registerTest() throws IOException {
-        // given
-        String httpMessage = "POST /user/create http/1.1\r\n" +
-                "Connection: keep-alive\r\n" +
-                "Content-Length: 70\r\n" +
-                "Content-Type: application/x-www-form-urlencoded\r\n" +
-                "Host: localhost:8080\r\n\r\n" +
-                "userId=minjun1234&name=minjun&password=1234&email=minjun%40naver.com\r\n";
-        ByteArrayInputStream bis = new ByteArrayInputStream(httpMessage.getBytes());
-        Request request = RequestParser.getRequestParser().getRequest(bis);
-        Response response = new Response();
-        String userId = request.getParameter("userId");
-        ApiProcessManager apiProcessManager = new ApiProcessManager();
-        ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
-        logger.debug("apiProcess={}", apiProcess.getClass());
-
-        // when
-        apiProcess.process(request, response);
-        User user = Database.findUserById(userId);
-
-        // then
-        assertThat(request.getPath()).isEqualTo("/user/create");
-        assertThat(userId).isEqualTo("minjun1234");
-        assertThat(user).isNotNull();
-        assertThat(user.getUserId()).isEqualTo("minjun1234");
-        assertThat(user.getEmail()).isEqualTo("minjun@naver.com");
-        assertThat(user.getName()).isEqualTo("minjun");
-        assertThat(user.getPassword()).isEqualTo("1234");
     }
 
     @Test
@@ -176,12 +155,11 @@ class RequestParserTest {
         Request request = RequestParser.getRequestParser().getRequest(bis);
         Response response = new Response();
         String userId = request.getParameter("userId");
-        ApiProcessManager apiProcessManager = new ApiProcessManager();
-        ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
+        ApiProcess apiProcess = apiProcessManager.get(request.getPath(), request.getMethod());
         logger.debug("apiProcess={}", apiProcess.getClass());
 
         // when
-        String fileName = apiProcess.process(request, response);
+        String fileName = apiProcess.process(request, response, model);
 
         // then
         assertThat(response.getHttpCode()).isEqualTo(HttpCode.BAD_REQUEST);
@@ -224,6 +202,27 @@ class RequestParserTest {
     }
 
     @Test
+    @DisplayName("헤더의 키가 대소문자 구분 없이 들어왔을 때")
+    void caseInsensitiveTest() throws IOException {
+        // given
+        String httpMessage = "GET /index.html http/1.1\r\n" +
+                "CoOkIe: eachPrice=10; quantity=3\r\n" +
+                "HOst: loCAlHosT:8080\r\n" +
+                "CoNtEnT-TyPe: applIcation/x-www-form-UrLeNcOdEd\r\n\r\n" +
+                "username=minjun&userId=minjun123&password=1234\r\n";
+        ByteArrayInputStream bis = new ByteArrayInputStream(httpMessage.getBytes());
+
+        // when
+        Request request = RequestParser.getRequestParser().getRequest(bis);
+
+        // then
+        assertThat(request.getCookie("eachPrice")).isEqualTo("10");
+        assertThat(request.getCookie("quantity")).isEqualTo("3");
+        assertThat(request.getHeader(RequestHeader.CONTENT_TYPE)).isEqualTo(MimeType.FORM.toString());
+        assertThat(request.getHeader(RequestHeader.HOST)).isEqualTo("localhost:8080");
+    }
+
+    @Test
     @DisplayName("빈 폼 데이터가 들어왔을 때")
     void emptyFormDataTest() throws IOException {
         // given
@@ -241,7 +240,7 @@ class RequestParserTest {
 
     @Test
     @DisplayName("쿠키의 key-value 사이의 구분자가 잘못되었을 때")
-    void wrongKeyValueDelimeterTest() throws IOException {
+    void wrongKeyValueDelimeterTest() {
         // given
         String httpMessage = "GET /index.html http/1.1\r\n" +
                 "Cookie: price=10; name:minjun\r\n" +

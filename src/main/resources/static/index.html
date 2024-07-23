@@ -3,25 +3,58 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="./reset.css" rel="stylesheet" />
-    <link href="./global.css" rel="stylesheet" />
-    <link href="./main.css" rel="stylesheet" />
+    <link href="/reset.css" rel="stylesheet" />
+    <link href="/global.css" rel="stylesheet" />
+    <link href="/main.css" rel="stylesheet" />
   </head>
   <body>
     <div class="container">
       <header class="header">
-        <a href="/"><img src="./img/signiture.svg" /></a>
-        <ul class="header__menu">
-          <li class="header__menu__item">
-            <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
-          </li>
-          <li class="header__menu__item">
-            <a class="btn btn_ghost btn_size_s" href="/registration">
-              회원 가입
-            </a>
-          </li>
-        </ul>
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <my-template mt::if="user">
+          <ul class="header__menu">
+            <li class="header__menu__item">
+              안녕하세요. {user.name}님
+            </li>
+            <li class="header__menu__item">
+              <form method="post" action="/user/logout">
+                <button class="btn btn_contained btn_size_s" type="submit">로그아웃</button>
+              </form>
+            </li>
+            <li class="header__menu__item">
+              <a class="btn btn_ghost btn_size_s" href="/user/list">유저목록</a>
+            </li>
+          </ul>
+        </my-template>
+
+        <my-template mt::if-not="user">
+          <ul class="header__menu">
+            <li class="header__menu__item">
+              <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
+            </li>
+            <li class="header__menu__item">
+              <a class="btn btn_ghost btn_size_s" href="/registration">
+                회원 가입
+              </a>
+            </li>
+          </ul>
+        </my-template>
       </header>
+
+      <my-template mt::if="postNotLogin">
+        <div>
+          {postNotLogin}
+        </div>
+      </my-template>
+
+      <my-template mt::if="loginFail">
+        <div>
+          {loginFail}
+        </div>
+      </my-template>
+
+
+
       <div class="wrapper">
         <div class="post">
           <div class="post__account">
@@ -33,17 +66,17 @@
             <ul class="post__menu__personal">
               <li>
                 <button class="post__menu__btn">
-                  <img src="./img/like.svg" />
+                  <img src="/img/like.svg" />
                 </button>
               </li>
               <li>
                 <button class="post__menu__btn">
-                  <img src="./img/sendLink.svg" />
+                  <img src="/img/sendLink.svg" />
                 </button>
               </li>
             </ul>
             <button class="post__menu__btn">
-              <img src="./img/bookMark.svg" />
+              <img src="/img/bookMark.svg" />
             </button>
           </div>
           <p class="post__article">
@@ -118,28 +151,32 @@
             모든 댓글 보기(3개)
           </button>
         </ul>
+        <my-template mt::each="allPost">
+          <p>{idx}번째글의 제목은 {title}입니다. </p>
+        </my-template>
         <nav class="nav">
           <ul class="nav__menu">
             <li class="nav__menu__item">
               <a class="nav__menu__item__btn" href="">
                 <img
                   class="nav__menu__item__img"
-                  src="./img/ci_chevron-left.svg"
+                  src="/img/ci_chevron-left.svg"
                 />
                 이전 글
               </a>
             </li>
             <li class="nav__menu__item">
               <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+              <a class="btn btn_contained btn_size_m" href="/user/write">글쓰기</a>
             </li>
             <li class="nav__menu__item">
-              <a class="nav__menu__item__btn" href="">
-                다음 글
-                <img
-                  class="nav__menu__item__img"
-                  src="./img/ci_chevron-right.svg"
-                />
-              </a>
+                <a class="nav__menu__item__btn" href="/post/{postId}">
+                  다음 글
+                  <img
+                          class="nav__menu__item__img"
+                          src="/img/ci_chevron-right.svg"
+                  />
+                </a>
             </li>
           </ul>
         </nav>

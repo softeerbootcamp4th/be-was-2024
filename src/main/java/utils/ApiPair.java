@@ -9,7 +9,8 @@ public class ApiPair {
   private String path;
   private HttpMethod method;
 
-  public ApiPair(String path, HttpMethod method) {
+  private ApiPair() {}
+  private ApiPair(String path, HttpMethod method) {
     this.path = path;
     this.method = method;
   }
@@ -20,6 +21,10 @@ public class ApiPair {
 
   public HttpMethod getMethod() {
     return method;
+  }
+
+  public static ApiPair of(String path, HttpMethod method) {
+    return new ApiPair(path, method);
   }
 
   @Override

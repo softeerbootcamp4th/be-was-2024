@@ -4,10 +4,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.concurrent.Callable;
 
-import ApiProcess.ApiProcess;
-
 import enums.HttpResult;
-import enums.MimeType;
+import model.ModelView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.*;
@@ -32,21 +30,8 @@ public class RequestHandler implements Callable<Void> {
             Request request = requestParser.getRequest(in);
             Response response = new Response();
 
-            if(AuthUtil.isLogin(request) != null) {
-                logger.debug("로그인 된 상태 입니다.");
-            } else {
-                logger.debug("로그인 되지 않은 상태 입니다.");
-            }
-
-            /**
-             * 경로에 따른 로직 처리
-             * ApiProcess 인터페이스를 만들어 로직 처리를 추상화
-             * ApiProcessManager가 해당 하는 구체화 클래스를 주입 합니다.
-             * RequestHandler는 로직 처리를 위한 구체화 클래스를 알지 못해도 된다.
-             */
-            ApiProcessManager apiProcessManager = new ApiProcessManager();
-            ApiProcess apiProcess = apiProcessManager.getApiProcess(request.getPath(), request.getMethod());
-            String fileNameWithoutExt = apiProcess.process(request, response);
+            CommonApiProcess apiProcess = CommonApiProcess.getInstance();
+            ModelView view = apiProcess.getView(request, response);
 
             // 리다이렉트 시
             if(isRedirect(response)) {
@@ -54,18 +39,8 @@ public class RequestHandler implements Callable<Void> {
                return null;
             }
 
-            // 확장자를 넣어주는 메서드 사용
-            String fileName = PathUtils.filePathResolver(fileNameWithoutExt);
-
-            // 파일의 바이너리 데이터 읽기
-            byte[] body = ResourcesLoader.getFile(fileName);
-
-            // mimeType 변환
-            MimeType mimeType = PathUtils.extToMimetype(fileName);
-            response.setContentType(mimeType);
-
             // 클라이언트에게 파일 반환
-            response.send(dos, body);
+            response.send(dos, view.render());
         } catch (Exception e) {
             logger.error(e.getMessage());
         }

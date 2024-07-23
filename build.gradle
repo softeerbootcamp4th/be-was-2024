@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'violet-mj'
-version '2.2.0'
+version '2.3.0'
 
 repositories {
     mavenCentral()
@@ -23,13 +23,16 @@ tasks.withType(Copy).configureEach {
 
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-
+    implementation 'com.h2database:h2:2.1.214'
+    implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation 'ch.qos.logback:logback-classic:1.2.3'
+
     testImplementation 'org.assertj:assertj-core:3.16.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
 }
 
 test {
+    systemProperty 'APP_ENV', 'test'
     useJUnitPlatform()
 }
