@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class BodyContentDecomposision {
-    private static final byte[] NEWLINE = {'\r','\n'};
-
     public static Map<String, FileData> decompose(byte[] body, String boundary) {
         Map<String, FileData> map = new HashMap<>();
         String boundaryString = "--" + boundary;

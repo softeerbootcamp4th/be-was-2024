@@ -12,8 +12,12 @@ import webserver.http.response.PageBuilder;
 
 import java.io.IOException;
 
+
+/**
+ * Main page에 대한 html response를 반환하는 클래스
+ */
 public class MainPageHandler implements FunctionHandler {
-    //singleton pattern
+    // singleton pattern
     private static FunctionHandler single_instance = null;
     public static synchronized FunctionHandler getInstance()
     {
@@ -22,23 +26,36 @@ public class MainPageHandler implements FunctionHandler {
         return single_instance;
     }
 
+    /**
+     * main page response를 생성한다
+     * <p>
+     *     session id를 확인하고 loggedin page 또는 loggedout page를 넘겨준다
+     * </p>
+     * <p>
+     *     이 과정에서 path variable을 찾아서 page builder에 넘겨준다
+     * </p>
+     * @see PageBuilder#buildLoggedinPage(String, String)
+     * @see PageBuilder#buildLoggedoutPage(String)
+     */
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();
         SessionDAO sessionDAO = new SessionDAO();
-        UserDAO userDAO = new UserDAO();
+
+        String postid = request.getPathVariables().get("postid");
 
         if(sessionid !=null && sessionDAO.findSession(sessionid) != null){
+            UserDAO userDAO = new UserDAO();
             User user = userDAO.getUser(sessionDAO.findSession(sessionid));
             return new HttpResponse.ResponseBuilder(200)
                     .addheader("Content-Type", "text/html; charset=utf-8")
-                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
+                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),postid))
                     .build();
         }
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.MAIN_PAGE))
+                .setBody(PageBuilder.buildLoggedoutPage(postid) )
                 .build();
     }
 }

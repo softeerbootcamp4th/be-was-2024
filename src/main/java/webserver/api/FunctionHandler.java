@@ -6,10 +6,12 @@ import webserver.http.HttpResponse;
 import java.io.IOException;
 
 
-/*
-* interface of all functions of WAS
-* all server functions should implement this interface
-* */
+/**
+ * WAS 의 모든 기능에 대한 interface
+ * <p>
+ *     all server functions should implement this interface
+ * </p>
+*/
 public interface FunctionHandler {
     HttpResponse function(HttpRequest request) throws IOException;
 }

@@ -2,8 +2,6 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import org.slf4j.Logger;
@@ -15,11 +13,10 @@ import webserver.http.path.PathMap;
 import webserver.http.response.ResponseLibrary;
 import webserver.util.StreamByteReader;
 
-
-/*
-* Request들에 대해서 hanldling하는 class
-* socket을 통한 모든 IO는 이 class가 관장한다
-* */
+/**
+ *  request에 대해 처리한다
+ *  모든 client로부터 input과 output은 이곳에서 처리한다
+ */
 public class RequestHandler implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     private final Socket connection;
@@ -37,10 +34,11 @@ public class RequestHandler implements Runnable {
             BufferedInputStream bif = new BufferedInputStream(in);
 
             String startline = StreamByteReader.readLine(bif); // http request의 첫번째줄
-            HttpRequest.ReqeustBuilder reqeustBuilder = new HttpRequest.ReqeustBuilder(startline);
+            HttpRequest.RequestBuilder reqeustBuilder = new HttpRequest.RequestBuilder(startline);
 
             String headers = startline;
             int contentLength = 0;
+            int readbyte = 0;
             while(!headers.isEmpty()){ //header들을 한줄씩 순회하면서 request에 header를 하나씩 추가함
                 headers = StreamByteReader.readLine(bif);
                 logger.info(headers);
@@ -52,14 +50,13 @@ public class RequestHandler implements Runnable {
             }
             if(contentLength != 0) {
                 byte[] body = new byte[contentLength];
-                logger.info("bytes_read : {}\n",bif.read(body, 0, contentLength));
+                for(readbyte=0;readbyte<contentLength;readbyte+=bif.read(body,readbyte,contentLength-readbyte));
                 reqeustBuilder.setBody(body);
             }
             HttpRequest request = reqeustBuilder.build();
 
             logger.info(request.printRequest());
-            if(request.getBody() != null && request.getBody().length > 0)
-                logger.info("body: {}", new String(request.getBody()));
+            logger.info("bytes read: {}", readbyte);
 
             FunctionHandler api = PathMap.getPathMethod(request); //해당 path에 대한 function을 request정보를 이용하여 받아온다
             HttpResponse response =
@@ -69,7 +66,8 @@ public class RequestHandler implements Runnable {
 
             // response 출력
             dos.writeBytes(response.getHeader());
-            dos.write(response.getBody());
+            if(response.getBody() !=null)
+                dos.write(response.getBody());
             dos.flush();
         } catch (IOException | NumberFormatException | NullPointerException e) {
             logger.error("error{}", e.getMessage());

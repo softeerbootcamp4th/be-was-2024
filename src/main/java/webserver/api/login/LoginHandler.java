@@ -17,8 +17,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 
+
+/**
+ * login이 유효한지 확인하는 클래스
+ */
 public class LoginHandler implements FunctionHandler {
-    //singleton pattern
+    // Singleton pattern
     private static FunctionHandler single_instance = null;
     public static synchronized FunctionHandler getInstance()
     {
@@ -28,6 +32,19 @@ public class LoginHandler implements FunctionHandler {
         return single_instance;
     }
 
+    /**
+     * login이 유효한지 확인한다
+     * <p>
+     *     아이디 및 비밀번호가 유효하다면 main page로 redirect 한다
+     * </p>
+     * <p>
+     *     유효하지 않다면 오류 페이지를 띄운다
+     * </p>
+     * @param request 해당 요청에 대한 Httprequest class
+     * @return 반환할 HttpResponse class
+     * @see UserDAO
+     * @see SessionDAO
+     */
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String body = new String(request.getBody(), StandardCharsets.UTF_8);
@@ -54,10 +71,10 @@ public class LoginHandler implements FunctionHandler {
         String sessionString = sessionDAO.insertSession(user.getUserId());
 
         //go to logined main page
-        return new HttpResponse.ResponseBuilder(200)
+        return new HttpResponse.ResponseBuilder(302)
                 .addheader("Content-Type", Extension.HTML.getContentType())
+                .addheader("Location", "http://localhost:8080/")
                 .addheader("Set-Cookie","sid="+sessionString +"; Max-Age=3600; Path=/") //set cookie
-                .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
                 .build();
     }
 }

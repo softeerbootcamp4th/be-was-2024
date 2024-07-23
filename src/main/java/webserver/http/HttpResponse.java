@@ -1,15 +1,32 @@
 package webserver.http;
 
 import webserver.http.enums.StatusCode;
+import webserver.http.response.PageBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * response에 대한 클래스
+ */
 public class HttpResponse{
+    /**
+     * response status code
+     */
     private StatusCode statusCode;
+    /**
+     * header들에 대한 map
+     */
     private Map<String, String> headers;
+    /**
+     * response의 body
+     */
     private byte[] body;
 
+    /**
+     * header map을 기반으로 header 문자열을 반환
+     * @return header string
+     */
     public String getHeader() {
         StringBuilder header = new StringBuilder();
         header.append(statusCode.getStartline());
@@ -35,6 +52,12 @@ public class HttpResponse{
         return headers;
     }
 
+    /**
+     * HttpResponse class에 대한 생성자
+     * <p>
+     *     builder를 이용하여 response를 생성한다.
+     * </p>
+     */
     private HttpResponse(ResponseBuilder responseBuilder) {
         this.statusCode = responseBuilder.statusCode;
         this.headers = responseBuilder.headers;
@@ -42,6 +65,9 @@ public class HttpResponse{
     }
 
 
+    /**
+     * HttpResponse에 대한 builder class
+     */
     public static class ResponseBuilder{
         private StatusCode statusCode;
         private byte[] body;

@@ -1,5 +1,11 @@
 package model.user;
 
+
+import webserver.session.SessionDAO;
+
+/**
+ * 사용자에 대한 클래스
+ */
 public class User {
     private String userId;
     private String password;
@@ -29,6 +35,11 @@ public class User {
         return email;
     }
 
+
+    /**
+     * user 정보를 뽑아낸다
+     * @return 사용자 정보에 대한 string
+     */
     @Override
     public String toString() {
         return "User [userId=" + userId + ", password=" + password + ", name=" + name + ", email=" + email + "]";

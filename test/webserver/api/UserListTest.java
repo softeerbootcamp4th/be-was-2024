@@ -27,7 +27,7 @@ class UserListTest {
         assertNotNull(sessionDAO.findSession(sessionId));
 
         HttpRequest request;
-        request = new HttpRequest.ReqeustBuilder("GET /user HTTP/1.1")
+        request = new HttpRequest.RequestBuilder("GET /user HTTP/1.1")
                 .addHeader("Cookie", "sid=" + sessionId)
                 .build();
 

@@ -4,64 +4,134 @@ import webserver.http.enums.Methods;
 import webserver.http.url.Url;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
 
-/*
-* HttpRequest 정보를 모두 담고있는 class
-*
-* method : method of request
-* url : url data of request
-* body : body of request
-* protocol : protocol of request
-* headers : header map of request
-* */
-
+/**
+ * HttpRequest 정보를 모두 담고있는 class
+ *
+*/
 public class HttpRequest {
+    /**
+     * request 의 method
+     * @see Methods
+     */
     private Methods method;
-    private Url url; //하나의 클래스로 분리를 하면
+
+    /**
+     * request의 url 정보
+     * @see Url
+     */
+    private Url url;
+
+    /**
+     * request의 body byte
+     */
     private byte[] body;
+
+    /**
+     * protocol 이름
+     */
     private String protocol;
+
+    /**
+     * request의 헤더 map
+     */
     private Map<String, String> headers;
+
+    /**
+     * request의 쿠키 map
+     */
     private Map<String, String> cookies;
+
+    /**
+     * request의 path variable map <br>
+     * 추가는 path routing과정에서 진행
+     */
     private Map<String, String> pathVariables;
+
+    /**
+     * request의 세션 id
+     */
     private String sessionid;
 
+    /**
+     * method 반환
+     * @return Method enum class
+     * @see Methods
+     */
     public Methods getMethod() {
         return method;
     }
 
+    /**
+     * url 반환
+     * @return url class
+     * @see Url
+     */
     public Url getUrl() {
         return url;
     }
 
+    /**
+     * body byte 반환
+     * @return body byte
+     */
     public byte[] getBody() {
         return body;
     }
 
+    /**
+     * protocol 반환
+     * @return protocol
+     */
     public String getProtocol() {
         return protocol;
     }
 
+    /**
+     * header 반환
+     * @return header map
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * cookie 반환
+     * @return cookie map
+     */
     public Map<String, String> getCookie(String key) {return cookies;}
 
+    /**
+     * session id 반환
+     * @return session id
+     * @see webserver.session.SessionDAO
+     */
     public String getSessionid() {return sessionid;}
 
+    /**
+     * path variable 반환
+     * @return path variable map
+     */
     public Map<String, String> getPathVariables() {
         return pathVariables;
     }
 
+    /**
+     * path variable에 key와 value 추가
+     * @param key 추가할 key
+     * @param value 추가할 value
+     */
     public void addPathVariable(String key, String value) {
         this.pathVariables.put(key, value);
     }
 
+    /**
+     * request header 내용들에 대해서 반환
+     */
     public String printRequest(){
         return "method: " + method.getMethod() + "\n" +
                 "url: " + url.getPath() + "\n" +
@@ -70,8 +140,12 @@ public class HttpRequest {
                 "headers: " + headers.toString() + "\n";
     }
 
-
-    private HttpRequest(ReqeustBuilder builder) {
+    /**
+     * 생성자 클래스 <br>
+     * builder를 이용하여 생성해야함
+     * @see HttpRequest.RequestBuilder
+     */
+    private HttpRequest(RequestBuilder builder) {
         this.method = builder.method;
         this.url = builder.url;
         this.protocol = builder.protocol;
@@ -82,7 +156,13 @@ public class HttpRequest {
         this.pathVariables = new HashMap<>();
     }
 
-    public static class ReqeustBuilder{
+    /**
+     * HttpRequest에 대한 builder
+     * <p>
+     *      path parameter는 여기서 설정하지 않는다
+     * </p>
+     */
+    public static class RequestBuilder {
         private Methods method;
         private Url url;
         private byte[] body;
@@ -91,7 +171,11 @@ public class HttpRequest {
         private Map<String, String> cookies= new HashMap<>();
         private String sessionid;
 
-        public ReqeustBuilder(String startline) throws IOException {
+        /**
+         * Request builder의 생성자
+         * @param startline http request의 첫번째 line
+         */
+        public RequestBuilder(String startline) throws IOException {
             String[] split = startline.split(" ");
             if(split.length != 3){
                 throw new IOException("Invalid request line: " + startline);
@@ -102,16 +186,35 @@ public class HttpRequest {
             protocol = split[2];
         }
 
-        public ReqeustBuilder addHeader(String key, String value){
+        /**
+         * Request 에 header를 추가
+         * <p>
+         *     이때 key는 lower case로 바꿔서 저장한다
+         * </p>
+         * @param key header의 키
+         * @param value header의 value
+         */
+        public RequestBuilder addHeader(String key, String value){
             headers.put(key.toLowerCase(), value);
             return this;
         }
 
-        public ReqeustBuilder setBody(byte[] body) {
+        /**
+         * Request body를 추가
+         * @param body request의 body byte
+         */
+        public RequestBuilder setBody(byte[] body) {
             this.body = body;
             return this;
         }
 
+        /**
+         * Request의 header에서 cookie를 추출
+         * <p>
+         *     이때 세션 id를 확인해서 HttpRequest의 session id를 설정한다
+         * </p>
+         * @see HttpRequest#sessionid
+         */
         private void setCookies (){
             if(headers.containsKey("cookie")){
                 String[] split = headers.get("cookie").trim().split(";");
@@ -125,6 +228,9 @@ public class HttpRequest {
             }
         }
 
+        /**
+         * HttpRequest를 생성한다
+         */
         public HttpRequest build(){
             setCookies();
             return new HttpRequest(this);

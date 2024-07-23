@@ -5,9 +5,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-/*
-* enum data of methods
-* */
+/**
+ * http request의 method
+ */
 public enum Methods {
     GET("GET"),
     POST("POST"),
@@ -23,10 +23,15 @@ public enum Methods {
         return this.method;
     }
 
-    //using map to find by method string
+    /**
+     * key가 method string, value가 method enum인 map 생성
+     */
     private static final Map<String, Methods> BY_METHOD =
             Stream.of(values()).collect(Collectors.toMap(Methods::getMethod, e -> e));
 
+    /**
+     * http request의 method enum을 method string으로 구한다
+     */
     public static Methods valueOfMethod(String method) {
         return BY_METHOD.get(method.toUpperCase());
     }

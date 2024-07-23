@@ -21,7 +21,7 @@ class HttpRequestHandlerTest {
         Methods method = Methods.GET;
 
         //when
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder(method.getMethod()+" / HTTP/1.1").build();
+        HttpRequest requestHandler  = new HttpRequest.RequestBuilder(method.getMethod()+" / HTTP/1.1").build();
 
         //then
         assertEquals(requestHandler.getMethod(), method);
@@ -34,7 +34,7 @@ class HttpRequestHandlerTest {
         String path = "/test/url";
 
         //when
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET " + path +" HTTP/1.1").build();
+        HttpRequest requestHandler  = new HttpRequest.RequestBuilder("GET " + path +" HTTP/1.1").build();
 
         //then
         assertEquals(requestHandler.getUrl().getPath(),path );
@@ -57,7 +57,7 @@ class HttpRequestHandlerTest {
 
 
         //when
-        HttpRequest request = new HttpRequest.ReqeustBuilder("GET " + url.toString() + " HTTP/1.1").build();
+        HttpRequest request = new HttpRequest.RequestBuilder("GET " + url.toString() + " HTTP/1.1").build();
 
         //then
         for(Map.Entry<String, String> entry : params.entrySet()) {
@@ -71,7 +71,7 @@ class HttpRequestHandlerTest {
         //given
 
         //when
-        HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("GET /registration HTTP/1.1").build();
+        HttpRequest requestHandler  = new HttpRequest.RequestBuilder("GET /registration HTTP/1.1").build();
 
         //then
         assertTrue(requestHandler.getUrl().getParamsMap().isEmpty());
@@ -84,6 +84,6 @@ class HttpRequestHandlerTest {
 
         //when & then
         assertThrows(IOException.class, () ->
-        { HttpRequest requestHandler  = new HttpRequest.ReqeustBuilder("wrong request").build(); });
+        { HttpRequest requestHandler  = new HttpRequest.RequestBuilder("wrong request").build(); });
     }
 }

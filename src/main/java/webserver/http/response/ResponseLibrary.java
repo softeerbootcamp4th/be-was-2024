@@ -5,6 +5,9 @@ import webserver.http.enums.StatusCode;
 
 import static webserver.http.response.PageBuilder.buildErrorPage;
 
+/**
+ * 에러 response 저장소
+ */
 public class ResponseLibrary {
     public static HttpResponse notFound =
             new HttpResponse.ResponseBuilder(404)

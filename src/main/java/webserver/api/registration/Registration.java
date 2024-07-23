@@ -5,6 +5,7 @@ import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.response.PageBuilder;
+import webserver.session.SessionDAO;
 import webserver.util.ParamsParser;
 
 import java.io.IOException;
@@ -15,9 +16,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-/*
-* Registration function
-* */
+/**
+ * 회원가입 기능 class
+ */
 public class Registration implements FunctionHandler {
     //singleton pattern
     private static FunctionHandler single_instance = null;
@@ -29,9 +30,33 @@ public class Registration implements FunctionHandler {
         return single_instance;
     }
 
+    /**
+     * id 정규표현식
+     * <p>
+     *     영어로 시작해야 하며, 3~11글자여야 한다.
+     * </p>
+     */
     static final String idRegex = "^[a-zA-Z][a-zA-Z0-9]{3,11}$";
+    /**
+     * password 정규표현식
+     * <p>
+     *     영어 및 숫자로만 이루어져야 하며, 6 ~ 20글자여야 한다.
+     * </p>
+     */
     static final String passwordRegex = "^[a-zA-Z0-9]{6,20}$";
 
+
+    /**
+     * 회원가입을 진행한다
+     * <p>
+     *     회원가입시 id, password에 대한 표현식 및 중복 검증을 진행하고 DB에 저장한다
+     * </p>
+     * <p>
+     *     회원가입 완료 시 메인 페이지로 redirect 한다.
+     * </p>
+     * @param request 해당 요청에 대한 Httprequest class
+     * @return 반환할 HttpResponse class
+     */
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         UserDAO userDAO = new UserDAO();
@@ -68,6 +93,20 @@ public class Registration implements FunctionHandler {
             return new HttpResponse.ResponseBuilder(422)
                     .addheader("Content-Type", "text/html; charset=utf-8")
                     .setBody(PageBuilder.buildRegistrationFailedPage("비밀번호는 6~20자이어야 합니다"))
+                    .build();
+        }
+
+        if(email.length() > 100){
+            return new HttpResponse.ResponseBuilder(422)
+                    .addheader("Content-Type", "text/html; charset=utf-8")
+                    .setBody(PageBuilder.buildRegistrationFailedPage("이메일이 100자 이상입니다."))
+                    .build();
+        }
+
+        if(username.length() > 100){
+            return new HttpResponse.ResponseBuilder(422)
+                    .addheader("Content-Type", "text/html; charset=utf-8")
+                    .setBody(PageBuilder.buildRegistrationFailedPage("이름이 100자 이상입니다."))
                     .build();
         }
 
