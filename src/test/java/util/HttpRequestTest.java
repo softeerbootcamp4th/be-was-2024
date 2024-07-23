@@ -56,8 +56,8 @@ class HttpRequestTest {
         HttpRequest request = HttpRequest.from("GET /index.html HTTP/1.1");
         headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
         int idx = headerLine.indexOf(ConstantUtil.COLON);
-        String key = headerLine.substring(0, idx).trim();
-        String value = headerLine.substring(idx + 1).trim();
+        String key = headerLine.substring(0, idx).toLowerCase().trim();
+        String value = headerLine.substring(idx + 1).toLowerCase().trim();
 
         // when
         request.putHeaders(headerLine);
@@ -72,7 +72,7 @@ class HttpRequestTest {
     void putHeadersMulti(String headerLines) {
         // given
         HttpRequest request = HttpRequest.from("GET /index.html HTTP/1.1");
-        String[] headers = headerLines.split(ConstantUtil.CRLF);
+        String[] headers = headerLines.toLowerCase().split(ConstantUtil.CRLF);
 
         // when
         for (String header : headers) {
@@ -81,8 +81,8 @@ class HttpRequestTest {
 
         // then
         assertThat(request.getRequestHeaders())
-                .containsEntry("Host", "localhost:8080")
-                .containsEntry("Connection", "keep-alive");
+                .containsEntry("host", "localhost:8080")
+                .containsEntry("connection", "keep-alive");
     }
 
     @DisplayName("putHeaders: HeaderLine에 콜론(:)이 잘못된 경우 예외가 발생해야 한다.")

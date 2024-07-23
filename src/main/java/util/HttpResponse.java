@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * HTTP 응답에 대한 정보를 관리하는 클래스
+ */
 public class HttpResponse {
 
     private String type;
@@ -16,9 +19,16 @@ public class HttpResponse {
     protected HttpResponse() {
     }
 
-    public static HttpResponse ok(String type, String path, String httpVersion, String body) {
+    /**
+     * 200 OK 응답 생성하는 정적 팩토리 메서드
+     * @param path
+     * @param httpVersion
+     * @param body
+     * @return HttpResponse
+     */
+    public static HttpResponse ok(String path, String httpVersion, String body) {
         HttpResponse response = new HttpResponse();
-        response.type = type;
+        response.type = ConstantUtil.DYNAMIC;
         response.path = path;
         response.statusCode = HttpCode.OK.getStatus();
         response.httpVersion = httpVersion;
@@ -33,7 +43,13 @@ public class HttpResponse {
         return response;
     }
 
-    // staticResponse에서 담당하기에 Header/Body를 설정하지 않음
+    /**
+     * 200 OK 정적 응답 생성하는 정적 팩토리 메서드
+     * staticResponse에서 헤더 처리를 담당하기에 Header/Body를 설정하지 않음
+     * @param path
+     * @param httpVersion
+     * @return HttpResponse
+     */
     public static HttpResponse okStatic(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.STATIC;
@@ -43,14 +59,55 @@ public class HttpResponse {
         return response;
     }
 
-    public static HttpResponse error(String statusCode, String httpVersion) {
+    /**
+     * 404 Not Found 응답 생성하는 정적 팩토리 메서드
+     * @param httpVersion
+     * @return HttpResponse
+     */
+    public static HttpResponse notFound(String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.FAULT;
-        response.statusCode = statusCode;
+        response.statusCode = HttpCode.NOT_FOUND.getStatus();
         response.httpVersion = httpVersion;
+        response.putBody(HttpCode.NOT_FOUND.toString());
         return response;
     }
 
+    /**
+     * 405 Method Not Allowed 응답 생성하는 정적 팩토리 메서드
+     * @param httpVersion
+     * @return HttpResponse
+     */
+    public static HttpResponse methodNotAllowed(String httpVersion) {
+        HttpResponse response = new HttpResponse();
+        response.type = ConstantUtil.FAULT;
+        response.statusCode = HttpCode.METHOD_NOT_ALLOWED.getStatus();
+        response.httpVersion = httpVersion;
+        response.putBody(HttpCode.METHOD_NOT_ALLOWED.toString());
+        return response;
+    }
+
+    /**
+     * 500 Internal Server Error 응답 생성하는 정적 팩토리 메서드
+     * @param body
+     * @param httpVersion
+     * @return HttpResponse
+     */
+    public static HttpResponse error(String body, String httpVersion) {
+        HttpResponse response = new HttpResponse();
+        response.type = ConstantUtil.FAULT;
+        response.statusCode = HttpCode.INTERNAL_SERVER_ERROR.getStatus();
+        response.httpVersion = httpVersion;
+        response.putBody(body);
+        return response;
+    }
+
+    /**
+     * 302 Found 응답 생성하는 정적 팩토리 메서드
+     * @param path
+     * @param httpVersion
+     * @return HttpResponse
+     */
     public static HttpResponse redirect(String path, String httpVersion) {
         HttpResponse response = new HttpResponse();
         response.type = ConstantUtil.DYNAMIC;
@@ -73,10 +130,18 @@ public class HttpResponse {
         return statusCode;
     }
 
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
     public byte[] getBody(){
         return body;
     }
 
+    /**
+     * 모든 헤더를 반환하는 메서드
+     * @return String
+     */
     public String getTotalHeaders(){
         StringBuilder sb = new StringBuilder();
         sb.append(httpVersion).append(ConstantUtil.SPACE)
@@ -90,19 +155,36 @@ public class HttpResponse {
         return sb.toString();
     }
 
+    /**
+     * 헤더를 추가
+     * @param key
+     * @param value
+     */
     private void putHeader(String key, String value){
         header.put(key, value);
     }
 
+    /**
+     * 바디를 추가
+     * @param body
+     */
     private void putBody(String body){
         this.body = body.getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 세션 ID 설정
+     * @param sessionId
+     */
     public void setSessionId(String sessionId){
         putHeader(ConstantUtil.SET_COOKIE, sessionId);
     }
 
+    /**
+     * 세션 ID 삭제
+     * @param sessionId
+     */
     public void deleteSessionId(String sessionId){
-        putHeader("Set-Cookie", "sid=" + sessionId + "; Path=/; Max-Age=0");
+        putHeader(ConstantUtil.SET_COOKIE, "sid=" + sessionId + "; Path=/; Max-Age=0");
     }
 }

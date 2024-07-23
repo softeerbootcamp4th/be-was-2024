@@ -1,5 +1,8 @@
 package util;
 
+/**
+ * 상수를 보관하는 클래스
+ */
 public class ConstantUtil {
 
     private ConstantUtil() {
@@ -21,7 +24,7 @@ public class ConstantUtil {
     public static final String DYNAMIC = "dynamic";
     public static final String FAULT = "fault";
     public static final String STATIC = "static";
-    public static final String COOKIE = "Cookie";
+    public static final String COOKIE = "cookie";
     public static final String SESSION_ID = "sid";
     public static final String DOT_HTML = ".html";
 
@@ -33,13 +36,17 @@ public class ConstantUtil {
     public static final String PASSWORD = "password";
     public static final String NAME = "name";
     public static final String EMAIL = "email";
-
-    public static final String INVALID_LOGIN = "Invalid Login";
+    public static final String ARTICLE_ID = "articleId";
+    public static final String TITLE = "title";
+    public static final String CONTENT = "contents";
+    public static final String AUTHOR_NAME = "authorName";
+    
     public static final String INVALID_SIGNUP = "Invalid Signup";
     public static final String INVALID_PATH = "Invalid Path: ";
     public static final String INVALID_HEADER = "Invalid Header: ";
     public static final String INVALID_BODY = "Invalid Body";
-    public static final String INVALID_SESSION = "Invalid Session";
+
+    public static final String USER_NOT_FOUND = "User Not Found";
 
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_LENGTH = "Content-Length";

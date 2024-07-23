@@ -28,6 +28,7 @@ class SessionHandlerTest {
     @BeforeEach
     void setUp() {
         sessionHandler = SessionHandler.getInstance();
+        Database.clearUsers();
     }
 
     private Map<String, String> createFields(String userId, String password) {

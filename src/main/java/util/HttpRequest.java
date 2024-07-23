@@ -9,6 +9,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * HTTP 요청에 대한 정보를 저장하는 클래스
+ */
 public class HttpRequest {
 
     private String requestMethod;
@@ -25,6 +28,11 @@ public class HttpRequest {
         this.httpVersion = httpVersion;
     }
 
+    /**
+     * RequestLine을 파싱하여 HttpRequest 객체를 최초로 생성하는 메서드
+     * @param requestLine
+     * @return HttpRequest
+     */
     public static HttpRequest from(String requestLine) {
         String[] requestLineElements = Arrays.stream(requestLine.split(ConstantUtil.SPACES)).map(String::trim).toArray(String[]::new);
         String requestMethod = requestLineElements[0];
@@ -70,6 +78,10 @@ public class HttpRequest {
         return new String(requestBody, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Request Body를 Map으로 변환하는 메서드
+     * @return
+     */
     public Map<String, String> getBodyMap() {
         Map<String, String> bodyMap = new HashMap<>();
 
@@ -89,6 +101,10 @@ public class HttpRequest {
         return bodyMap;
     }
 
+    /**
+     * Request Header를 Map으로 변환하는 메서드
+     * @param headerLine
+     */
     public void putHeaders(String headerLine){
         if(headerLine.isEmpty()) return;
         headerLine = headerLine.replaceAll(ConstantUtil.SPACES, ConstantUtil.SPACE); // remove multiple spaces
@@ -109,9 +125,13 @@ public class HttpRequest {
             throw new RequestException(ConstantUtil.INVALID_HEADER);
         }
         String[] header = {headerLine.substring(0, idx), headerLine.substring(idx + 1)};
-        requestHeaders.put(header[0].trim(), header[1].trim());
+        requestHeaders.put(header[0].toLowerCase().trim(), header[1].toLowerCase().trim());
     }
 
+    /**
+     * Byte 배열로 입력되는 body를 byte[]로 저장하며, 이 때 UTF-8로 디코딩하여 저장
+     * @param body
+     */
     public void putBody(List<Byte> body){
         // List<Byte> to byte[]
         byte[] byteArray = new byte[body.size()];
@@ -119,6 +139,6 @@ public class HttpRequest {
             byteArray[i] = body.get(i);
         }
         // byte[] to String 후 디코딩하여 다시 byte[]로 변환
-        this.requestBody = new String(byteArray, StandardCharsets.ISO_8859_1).getBytes(StandardCharsets.UTF_8);
+        this.requestBody = new String(byteArray, StandardCharsets.UTF_8).getBytes();
     }
 }

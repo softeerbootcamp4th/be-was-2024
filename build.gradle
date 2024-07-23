@@ -18,6 +18,8 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.16.1'
 
 
+    // h2
+    implementation 'com.h2database:h2:1.4.200'
 }
 
 test {
