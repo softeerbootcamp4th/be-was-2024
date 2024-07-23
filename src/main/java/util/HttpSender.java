@@ -5,6 +5,7 @@ import dto.HttpResponse;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Map;
 
 import static util.constant.StringConstants.*;
@@ -14,7 +15,6 @@ public class HttpSender {
 
     /**
      * outputStream을 통해, HTTPResponse를 전송하는 로직
-     *
      * @param out : outputStream
      */
     public void sendHttpResponse(OutputStream out, HttpResponse httpResponse) {

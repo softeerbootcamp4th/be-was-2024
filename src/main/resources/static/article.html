@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./reset.css" rel="stylesheet" />
+    <link href="./global.css" rel="stylesheet" />
+    <link href="./main.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <a href="/"><img src="./img/signiture.svg" /></a>
+        <ul class="header__menu">
+          <li class="header__menu__item" >
+            <a class="btn btn_contained btn_size_s" href="/user/list">사용자 목록 조회</a>
+          </li>
+          <!-- DYNAMIC_CONTENT_IS_LOGIN -->
+          <!-- DYNAMIC_CONTENT_IS_NOT_LOGIN -->
+
+        </ul>
+      </header>
+      <div class="wrapper">
+        <div class="post">
+          <div class="post__account">
+            <img class="post__account__img" />
+            <p class="post__account__nickname">account</p>
+            <a class="btn btn_contained btn_size_s" href="/write.html">글 쓰기</a>
+
+          </div>
+          <p class="post__article">
+            <!-- DYNAMIC_ARTICLE_CONTENT -->
+          </p>
+          <img class="post__img" />
+          <div class="post__menu">
+            <ul class="post__menu__personal">
+              <li>
+                <button class="post__menu__btn">
+                  <img src="./img/like.svg" />
+                </button>
+              </li>
+              <li>
+                <button class="post__menu__btn">
+                  <img src="./img/sendLink.svg" />
+                </button>
+              </li>
+            </ul>
+            <button class="post__menu__btn">
+              <img src="./img/bookMark.svg" />
+            </button>
+          </div>
+
+        </div>
+        <ul class="comment">
+          <li class="comment__item">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">
+             언니 사진 너무잘나왔어요
+            </p>
+          </li>
+          <li class="comment__item">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">
+              좋아요누르고갑니다. 맞팔부탁해요
+            </p>
+          </li>
+          <li class="comment__item">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">
+              분위기가너무좋으세요
+            </p>
+          </li>
+          <li class="comment__item hidden">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">Comment 1</p>
+          </li>
+          <li class="comment__item hidden">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">Comment 2</p>
+          </li>
+          <li class="comment__item hidden">
+            <div class="comment__item__user">
+              <img class="comment__item__user__img" />
+              <p class="comment__item__user__nickname">account</p>
+            </div>
+            <p class="comment__item__article">Comment 3</p>
+          </li>
+          <button id="show-all-btn" class="btn btn_ghost btn_size_m">
+            모든 댓글 보기(3개)
+          </button>
+        </ul>
+        <nav class="nav">
+          <ul class="nav__menu">
+            <li class="nav__menu__item">
+              <a class="nav__menu__item__btn" href="">
+                <img
+                  class="nav__menu__item__img"
+                  src="./img/ci_chevron-left.svg"
+                />
+                이전 글
+              </a>
+            </li>
+            <li class="nav__menu__item">
+              <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+            </li>
+            <li class="nav__menu__item">
+              <a class="nav__menu__item__btn" href="">
+                다음 글
+                <img
+                  class="nav__menu__item__img"
+                  src="./img/ci_chevron-right.svg"
+                />
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </body>
+</html>
