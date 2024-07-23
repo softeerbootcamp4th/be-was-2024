@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * DB에 저장할 유저 엔티티
+ */
 public class User {
     private Long id;
     private String userId;

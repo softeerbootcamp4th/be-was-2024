@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Http 요청 메시지 객체
+ */
 public class HttpRequestMessage {
     String method;
     String uri;

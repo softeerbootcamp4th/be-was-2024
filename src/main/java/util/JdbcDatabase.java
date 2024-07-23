@@ -21,6 +21,11 @@ public class JdbcDatabase {
         }
     }
 
+    /**
+     * 새로운 DB커넥션을 생성해서 반환한다.
+     * @return 새로운 DB커넥션
+     * @throws SQLException
+     */
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(JDBC_URL, USER, PASSWORD);
     }
