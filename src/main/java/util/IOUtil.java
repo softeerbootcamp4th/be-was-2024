@@ -64,4 +64,39 @@ public class IOUtil {
             throw new FileNotFoundException();
         }
     }
+
+    /**
+     * 파일을 읽어 String으로 반환하는 메서드 (중복 제거용)
+     * @param path
+     * @return String
+     */
+    public static String readBytesFromFile(String path) {
+        try {
+            return new String(IOUtil.readBytesFromFile(false, path));
+        } catch (IOException e) {
+            return HttpRequestMapper.DEFAULT_PAGE.getPath();
+        }
+    }
+
+    /**
+     * 파일을 저장하고 그 경로를 반환
+     * @param fileData
+     * @param fileName
+     * @return String
+     */
+    public static String saveFile(byte[] fileData, String fileName) {
+        // uploads라는 디렉토리 생성
+        File dir = new File(ConstantUtil.FILE_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        String filePath = ConstantUtil.FILE_DIR + fileName;
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(fileData);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filePath;
+    }
 }

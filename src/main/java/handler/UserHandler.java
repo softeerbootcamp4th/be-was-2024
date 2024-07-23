@@ -31,15 +31,16 @@ public class UserHandler implements ModelHandler<User>{
      */
     @Override
     public Optional<User> create(Map<String, String> fields) {
-        if (fields.size() != 4 || fields.values().stream().anyMatch(String::isBlank)) {
+        if (fields.size() != 4) {
             throw new ModelException(ConstantUtil.INVALID_SIGNUP);
         }
         if(!fields.get(ConstantUtil.EMAIL).matches(ConstantUtil.EMAIL_REGEX)){
             throw new ModelException(ConstantUtil.INVALID_SIGNUP);
         }
-        if(fields.get(ConstantUtil.USER_ID) == null || fields.get(ConstantUtil.PASSWORD) == null || fields.get(ConstantUtil.NAME) == null || fields.get(ConstantUtil.EMAIL) == null){
-            throw new ModelException(ConstantUtil.INVALID_SIGNUP);
-        }
+        validateValue(fields.get(ConstantUtil.USER_ID));
+        validateValue(fields.get(ConstantUtil.PASSWORD));
+        validateValue(fields.get(ConstantUtil.NAME));
+        validateValue(fields.get(ConstantUtil.EMAIL));
 
         User user = User.from(fields);
         Database.addUser(user);
@@ -63,5 +64,11 @@ public class UserHandler implements ModelHandler<User>{
     @Override
     public List<User> findAll() {
         return Database.findAllUser().stream().toList();
+    }
+
+    public void validateValue(String value) {
+        if (value == null || value.isBlank()) {
+            throw new ModelException(ConstantUtil.INVALID_BODY);
+        }
     }
 }

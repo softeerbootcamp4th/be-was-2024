@@ -1,5 +1,7 @@
 package session;
 
+import util.ConstantUtil;
+
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -22,6 +24,10 @@ public class Session {
         this.expiredAt = time.plusMinutes(30); // 30분 뒤 만료
     }
 
+    public Session(String sessionId, String userId){
+        this(sessionId, userId, LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)));
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -34,7 +40,7 @@ public class Session {
      * 세션의 만료 시간을 갱신
      */
     public void updateSession() {
-        this.lastAccessedAt = LocalDateTime.now(ZoneId.of("GMT"));
+        this.lastAccessedAt = LocalDateTime.now(ZoneId.of(ConstantUtil.GMT));
         this.expiredAt = lastAccessedAt.plusMinutes(30);
     }
 
@@ -43,7 +49,7 @@ public class Session {
      * @return boolean
      */
     public boolean isExpired() {
-        return LocalDateTime.now(ZoneId.of("GMT")).isAfter(expiredAt);
+        return LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)).isAfter(expiredAt);
     }
 
     /**

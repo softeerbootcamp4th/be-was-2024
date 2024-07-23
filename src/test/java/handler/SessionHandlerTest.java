@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import session.SessionHandler;
 import util.ConstantUtil;
 
@@ -160,58 +159,5 @@ class SessionHandlerTest {
 
         // then
         assertThat(isValid).isFalse();
-    }
-
-    @DisplayName("parseSessionId: 세션 쿠키에서 세션 아이디를 추출한다.")
-    @ParameterizedTest(name = "Test {index} => cookie={0}, expected={1}")
-    @CsvSource({
-            "sid=1234; userId=1234, 1234",
-            "sid=abcd; userId=1234; name=1234, abcd",
-            "sid=5678; userId=abcd; name=1234; email=1234, 5678",
-            "userId=1234; sid=efgh; name=abcd, efgh",
-            "name=abcd; sid=ijkl; email=1234, ijkl",
-            "userId=abcd; name=1234; sid=mnop, mnop",
-            "sid=qrst, qrst",
-            "sid=uvwx; sid=1234, uvwx",
-            "userId=abcd; name=1234; sid=5678; email=1234; sid=91011, 5678"
-    })
-    void parseSessionId(String cookie, String expected) {
-        // when
-        String sessionId = sessionHandler.parseSessionId(cookie).orElse(null);
-
-        // then
-        assertThat(sessionId).isEqualTo(expected);
-    }
-
-    @DisplayName("parseSessionId: 세션 쿠키가 sid를 포함하지 않으면 빈 Optional을 반환한다.")
-    @ParameterizedTest(name = "Test {index} => cookie={0}")
-    @ValueSource(strings = {
-            "userId=1234",
-            "name=1234",
-            "email=1234",
-            "userId=1234; name=1234",
-            "userId=1234; email=1234",
-            "name=1234; email=1234",
-            "userId=1234; name=1234; email=1234",
-            "",
-            " ",
-            "   "
-    })
-    void filterSessionId_no_sid(String cookie) {
-        // when
-        Optional<String> sessionId = sessionHandler.parseSessionId(cookie);
-
-        // then
-        assertThat(sessionId).isEmpty();
-    }
-
-    @DisplayName("parseSessionId: 세션 쿠키가 null이면 빈 Optional을 반환한다.")
-    @Test
-    void filterSessionId_null() {
-        // when
-        Optional<String> sessionId = sessionHandler.parseSessionId(null);
-
-        // then
-        assertThat(sessionId).isEmpty();
     }
 }

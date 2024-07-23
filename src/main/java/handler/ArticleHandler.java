@@ -31,12 +31,13 @@ public class ArticleHandler implements ModelHandler<Article> {
      */
     @Override
     public Optional<Article> create(Map<String, String> fields) {
-        if (fields.size() != 3 || fields.values().stream().anyMatch(String::isBlank)) {
+        if (fields.size() < 3 || fields.size() > 4){
             throw new ModelException(ConstantUtil.INVALID_BODY);
         }
-        if(fields.get(ConstantUtil.TITLE) == null || fields.get(ConstantUtil.CONTENT) == null || fields.get(ConstantUtil.AUTHOR_NAME) == null){
-            throw new ModelException(ConstantUtil.INVALID_BODY);
-        }
+
+        validateValue(fields.get(ConstantUtil.TITLE));
+        validateValue(fields.get(ConstantUtil.CONTENT));
+        validateValue(fields.get(ConstantUtil.AUTHOR_NAME));
 
         Article article = Article.from(fields);
         return Optional.ofNullable(Database.addArticle(article));
@@ -59,5 +60,11 @@ public class ArticleHandler implements ModelHandler<Article> {
     @Override
     public List<Article> findAll() {
         return Database.findAllArticles().stream().toList();
+    }
+
+    private void validateValue(String value) {
+        if (value == null || value.isBlank()) {
+            throw new ModelException(ConstantUtil.INVALID_BODY);
+        }
     }
 }

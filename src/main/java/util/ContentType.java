@@ -36,6 +36,20 @@ public enum ContentType {
         return "text/plain;charset=utf-8";
     }
 
+    /**
+     * 지원하는 확장자인지 확인하는 메서드
+     * @param extension
+     * @return boolean
+     */
+    public static boolean isSupported(String extension) {
+        for (ContentType contentType : values()) {
+            if (contentType.extension.equals(extension)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String getExtension() {
         return extension;
     }

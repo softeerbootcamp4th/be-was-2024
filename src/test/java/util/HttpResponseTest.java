@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class HttpResponseTest {
 
-    @DisplayName("ok: 정상적인 응답을 생성한다.")
+    @DisplayName("forward: 정상적인 응답을 생성한다.")
     @ParameterizedTest(name = "path: {0}, httpVersion: {1}, body: {2}")
     @CsvSource(value = {
             "/css/styles.css, HTTP/1.1, body",
@@ -28,9 +28,9 @@ class HttpResponseTest {
             "/submit, HTTP/1.1, name=value&anothername=anothervalue",
             "/, HTTP/1.1, <html><body>Welcome</body></html>"
     })
-    void ok(String path, String httpVersion, String body) {
+    void forward(String path, String httpVersion, String body) {
         // when
-        HttpResponse response = HttpResponse.ok(path, httpVersion, body);
+        HttpResponse response = HttpResponse.forward(path, httpVersion, body);
 
         // then
         assertThat(response.getType()).isEqualTo(ConstantUtil.DYNAMIC);
@@ -42,12 +42,12 @@ class HttpResponseTest {
         assertThat(response.getTotalHeaders()).contains(ConstantUtil.CONTENT_TYPE);
     }
 
-    @DisplayName("okStatic: 정적 자원 요청에 대한 응답을 생성한다.")
+    @DisplayName("forward: 정적 자원 요청에 대한 응답을 생성한다.")
     @ParameterizedTest(name = "path: {0}, httpVersion: {1}")
     @CsvSource(value = {"/css/styles.css, HTTP/1.1", "/img/logo.png, HTTP/1.1"})
-    void okStatic(String path, String httpVersion) {
+    void forward(String path, String httpVersion) {
         // when
-        HttpResponse response = HttpResponse.okStatic(path, httpVersion);
+        HttpResponse response = HttpResponse.forward(path, httpVersion);
 
         // then
         assertThat(response.getType()).isEqualTo(ConstantUtil.STATIC);
@@ -103,9 +103,9 @@ class HttpResponseTest {
     @DisplayName("redirect: 리다이렉트 응답을 생성한다.")
     @ParameterizedTest(name = "path: {0}, httpVersion: {1}")
     @CsvSource(value = {"/login, HTTP/1.1", "/index, HTTP/1.1"})
-    void redirect(String path, String httpVersion) {
+    void sendRedirect(String path, String httpVersion) {
         // when
-        HttpResponse response = HttpResponse.redirect(path, httpVersion);
+        HttpResponse response = HttpResponse.sendRedirect(path, httpVersion);
 
         // then
         assertThat(response.getType()).isEqualTo(ConstantUtil.DYNAMIC);
@@ -121,7 +121,7 @@ class HttpResponseTest {
     @CsvSource(value = {"dajwkld", "dwkdlwl", "2dkljwdkld", "dwlkdwkldw"})
     void setSessionId(String sessionId) {
         // given
-        Session session = new Session(sessionId, "userId", LocalDateTime.now(ZoneId.of("GMT")));
+        Session session = new Session(sessionId, ConstantUtil.USER_ID, LocalDateTime.now(ZoneId.of(ConstantUtil.GMT)));
         HttpResponse response = new HttpResponse();
 
         // when

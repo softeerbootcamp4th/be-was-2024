@@ -2,6 +2,8 @@ package db;
 
 import model.Article;
 import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.ConstantUtil;
 
 import java.sql.*;
@@ -17,6 +19,7 @@ public class Database {
     private Database() {
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(Database.class);
     private static final String DB_URL = "jdbc:h2:~/test";
     private static final String DB_USER = "sa";
     private static final String DB_PASSWORD = "";
@@ -27,6 +30,11 @@ public class Database {
     static {
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              Statement statement = connection.createStatement()) {
+
+//            String deleteUserTableSQL = "DROP TABLE IF EXISTS \"User\"";
+//            String deleteArticleTableSQL = "DROP TABLE IF EXISTS \"Article\"";
+//            statement.execute(deleteUserTableSQL);
+//            statement.execute(deleteArticleTableSQL);
 
             String createUserTableSQL = "CREATE TABLE IF NOT EXISTS \"User\" (" +
                     "userId VARCHAR(255) PRIMARY KEY, " +
@@ -39,15 +47,10 @@ public class Database {
                     "articleId INT AUTO_INCREMENT PRIMARY KEY, " +
                     "title VARCHAR(255) NOT NULL, " +
                     "contents VARCHAR(255) NOT NULL, " +
-                    "authorName VARCHAR(255) NOT NULL" +
+                    "authorName VARCHAR(255) NOT NULL," +
+                    "imagePath VARCHAR(255) NOT NULL" +
                     ")";
 
-            /*
-            String deleteUserTableSQL = "DROP TABLE IF EXISTS \"User\"";
-            String deleteArticleTableSQL = "DROP TABLE IF EXISTS \"Article\"";
-            statement.execute(deleteUserTableSQL);
-            statement.execute(deleteArticleTableSQL);
-             */
             statement.execute(createUserTableSQL);
             statement.execute(createArticleTableSQL);
         } catch (SQLException e) {
@@ -82,7 +85,7 @@ public class Database {
      * @return articleId
      */
     public static Article addArticle(Article article) {
-        String sql = "INSERT INTO \"Article\" (title, contents, authorName) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO \"Article\" (title, contents, authorName, imagePath) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -90,12 +93,14 @@ public class Database {
             pstmt.setString(1, article.getTitle());
             pstmt.setString(2, article.getContent());
             pstmt.setString(3, article.getAuthorName());
+            pstmt.setString(4, article.getImagePath());
             pstmt.execute();
 
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     int id = rs.getInt(1);
-                    return Article.of(id + "", article.getTitle(), article.getContent(), article.getAuthorName());
+                    logger.debug("Article added: {}", article.toString());
+                    return Article.of(id + "", article.getTitle(), article.getContent(), article.getAuthorName(), article.getImagePath());
                 }
             }
         } catch (SQLException e) {
@@ -125,6 +130,7 @@ public class Database {
                         rs.getString(ConstantUtil.NAME),
                         rs.getString(ConstantUtil.EMAIL)
                 );
+                logger.debug("User found: {}", user.toString());
                 return Optional.of(user);
             }
 
@@ -154,8 +160,10 @@ public class Database {
                         rs.getString(ConstantUtil.ARTICLE_ID),
                         rs.getString(ConstantUtil.TITLE),
                         rs.getString(ConstantUtil.CONTENT),
-                        rs.getString(ConstantUtil.AUTHOR_NAME)
+                        rs.getString(ConstantUtil.AUTHOR_NAME),
+                        rs.getString(ConstantUtil.IMAGE_PATH)
                 );
+                logger.debug("Article found: {}", article.toString());
                 return Optional.of(article);
             }
 
@@ -189,6 +197,7 @@ public class Database {
                         rs.getString(ConstantUtil.NAME),
                         rs.getString(ConstantUtil.EMAIL)
                 );
+                logger.debug("User logged in: {}", user.toString());
                 return Optional.of(user);
             }
 
@@ -224,7 +233,7 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        logger.debug("Users found");
         return users;
     }
 
@@ -245,13 +254,15 @@ public class Database {
                         rs.getString(ConstantUtil.ARTICLE_ID),
                         rs.getString(ConstantUtil.TITLE),
                         rs.getString(ConstantUtil.CONTENT),
-                        rs.getString(ConstantUtil.AUTHOR_NAME)
+                        rs.getString(ConstantUtil.AUTHOR_NAME),
+                        rs.getString(ConstantUtil.IMAGE_PATH)
                 );
                 articles.add(article);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        logger.debug("Articles found");
         return articles;
     }
 

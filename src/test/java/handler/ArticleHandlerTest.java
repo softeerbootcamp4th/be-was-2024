@@ -30,7 +30,7 @@ class ArticleHandlerTest {
 
     private Map<String, String> createFields(String title, String content, String authorName) {
         return new HashMap<>
-                (Map.of(ConstantUtil.TITLE, title, ConstantUtil.CONTENT, content, ConstantUtil.AUTHOR_NAME, authorName));
+                (Map.of(ConstantUtil.TITLE, title, ConstantUtil.CONTENT, content, ConstantUtil.AUTHOR_NAME, authorName, ConstantUtil.IMAGE_PATH, "imagePath"));
     }
 
     @DisplayName("create: requestBody로부터 Article 객체를 생성하고 필드값을 확인한다.")
@@ -70,7 +70,7 @@ class ArticleHandlerTest {
     @Test
     void createWithWrongField() {
         // given
-        Map<String, String> fields = Map.of("wrong", "wrong", "wrong", "wrong", "wrong", "wrong");
+        Map<String, String> fields = Map.of("wrong", "wrong", "title", "wrong", "contents", "wrong");
 
         // when & then
         assertThatThrownBy(() -> articleHandler.create(fields))
