@@ -5,12 +5,14 @@ public class Post {
     private final String userId;
     private final String title;
     private final String content;
+    private final String path;
 
     private Post(Builder builder) {
         this.postId = builder.postId;
         this.userId = builder.userId;
         this.title = builder.title;
         this.content = builder.content;
+        this.path = builder.path;
     }
 
     public static class Builder {
@@ -18,6 +20,7 @@ public class Post {
         private String userId;
         private String title;
         private String content;
+        private String path;
 
         public Builder postId(int postId) {
             this.postId = postId;
@@ -36,6 +39,11 @@ public class Post {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder path(String path) {
+            this.path = path;
             return this;
         }
 
@@ -58,5 +66,9 @@ public class Post {
 
     public String getContent() {
         return content;
+    }
+
+    public String getPath() {
+        return path;
     }
 }
