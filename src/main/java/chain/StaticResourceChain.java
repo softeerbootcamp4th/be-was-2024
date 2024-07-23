@@ -6,6 +6,9 @@ import http.enums.HttpStatusType;
 import chain.core.MiddlewareChain;
 import route.routes.StaticResourceHandler;
 
+/**
+ * static 자원을 찾을 때 사용하는 체인
+ */
 public class StaticResourceChain extends MiddlewareChain {
     private final StaticResourceHandler resourceHandler;
 

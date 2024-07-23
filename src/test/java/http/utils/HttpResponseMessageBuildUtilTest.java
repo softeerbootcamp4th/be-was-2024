@@ -42,7 +42,7 @@ class HttpResponseMessageBuildUtilTest {
         MyHttpResponse response = new MyHttpResponse("HTTP/1.1");
         String body = "test";
 
-        byte[] expectedMessageBytes = "HTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\ntest".getBytes();
+        byte[] expectedMessageBytes = "HTTP/1.1 200 OK\r\ncontent-length: 4\r\n\r\ntest".getBytes();
 
         response.setBody(body.getBytes());
         response.setStatusInfo(HttpStatusType.OK);

@@ -1,12 +1,17 @@
 package routehandler.core.trie;
 
+import http.MyHttpRequest;
 import http.enums.HttpMethodType;
 import routehandler.core.IRouteHandler;
+import routehandler.core.exception.NoMatchedMethodException;
 import routehandler.utils.RouteUtil;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 전체 경로 중 /로 구분되는 한 path segment를 라우팅하는 노드
+ */
 public class RouteTrieNode {
     private final Map<String, RouteTrieNode> children;
     private RouteTrieNode pathVariableNode;
@@ -43,6 +48,15 @@ public class RouteTrieNode {
      * @param pathSegment / 을 기준으로 나눈 각 pathname의 부분
      * @return 다음 노드 (nullable)
      */
+    public RouteTrieNode nextForSearch(String pathSegment, MyHttpRequest req) {
+        // 구체적으로 매칭되는 노드가 있다면 반환하고, 없으면 pathVariableNode 반환
+        RouteTrieNode node = children.get(pathSegment);
+        if (node != null) return node;
+
+        if(pathVariableNode != null) req.setPathVariable(pathVariableName, pathSegment);
+        return pathVariableNode;
+    }
+
     public RouteTrieNode nextForSearch(String pathSegment) {
         // 구체적으로 매칭되는 노드가 있다면 반환하고, 없으면 pathVariableNode 반환
         return children.getOrDefault(pathSegment, pathVariableNode);
@@ -60,7 +74,7 @@ public class RouteTrieNode {
     public IRouteHandler getHandler(HttpMethodType method) {
         IRouteHandler handler = handlers.get(method);
         // 핸들러가 없다면 예외 상황
-        if(handler == null) throw new RuntimeException("No handler for method " + method);
+        if(handler == null) throw new NoMatchedMethodException("No handler for method " + method);
 
         return handler;
     }

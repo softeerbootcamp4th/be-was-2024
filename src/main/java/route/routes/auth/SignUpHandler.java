@@ -1,6 +1,6 @@
 package route.routes.auth;
 
-import db.Database;
+import db.tables.UserTable;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
 import http.enums.HttpStatusType;
@@ -33,7 +33,7 @@ public class SignUpHandler implements IRouteHandler {
         };
 
         User user = new User(userId, password, name, email);
-        Database.addUser(user);
+        UserTable.addUser(user);
         logger.debug("success to create user {}", user);
 
         res.redirect("/");

@@ -1,6 +1,6 @@
 package route.auth;
 
-import db.Database;
+import db.tables.UserTable;
 import http.MyHttpHeaders;
 import http.MyHttpRequest;
 import http.MyHttpResponse;
@@ -23,7 +23,7 @@ class SignInHandlerTest {
     @BeforeAll
     static void setUp() {
         User user = new User("id", "password", null, null);
-        Database.addUser(user);
+        UserTable.addUser(user);
     }
 
     @Test

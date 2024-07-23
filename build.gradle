@@ -18,6 +18,8 @@ dependencies {
     testImplementation 'org.assertj:assertj-core:3.16.1'
 
     testImplementation "org.mockito:mockito-core:3.+"
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    implementation 'com.h2database:h2:2.3.230'
 }
 
 test {

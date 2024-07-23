@@ -5,6 +5,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 뷰 빌더
+ */
 public class ViewBuilder {
 
     // original view를 적절한 형태로 변환한다.
@@ -22,7 +25,6 @@ public class ViewBuilder {
             int end = blockMatcher.start();
             builder.append(template, nextStart, end);
             nextStart = blockMatcher.end();
-            System.out.println(blockMatcher.start() + blockMatcher.end());
             // block의 attributes / body부 캡쳐
             String attrString = blockMatcher.group(1);
             String body = blockMatcher.group(3);

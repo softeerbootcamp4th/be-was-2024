@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * 세션 저장소
+ */
 public class MySession {
     private static final Map<String, Object> sessionStore = new HashMap<>();
 

@@ -11,7 +11,7 @@
     <header class="header">
         <a href="/"><img src="/img/signiture.svg" /></a>
         <ul class="header__menu">
-            <my-template if-not="user">
+            <my-template if-not='@auth_user'>
                 <li class="header__menu__item">
                     <a class="btn btn_contained btn_size_s" href="/login">로그인</a>
                 </li>
@@ -21,8 +21,8 @@
                     </a>
                 </li>
             </my-template>
-            <my-template if="user">
-                <li>{user.name} 님, 안녕하세요!</li>
+            <my-template if='@auth_user'>
+                <li>{@auth_user.name} 님, 안녕하세요!</li>
                 <li class="header__menu__item">
                     <form method="post" action="/auth/signout">
                         <button class="btn btn_ghost btn_size_s" type="submit">로그아웃</button>

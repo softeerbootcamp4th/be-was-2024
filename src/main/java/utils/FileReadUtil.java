@@ -1,5 +1,6 @@
 package utils;
 
+import config.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webserver.RequestHandler;
@@ -9,7 +10,7 @@ import java.io.*;
 public class FileReadUtil {
     private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
     /**
-     * 파일 경로에서 데이터를 읽어오는 메서드. 길이 0의 파일을 읽는 것과 파일을 읽지 않는 것은 다르다.
+     * 클래스 경로에서 데이터를 읽어오는 메서드. 길이 0의 파일을 읽는 것과 파일을 읽지 않는 것은 다르다.
       */
     public static byte[] read(String filePath) throws IOException {
         // classloader로 경로를 얻는 경우 처음에 슬래시가 오면 안된다.
@@ -25,6 +26,18 @@ public class FileReadUtil {
             logger.error(e.getMessage());
             throw e;
         }
+    }
 
+    /**
+     * 파일 경로에서 데이터를 읽어오는 메서드
+     */
+    public static byte[] readFromLocal(String filePath) throws IOException {
+        String _filename = filePath.startsWith("/") ? filePath.substring(1) : filePath;
+        try(FileInputStream fis = new FileInputStream(AppConfig.FILE_SRC +  _filename)) {
+            return fis.readAllBytes();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw e;
+        }
     }
 }

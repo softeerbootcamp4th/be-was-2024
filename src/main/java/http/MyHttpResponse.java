@@ -6,13 +6,10 @@ import http.enums.HttpStatusType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.FileReadUtil;
-import view.ViewBuilder;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * http response을 표현하는 클래스
+ */
 public class MyHttpResponse {
     private static Logger logger = LoggerFactory.getLogger(MyHttpResponse.class);
 
@@ -32,7 +29,6 @@ public class MyHttpResponse {
 
     /**
      * 쿠키 모음 객체를 반환한다.
-     * @return
      */
     public MyCookies getCookies() {
         return cookies;
@@ -47,8 +43,7 @@ public class MyHttpResponse {
     }
 
     /**
-     * 헤더 객체를 반환한다. 쿠키를 설정하고 싶은 경우, 헤더 대신 getCookies를 사용.
-     * @return
+     * 헤더 객체를 반환한다. 쿠키를 설정하고 싶은 경우, 헤더 대신 getCookies 를 사용.
      */
     public MyHttpHeaders getHeaders() {
         return headers;
@@ -62,10 +57,6 @@ public class MyHttpResponse {
         return body;
     }
 
-    /**
-     * 응답 상태를 지정한다
-     * @param statusInfo 응답 상태
-     */
     public void setStatusInfo(HttpStatusType statusInfo) {
         this.statusInfo = statusInfo;
     }

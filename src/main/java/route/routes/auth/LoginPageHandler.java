@@ -16,6 +16,5 @@ public class LoginPageHandler implements IRouteHandler {
     public void handle(MyHttpRequest req, MyHttpResponse res) {
         res.setStatusInfo(HttpStatusType.OK);
         MyView.render(req, res, "/login/index", new HashMap<>());
-//        res.send("/login/index.html");
     }
 }

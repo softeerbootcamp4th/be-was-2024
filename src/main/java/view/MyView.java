@@ -12,12 +12,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * View를 제공하는 클래스
+ */
 public class MyView {
     private static final Logger logger = LoggerFactory.getLogger(MyView.class);
 
     public static void render(MyHttpRequest req, MyHttpResponse res, String path, Map<String,Object> items) {
+
         Map<String, Object> _items = new HashMap<>(req.getStore());
-        _items.putAll(items);
+        if(items != null ) _items.putAll(items);
 
         try {
             byte[] template = FileReadUtil.read(AppConfig.TEMPLATE_BASE_PATH + path + ".html");
@@ -31,5 +35,9 @@ public class MyView {
             res.setBody(new byte[0]);
             res.setStatusInfo(HttpStatusType.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public static void render(MyHttpRequest req, MyHttpResponse res, String path) {
+        render(req, res, path, null);
     }
 }

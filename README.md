@@ -102,17 +102,79 @@ classDiagram
         + next(req, res)
     }
     MiddlewareChain o-- MiddlewareChain
+
+    class RouteTrie
+    class RouteTrieNode
     
     class RouteHandleChain {
         - List&lt;IRouteHandler&gt; routeHandlers
         
     }
-    RouteHandleChain o-- IRouteHandler
+    RouteHandleChain  ..>  RouteTrie : «create»
+   
     RouteHandleChain --|> MiddlewareChain
     StaticResourceChain --|> MiddlewareChain
     
-    class IRouteHandler {
-        <<interface>>
-    }
-    
 ```
+미들웨어는 요청 & 응답을 이용하여 작업을 수행하는 단위로, 자신의 작업을 마친 후 next 메서드를 호출하여 다른 미들웨어에게 작업을 넘길 수 있다. 요청 - 응답 프로세스 중 새로운 작업이 필요한 경우, 새로운 미들웨어로 구현하여 등록한다.
+
+- 유저 세션 관리
+- static 파일 제공
+- upload 파일 제공
+- 권한 확인 및 거부
+- 라우팅
+
+## 라우팅 구조
+```mermaid
+classDiagram
+ RouteHandleChain "1" *--> "trie 1" RouteTrie
+    RouteTrie "1" *--> "root 1" RouteTrieNode
+    RouteTrieNode "1" *--> "handlers *" HttpMethodType
+    RouteTrieNode "1" *--> "handlers *" IRouteHandler
+```
+현재 프로젝트에서 라우팅은 Trie 자료구조 기반으로 동작한다. 각 노드는 pathname을 '/' 단위로 자른 path segment에 대응되며, 다음 path segment에 대한 라우팅 책임을 가진다.
+- RouteTrie: 라우팅을 위한 Trie 자료구조
+- RouteTrieNode: 하나의 path segment를 담당하는 노드
+- IRouteHandler: HTTP Method 및 경로에 매칭되는 핸들러
+
+### 동작 방식
+```mermaid
+
+flowchart TD
+    node1["/"users]
+    node1_handlers[handlers]
+    node1_get[GET:\nUserListHandler]
+    node1_post[POST:\nUserCreateHandler]
+    node1_nodes[next_nodes]
+    node1_var["/{id}"]
+    node1_var_handlers[handlers]
+    node1_var_get[GET:\nUserFindOneHandler]
+    node1_var_patch[PATCH:\nUserUpdateHandler]
+    
+    node2["/list"]
+    node2_handlers[handlers]
+    node2_get[GET:\nUserListPageHandler]
+    node3["/write"]
+    node3_handlers[handlers]
+    node3_get[GET:\nUserWritePageHandler]
+    
+    node1 --> node1_var
+    node1 --> node1_handlers
+    node1_handlers --> node1_get
+    node1_handlers --> node1_post
+    node1_var --> node1_var_handlers
+    node1_var_handlers-->node1_var_get
+    node1_var_handlers-->node1_var_patch
+    node1 --> node1_nodes
+    node1_nodes --> node2
+    node1_nodes --> node3
+    node2 --> node2_handlers
+    node2_handlers --> node2_get
+    node3 --> node3_handlers
+    node3_handlers --> node3_get
+```
+1. RouteTrie에 pathname이 도착한다.
+2. pathname을 / 단위로 쪼갠다. /hello/world라면, hello와 world가 path segment가 된다.
+3. RouteTrie의 root 노드부터 시작해 path segment를 노드에 매칭한다.
+4. 경로가 매칭되지 않는다면, path variable이 있는지 검사한다. 있다면 현재 path segment를 path variable로 간주하고 경로를 계속 탐색한다.
+5. 최종 매칭된 노드에 요청된 http method에 대한 핸들러가 있다면 반환한다.
