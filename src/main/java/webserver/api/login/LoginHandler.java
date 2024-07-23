@@ -1,20 +1,19 @@
 package webserver.api.login;
 
-import db.Database;
-import model.User;
+import model.post.PostDAO;
+import model.user.User;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
-import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
 import webserver.http.enums.Extension;
+import webserver.session.SessionDAO;
+import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
-import webserver.session.Session;
 import webserver.util.ParamsParser;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Map;
 import java.util.Objects;
 
@@ -33,10 +32,11 @@ public class LoginHandler implements FunctionHandler {
     public HttpResponse function(HttpRequest request) throws IOException {
         String body = new String(request.getBody(), StandardCharsets.UTF_8);
         Map<String, String> params = ParamsParser.parseParams(body);
+        UserDAO userDAO = new UserDAO();
 
         String id =params.get("id");
         String password = params.get("password");
-        User user = Database.findUserById(id);
+        User user = userDAO.getUser(id);
 
         // if user information is not valid
         if(id == null || id.isEmpty()
@@ -44,19 +44,20 @@ public class LoginHandler implements FunctionHandler {
                 || user == null || !Objects.equals(user.getPassword(), password)){
             return new HttpResponse.ResponseBuilder(401)
                     .addheader("Content-Type", Extension.HTML.getContentType())
-                    .setBody(PageBuilder.buildFailedLoginPage())
+                    .setBody(HtmlFiles.readHtmlByte(HtmlFiles.LOGIN_FAILED))
                     .build();
-
         }
 
         // if user information is valid
-        String sessionString = Session.createSession(user);
+        SessionDAO sessionDAO = new SessionDAO();
+        sessionDAO.deleteSessionByUserid(user.getUserId());
+        String sessionString = sessionDAO.insertSession(user.getUserId());
 
         //go to logined main page
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", Extension.HTML.getContentType())
                 .addheader("Set-Cookie","sid="+sessionString +"; Max-Age=3600; Path=/") //set cookie
-                .setBody(PageBuilder.buildLoggedinPage(user.getName()))
+                .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
                 .build();
     }
 }

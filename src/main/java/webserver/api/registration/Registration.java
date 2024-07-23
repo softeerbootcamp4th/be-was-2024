@@ -1,7 +1,6 @@
 package webserver.api.registration;
 
-import db.Database;
-import model.User;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -35,7 +34,7 @@ public class Registration implements FunctionHandler {
 
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
-
+        UserDAO userDAO = new UserDAO();
         String body = URLDecoder.decode(new String(request.getBody()),StandardCharsets.UTF_8) ;
 
 
@@ -72,13 +71,13 @@ public class Registration implements FunctionHandler {
                     .build();
         }
 
-        if(Database.findUserById(id) !=null){
+        if(userDAO.getUser(id) !=null){
             return new HttpResponse.ResponseBuilder(422)
                     .addheader("Content-Type", "text/html; charset=utf-8")
                     .setBody(PageBuilder.buildRegistrationFailedPage("아이디가 중복되었습니다"))
                     .build();
         }
-        Database.addUser(new User(id, password, username, email));
+        userDAO.insertUser(id, username, email, password);
 
         return new HttpResponse.ResponseBuilder(302)
                 .addheader("Location", "http://localhost:8080/")

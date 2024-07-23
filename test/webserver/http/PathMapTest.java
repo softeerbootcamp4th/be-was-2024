@@ -7,10 +7,13 @@ import webserver.api.login.LoginHandler;
 import webserver.api.logout.LogoutHandler;
 import webserver.api.FunctionHandler;
 import webserver.api.ReadFileHandler;
+import webserver.api.pagehandler.MainPageHandler;
 import webserver.api.pagehandler.RegistrationPageHandler;
 import webserver.api.registration.Registration;
 import webserver.http.enums.Methods;
 import webserver.http.path.PathMap;
+
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,13 +21,15 @@ class PathMapTest {
 
     @DisplayName("check finding registration function")
     @Test
-    void getPathMethodTest(){
+    void getPathMethodTest() throws IOException {
         //given
         Methods method = Methods.POST;
         String path = "/create";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path , null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), Registration.class);
@@ -32,13 +37,15 @@ class PathMapTest {
 
     @DisplayName("check reading file function")
     @Test
-    void getReadFileTest(){
+    void getReadFileTest() throws IOException {
         //given
         Methods method = Methods.GET;
         String path = "/resource";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path , null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), ReadFileHandler.class);
@@ -46,13 +53,15 @@ class PathMapTest {
 
     @DisplayName("check login file function")
     @Test
-    void getLoginTest(){
+    void getLoginTest() throws IOException {
         //given
         Methods method = Methods.POST;
         String path = "/login";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path , null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), LoginHandler.class);
@@ -60,13 +69,15 @@ class PathMapTest {
 
     @DisplayName("check logout file function")
     @Test
-    void getLogoutTest(){
+    void getLogoutTest() throws IOException {
         //given
         Methods method = Methods.GET;
         String path = "/logout";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path, null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), LogoutHandler.class);
@@ -75,13 +86,15 @@ class PathMapTest {
 
     @DisplayName("check unauthorized access")
     @Test
-    void unauthorizedTest(){
+    void unauthorizedTest() throws IOException {
         //given
         Methods method = Methods.GET;
         String path = "/user/login";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path, null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), Unauthorized.class);
@@ -89,17 +102,36 @@ class PathMapTest {
 
     @DisplayName("check pagehanlder access")
     @Test
-    void pagehandlerTest(){
+    void pagehandlerTest() throws IOException {
         //given
         Methods method = Methods.GET;
         String path = "/registration";
 
         //when
-        FunctionHandler function = PathMap.getPathMethod(method, path, null);
+        FunctionHandler function = PathMap.getPathMethod(
+                new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build()
+        );
 
         //then
         assertEquals(function.getClass(), RegistrationPageHandler.class);
     }
+
+    @DisplayName("check pathvariable access")
+    @Test
+    void pathvariableTest() throws IOException {
+        //given
+        Methods method = Methods.GET;
+        String path = "/post/3";
+
+        HttpRequest request = new HttpRequest.ReqeustBuilder(method.getMethod() + " "+path+" HTTP/1.1").build();
+        //when
+        FunctionHandler function = PathMap.getPathMethod(request);
+
+        //then
+        assertEquals(function.getClass(), MainPageHandler.class);
+        assertEquals(request.getPathVariables().get("postid"), "3");
+    }
+
 
 
 }

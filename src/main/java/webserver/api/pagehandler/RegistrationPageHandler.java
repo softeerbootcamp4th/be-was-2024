@@ -3,8 +3,8 @@ package webserver.api.pagehandler;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
-import webserver.http.response.PageBuilder;
-import webserver.session.Session;
+import webserver.session.SessionDAO;
+import webserver.util.HtmlFiles;
 
 import java.io.IOException;
 
@@ -23,8 +23,9 @@ public class RegistrationPageHandler implements FunctionHandler {
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();
+        SessionDAO sessionDAO = new SessionDAO();
 
-        if(sessionid !=null && Session.getSession(sessionid) != null){
+        if(sessionid !=null && sessionDAO.findSession(sessionid) != null){
             return new HttpResponse.ResponseBuilder(302)
                     .addheader("Location", "http://localhost:8080/")
                     .addheader("Content-Type", "text/html; charset=utf-8")
@@ -33,7 +34,7 @@ public class RegistrationPageHandler implements FunctionHandler {
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(PageBuilder.buildRegistrationPage())
+                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.REGISTER))
                 .build();
 
 

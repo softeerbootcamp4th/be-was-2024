@@ -1,7 +1,5 @@
 package webserver.api.pagehandler;
 
-import db.Database;
-import model.User;
 import webserver.api.FunctionHandler;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
@@ -19,21 +17,6 @@ public class UserListPageHandler implements FunctionHandler {
 
         return single_instance;
     }
-
-
-    private static final String userlistFormat1 =
-            "<!DOCTYPE html>"
-            + "<html>"
-            + "<head>"
-            + "<meta charset=\"UTF-8\">"
-            + "</head>"
-            + "<body>"
-            + "<ul>";
-
-    private static final String getUserlistFormat2 =
-            "</ul>"
-            + "</body>"
-            +"</html>";
 
 
     @Override

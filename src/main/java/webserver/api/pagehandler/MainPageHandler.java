@@ -1,16 +1,16 @@
 package webserver.api.pagehandler;
 
-import model.User;
+import model.post.PostDAO;
+import model.user.User;
+import model.user.UserDAO;
 import webserver.api.FunctionHandler;
-import webserver.http.response.HtmlFiles;
 import webserver.http.HttpRequest;
 import webserver.http.HttpResponse;
+import webserver.session.SessionDAO;
+import webserver.util.HtmlFiles;
 import webserver.http.response.PageBuilder;
-import webserver.session.Session;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 public class MainPageHandler implements FunctionHandler {
     //singleton pattern
@@ -25,18 +25,20 @@ public class MainPageHandler implements FunctionHandler {
     @Override
     public HttpResponse function(HttpRequest request) throws IOException {
         String sessionid = request.getSessionid();
+        SessionDAO sessionDAO = new SessionDAO();
+        UserDAO userDAO = new UserDAO();
 
-        if(sessionid !=null && Session.getSession(sessionid) != null){
-            User user = Session.getSession(sessionid);
+        if(sessionid !=null && sessionDAO.findSession(sessionid) != null){
+            User user = userDAO.getUser(sessionDAO.findSession(sessionid));
             return new HttpResponse.ResponseBuilder(200)
                     .addheader("Content-Type", "text/html; charset=utf-8")
-                    .setBody(PageBuilder.buildLoggedinPage(user.getName()))
+                    .setBody(PageBuilder.buildLoggedinPage(user.getName(),null))
                     .build();
         }
 
         return new HttpResponse.ResponseBuilder(200)
                 .addheader("Content-Type", "text/html; charset=utf-8")
-                .setBody(PageBuilder.buildMainPage())
+                .setBody(HtmlFiles.readHtmlByte(HtmlFiles.MAIN_PAGE))
                 .build();
     }
 }
