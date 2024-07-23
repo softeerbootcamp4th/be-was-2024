@@ -16,7 +16,7 @@ public class PostDatabase {
     private static final String dbPassword = "";
 
     public static void addPost(Post newPost) {
-        String sqlInsert = "INSERT INTO Posts (userId, title, content) VALUES (?, ?, ?)";
+        String sqlInsert = "INSERT INTO Posts (userId, title, content, path) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
              PreparedStatement pstmt = conn.prepareStatement(sqlInsert)) {
@@ -24,6 +24,7 @@ public class PostDatabase {
             pstmt.setString(1, newPost.getUserId());
             pstmt.setString(2, newPost.getTitle());
             pstmt.setString(3, newPost.getContent());
+            pstmt.setString(4, newPost.getPath());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
