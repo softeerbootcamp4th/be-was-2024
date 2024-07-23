@@ -6,6 +6,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Base64;
 
 public class ResourceUtil {
     public byte[] getByteArray(String url) throws IOException {
@@ -22,6 +23,18 @@ public class ResourceUtil {
         }
 
         return body;
+    }
+
+    public String getImageAsBase64(String path) throws IOException {
+        File image = new File(path);
+        byte[] imageByte = new byte[(int) image.length()];
+
+        try (FileInputStream fileInputStream = new FileInputStream(image);
+             BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream)) {
+            bufferedInputStream.read(imageByte);
+        }
+
+        return Base64.getEncoder().encodeToString(imageByte);
     }
 
     // content-type을 반환하기 위한 메소드
