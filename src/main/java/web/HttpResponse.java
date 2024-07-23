@@ -5,6 +5,9 @@ import java.io.OutputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * HTTP 응답에 대한 정보를 담는 POJO
+ */
 public class HttpResponse {
 
     private String httpVersion;
@@ -107,16 +110,16 @@ public class HttpResponse {
                 .append(statusCode.getMessage()).append("\n");
 
         if(!location.isEmpty()) {
-            response.append("Location: ").append(location).append("\r\n");
+            response.append(HeaderKey.LOCATION.getKey()).append(": ").append(location).append("\r\n");
         }
         if(contentLength > 0) {
-            response.append("Content-Length: ").append(contentLength).append("\r\n");
+            response.append(HeaderKey.CONTENT_LENGTH.getKey()).append(": ").append(contentLength).append("\r\n");
         }
         if(!contentType.isEmpty()) {
-            response.append("Content-Type: ").append(contentType).append("\r\n");
+            response.append(HeaderKey.CONTENT_TYPE.getKey()).append(": ").append(contentType).append("\r\n");
         }
         if(!cookie.isEmpty()) {
-            response.append("Set-cookie: ");
+            response.append(HeaderKey.SET_COOKIE.getKey()).append(": ");
             for(String name : cookie.keySet()) {
                 String value = cookie.get(name);
                 response.append(name).append("=").append(value).append(";");

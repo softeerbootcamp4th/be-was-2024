@@ -3,6 +3,9 @@ package web;
 import java.util.LinkedList;
 import java.util.Map;
 
+/**
+ * HTTP 요청에 대한 정보를 담는 POJO
+ */
 public class HttpRequest {
 
     private HttpMethod method;

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Deprecated
 public class UserDatabase {
     private static Map<String, User> users = new ConcurrentHashMap<>();
 

@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * Session POJO
+ */
 public class Session {
     private final String id;
     private long age;

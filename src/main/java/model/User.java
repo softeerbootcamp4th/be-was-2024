@@ -1,5 +1,8 @@
 package model;
 
+/**
+ * User POJO
+ */
 public class User {
     private String userId;
     private String password;

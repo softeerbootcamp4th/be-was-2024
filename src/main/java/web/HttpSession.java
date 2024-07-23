@@ -2,6 +2,9 @@ package web;
 
 import common.StringUtils;
 
+/**
+ * HTTP 세션에 대한 정보를 담는 POJO
+ */
 public class HttpSession {
 
     private String name;

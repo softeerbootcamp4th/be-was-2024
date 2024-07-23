@@ -1,5 +1,8 @@
 package web;
 
+/**
+ * MIME과 적절한 Content-type을 매핑
+ */
 public enum MIME {
     HTML("html", "text/html"),
     CSS("css", "text/css"),
@@ -10,6 +13,7 @@ public enum MIME {
     SVG("svg", "image/svg+xml"),
     JSON("json", "application/json"),
     FORM("form", "application/x-www-form-urlencoded"),
+    MULTIPART("multipart", "multipart/form-data"),
     UNKNOWN("default", "*/*");
 
     private final String key;

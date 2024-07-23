@@ -1,5 +1,8 @@
 package web;
 
+/**
+ * HTTP Status Code 정보를 저장하는 enum 클래스
+ */
 public enum ResponseCode {
     // 2xx
     OK("200", "OK"),

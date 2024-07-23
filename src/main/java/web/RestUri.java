@@ -1,11 +1,15 @@
 package web;
 
+/**
+ * 요청 uri 정리
+ */
 public enum RestUri {
-    SIGN_UP("/signUp"),
-    SIGN_IN("/signIn"),
+    REGISTRATION("/registration"),
+    LOGIN("/login"),
     LOGOUT("/logout"),
     USER_LIST("/user/list"),
-    DATABASE_INIT("/database/init");
+    DATABASE_INIT("/database/init"),
+    ARTICLE("/article");
 
     private final String uri;
 

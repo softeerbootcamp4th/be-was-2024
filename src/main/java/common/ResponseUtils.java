@@ -7,6 +7,9 @@ import web.ViewPath;
 
 import java.util.Map;
 
+/**
+ * 케이스에 따라서 다양한 HttpResponse 객체를 생성하기 위한 클래스
+ */
 public class ResponseUtils {
 
     public static HttpResponse redirectToView(ViewPath viewPath) {
@@ -56,6 +59,12 @@ public class ResponseUtils {
     public static HttpResponse responseBadRequest() {
         return new HttpResponse.HttpResponseBuilder()
                 .code(ResponseCode.BAD_REQUEST)
+                .build();
+    }
+
+    public static HttpResponse responseNotFound() {
+        return new HttpResponse.HttpResponseBuilder()
+                .code(ResponseCode.NOT_FOUND)
                 .build();
     }
 
