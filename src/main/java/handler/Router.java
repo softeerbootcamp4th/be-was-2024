@@ -30,20 +30,23 @@ public class Router {
 
         return switch (requestTarget) {
             case PATH_ROOT -> serveRootPage(httpRequest);
-            case PATH_REGISTRATION, PATH_LOGIN, PATH_ARTICLE, PATH_COMMENT ->
+            case PATH_REGISTRATION, PATH_LOGIN, PATH_COMMENT ->
                     serveStaticFile(requestTarget + FILE_INDEX);
+            case PATH_ARTICLE -> GetHandler.postArticle(httpRequest);
             case PATH_LOGOUT -> logout(httpRequest);
             case PATH_USER + PATH_LIST -> getUserList(httpRequest);
+            case "/articles" -> getAllArticles(httpRequest);
             default -> serveStaticFile(requestTarget);
         };
     }
 
-    private static HttpResponse postRequestMapping(HttpRequest httpRequest) {
+    private static HttpResponse postRequestMapping(HttpRequest httpRequest) throws IOException {
         String requestUrl = httpRequest.getRequestUrl();
 
         return switch (requestUrl) {
             case PATH_USER + PATH_CREATE -> createUser(httpRequest);
             case PATH_USER + PATH_LOGIN -> loginUser(httpRequest);
+            case PATH_ARTICLE -> PostHandler.postArticle(httpRequest);
             default -> throw new IllegalStateException("Unexpected value: " + requestUrl);
         };
     }

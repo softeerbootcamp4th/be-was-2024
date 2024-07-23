@@ -1,16 +1,23 @@
 package handler;
 
-import db.Session;
+import db.ArticleDatabase;
+import db.SessionDatabase;
 import http.HttpResponse;
 import processer.UserProcessor;
 import util.exception.CustomException;
 import http.HttpRequest;
 import http.HttpStatus;
 
+import java.util.HashMap;
+
 import static util.Constants.*;
 import static util.TemplateEngine.showAlert;
+import static util.Utils.cookieParsing;
 
 public class PostHandler {
+    private static final ArticleDatabase articleDatabase = new ArticleDatabase();
+
+
     static HttpResponse createUser(HttpRequest httpRequest) {
         String body = new String(httpRequest.getBody());
 
@@ -57,7 +64,7 @@ public class PostHandler {
             String password = bodyTokens[1].split(REG_EQ)[1];
 
             UserProcessor.loginUser(userId, password);
-            String sid = Session.createSession(userId);
+            String sid = SessionDatabase.createSession(userId);
 
             response.addStatus(HttpStatus.FOUND)
                     .addHeader(LOCATION, PATH_ROOT)
@@ -76,4 +83,23 @@ public class PostHandler {
                 .addHeader(CONTENT_TYPE, TEXT_HTML);
         return response;
     }
+
+    static HttpResponse postArticle(HttpRequest httpRequest) {
+        String cookie = httpRequest.getHeaders(COOKIE);
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get(SID);
+
+        String userId = SessionDatabase.getUser(sid);
+
+        String body = new String(httpRequest.getBody());
+        String text = body.split("=")[1].trim();
+
+        articleDatabase.createArticle(userId, text, "");
+
+        return new HttpResponse()
+                .addStatus(HttpStatus.FOUND)
+                .addHeader(LOCATION, PATH_ROOT)
+                .addBody(new byte[0]);
+    }
+
 }

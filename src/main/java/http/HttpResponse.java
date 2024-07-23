@@ -9,7 +9,7 @@ public class HttpResponse {
     HashMap<String, String> headers = new HashMap<>();
     byte[] body;
 
-
+    /// 필수적인 필드값은 생성자에 넣어서 생성되도록 -> HttpStatus 같은 경우는 무조건 있어야 함, final 붙여주기
     public String getStatusLine(){
         return HTTP_VERSION + httpStatus.getStatus() + " " + httpStatus.getMessage() + "\r\n";
     }
@@ -17,6 +17,7 @@ public class HttpResponse {
     public String getHeader(String key){
         return headers.get(key);
     }
+
     public String getHeaders(){
         StringBuilder header = new StringBuilder();
         for (String key : headers.keySet()) {

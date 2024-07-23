@@ -37,7 +37,6 @@ public class Constants {
     public static String STATIC_PATH;
     public static final String PATH_HOST = "http://localhost:8080";
     public static final String PATH_ROOT = "/";
-    public static final String PATH_MAIN = "/main";
     public static final String PATH_USER = "/user";
     public static final String PATH_CREATE = "/create";
     public static final String PATH_LIST = "/list";
@@ -50,7 +49,8 @@ public class Constants {
 
     // static file
     public static final String FILE_INDEX = "/index.html";
-    public static final String FILE_LIST = "/userList.html";
+    public static final String FILE_USER_LIST = "/userList.html";
+    public static final String FILE_ARTICLE_LIST = "/articleList.html";
     public static final String FILE_NOT_FOUND = "/NOT_FOUND.html";
 
     //html
@@ -59,9 +59,16 @@ public class Constants {
     public static final String TABLE_DATA_START = "<td>";
     public static final String TABLE_DATA_END = "</td>";
 
+    //database
+    public static String JDBC_URL_ARTICLE;
+    public static String JDBC_URL_USER;
+    public static String JDBC_URL_SESSION;
+    public static String H2_USERNAME;
+    public static String H2_PASSWORD;
 
 
     private static final Properties properties = new Properties();
+
     static {
         try (InputStream input = Utils.class.getClassLoader().getResourceAsStream("config.properties")) {
             if (input == null) {
@@ -69,6 +76,11 @@ public class Constants {
             }
             properties.load(input);
             STATIC_PATH =  properties.getProperty("staticPath");
+            JDBC_URL_ARTICLE = properties.getProperty("jdbc_url_article");
+            JDBC_URL_USER = properties.getProperty("jdbc_url_user");
+            JDBC_URL_SESSION = properties.getProperty("jdbc_url_session");
+            H2_USERNAME = properties.getProperty("database_username");
+            H2_PASSWORD = properties.getProperty("database_password");
         } catch (IOException e) {
             logger.error(e.getMessage());
         }

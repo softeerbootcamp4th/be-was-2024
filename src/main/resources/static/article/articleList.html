@@ -5,21 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <link href="../reset.css" rel="stylesheet"/>
     <link href="../global.css" rel="stylesheet"/>
-    <link href="../main.css" rel="stylesheet"/>
     <style>
         table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed; /* Ensure fixed table layout */
         }
 
         table, th, td {
             border: 1px solid black;
             padding: 8px;
             text-align: left;
+            word-wrap: break-word; /* Allow words to break and wrap */
+            overflow-wrap: break-word; /* Ensure words break within the cell */
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #f1f1f1;
+        }
+
+        tr:hover td {
+            background-color: #f5f5f5; /* Change this color as needed */
         }
     </style>
 </head>
@@ -28,29 +34,29 @@
     <header class="header">
         <a href="/"><img src="../img/signiture.svg"/></a>
         <ul class="header__menu">
+            <div class="btn_size_s">
+                {{userName}}{{msg}}
+            </div>
             <li class="header__menu__item">
-                <div class="btn  btn_size_s">
-                    {{userName}}님 반갑습니다.
-                </div>
+                <a class="btn btn_contained btn_size_s" href="{{LoginOrArticle}}">{{loginButton}}</a>
             </li>
             <li class="header__menu__item">
-                <a class="btn btn_contained btn_size_s" href="/article">글쓰기</a>
-            </li>
-            <li class="header__menu__item">
-                <a class="btn btn_ghost btn_size_s" href="/logout">
-                    로그아웃
+                <a class="btn btn_ghost btn_size_s" href="{{RegistrationOrLogout}}">
+                    {{registrationButton}}
                 </a>
             </li>
         </ul>
     </header>
-    <div class="wrapper">
+    <div class="article-list">
         <table>
+            <thead>
             <tr>
-                <th>User Id</th>
-                <th>User Name</th>
-                <th>User Email</th>
+                <th>Article ID</th>
+                <th>Writer</th>
+                <th>Content</th>
             </tr>
-            {{userList}}
+            </thead>
+            <tbody>{{articleList}}</tbody>
         </table>
     </div>
 </div>

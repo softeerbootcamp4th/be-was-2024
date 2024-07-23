@@ -1,25 +1,29 @@
 package handler;
 
-import db.Database;
-import db.Session;
+import db.ArticleDatabase;
+import db.UserDatabase;
+import db.SessionDatabase;
 import http.HttpRequest;
 import http.HttpResponse;
 import http.HttpStatus;
+import model.Article;
 import model.User;
 import util.TemplateEngine;
 import util.Utils.ResponseWithStatus;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.net.URLDecoder;
+import java.util.*;
 
-import static db.Session.getUser;
-import static db.Session.isLogin;
+import static db.SessionDatabase.getUser;
+import static db.SessionDatabase.isLogin;
 import static util.Constants.*;
 import static util.Utils.*;
 
 public class GetHandler {
+    private static final ArticleDatabase articleDatabase = new ArticleDatabase();
+    private static final UserDatabase userDatabase = new UserDatabase();
+    private static final SessionDatabase sessionDatabase = new SessionDatabase();
 
     public static HttpResponse serveStaticFile(String requestUrl) throws IOException {
         String[] tokens = requestUrl.split(REG_DOT);
@@ -55,14 +59,26 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        if (!isLogin(sid)) return serveStaticFile(FILE_INDEX);
-
-        String userId = getUser(sid);
-        User user = Database.findUserById(userId);
         Map<String, String> data = new HashMap<>();
-        data.put(USER_NAME, user.getName());
+        if (!isLogin(sid)) {
+            data.put(USER_NAME, "");
+            data.put("msg", "");
+            data.put("LoginOrArticle", "/login");
+            data.put("loginButton", "로그인");
+            data.put("RegistrationOrLogout", "/registration");
+            data.put("registrationButton", "회원가입");
+        } else {
+            String userId = getUser(sid);
+            Optional<User> user = userDatabase.findUserById(userId);
+            data.put(USER_NAME, user.get().getName());
+            data.put("msg", "님, 환영합니다.");
+            data.put("LoginOrArticle", "/article");
+            data.put("loginButton", "글쓰기");
+            data.put("RegistrationOrLogout", "/logout");
+            data.put("registrationButton", "로그아웃");
+        }
+        return serveDynamicFile(FILE_INDEX, data);
 
-        return serveDynamicFile(PATH_MAIN + FILE_INDEX, data);
     }
 
     public static HttpResponse logout(HttpRequest httpRequest) {
@@ -70,7 +86,7 @@ public class GetHandler {
         HashMap<String, String> parsedCookie = cookieParsing(cookie);
         String sid = parsedCookie.get(SID);
 
-        Session.deleteSession(sid);
+        sessionDatabase.deleteSession(sid);
 
         byte[] body = new byte[0];
 
@@ -94,7 +110,7 @@ public class GetHandler {
                     .addHeader(CONTENT_TYPE, TEXT_HTML)
                     .addBody(new byte[0]);
         } else {
-            Collection<User> users = Database.findAll();
+            Collection<User> users = userDatabase.findAll();
 
             StringBuilder userList = new StringBuilder();
             for (User user : users) {
@@ -107,8 +123,67 @@ public class GetHandler {
 
             Map<String, String> data = new HashMap<>();
             data.put(USER_LIST, userList.toString());
-            data.put(USER_NAME, Database.findUserById(Session.getUser(sid)).getName());
-            return serveDynamicFile(PATH_USER + FILE_LIST, data);
+            data.put(USER_NAME, userDatabase.findUserById(getUser(sid)).get().getName());
+            return serveDynamicFile(PATH_USER + FILE_USER_LIST, data);
         }
+    }
+
+    public static HttpResponse postArticle(HttpRequest httpRequest) throws IOException {
+        String cookie = httpRequest.getHeaders(COOKIE);
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get(SID);
+        String userId = getUser(sid);
+
+        if (!isLogin(sid)) {
+            return serveStaticFile(PATH_LOGIN + FILE_INDEX);
+        } else {
+            HashMap<String, String> data = new HashMap<>();
+            data.put("userName", userDatabase.findUserById(userId).get().getName());
+            data.put("msg", "님, 환영합니다.");
+
+            return serveDynamicFile(PATH_ARTICLE + FILE_INDEX, data);
+        }
+    }
+
+    public static HttpResponse getAllArticles(HttpRequest httpRequest) throws IOException {
+        String cookie = httpRequest.getHeaders(COOKIE);
+        HashMap<String, String> parsedCookie = cookieParsing(cookie);
+        String sid = parsedCookie.get(SID);
+
+        HashMap<String, String> data = new HashMap<>();
+        if (!isLogin(sid)) {
+            data.put(USER_NAME, "");
+            data.put("msg", "");
+            data.put("LoginOrArticle", "/login");
+            data.put("loginButton", "로그인");
+            data.put("RegistrationOrLogout", "/registration");
+            data.put("registrationButton", "회원가입");
+        } else {
+            String userId = getUser(sid);
+            Optional<User> user = userDatabase.findUserById(userId);
+            data.put(USER_NAME, user.get().getName());
+            data.put("msg", "님, 환영합니다.");
+            data.put("LoginOrArticle", "/article");
+            data.put("loginButton", "글쓰기");
+            data.put("RegistrationOrLogout", "/logout");
+            data.put("registrationButton", "로그아웃");
+        }
+
+        List<Article> articles = articleDatabase.getAllArticles();
+        StringBuilder articleList = new StringBuilder();
+
+        for (Article article : articles) {
+            String decodedText = URLDecoder.decode(article.getText(), "UTF-8");
+
+            articleList.append(TABLE_ROW_START);
+            articleList.append(TABLE_DATA_START).append(article.getArticleId()).append(TABLE_DATA_END);
+            articleList.append(TABLE_DATA_START).append(userDatabase.findUserById(article.getUserId()).get().getName()).append(TABLE_DATA_END);
+            articleList.append(TABLE_DATA_START).append(decodedText).append(TABLE_DATA_END);
+            articleList.append(TABLE_ROW_END);
+        }
+
+        data.put("articleList", articleList.toString());
+
+        return serveDynamicFile(PATH_ARTICLE + FILE_ARTICLE_LIST, data);
     }
 }
