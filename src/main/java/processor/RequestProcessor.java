@@ -41,7 +41,7 @@ public class RequestProcessor {
         return requestInfo.getQuery();
     }
 
-    public String getBody() {
+    public byte[] getBody() {
         return requestInfo.getBody();
     }
 
