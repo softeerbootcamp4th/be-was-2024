@@ -203,6 +203,3 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/gradle,intellij,java,macos
-
-# img/post
-src/main/resources/static/img/post/

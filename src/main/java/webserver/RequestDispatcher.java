@@ -1,7 +1,6 @@
 package webserver;
 
 import exception.StatusCodeException;
-import processor.ArticleRequestProcessor;
 import processor.RegistrationRequestProcessor;
 import processor.RootRequestProcessor;
 import processor.UserRequestProcessor;
@@ -25,8 +24,6 @@ public class RequestDispatcher {
                 rr = new RegistrationRequestProcessor(requestInfo).getResult();
             } else if (path.startsWith("/user")) {
                 rr = new UserRequestProcessor(requestInfo).getResult();
-            } else if (path.startsWith("/article")) {
-                rr = new ArticleRequestProcessor(requestInfo).getResult();
             } else rr = new RootRequestProcessor(requestInfo).getResult(); // startsWith("/")
         } catch(StatusCodeException e) {
             switch (e.getStatusCode()) {

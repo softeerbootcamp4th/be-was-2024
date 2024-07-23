@@ -2,8 +2,9 @@ package utils;
 
 import type.MIME;
 
-import java.io.*;
-import java.util.UUID;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class FileUtils {
     public static boolean isExists(String filePath) {
@@ -30,17 +31,5 @@ public class FileUtils {
         }
 
         return bytes;
-    }
-
-    public static String uploadFile(String path, String fileName, byte[] data) throws IOException {
-        UUID uuid = UUID.randomUUID();
-        // 파일 이름 중복 확인 필요
-        String concatenatedFileName = uuid + "_" + fileName;
-        File filePath = new File(path + "/" + concatenatedFileName);
-        if (!filePath.isFile()) filePath.createNewFile();
-        FileOutputStream fos = new FileOutputStream(filePath);
-        fos.write(data);
-        fos.close();
-        return concatenatedFileName;
     }
 }
