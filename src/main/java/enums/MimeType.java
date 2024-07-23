@@ -8,7 +8,8 @@ public enum MimeType {
     ICO("ico", "image/x-icon"),
     PNG("png", "image/png"),
     SVG("svg", "image/svg+xml"),
-    JPG("jpg", "image/jpeg");
+    JPG("jpg", "image/jpeg"),
+    JPEG("jpeg", "image/jpeg");
 
     private final String type;
     private final String mime;
