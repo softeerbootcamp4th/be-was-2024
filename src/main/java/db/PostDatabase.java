@@ -67,6 +67,7 @@ public class PostDatabase {
                 foundPost = new Post.Builder()
                         .title(rs.getString("title"))
                         .content(rs.getString("content"))
+                        .path(rs.getString("path"))
                         .build();
             }
         } catch (SQLException e) {
