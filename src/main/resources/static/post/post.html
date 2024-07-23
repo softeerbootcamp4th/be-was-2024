@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="/reset.css" rel="stylesheet" />
+    <link href="/global.css" rel="stylesheet" />
+    <link href="/main.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="/"><img src="/img/signiture.svg" /></a>
+        <ul class="header__menu">
+            <my-tag if-not="login">
+                <li class="header__menu__item">
+                    <a class="btn btn_contained btn_size_s" href="/login/index.html">로그인</a>
+                </li>
+            </my-tag>
+            <my-tag if="login">
+                <li class="header__menu__item">
+                    <span>{User[0].name}</span>
+                </li>
+            </my-tag>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/register/index.html">
+                    회원 가입
+                </a>
+            </li>
+            <my-tag if="login">
+                <li class="header__menu__item">
+                    <form id="logout-form" action="/logout" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn_ghost btn_size_s">로그아웃</button>
+                    </form>
+                </li>
+            </my-tag>
+            <li class="header__menu__item">
+                <a class="btn btn_ghost btn_size_s" href="/user/list">
+                    사용자 목록
+                </a>
+            </li>
+        </ul>
+    </header>
+    <div class="wrapper">
+        <div class="post">
+            <div class="post__account">
+                <img class="post__account__img" />
+                <p class="post__account__nickname">
+                    <my-tag if="post">
+                        {post[0].userId}
+                    </my-tag>
+                </p>
+            </div>
+            <div class="post__account__title">
+                <h2>
+                    <my-tag if="post">
+                        {post[0].title}
+                    </my-tag>
+                </h2>
+            </div>
+            <img class="post__img"
+                src="data:<my-tag if="post">{post[0].fileType};base64, {post[0].image}</my-tag>"/>
+            <div class="post__menu">
+                <ul class="post__menu__personal">
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="/img/like.svg" />
+                        </button>
+                    </li>
+                    <li>
+                        <button class="post__menu__btn">
+                            <img src="/img/sendLink.svg" />
+                        </button>
+                    </li>
+                </ul>
+                <button class="post__menu__btn">
+                    <img src="/img/bookMark.svg" />
+                </button>
+            </div>
+            <p class="post__article">
+                <my-tag if="post">
+                    {post[0].content}
+                </my-tag>
+            </p>
+        </div>
+
+        <nav class="nav">
+            <ul class="nav__menu">
+                <li class="nav__menu__item">
+                    <a class="nav__menu__item__btn" href="/post/prev/{<my-tag if="post">{post[0].id}</my-tag>}">
+                        <img
+                                class="nav__menu__item__img"
+                                src="/img/ci_chevron-left.svg"
+                        />
+                        이전 글
+                    </a>
+                </li>
+                <li class="nav__menu__item">
+                    <a class="btn btn_ghost btn_size_m">댓글 작성</a>
+                </li>
+                <li class="nav__menu__item">
+                    <a class="btn btn_ghost btn_size_m" href="/post/form">글쓰기</a>
+                </li>
+                <li class="nav__menu__item">
+                    <a class="nav__menu__item__btn" href="/post/next/{<my-tag if="post">{post[0].id}</my-tag>}">
+                        다음 글
+                        <img
+                                class="nav__menu__item__img"
+                                src="/img/ci_chevron-right.svg"
+                        />
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+</html>

@@ -31,6 +31,11 @@ dependencies {
     // Rest Assured
     testImplementation 'io.rest-assured:rest-assured:4.4.0'
 
+    // H2 DB
+    implementation 'com.h2database:h2:2.1.214'
+    // Spring JDBC
+    implementation 'org.springframework:spring-jdbc:5.3.22'
+
 
 }
 

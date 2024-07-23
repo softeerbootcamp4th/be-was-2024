@@ -1,7 +1,7 @@
 package webserver;
 
 import constant.HttpMethod;
-import db.Database;
+import repository.UserRepository;
 import dto.HttpRequest;
 import dto.HttpResponse;
 import exception.InvalidHttpRequestException;
@@ -34,7 +34,7 @@ public class RequestHandlerTest {
 
         httpRequest.setPath("/user/create");
         httpRequest.setHttpMethod(HttpMethod.POST.name());
-        httpRequest.setBody(requestBody);
+        httpRequest.setBody(requestBody.getBytes());
         httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
@@ -44,7 +44,7 @@ public class RequestHandlerTest {
         handler.handle(httpRequest, new HttpResponse());
 
         // then
-        User user = Database.findUserById("javajigi");
+        User user = UserRepository.findUserById("javajigi");
         assertThat(user.getUserId()).isEqualTo("javajigi");
         assertThat(user.getPassword()).isEqualTo("password");
         assertThat(user.getEmail()).isEqualTo("javajigi@slipp.net");
@@ -62,7 +62,7 @@ public class RequestHandlerTest {
 
         httpRequest.setPath("/user/create");
         httpRequest.setHttpMethod(HttpMethod.POST.name());
-        httpRequest.setBody(requestBody);
+        httpRequest.setBody(requestBody.getBytes());
         httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 
@@ -85,7 +85,7 @@ public class RequestHandlerTest {
 
         httpRequest.setPath("/user/create");
         httpRequest.setHttpMethod(HttpMethod.GET.name());
-        httpRequest.setBody(requestBody);
+        httpRequest.setBody(requestBody.getBytes());
         httpRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
         httpRequest.setHeader("Content-Length", String.valueOf(requestBody.length()));
 

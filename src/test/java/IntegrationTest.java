@@ -5,6 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -33,7 +35,7 @@ public class IntegrationTest {
         String responseBody = response.getBody().asString();
 
         // 예상되는 파일 내용 읽기
-        String expectedContent = new String(Objects.requireNonNull(HandlerManager.readStaticFile("index.html")));
+        String expectedContent = new String(HandlerManager.readStaticFile("index.html"), StandardCharsets.UTF_8);
 
         // then
         // index.html 파일 검증
@@ -92,14 +94,14 @@ public class IntegrationTest {
     }
 
     @Test
-    @DisplayName("POST /user/create 302 FOUND")
+    @DisplayName("POST /user/create 200 OK")
     void postUserCreateTest() {
         // given
         RestAssured.baseURI = "http://localhost:8080";
 
         // when & then
         // 정상 처리시, 302 redirect 응답 반환
-        RestAssured
+        Response response = RestAssured
                 .given().log().all()
                     .contentType("application/x-www-form-urlencoded")
                     .formParam("userId","javajigi")
@@ -110,7 +112,19 @@ public class IntegrationTest {
                 .then().log().all()
                 // Http Status 및 Content Type 검증
                 .assertThat()
-                    .statusCode(302);
+                    .statusCode(302)
+                .extract().response();
+
+        // given
+        String redirectUrl = response.getHeader("Location");
+
+        // when & then
+        // 리다이렉트 시, 200 OK 응답 반환
+        RestAssured.given().log().all()
+                .when().get(redirectUrl)
+                .then().log().all()
+                .assertThat()
+                .statusCode(200);
     }
 
     @Test

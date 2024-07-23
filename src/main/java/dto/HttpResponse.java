@@ -1,6 +1,7 @@
 package dto;
 
 import constant.FileExtensionType;
+import constant.HttpResponseAttribute;
 import constant.HttpStatus;
 import cookie.Cookie;
 import cookie.SessionCookie;
@@ -14,18 +15,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * client에게 응답할 HttpResponse 정보를 저장하는 클래스
+ */
 public class HttpResponse {
-    private static final Logger logger = LoggerFactory.getLogger(HttpResponse.class);
     private static final String HTTP_VERSION = "HTTP/1.1";
     private static final String CRLF = "\r\n";
-    private static final String LOCATION = "Location";
-    private static final String CONTENT_TYPE = "Content-Type";
-    private static final String CONTENT_LENGTH = "Content-Length";
-    private static final String ERROR_MESSAGE_404 =
-            "<html>" +
-                    "<head><title>404 Not Found</title></head>" +
-                    "<body><h1>404 Not Found</h1></body>" +
-                    "</html>";
 
     private HttpStatus status;
     private Map<String, List<String>> headers;
@@ -37,23 +32,26 @@ public class HttpResponse {
         cookies = new ArrayList<>();
     }
 
-    // client에 HttpResponse 응답
+    /**
+     * HttpResponse를 client에게 응답한다.
+     *
+     * @param dos : client에게 응답할 떄 사용하는 OutputStream 객체
+     * @throws IOException : I/O 작업 시 발생
+     */
     public void sendHttpResponse(DataOutputStream dos) throws IOException {
 
         makeHttpResponse(dos);
         dos.flush();
     }
 
+    /**
+     * redirect 응답 정보를 저장한다.
+     *
+     * @param url : redirect url
+     */
     public void setRedirect(String url){
         setHttpStatus(HttpStatus.FOUND);
-        addHeader(LOCATION, url);
-    }
-
-    public void setErrorResponse(HttpStatus errorStatus){
-        setHttpStatus(HttpStatus.NOT_FOUND);
-        addHeader(CONTENT_TYPE, FileExtensionType.HTML.getContentType());
-        addHeader(CONTENT_LENGTH, String.valueOf(ERROR_MESSAGE_404.length()));
-        setBody(ERROR_MESSAGE_404.getBytes());
+        addHeader(HttpResponseAttribute.LOCATION.getValue(), url);
     }
     // HttpResponse header 생성
     private void makeHttpResponse(DataOutputStream dos) throws IOException {
@@ -90,6 +88,12 @@ public class HttpResponse {
         this.status = status;
     }
 
+    /**
+     * HttpResponse의 헤더 값을 설정한다.
+     *
+     * @param headerName : 헤더 속성 이름
+     * @param headerValue : 헤더 값
+     */
     public void addHeader(String headerName, String headerValue) {
 
         if(!headers.containsKey(headerName)){

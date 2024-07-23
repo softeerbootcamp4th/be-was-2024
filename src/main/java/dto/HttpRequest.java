@@ -5,6 +5,9 @@ import exception.InvalidHttpRequestException;
 
 import java.util.*;
 
+/**
+ * HttpRequest의 정보를 저장하는 클래스
+ */
 public class HttpRequest {
     private static final String COOKIE_HEADER = "Cookie";
     private static final String COOKIE_NAME_SESSION_ID = "sessionId";
@@ -12,10 +15,11 @@ public class HttpRequest {
 
     private HttpMethod httpMethod;
     private String path;
+    private Integer pathVariable;
     private Map<String, String> queryParams;
     private String extensionType;
     private Map<String, List<String>> headers;
-    private String body;
+    private byte[] body;
 
     public HttpMethod getHttpMethod() {
         return httpMethod;
@@ -39,7 +43,7 @@ public class HttpRequest {
         return Optional.ofNullable(headers.get(key));
     }
 
-    public Optional<String> getBody() {
+    public Optional<byte[]> getBody() {
         return Optional.ofNullable(body);
     }
 
@@ -73,25 +77,37 @@ public class HttpRequest {
         headers.get(headerName).add(headerValue);
     }
 
-    public void setBody(String body) {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
+    /**
+     * HttpRequest의 쿠키에서 sessionId의 값을 반환한다.
+     *
+     * @return : session Id가 없을 수도 있으므로 Optional에 sessionId를 담아 반환
+     */
     public Optional<String> getSessionId(){
         if(headers == null)
             return Optional.empty();
 
         List<String> cookies = headers.get(COOKIE_HEADER);
-        for(String cookie : cookies){
-            if(cookie.contains(COOKIE_NAME_SESSION_ID)){
-                String sessionId = cookie.substring((COOKIE_NAME_SESSION_ID + "=").length());
-                return Optional.of(sessionId);
+        if(cookies!=null){
+            for(String cookie : cookies){
+                if(cookie.contains(COOKIE_NAME_SESSION_ID)){
+                    String sessionId = cookie.substring((COOKIE_NAME_SESSION_ID + "=").length());
+                    return Optional.of(sessionId);
+                }
             }
         }
 
         return Optional.empty();
     }
 
+    /**
+     * HttpRequest 쿠키에서 redirect 주소 값을 반환한다.
+     *
+     * @return : redirect 주소가 없을 수도 있으므로 Optional에 redirect 주소를 담아 반환
+     */
     public Optional<String> getRedirectUrl(){
         if(headers == null)
             return Optional.empty();
@@ -104,5 +120,13 @@ public class HttpRequest {
             }
         }
         return Optional.empty();
+    }
+
+    public Optional<Integer> getPathVariable() {
+        return Optional.ofNullable(pathVariable);
+    }
+
+    public void setPathVariable(Integer pathVariable) {
+        this.pathVariable = pathVariable;
     }
 }

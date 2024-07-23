@@ -1,6 +1,8 @@
 package cookie;
 
-// 핸들러에서 작업 성공 시, redirect 해야 하는 url을 설정하는 쿠키
+/**
+ * 핸들러에서 작업 성공 시, redirect 해야 하는 url을 설정하는 쿠키
+ */
 public class RedirectCookie implements Cookie{
     private final String redirectUrl;
     private final String domain;
@@ -21,6 +23,11 @@ public class RedirectCookie implements Cookie{
         this.maxAge = String.valueOf(maxAge);
     }
 
+    /**
+     * 쿠키의 값과 속성을 string으로 반환하여 OutputStream에 바로 저장할 수 있도록 한다.
+     *
+     * @return : 쿠키의 값과 속성을 string으로 반환
+     */
     public String getCookieString(){
         StringBuilder sb = new StringBuilder();
 
