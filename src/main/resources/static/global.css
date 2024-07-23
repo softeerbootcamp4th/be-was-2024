@@ -66,6 +66,13 @@
   background: #4362d0;
   color: #ffffff;
 }
+.btn_logout {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 14px;
+  background: #ff0000;
+  color: #ffffff;
+}
 
 .btn_size_s {
   padding: 8px 16px;
