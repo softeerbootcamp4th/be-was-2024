@@ -1,8 +1,10 @@
 package webserver;
 
-import db.Database;
+import enums.HttpHeader;
 import enums.Status;
 import model.User;
+import model.UserDao;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import utils.*;
@@ -11,8 +13,8 @@ import view.ViewResolver;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,12 +22,24 @@ public class RequestHandlerTest {
 
     private static final String CRLF = "\r\n";
     private static final String STATIC_RESOURCE_PATH = "src/main/resources/static";
+    private final UserDao userDao = new UserDao();
+
+    @BeforeEach
+    public void setUp() throws SQLException {
+        UserDao.createTable();
+        userDao.deleteAllUsers();
+    }
 
     @Test
     @DisplayName("GET 유저 생성 테스트")
     public void getAddUserTest() throws IOException {
         // given
-        String queryParameter = "userId=123&password=123&name=123&email=123@gmail.com";
+        String userId = "123";
+        String password = "123";
+        String name = "123";
+        String email = "123@gmail.com";
+
+        String queryParameter = String.format("userId=%s&password=%s&name=%s&email=%s", userId, password, name, email);
         String httpRequest =
                 "GET /user/create?" + queryParameter + " HTTP/1.1" + CRLF +
                         "Host: localhost:8080" + CRLF +
@@ -50,9 +64,15 @@ public class RequestHandlerTest {
 
     @Test
     @DisplayName("POST 유저 생성 테스트")
-    public void postAddUserTest() throws IOException {
+    public void postAddUserTest() throws IOException, SQLException {
         // given
-        String body = "userId=123&password=123&name=123&email=123@gmail.com";
+        String userId = "123";
+        String password = "123";
+        String name = "123";
+        String email = "123@gmail.com";
+
+        String body = String.format("userId=%s&password=%s&name=%s&email=%s", userId, password, name, email);
+
         String httpRequest =
                 "POST /user/create HTTP/1.1" + CRLF +
                 "Host: localhost:8080" + CRLF +
@@ -74,22 +94,26 @@ public class RequestHandlerTest {
         request(httpRequestParser, httpResponseHandler);
 
         // then
-        User user = Database.findUserById("123");
-        assertThat(user.getUserId()).isEqualTo("123");
-        assertThat(user.getName()).isEqualTo("123");
-        assertThat(user.getPassword()).isEqualTo("123");
-        assertThat(user.getEmail()).isEqualTo("123@gmail.com");
+        User user = userDao.findUserById(userId);
+        assertThat(user.getUserId()).isEqualTo(userId);
+        assertThat(user.getName()).isEqualTo(name);
+        assertThat(user.getPassword()).isEqualTo(password);
+        assertThat(user.getEmail()).isEqualTo(email);
     }
 
     @Test
     @DisplayName("로그인 성공 테스트")
-    public void loginSuccessTest() throws IOException {
+    public void loginSuccessTest() throws IOException, SQLException {
         // given
+        UserDao.createTable();
         User user = new User("123", "123", "123", "123@gmail.com");
-        Database.addUser(user);
+
+        if (!userDao.userExists("123")) {
+            userDao.addUser(user);
+        }
 
         // when
-        String body = "userId=123&password=123";
+        String body = String.format("userId=%s&password=%s", user.getUserId(), user.getPassword());
         String request =
                 "POST /login HTTP/1.1" + CRLF +
                         "Host: localhost:8080" + CRLF +
@@ -110,9 +134,9 @@ public class RequestHandlerTest {
         request(httpRequestParser, httpResponseHandler);
 
         // then
-        Map<String, String> responseHeadersMap = httpResponseHandler.getResponseHeadersMap();
         List<Cookie> cookieList = httpResponseHandler.getCookieList();
-        String sessionId = SessionManager.getSession(user);
+
+        String sessionId = SessionManager.getSession(user.getUserId());
         Status status = httpResponseHandler.getStatus();
 
         Cookie sessionIdCookie = null;
@@ -131,13 +155,16 @@ public class RequestHandlerTest {
 
     @Test
     @DisplayName("로그인 실패 테스트")
-    public void loginFailTest() throws IOException {
+    public void loginFailTest() throws IOException, SQLException {
         // given
         User user = new User("123", "123", "123", "123@gmail.com");
-        Database.addUser(user);
+
+        if (!userDao.userExists(user.getUserId())) {
+            userDao.addUser(user);
+        }
 
         // when
-        String body = "userId=12&password=123";
+        String body = String.format("userId=1%s&password=%s", user.getUserId(), user.getPassword());
         String request =
                 "POST /login HTTP/1.1" + CRLF +
                         "Host: localhost:8080" + CRLF +
@@ -165,10 +192,12 @@ public class RequestHandlerTest {
 
     @Test
     @DisplayName("로그아웃")
-    public void logoutTest() throws IOException {
+    public void logoutTest() throws IOException, SQLException {
         // given
         User user = new User("123", "123", "123", "123@gmail.com");
-        Database.addUser(user);
+        if (!userDao.userExists(user.getUserId())) {
+            userDao.addUser(user);
+        }
 
         String session = SessionManager.createSession(user);
 
@@ -210,7 +239,6 @@ public class RequestHandlerTest {
         assertThat(sessionIdCookie.getMaxAge()).isEqualTo(0);
         assertThat(sessionIdCookie.getValue()).isEqualTo(session);
         assertThat(sessionIdCookie.getPath()).isEqualTo("/");
-
     }
 
     private InputStream stringToInputStream(String httpRequest) {
@@ -232,14 +260,14 @@ public class RequestHandlerTest {
         if (viewName.startsWith("redirect:")) {
             String redirectUrl = viewName.substring("redirect:".length());
             httpResponseHandler
-                    .addHeader("Location", redirectUrl)
+                    .addHeader(HttpHeader.LOCATION, redirectUrl)
                     .respond();
         } else {
             View view = viewResolver.resolve(viewName);
             String content = view.render(model.getAttributes());
             httpResponseHandler
                     .setBody(content.getBytes())
-                    .addHeader("Content-Type", "text/html")
+                    .addHeader(HttpHeader.CONTENT_TYPE, "text/html")
                     .respond();
         }
     }

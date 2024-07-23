@@ -1,8 +1,12 @@
 package utils;
 
+import enums.HttpHeader;
 import enums.Method;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -16,9 +20,14 @@ public class HttpRequestParser {
     private final String extension;
     private final Method method;
     private final Map<String, String> cookiesMap = new HashMap<>();
-    private final Map<String, String> requestHeadersMap = new HashMap<>();
+    private final Map<HttpHeader, String> requestHeadersMap = new HashMap<>();
     private final Map<String, String> queryParametersMap = new HashMap<>();
-    private final String EXTENTION_REGEX = "\\.([a-z]+)$";
+    private final String EXTENSION_REGEX = "\\.([a-z]+)$";
+
+    // 멀티파트 바디 파싱 결과를 저장할 필드
+    private String parsedContent;
+    private byte[] parsedImage;
+
     public HttpRequestParser(InputStream inputStream) throws IOException {
         ByteArrayOutputStream headerBuffer = new ByteArrayOutputStream();
         int c;
@@ -46,12 +55,12 @@ public class HttpRequestParser {
             if (colonIndex != -1) {
                 String key = line.substring(0, colonIndex).trim();
                 String value = line.substring(colonIndex + 1).trim();
-                requestHeadersMap.put(key, value);
+                requestHeadersMap.put(HttpHeader.fromString(key), value);
             }
         }
 
         // 쿠키 파싱
-        String cookieHeader = requestHeadersMap.get("Cookie");
+        String cookieHeader = requestHeadersMap.get(HttpHeader.COOKIE);
         if (cookieHeader != null) {
             for (String keyValue : cookieHeader.split(";")) {
                 int equalsIndex = keyValue.indexOf("=");
@@ -64,16 +73,21 @@ public class HttpRequestParser {
             }
         }
 
-        String contentLengthHeader = requestHeadersMap.get("Content-Length");
+        String contentLengthHeader = requestHeadersMap.get(HttpHeader.CONTENT_LENGTH);
         int contentLength = contentLengthHeader == null ? 0 : Integer.parseInt(contentLengthHeader);
 
         // body 파싱
         if (contentLength > 0) {
             body = new byte[contentLength];
-            int bytesRead = inputStream.read(body, 0, contentLength);
+            int bytesRead;
+            int offset = 0;
 
-            if (bytesRead != contentLength) {
-                throw new IOException("Failed to read full request body");
+            while (offset < contentLength) {
+                bytesRead = inputStream.read(body, offset, contentLength - offset);
+                if (bytesRead == -1) {
+                    throw new IOException("Failed to read full request body");
+                }
+                offset += bytesRead;
             }
         } else {
             body = null;
@@ -86,7 +100,7 @@ public class HttpRequestParser {
         path = tokens[0];
 
         // 확장자 파싱
-        Pattern compile = Pattern.compile(EXTENTION_REGEX);
+        Pattern compile = Pattern.compile(EXTENSION_REGEX);
         Matcher matcher = compile.matcher(path);
 
         // 파일 확장자를 가진 path인지 검증
@@ -101,6 +115,17 @@ public class HttpRequestParser {
                     String value = keyValue.substring(equalsIndex + 1);
                     queryParametersMap.put(key, value);
                 }
+            }
+        }
+
+        // 멀티파트 바디 파싱 호출
+        String contentTypeHeader = requestHeadersMap.get(HttpHeader.CONTENT_TYPE);
+        if (contentTypeHeader != null && contentTypeHeader.startsWith("multipart/form-data")) {
+            try {
+                parseMultipartBody();
+            } catch (Exception e) {
+                e.printStackTrace(); // 에러 로그 출력
+                throw new IOException("Failed to parse multipart body", e);
             }
         }
     }
@@ -121,7 +146,7 @@ public class HttpRequestParser {
         return body;
     }
 
-    public Map<String, String> getRequestHeadersMap() {
+    public Map<HttpHeader, String> getRequestHeadersMap() {
         return requestHeadersMap;
     }
 
@@ -141,12 +166,112 @@ public class HttpRequestParser {
         return extension;
     }
 
+    public String getParsedContent() {
+        return parsedContent;
+    }
+
+    public byte[] getParsedImage() {
+        return parsedImage;
+    }
+
     public String headersToString() {
         StringBuilder sb = new StringBuilder();
-        for (String key : requestHeadersMap.keySet()) {
-            sb.append(key).append(": ").append(requestHeadersMap.get(key)).append("\n");
+        for (HttpHeader httpHeader : requestHeadersMap.keySet()) {
+            sb.append(httpHeader).append(": ").append(requestHeadersMap.get(httpHeader)).append("\n");
         }
 
         return sb.toString();
+    }
+
+    // 멀티파트 바디를 파싱하여 파트별로 처리하는 메서드
+    private void parseMultipartBody() throws Exception {
+        String contentTypeHeader = requestHeadersMap.get(HttpHeader.CONTENT_TYPE);
+        String boundary = extractBoundary(contentTypeHeader);
+        if (boundary == null) {
+            throw new Exception("Boundary not found in Content-Type header");
+        }
+
+        byte[] boundaryBytes = ("--" + boundary).getBytes();
+        byte[] endBoundaryBytes = ("--" + boundary + "--").getBytes();
+
+        int pos = 0;
+        while (pos < body.length) {
+            int boundaryIndex = indexOf(body, boundaryBytes, pos);
+            if (boundaryIndex == -1) {
+                break;
+            }
+            pos = boundaryIndex + boundaryBytes.length;
+
+            int partEndIndex = indexOf(body, boundaryBytes, pos);
+            if (partEndIndex == -1) {
+                partEndIndex = indexOf(body, endBoundaryBytes, pos);
+                if (partEndIndex == -1) {
+                    partEndIndex = body.length;
+                }
+            }
+
+            byte[] part;
+            if (partEndIndex > body.length - 4) { // Check for the last part without \r\n\r\n
+                part = Arrays.copyOfRange(body, pos, partEndIndex);
+            } else {
+                part = Arrays.copyOfRange(body, pos, partEndIndex - 2); // -2 to remove \r\n before boundary
+            }
+
+            try {
+                parsePart(part);
+            } catch (Exception e) {
+                e.printStackTrace(); // 에러 로그 출력
+                throw new Exception("Failed to parse part", e);
+            }
+            pos = partEndIndex;
+        }
+    }
+
+    // 멀티파트 바디의 각 파트를 파싱하여 내용과 이미지를 분리
+    private void parsePart(byte[] part) {
+        int headerEndIndex = indexOf(part, "\r\n\r\n".getBytes(), 0);
+        if (headerEndIndex == -1) {
+            headerEndIndex = part.length;
+        }
+
+        String headers = new String(part, 0, headerEndIndex);
+        byte[] body;
+
+        if (headerEndIndex + 4 > part.length) {
+            body = new byte[0]; // 본문이 없는 경우 빈 배열로 설정
+        } else {
+            body = Arrays.copyOfRange(part, headerEndIndex + 4, part.length);
+        }
+
+        if (headers.contains("Content-Disposition: form-data; name=\"content\"")) {
+            parsedContent = new String(body);
+        } else if (headers.contains("Content-Disposition: form-data; name=\"image\"; filename=\"")) {
+            parsedImage = body;
+        }
+    }
+
+    // 헬퍼 메서드: 바이트 배열에서 특정 바이트 배열을 검색하여 인덱스를 반환
+    private int indexOf(byte[] array, byte[] target, int start) {
+        outer: for (int i = start; i <= array.length - target.length; i++) {
+            for (int j = 0; j < target.length; j++) {
+                if (array[i + j] != target[j]) {
+                    continue outer;
+                }
+            }
+            return i;
+        }
+        return -1;
+    }
+
+    // 헬퍼 메서드: Content-Type 헤더에서 boundary 추출
+    private String extractBoundary(String contentType) {
+        String[] parts = contentType.split(";");
+        for (String part : parts) {
+            part = part.trim();
+            if (part.startsWith("boundary=")) {
+                return part.substring("boundary=".length());
+            }
+        }
+        return null;
     }
 }

@@ -1,9 +1,9 @@
 package utils;
 
+import enums.HttpHeader;
 import enums.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webserver.RequestHandler;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpResponseHandler {
-    private static final Logger logger = LoggerFactory.getLogger(RequestHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(HttpResponseHandler.class);
     private final DataOutputStream dos;
-    private final Map<String, String> responseHeadersMap = new HashMap<>();
+    private final Map<HttpHeader, String> responseHeadersMap = new HashMap<>();
     private final List<Cookie> cookieList = new ArrayList<>();
     private byte[] body;
     private Status status;
@@ -35,8 +35,8 @@ public class HttpResponseHandler {
         return this;
     }
 
-    public HttpResponseHandler addHeader(String key, String value) {
-        responseHeadersMap.put(key, value);
+    public HttpResponseHandler addHeader(HttpHeader httpHeader, String value) {
+        responseHeadersMap.put(httpHeader, value);
         return this;
     }
 
@@ -56,11 +56,11 @@ public class HttpResponseHandler {
     private void writeHeaders() {
         try {
             dos.writeBytes("HTTP/1.1 " + status.getStatusCode() + " " + status.getStatusMessage() + "\r\n");
-            for (Map.Entry<String, String> header : responseHeadersMap.entrySet()) {
-                dos.writeBytes(header.getKey() + ": " + header.getValue() + "\r\n");
+            for (Map.Entry<HttpHeader, String> header : responseHeadersMap.entrySet()) {
+                dos.writeBytes(header.getKey().getHeaderName() + ": " + header.getValue() + "\r\n");
             }
             for (Cookie cookie : cookieList) {
-                dos.writeBytes("Set-Cookie: " + cookie.toString() + "\r\n");
+                dos.writeBytes(HttpHeader.SET_COOKIE.getHeaderName() + ": " + cookie.toString() + "\r\n");
             }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class HttpResponseHandler {
         return status;
     }
 
-    public Map<String, String> getResponseHeadersMap() {
+    public Map<HttpHeader, String> getResponseHeadersMap() {
         return responseHeadersMap;
     }
 

@@ -2,8 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
-
-import enums.Status;
+import enums.HttpHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utils.Handler;
@@ -25,8 +24,6 @@ public class RequestHandler implements Runnable {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream(); OutputStream out = connection.getOutputStream()) {
-            // TODO 사용자 요청에 대한 처리는 이 곳에 구현하면 된다.
-
             HttpRequestParser httpRequestParser = new HttpRequestParser(in);
             HttpResponseHandler httpResponseHandler = new HttpResponseHandler(out);
 
@@ -56,14 +53,14 @@ public class RequestHandler implements Runnable {
             if (viewName.startsWith("redirect:")) {
                 String redirectUrl = viewName.substring("redirect:".length());
                 httpResponseHandler
-                        .addHeader("Location", redirectUrl)
+                        .addHeader(HttpHeader.LOCATION, redirectUrl)
                         .respond();
             } else {
                 View view = viewResolver.resolve(viewName);
                 String content = view.render(model.getAttributes());
                 httpResponseHandler
                         .setBody(content.getBytes())
-                        .addHeader("Content-Type", "text/html")
+                        .addHeader(HttpHeader.CONTENT_TYPE, "text/html")
                         .respond();
             }
 
