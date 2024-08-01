@@ -26,7 +26,6 @@ public class HtmlBuilder {
         String template = new String(resourceUtil.getByteArray(templateFilePath));
 
         User user = SessionHandler.getUser(sessionId);
-        String userId = user.getUserId();
         String username = user.getName();
 
         String loginButtonHtml, registrationButtonText, registrationButtonHref, userNameHtml, userListHtml;
@@ -41,21 +40,12 @@ public class HtmlBuilder {
                 "        </a>\n" +
                 "      </li>";
 
-        // 글 제목 목록 받아오기
-        List<String> titles = PostDatabase.findAllTitleByUserId(userId);
-        StringBuilder titleList = new StringBuilder();
-        for (String title : titles) {
-            String postUrl = "/posts?title=" + title;
-            titleList.append("<li><a href=\"").append(postUrl).append("\">").append(title).append("</a></li>\n");
-        }
-
         // 문자열 대체
         template = template.replace("{username_placeholder}", userNameHtml)
                 .replace("{login_button_placeholder}", loginButtonHtml)
                 .replace("{registration_button_text}", registrationButtonText)
                 .replace("{registration_button_href}", registrationButtonHref)
-                .replace("{user_list_placeholder}", userListHtml)
-                .replace("{title_placeholder}", titleList.toString());
+                .replace("{user_list_placeholder}", userListHtml);
 
         return template;
     }
@@ -116,9 +106,14 @@ public class HtmlBuilder {
 
         Post post = PostDatabase.findPostByUserIdAndTitle(userId, title);
 
+        String base64Image = resourceUtil.getImageAsBase64(post.getPath());
+        String mimeType = resourceUtil.getContentType(post.getPath());
+        String replaceImageString = "data:" + mimeType + ";base64," + base64Image;
+
         // 문자열 대체
         template = template.replace("{title_placeholder}", post.getTitle())
-                .replace("{content_placeholder}", post.getContent());
+                .replace("{content_placeholder}", post.getContent())
+                .replace("{image_placeholder}", replaceImageString);
 
         return template;
     }
